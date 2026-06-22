@@ -3792,7 +3792,7 @@ def format_signal(symbol: str, sig: SignalResult, engine_tag: str = "V5", rank: 
         f"✅ Leverage appropriate ({lev_range})\n"
         f"{chk_funding} {funding_str}\n"
         f"📊 {format_oi(sig.open_interest)}\n\n"
-        f"<i>Scalp Swing v{__version__} [4H/15m] • Hyperliquid Perps • {ts}</i>"
+        f"<i>Scalp Swing v{__version__} - Liquidity Confluence On [4H/15m] • Hyperliquid Perps • {ts}</i>"
     )
 
 # ═══════════════════════════════════════════════════════════════
