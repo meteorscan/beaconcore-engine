@@ -176,7 +176,7 @@ __version__ = "15.8.1"  # Rollback pass (2026-06-20): reverted the Section 6
 
 
 # ── LIQUIDITY CONFLUENCE FEATURE FLAG ─────────────────────────
-ENABLE_LIQUIDITY_CONFLUENCE: bool = False
+ENABLE_LIQUIDITY_CONFLUENCE: bool = True
 # [Fix-46] L2 order-book imbalance feature flag. fetch_l2_imbalance() was
 # fully implemented and imported, but the call site below hardcoded
 # `_l2_imb = None`, so l2_imbalance_weight/l2_imbalance_threshold never
