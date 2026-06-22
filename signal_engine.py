@@ -4084,7 +4084,7 @@ def send_summary(state: dict):
                 wr   = wins / len(subset)
                 pnl  = r_pnl(subset)
                 breakdown_lines.append(
-                    f"  {sig_type} {dirn}: {wr*100:.0f}% WR  {pnl:+d}R  (n={len(subset)})"
+                    f"  {sig_type} {dirn}: {wr*100:.0f}% WR  {pnl:+.2f}R  (n={len(subset)})"
                 )
 
     if breakdown_lines:
