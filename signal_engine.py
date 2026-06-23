@@ -343,7 +343,7 @@ MIN_ATR_PCT     = 0.2
 WICK_FILTER     = 0.45
 RANGE_PCT_BREAK = 0.20
 PULL_ZONE_MULT  = 0.25
-PULL_TOUCH_LOOKBACK   = 3
+PULL_TOUCH_LOOKBACK   = 5
 PULL_RECOVER_ATR_MULT_TREND: float = 0.25
 PULL_RECOVER_ATR_MULT_MIXED: float = 0.10
 # [Fix-29] TUNABLE — needs backtest validation, but user/reviewer has explicitly
@@ -575,7 +575,7 @@ RS_BEARISH_REGIME_EXEMPT_PCT: float = 3.0
 LEVERAGE_BASE_RISK_PCT: float = 10.0
 LEVERAGE_RANGE_LOW_RISK_PCT: float = 5.0
 LEVERAGE_RANGE_HIGH_RISK_PCT: float = 15.0
-LEVERAGE_MAX: float = 10.0
+LEVERAGE_MAX: float = 15.0
 
 SR_LOOKBACK_BARS: int = 200
 
@@ -2360,8 +2360,6 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
     update_atr_history(state, symbol, atr_pct)
 
     rv         = daily_vwap(candles_15m_from_ind(ind), reference_ms=reference_ms)
-    vwap_long  = cur_c > rv if USE_ROLLING_VWAP else True
-    vwap_short = cur_c < rv if USE_ROLLING_VWAP else True
 
     rsi_break_long  = RSI_BREAK_LONG_MIN  <= r15 <= RSI_BREAK_LONG_MAX
     rsi_break_short = RSI_BREAK_SHORT_MIN <= r15 <= RSI_BREAK_SHORT_MAX
@@ -2497,6 +2495,11 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
     if USE_PULLBACK_ALIGNMENT and pullback_short_align:
         pull_short_align = True
 
+    _is_pullback_long  = USE_PULLBACK_ALIGNMENT and pullback_long_align
+    _is_pullback_short = USE_PULLBACK_ALIGNMENT and pullback_short_align
+    vwap_long  = True if _is_pullback_long  else (cur_c > rv if USE_ROLLING_VWAP else True)
+    vwap_short = True if _is_pullback_short else (cur_c < rv if USE_ROLLING_VWAP else True)
+
     rng = cur_h - cur_l + 1e-10
 
     def clean_bull_bar():
@@ -2586,14 +2589,24 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
     }
 
     if long_sig:
-        res.fire_long    = True
-        res.signal_type  = "BREAK" if long_break else "PULL"
-        res.score        = long_score
+        res.fire_long   = True
+        if long_break and long_pull and pull_touched_long:
+            res.signal_type = "PULL"
+        elif long_break:
+            res.signal_type = "BREAK"
+        else:
+            res.signal_type = "PULL"
+        res.score       = long_score
         _setup_signal_entry(res, cur_c, atr_val)
     elif short_sig:
-        res.fire_short   = True
-        res.signal_type  = "BREAK" if short_break else "PULL"
-        res.score        = short_score
+        res.fire_short  = True
+        if short_break and short_pull and pull_touched_short:
+            res.signal_type = "PULL"
+        elif short_break:
+            res.signal_type = "BREAK"
+        else:
+            res.signal_type = "PULL"
+        res.score       = short_score
         _setup_signal_entry(res, cur_c, atr_val)
 
     if res.fire_long or res.fire_short:
@@ -3500,7 +3513,8 @@ def check_cooldown(state, coin, direction, bar_index, signal_type: str = "",
 
     with _state_lock:
         active = list(state.get("active_signals", []))
-        last_bar   = state.get("signal_cooldowns",  {}).get(f"{symbol}_{direction}")
+        _cd_key    = f"{symbol}_{direction}_{signal_type}" if signal_type in ("BREAK", "PULL") else f"{symbol}_{direction}"
+        last_bar   = state.get("signal_cooldowns",  {}).get(_cd_key)
         last_sl_ts = state.get("post_loss_cooldown", {}).get(f"{symbol}_{direction}")
         prev_outcome = state.get("last_signal_outcome", {}).get(f"{symbol}_{direction}", "unknown")
 
@@ -3545,9 +3559,11 @@ def check_cooldown(state, coin, direction, bar_index, signal_type: str = "",
 
     return True
 
-def update_cooldown(state, coin, direction, bar_index):
+def update_cooldown(state, coin, direction, bar_index, signal_type: str = ""):
     symbol = coin if coin.endswith("USDT") else coin + "USDT"
-    cooldown_key = f"{symbol}_{direction}"
+    cooldown_key = (f"{symbol}_{direction}_{signal_type}"
+                    if signal_type in ("BREAK", "PULL")
+                    else f"{symbol}_{direction}")
     with _state_lock:
         state.setdefault("signal_cooldowns", {})[cooldown_key] = bar_index
 
@@ -3792,7 +3808,7 @@ def format_signal(symbol: str, sig: SignalResult, engine_tag: str = "V5", rank: 
         f"✅ Leverage appropriate ({lev_range})\n"
         f"{chk_funding} {funding_str}\n"
         f"📊 {format_oi(sig.open_interest)}\n\n"
-        f"<i>Scalp Swing v{__version__} - Liquidity Confluence On [4H/15m] • Hyperliquid Perps • {ts}</i>"
+        f"<i>Scalp Swing v{__version__} [4H/15m] • Hyperliquid Perps • {ts}</i>"
     )
 
 # ═══════════════════════════════════════════════════════════════
@@ -4473,7 +4489,7 @@ def main():
         )
 
         if msg_id:
-            update_cooldown(state, symbol, direction, bar_index_now)
+            update_cooldown(state, symbol, direction, bar_index_now, signal_type=sig.signal_type)
             track_signal(state, symbol, direction, msg_id, sig, bar_index_now, hist_id=hist_id)
             print(f"  [TRACK] #{rank} {hl_coin(symbol)} {direction.upper()} "
                   f"TP1={sig.tp1:.4f} TP2={sig.tp2:.4f} SL={sig.sl:.4f}")
