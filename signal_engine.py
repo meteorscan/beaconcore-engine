@@ -14,7 +14,7 @@ from zoneinfo import ZoneInfo
 # removed below in utils.py.
 from utils import safe, atr
 
-__version__ = "15.8.1.1"  # Rollback pass (2026-06-20): reverted the Section 6
+__version__ = "15.8.1.2"  # Rollback pass (2026-06-20): reverted the Section 6
 # frequency-tuning constants (MIN_RR_RATIO, ADX_SCORE_MIN, MIN_DAILY_ADX,
 # ADX_BREAK_GATE, TREND_HOLD_BARS, SIGNAL_COOLDOWN_BARS[_HIGHSCORE],
 # MAX_SIGNALS_DEFAULT/BULL_TREND) back to their pre-Section-6 originals. See
@@ -327,7 +327,7 @@ ADX_SCORE_MIN   = 20.0
 
 RSI_BREAK_LONG_MIN  = 50.0;  RSI_BREAK_LONG_MAX  = 75.0
 RSI_BREAK_SHORT_MIN = 25.0;  RSI_BREAK_SHORT_MAX = 50.0
-RSI_PULL_LONG_MIN   = 38.0;  RSI_PULL_LONG_MAX   = 65.0
+RSI_PULL_LONG_MIN   = 38.0;  RSI_PULL_LONG_MAX   = 58.0  # [PATCH-7a] 65→58: RSI 59–65 is recovery momentum, not a dip
 RSI_PULL_SHORT_MIN  = 38.0;  RSI_PULL_SHORT_MAX  = 62.0
 # [Fix-26] NOT changed in this pass — audit Section 5/6 flags these RSI bands as
 # candidates for narrowing "if backtest data supports it," but no such data exists
@@ -343,9 +343,9 @@ MIN_ATR_PCT     = 0.2
 WICK_FILTER     = 0.45
 RANGE_PCT_BREAK = 0.20
 PULL_ZONE_MULT  = 0.25
-PULL_TOUCH_LOOKBACK   = 5
-PULL_RECOVER_ATR_MULT_TREND: float = 0.25
-PULL_RECOVER_ATR_MULT_MIXED: float = 0.10
+PULL_TOUCH_LOOKBACK   = 3  # [PATCH-7b] 5→3 bars (75 min→45 min): eliminate stale-touch entries
+PULL_RECOVER_ATR_MULT_TREND: float = 0.50  # [PATCH-7c] 0.25→0.50: require meaningful recovery, not a single tick
+PULL_RECOVER_ATR_MULT_MIXED: float = 0.25  # [PATCH-7c] 0.10→0.25: same ratio scaling as trend
 # [Fix-29] TUNABLE — needs backtest validation, but user/reviewer has explicitly
 # confirmed (2026-06-20) that higher signal frequency is wanted, satisfying the
 # Section 6 preamble's "confirm before implementing" requirement. Section 6 Item 1:
@@ -2167,8 +2167,14 @@ def get_effective_min_score(btc_regime: dict | None, breadth_pct: float) -> int:
     if btc_regime is None:
         return MIN_SCORE
     bearish = btc_regime.get("bearish", False)
+    # [PATCH-6] Original condition (bearish AND breadth > 75%) was inverted for the
+    # real risk case: a confirmed bear regime with near-capitulation breadth (<10%)
+    # is the common loss environment and should raise the bar most. The old condition
+    # never fired in observed data (breadth was 4%). Both branches now preserved.
+    if bearish and breadth_pct < 0.10:
+        return MIN_SCORE + 2   # confirmed bear + near-capitulation breadth
     if bearish and breadth_pct > 0.75:
-        return MIN_SCORE + 1
+        return MIN_SCORE + 1   # original condition preserved
     return MIN_SCORE
 
 def get_dynamic_max_signals(btc_regime: dict | None, breadth_pct: float) -> int:
@@ -2386,9 +2392,17 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
         for i in range(_vol_accel_bars)
     ) if len(v15) > _vol_accel_bars + 1 else False
 
+    # [PATCH-2] Fix dead branch. For PULL signals, healthy volume is LOW
+    # (declining into the EMA is the classic retracement signature). Accept
+    # any vol_ratio in [0.10, 1.30] as "healthy" for PULL display purposes.
+    # Values > 1.30 on a pullback candle suggest distribution or reversal.
+    # The base score still uses vol_score_ok (BREAK threshold, >= 0.75x) —
+    # the PULL low-vol correction in _apply_scoring_and_filters (PATCH-3)
+    # restores the missed base-score point for the 0.10–0.75x band.
+    PULL_VOL_RATIO_MIN: float = 0.10
+    PULL_VOL_RATIO_MAX: float = 1.30
     vol_score_ok_pull = True if vm15 == 0 else (
-        cur_v >= vm15 * VOL_SCORE_MULT if True
-        else cur_v <= vm15 * 1.3
+        PULL_VOL_RATIO_MIN <= (cur_v / vm15) <= PULL_VOL_RATIO_MAX
     )
 
     ef1h = safe(ind["ema_f1h"][-1]); es1h = safe(ind["ema_s1h"][-1])
@@ -2810,23 +2824,36 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
     vol_accel_ok = ctx["vol_accel_ok"]
 
     if res.signal_type == "PULL":
+        # [PATCH-8] Removed price_dir == "down" guard. On a PULL entry bar price
+        # is always "up" (green recovery bar is required by pull_recover_long), so
+        # the original condition was structurally always False — OI falling on PULL
+        # was never penalized. OI falling on the recovery bar means no institutional
+        # longs are being added as price recovers: genuinely low conviction.
         _oi_falling_bearish = (
             oi_data.get("oi_trend") == "falling"
             and oi_data.get("score_adj", 0) == 0
-            and price_dir == "down"
         )
         if _oi_falling_bearish:
             adjusted_score -= 1
-            adjs.append(("OI falling on PULL with price down (Step-1 neutral)", -1))
+            adjs.append(("OI falling on PULL entry (no new longs on recovery)", -1))
 
         if vol_ratio is not None:
             _vol_floor = (PULL_VOL_FLOOR_OVERBOUGHT
                             if breadth_pct > PULL_VOL_OVERBOUGHT_BREADTH
                             else PULL_VOL_FLOOR)
             if vol_ratio <= _vol_floor:
+                # Very low volume — lack of buyer conviction.
                 adjusted_score -= 1
                 adjs.append((f"Vol floor (ratio {vol_ratio:.2f}x <= {_vol_floor:.2f}x"
                              f"{' overbought' if breadth_pct > PULL_VOL_OVERBOUGHT_BREADTH else ''})", -1))
+            elif vol_ratio < VOL_SCORE_MULT:
+                # [PATCH-3] Restored from v15.5.5.1. Vol is between the floor and
+                # the BREAK threshold (0.40x–0.75x): classic declining-volume pullback
+                # signature. Base score penalised it (vol_score_ok failed), restore +1
+                # here. Mutually exclusive with floor check: floor fires ≤ 0.40x,
+                # this fires 0.40x < vol < 0.75x.
+                adjusted_score += 1
+                adjs.append(("PULL low-vol correction (healthy pullback volume)", +1))
 
         candle_range = cur_h - cur_l
         body_size    = abs(cur_c - cur_o)
@@ -2871,6 +2898,24 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                     adjs.append((f"RS negative on BREAK ({rs_pct:+.1f}%, "
                                  f"{rs_percentile*100:.0f}th pct)", -1))
 
+    elif res.signal_type == "PULL":
+        # [PATCH-4] PULL RS gate. BREAK has hard + soft gates; PULL had none.
+        # A coin underperforming BTC on a PULL entry suggests structural weakness,
+        # not healthy retracement. Softer thresholds than BREAK to preserve frequency.
+        RS_PULL_SOFT_GATE_PCT: float = -1.0   # softer than BREAK's 0% bottom-pct check
+        RS_PULL_HARD_GATE_PCT: float = -4.0   # softer than BREAK's -6.0%
+        rs_pct = rs_data.get("rs_pct")
+        if rs_pct is not None:
+            if rs_pct < RS_PULL_HARD_GATE_PCT:
+                adjusted_score -= 2
+                adjs.append((f"RS strongly negative on PULL ({rs_pct:+.1f}% < "
+                             f"{RS_PULL_HARD_GATE_PCT:.1f}%)", -2))
+            elif rs_pct < RS_PULL_SOFT_GATE_PCT:
+                adjusted_score -= 1
+                adjs.append((f"RS negative on PULL ({rs_pct:+.1f}% < "
+                             f"{RS_PULL_SOFT_GATE_PCT:.1f}%)", -1))
+
+    if res.signal_type == "BREAK":
         if direction == "long" and res.resistances:
             nearest_res = res.resistances[0]
             if res.entry < nearest_res < res.tp1:
@@ -2889,6 +2934,30 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                     if blocked_pct >= TP1_WALL_MIN_CLEARANCE:
                         adjusted_score -= 1
                         adjs.append((f"Support blocks TP1 ({blocked_pct*100:.0f}%)", -1))
+
+    if res.signal_type == "PULL":
+        # [PATCH-5] PULL TP1 resistance wall check. Mirrors the BREAK check above.
+        # PULL entries sit closer to recent swing lows, making resistance overhead
+        # more likely to be within TP1 range. Uses the same TP1_WALL_MIN_CLEARANCE
+        # threshold (0.40): resistance blocking ≥ 40% of path to TP1 degrades R:R.
+        if direction == "long" and res.resistances:
+            nearest_res = res.resistances[0]
+            if res.entry < nearest_res < res.tp1:
+                tp_range = res.tp1 - res.entry
+                if tp_range > 0:
+                    blocked_pct = (nearest_res - res.entry) / tp_range
+                    if blocked_pct >= TP1_WALL_MIN_CLEARANCE:
+                        adjusted_score -= 1
+                        adjs.append((f"Resistance blocks PULL TP1 ({blocked_pct*100:.0f}%)", -1))
+        elif direction == "short" and res.supports:
+            nearest_sup = res.supports[0]
+            if res.tp1 < nearest_sup < res.entry:
+                tp_range = res.entry - res.tp1
+                if tp_range > 0:
+                    blocked_pct = (res.entry - nearest_sup) / tp_range
+                    if blocked_pct >= TP1_WALL_MIN_CLEARANCE:
+                        adjusted_score -= 1
+                        adjs.append((f"Support blocks PULL TP1 ({blocked_pct*100:.0f}%)", -1))
 
     if USE_D200_FILTER:
         if direction == "long" and ctx["d200_above"]:
@@ -3214,8 +3283,27 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             # adjusted_score = res.score + sum(adjs), so adding it both
             # ways would double-count the bonus on capped signals.
             if _liq_out.liquidity_bonus != 0:
-                adjs.append(("[LIQ] liquidity_bonus", _liq_out.liquidity_bonus))
-                adjusted_score += _liq_out.liquidity_bonus
+                # [PATCH-1] Cap the liquidity bonus when HTF structure is not
+                # aligned with trade direction. The discount-zone/BOS/FVG stack
+                # can reach +10, overwhelming all environmental penalties in a
+                # counter-trend regime. When HTF aligned = False, cap at +4 so
+                # structural confluence still contributes without masking weak
+                # base quality. Source: cross-arbitrated from three audits.
+                _LIQ_HTF_MISALIGN_CAP = 4
+                _effective_liq_bonus = (
+                    min(_liq_out.liquidity_bonus, _LIQ_HTF_MISALIGN_CAP)
+                    if not _liq_out.htf_alignment
+                    else _liq_out.liquidity_bonus
+                )
+                if _effective_liq_bonus != _liq_out.liquidity_bonus:
+                    adjs.append((
+                        f"[LIQ] liquidity_bonus capped (HTF not aligned: "
+                        f"{_liq_out.liquidity_bonus} → {_effective_liq_bonus})",
+                        _effective_liq_bonus
+                    ))
+                else:
+                    adjs.append(("[LIQ] liquidity_bonus", _effective_liq_bonus))
+                adjusted_score += _effective_liq_bonus
 
             # Per-reason strings are for display/logging only (adj=0 so
             # they do not contribute to score totals or cap accounting).
