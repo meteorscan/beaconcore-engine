@@ -4070,7 +4070,7 @@ def send_summary(state: dict):
         overall_wr = wins / total
 
     lines = [
-        "📊 Signal Summary (last 24h)",
+        f"📊 Signal Summary (last 24h)  •  v{__version__}",
         f"✅ Winners: {winners} (🔥×{tp1_count}  🏆×{tp2_count})",
         f"❌ Losers:  {losers} (😭×{sl_count})",
         f"🟡 TP1-then-SL: {tp1_then_sl_count} (counted as half-win in overall WR)",
