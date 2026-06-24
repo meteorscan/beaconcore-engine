@@ -4158,7 +4158,7 @@ def send_summary(state: dict):
         overall_wr = wins / total
 
     lines = [
-        f"📊 Signal Summary (last 24h)  •  v{__version__}",
+        f"📊 Signal Summary (last 24h)  •  v{__version__} - Liquidity Confluence ON",
         f"✅ Winners: {winners} (🔥×{tp1_count}  🏆×{tp2_count})",
         f"❌ Losers:  {losers} (😭×{sl_count})",
         f"🟡 TP1-then-SL: {tp1_then_sl_count} (counted as half-win in overall WR)",
