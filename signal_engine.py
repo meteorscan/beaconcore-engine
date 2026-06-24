@@ -14,12 +14,114 @@ from zoneinfo import ZoneInfo
 # removed below in utils.py.
 from utils import safe, atr
 
-__version__ = "15.8.1.5"  # tp1_then_sl removed; SL-after-TP1 resolves as plain tp1
+__version__ = "17.0.0"  # tp1_then_sl removed; SL-after-TP1 resolves as plain tp1
 # frequency-tuning constants (MIN_RR_RATIO, ADX_SCORE_MIN, MIN_DAILY_ADX,
 # ADX_BREAK_GATE, TREND_HOLD_BARS, SIGNAL_COOLDOWN_BARS[_HIGHSCORE],
 # MAX_SIGNALS_DEFAULT/BULL_TREND) back to their pre-Section-6 originals. See
 # SECTION 9 below.
 
+# ═══════════════════════════════════════════════════════════════
+# CHANGELOG — BREAK & PULL Engine Overhaul (2026-06-25)
+# Implementation of audit fixes for BREAK/PULL signal quality and timing
+# ═══════════════════════════════════════════════════════════════
+
+# PHASE 1 (Fix A) — Overextension/Blow-off Suppression for BREAK
+#   - ENABLE_OVEREXTENSION_GATE = True
+#   - BREAK_OVEREXT_ATR_MULT = 2.0
+#   - BREAK_MA_DIST_ATR_MULT = 3.5
+#   - BREAK_MULTIBAR_ATR_MULT = 3.5
+#   - BREAK_OVEREXT_LOOKBACK = 4
+#   - Soft penalty: -3 for 2+ overextension signals, -1 for 1 signal
+#   - Breakout-trap detection: -3 penalty for liquidity grabs with closing fail
+#   - Location: _apply_scoring_and_filters() BREAK section
+
+# PHASE 2 (Fix F) — Suppress Counter-4H-Trend PULL
+#   - ENABLE_COUNTERTREND_PULL_GATE = True
+#   - Soft penalty: -2 for PULL into active 4H counter-trend without OI+divergence
+#   - Hard-gate alternative commented for future validation
+#   - Location: _apply_scoring_and_filters() PULL section
+
+# PHASE 3 (Fix C) — Pullback Depth Gate
+#   - ENABLE_PULL_DEPTH_GATE = True
+#   - PULL_MIN_DEPTH_ATR = 0.15
+#   - Hard gate: requires minimum 0.15 ATR penetration below EMA21
+#   - Location: _detect_raw_signals() pull_touched block, folded into long_pull/short_pull
+
+# PHASE 4 (Fix D) — PULL Momentum Collapse Penalty
+#   - ENABLE_PULL_MOMENTUM_COLLAPSE_PENALTY = True
+#   - PULL_RSI_COLLAPSE_THRESH = 5.0
+#   - PULL_RSI_LOOKBACK = 4
+#   - Soft penalty: -1 for RSI dropping >5 pts over 4 bars on PULL
+#   - Location: _apply_scoring_and_filters() PULL section
+
+# PHASE 4 (Fix E) — PULL EMA Velocity Check
+#   - ENABLE_PULL_EMA_VELOCITY_CHECK = True
+#   - Soft penalty: -1 for weakening EMA velocity on PULL
+#   - Location: _apply_scoring_and_filters() EMA velocity block (extended BREAK-only logic)
+
+# PHASE 5 (Fix B) — BREAK RSI Ceiling Expansion
+#   - ENABLE_BREAK_RSI_WIDENING = True
+#   - RSI_BREAK_LONG_MAX: 75.0 → 82.0
+#   - RSI_BREAK_SHORT_MIN: 25.0 → 18.0
+#   - Soft penalty: -1 for BREAK in extended zone (RSI >75 long, <25 short)
+#   - Location: Constants section + _apply_scoring_and_filters() BREAK section
+
+# PHASE 5 (Fix H) — PULL RSI Lower-Bound Tightening
+#   - ENABLE_PULL_RSI_TIGHTENING = True
+#   - Soft penalty: -1 for PULL near oversold/overbought (RSI <44 long, >56 short)
+#   - Hard-gate alternative commented (constant changes)
+#   - Location: _apply_scoring_and_filters() PULL section
+
+# PHASE 6 (Fix G) — VWAP Restoration for Pullback Mode
+#   - ENABLE_PULL_VWAP_RESTORATION = True
+#   - Hard gate: VWAP check now applies to pullback mode (was bypassed)
+#   - Soft-penalty fallback commented for validation
+#   - Location: _detect_raw_signals() vwap_long/vwap_short logic
+
+# PHASE 7 (Fix I) — ADX Expanding Check
+#   - ENABLE_ADX_EXPANDING_CHECK = True
+#   - ADX_RISING_LOOKBACK = 3
+#   - ENABLE_SCORE_REBALANCE = True
+#   - ADX_BREAK_OK: now accepts ADX ≥20 if rising (was ≥25 only)
+#   - Soft bonus: +1 for expanding ADX, +1 for strong ADX ≥30
+#   - Score rebalance: replaced adx4h_score_ok with h4_vol_expansion in base score
+#   - Location: _detect_raw_signals() ADX logic + _apply_scoring_and_filters() BREAK section
+
+# PHASE 8 (Fix J) — Two-Tier BREAK Engine
+#   - ENABLE_EARLY_BREAK_TIER = True
+#   - EARLY_BREAK_PRIOR_HIGHS_LOOKBACK = 3
+#   - EARLY_BREAK_REQUIRE_ADX_RISING = True
+#   - Tier 2 (Early): intra-candle breakout detection with -1 confidence discount
+#   - Tier 1 (Standard): unchanged close-confirmed BREAK
+#   - res.break_tier field added for labeling ("early" vs "standard")
+#   - Location: _detect_raw_signals() early_break logic + _apply_scoring_and_filters() scoring
+
+# PHASE 9 — Quality-Stratified PULL Engine
+#   - ENABLE_PULL_TIERING = True
+#   - Tier A: +1 bonus for full quality confirmation (MTF, RSI, depth, VWAP, momentum)
+#   - Tier B: standard PULL (default label)
+#   - Tier C: hard gates for prohibited conditions (counter-trend + bad RSI, extreme breadth)
+#   - Structural backing penalty: -1 if no support/resistance within 1 ATR
+#   - Volume-quality filter: -1 if pullback volume not lower than impulse
+#   - res.pull_tier field added ("A" or "B")
+#   - Location: _apply_scoring_and_filters() PULL section
+
+# CROSS-CUTTING ITEMS
+#   - ENABLE_SR_CLEARANCE_FIX = True: SR clearance only blocks when level not yet cleared
+#   - ENABLE_LIQUIDITY_CONFLUENCE = True: enabled HTF liquidity engine (was False)
+#   - 4H stale-bias penalty: increased from -1 to -2 for PULL signals
+#   - continuation_probability() function added (0-10 scale, baseline 5)
+#   - ENABLE_CONTINUATION_PROB_GATE = False (display-only until validated)
+#   - res.continuation_prob_score field added
+#   - Location: Constants, SR filter logic, 4H stale bias logic, new function
+
+# VALIDATION ORDER (per audit priority)
+#   1. Phase 1 (overextension) → 2. Phase 2 (countertrend PULL) → 3. Phase 3 (depth)
+#   4. Phase 4 (momentum/EMA) → 5. Phase 5 (RSI bands) → 7. Phase 7 (ADX expanding)
+#   8. Phase 8 (early BREAK - validate last, highest complexity)
+#   6. Phase 9 / cross-cutting as time allows
+
+# All new behaviors default to enabled (True) except ENABLE_CONTINUATION_PROB_GATE (False)
 # ═══════════════════════════════════════════════════════════════
 # CHANGELOG — scalp_swing_bot_audit.md implementation pass (2026-06-20)
 # One line per audit item, grouped by implementation_prompt.md section.
@@ -176,6 +278,7 @@ __version__ = "15.8.1.5"  # tp1_then_sl removed; SL-after-TP1 resolves as plain 
 
 
 # ── LIQUIDITY CONFLUENCE FEATURE FLAG ─────────────────────────
+# Cross-cutting: Enable HTF liquidity confluence (audit §9)
 ENABLE_LIQUIDITY_CONFLUENCE: bool = True
 # [Fix-46] L2 order-book imbalance feature flag. fetch_l2_imbalance() was
 # fully implemented and imported, but the call site below hardcoded
@@ -325,8 +428,60 @@ FALSE_BREAKOUT_BONUS: int = 1
 ADX_BREAK_GATE  = 25.0
 ADX_SCORE_MIN   = 20.0
 
-RSI_BREAK_LONG_MIN  = 50.0;  RSI_BREAK_LONG_MAX  = 75.0
-RSI_BREAK_SHORT_MIN = 25.0;  RSI_BREAK_SHORT_MAX = 50.0
+# Phase 1 (Fix A) — Overextension/Blow-off Suppression for BREAK
+ENABLE_OVEREXTENSION_GATE: bool = True
+BREAK_OVEREXT_ATR_MULT: float = 2.0
+BREAK_MA_DIST_ATR_MULT: float = 3.5
+BREAK_MULTIBAR_ATR_MULT: float = 3.5
+BREAK_OVEREXT_LOOKBACK: int = 4
+
+# Phase 2 (Fix F) — Suppress Counter-4H-Trend PULL
+ENABLE_COUNTERTREND_PULL_GATE: bool = True
+
+# Phase 3 (Fix C) — Pullback Depth Gate
+ENABLE_PULL_DEPTH_GATE: bool = True
+PULL_MIN_DEPTH_ATR: float = 0.15
+
+# Phase 4 (Fix D) — PULL Momentum Collapse Penalty
+ENABLE_PULL_MOMENTUM_COLLAPSE_PENALTY: bool = True
+PULL_RSI_COLLAPSE_THRESH: float = 5.0
+PULL_RSI_LOOKBACK: int = 4
+
+# Phase 4 (Fix E) — PULL EMA Velocity Check
+ENABLE_PULL_EMA_VELOCITY_CHECK: bool = True
+
+# Phase 5 (Fix B) — BREAK RSI ceiling expansion
+ENABLE_BREAK_RSI_WIDENING: bool = True
+
+# Phase 5 (Fix H) — PULL RSI lower-bound tightening
+ENABLE_PULL_RSI_TIGHTENING: bool = True
+
+# Phase 6 (Fix G) — VWAP Restoration for Pullback Mode
+ENABLE_PULL_VWAP_RESTORATION: bool = True
+
+# Phase 7 (Fix I) — ADX Expanding Check
+ENABLE_ADX_EXPANDING_CHECK: bool = True
+ADX_RISING_LOOKBACK: int = 3
+ENABLE_SCORE_REBALANCE: bool = True
+
+# Phase 8 (Fix J) — Two-Tier BREAK Engine
+ENABLE_EARLY_BREAK_TIER: bool = True
+EARLY_BREAK_PRIOR_HIGHS_LOOKBACK: int = 3
+EARLY_BREAK_REQUIRE_ADX_RISING: bool = True
+
+# Phase 9 — Quality-Stratified PULL Engine
+ENABLE_PULL_TIERING: bool = True
+
+# Cross-cutting items
+ENABLE_SR_CLEARANCE_FIX: bool = True
+ENABLE_CONTINUATION_PROB_GATE: bool = False
+
+if ENABLE_BREAK_RSI_WIDENING:
+    RSI_BREAK_LONG_MIN  = 50.0;  RSI_BREAK_LONG_MAX  = 82.0
+    RSI_BREAK_SHORT_MIN = 18.0;  RSI_BREAK_SHORT_MAX = 50.0
+else:
+    RSI_BREAK_LONG_MIN  = 50.0;  RSI_BREAK_LONG_MAX  = 75.0
+    RSI_BREAK_SHORT_MIN = 25.0;  RSI_BREAK_SHORT_MAX = 50.0
 RSI_PULL_LONG_MIN   = 38.0;  RSI_PULL_LONG_MAX   = 58.0  # [PATCH-7a] 65→58: RSI 59–65 is recovery momentum, not a dip
 RSI_PULL_SHORT_MIN  = 38.0;  RSI_PULL_SHORT_MAX  = 62.0
 # [Fix-26] NOT changed in this pass — audit Section 5/6 flags these RSI bands as
@@ -2118,6 +2273,9 @@ class SignalResult:
         # Not used in scoring; reconciling which system is "right" is a separate
         # tuning decision the audit didn't make for us.
         self.sr_liquidity_disagreement: str | None = None
+        self.continuation_prob_score:   int         = 0
+        self.break_tier:                str         = "standard"
+        self.pull_tier:                 str         = "B"
 
         # [Fix-43] Real 1h/4h liquidity structure (separate from
         # htf_alignment above, which is the borrowed EMA-cross boolean).
@@ -2505,8 +2663,21 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
 
     _is_pullback_long  = USE_PULLBACK_ALIGNMENT and pullback_long_align
     _is_pullback_short = USE_PULLBACK_ALIGNMENT and pullback_short_align
-    vwap_long  = True if _is_pullback_long  else (cur_c > rv if USE_ROLLING_VWAP else True)
-    vwap_short = True if _is_pullback_short else (cur_c < rv if USE_ROLLING_VWAP else True)
+    # Phase 6 (Fix G) — VWAP Restoration for Pullback Mode
+    if ENABLE_PULL_VWAP_RESTORATION:
+        vwap_long  = (cur_c > rv if USE_ROLLING_VWAP else True)
+        vwap_short = (cur_c < rv if USE_ROLLING_VWAP else True)
+    else:
+        vwap_long  = True if _is_pullback_long  else (cur_c > rv if USE_ROLLING_VWAP else True)
+        vwap_short = True if _is_pullback_short else (cur_c < rv if USE_ROLLING_VWAP else True)
+        # Soft-penalty fallback (commented):
+        # if res.signal_type == "PULL" and USE_ROLLING_VWAP:
+        #     if direction == "long" and cur_c < rv * 0.999:
+        #         adjusted_score -= 1
+        #         adjs.append(("PULL long below VWAP (adverse entry zone)", -1))
+        #     elif direction == "short" and cur_c > rv * 1.001:
+        #         adjusted_score -= 1
+        #         adjs.append(("PULL short above VWAP (adverse entry zone)", -1))
 
     rng = cur_h - cur_l + 1e-10
 
@@ -2519,7 +2690,17 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
     def close_in_bot_range():
         return (cur_c - cur_l) / rng <= RANGE_PCT_BREAK
 
-    adx_break_ok   = adx15 >= ADX_BREAK_GATE
+    # Phase 7 (Fix I) — ADX Expanding Check
+    if ENABLE_ADX_EXPANDING_CHECK:
+        _adx15_now  = adx15
+        _adx15_prev = (safe(adx15_arr[-(ADX_RISING_LOOKBACK + 1)], adx15)
+                       if len(adx15_arr) > ADX_RISING_LOOKBACK + 1 else adx15)
+        adx15_rising = _adx15_now > _adx15_prev + 1.0
+        adx_break_ok = (adx15 >= ADX_BREAK_GATE) or (adx15 >= 20.0 and adx15_rising)
+    else:
+        adx15_rising = False
+        adx_break_ok = adx15 >= ADX_BREAK_GATE
+
     break_bull_bar = cur_c > cur_o and clean_bull_bar() and close_in_top_range()
     break_bear_bar = cur_c < cur_o and clean_bear_bar() and close_in_bot_range()
 
@@ -2532,11 +2713,32 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
         h15[-(i + 1)] >= safe(ema_f15[-(i + 1)]) - pull_zone
         for i in range(0, PULL_TOUCH_LOOKBACK + 1)
     )
+    # Phase 3 (Fix C) — Pullback Depth Gate
+    if ENABLE_PULL_DEPTH_GATE:
+        pull_depth_long = any(
+            safe(ema_f15[-(i + 1)]) - l15[-(i + 1)] >= atr_val * PULL_MIN_DEPTH_ATR
+            for i in range(0, PULL_TOUCH_LOOKBACK + 1)
+        )
+        pull_depth_short = any(
+            h15[-(i + 1)] - safe(ema_f15[-(i + 1)]) >= atr_val * PULL_MIN_DEPTH_ATR
+            for i in range(0, PULL_TOUCH_LOOKBACK + 1)
+        )
+    else:
+        pull_depth_long = pull_depth_short = True
     _pull_recover_mult  = get_pull_recover_mult(btc_regime)
     pull_recover_long   = (cur_c > ef15 + atr_val * _pull_recover_mult) and cur_c > cur_o
     pull_recover_short  = (cur_c < ef15 - atr_val * _pull_recover_mult) and cur_c < cur_o
     pull_bull_bar      = cur_c > cur_o and clean_bull_bar()
     pull_bear_bar      = cur_c < cur_o and clean_bear_bar()
+
+    # Phase 7 (Fix I) — Score rebalance: replace adx4h_score_ok with h4_vol_expansion
+    if ENABLE_SCORE_REBALANCE:
+        h4_vol_ma = ind.get("vol_ma4h")
+        v4h = ind.get("v4h", [])
+        h4_vol_expansion = (h4_vol_ma is not None and len(v4h) > 0
+                             and v4h[-1] > h4_vol_ma[-1] * 1.2)
+    else:
+        h4_vol_expansion = adx4h_score_ok
 
     long_score = sum([
         bb_long,
@@ -2544,7 +2746,7 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
         adx_score_ok,
         obv_slope_long,
         vol_score_ok,
-        adx4h_score_ok,
+        h4_vol_expansion,
     ])
     short_score = sum([
         bb_short,
@@ -2552,7 +2754,7 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
         adx_score_ok,
         obv_slope_short,
         vol_score_ok,
-        adx4h_score_ok,
+        h4_vol_expansion,
     ])
 
     long_break  = (daily_adx_ok and (full_long_align or exhaustion_long_align) and break_bull_bar
@@ -2564,17 +2766,56 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
                    and adx_break_ok and rsi_break_short
                    and short_score >= MIN_SCORE and market_ok)
 
+    # Phase 8 (Fix J) — Two-Tier BREAK Engine: Early (Tier 2) BREAK detection
+    if ENABLE_EARLY_BREAK_TIER:
+        prior_highs_max = max(h15[-(i + 2)] for i in range(EARLY_BREAK_PRIOR_HIGHS_LOOKBACK))
+        prior_lows_min  = min(l15[-(i + 2)] for i in range(EARLY_BREAK_PRIOR_HIGHS_LOOKBACK))
+
+        # Check if overextended (reuse Phase 1 logic)
+        _bar_range_mult = (cur_h - cur_l) / atr_val if atr_val > 0 else 0.0
+        _ema_dist_mult  = abs(cur_c - safe(ema_f15[-1])) / atr_val if atr_val > 0 else 0.0
+        _lb = BREAK_OVEREXT_LOOKBACK
+        _multibar_move  = (abs(cur_c - ind["c15"][-(_lb + 1)]) / atr_val
+                           if len(ind["c15"]) > _lb and atr_val > 0 else 0.0)
+        OVEREXT_CHECKS = [
+            _bar_range_mult >= BREAK_OVEREXT_ATR_MULT,
+            _ema_dist_mult  >= BREAK_MA_DIST_ATR_MULT,
+            _multibar_move  >= BREAK_MULTIBAR_ATR_MULT,
+        ]
+        break_overextended = sum(OVEREXT_CHECKS) >= 2
+
+        early_break_long = (
+            cur_h > prior_highs_max
+            and cur_c > cur_o
+            and (not EARLY_BREAK_REQUIRE_ADX_RISING or adx15_rising)
+            and full_long_align
+            and rsi_break_long
+            and not break_overextended
+            and market_ok
+        )
+        early_break_short = (
+            cur_l < prior_lows_min
+            and cur_c < cur_o
+            and (not EARLY_BREAK_REQUIRE_ADX_RISING or adx15_rising)
+            and full_short_align
+            and rsi_break_short
+            and not break_overextended
+            and market_ok
+        )
+    else:
+        early_break_long = early_break_short = False
+
     long_pull  = (daily_adx_ok and pull_long_align and pull_touched_long
-                  and pull_recover_long  and pull_bull_bar and vwap_long  and rsi_pull_long
+                  and pull_depth_long and pull_recover_long  and pull_bull_bar and vwap_long  and rsi_pull_long
                   and long_score  >= MIN_SCORE and market_ok)
     short_pull = (daily_adx_ok
                   and pull_short_align
                   and pull_touched_short
-                  and pull_recover_short and pull_bear_bar and vwap_short and rsi_pull_short
+                  and pull_depth_short and pull_recover_short and pull_bear_bar and vwap_short and rsi_pull_short
                   and short_score >= MIN_SCORE and market_ok)
 
-    long_sig  = long_break  or long_pull
-    short_sig = short_break or short_pull
+    long_sig  = long_break  or long_pull or early_break_long
+    short_sig = short_break or short_pull or early_break_short
 
     res._ind = ind
     res._ctx = {
@@ -2594,26 +2835,41 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
         "adx_score_ok": adx_score_ok, "adx4h": adx4h, "adx4h_score_ok": adx4h_score_ok,
         "ef15": ef15, "es15": es15, "ef1h": ef1h, "es1h": es1h, "ef4h": ef4h, "es4h": es4h,
         "candles_15m_len": len(c15),
+        "adx15_rising": adx15_rising,
+        "pull_depth_long": pull_depth_long,
+        "pull_depth_short": pull_depth_short,
     }
 
     if long_sig:
         res.fire_long   = True
-        if long_break and long_pull and pull_touched_long:
+        if early_break_long:
+            res.signal_type = "BREAK"
+            res.break_tier = "early"
+        elif long_break and long_pull and pull_touched_long:
             res.signal_type = "PULL"
+            res.break_tier = "standard"
         elif long_break:
             res.signal_type = "BREAK"
+            res.break_tier = "standard"
         else:
             res.signal_type = "PULL"
+            res.break_tier = "standard"
         res.score       = long_score
         _setup_signal_entry(res, cur_c, atr_val)
     elif short_sig:
         res.fire_short  = True
-        if short_break and short_pull and pull_touched_short:
+        if early_break_short:
+            res.signal_type = "BREAK"
+            res.break_tier = "early"
+        elif short_break and short_pull and pull_touched_short:
             res.signal_type = "PULL"
+            res.break_tier = "standard"
         elif short_break:
             res.signal_type = "BREAK"
+            res.break_tier = "standard"
         else:
             res.signal_type = "PULL"
+            res.break_tier = "standard"
         res.score       = short_score
         _setup_signal_entry(res, cur_c, atr_val)
 
@@ -2785,8 +3041,10 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                        and not btc_regime.get("bullish")
                        and not btc_regime.get("bearish"))
     if h4_stale_bias and not _is_mixed_local:
-        adjusted_score -= 1
-        adjs.append((f"4H bias stale ({bar_age_frac*100:.0f}% into bar, 1H spread {_h1_spread:+.2f}x ATR)", -1))
+        # Cross-cutting: Increase penalty for PULL signals (Low/L1)
+        penalty = -2 if res.signal_type == "PULL" else -1
+        adjusted_score += penalty
+        adjs.append((f"4H bias stale ({bar_age_frac*100:.0f}% into bar, 1H spread {_h1_spread:+.2f}x ATR)", penalty))
 
     adjusted_score += rs_data["score_adj"]
     if rs_data["score_adj"] != 0:
@@ -2818,6 +3076,29 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
     vol_accel_ok = ctx["vol_accel_ok"]
 
     if res.signal_type == "PULL":
+        # Phase 2 (Fix F) — Suppress Counter-4H-Trend PULL
+        if ENABLE_COUNTERTREND_PULL_GATE and direction == "long" \
+                and ctx.get("h4_bear") and ctx.get("h4_trend_held_bear"):
+            _oi_confirms  = oi_data.get("oi_trend") == "rising"
+            _div_confirms = (rsi_divergence.get("type") == "bullish"
+                             if isinstance(rsi_divergence, dict) else False)
+            if not (_oi_confirms and _div_confirms):
+                adjusted_score -= 2
+                adjs.append(("PULL long into active 4H downtrend (no OI+divergence confirmation)", -2))
+                # Hard-gate alternative (use if -2 still leaks losing trades after backtest):
+                # res.fire_long = False; return res
+
+        if ENABLE_COUNTERTREND_PULL_GATE and direction == "short" \
+                and ctx.get("h4_bull") and ctx.get("h4_trend_held_bull"):
+            _oi_confirms  = oi_data.get("oi_trend") == "rising"
+            _div_confirms = (rsi_divergence.get("type") == "bearish"
+                             if isinstance(rsi_divergence, dict) else False)
+            if not (_oi_confirms and _div_confirms):
+                adjusted_score -= 2
+                adjs.append(("PULL short into active 4H uptrend (no OI+divergence confirmation)", -2))
+                # Hard-gate alternative (use if -2 still leaks losing trades after backtest):
+                # res.fire_short = False; return res
+
         # [PATCH-8] Removed price_dir == "down" guard. On a PULL entry bar price
         # is always "up" (green recovery bar is required by pull_recover_long), so
         # the original condition was structurally always False — OI falling on PULL
@@ -2857,6 +3138,120 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             adjusted_score -= 1
             adjs.append((f"Weak candle body (ratio {body_ratio:.2f} < {PULL_BODY_MIN_RATIO})", -1))
 
+        # Phase 4 (Fix D) — PULL Momentum Collapse Penalty
+        if ENABLE_PULL_MOMENTUM_COLLAPSE_PENALTY:
+            _rsi15 = ind["rsi15"]
+            if len(_rsi15) > PULL_RSI_LOOKBACK + 1:
+                _rsi_now   = safe(_rsi15[-1])
+                _rsi_prior = safe(_rsi15[-(PULL_RSI_LOOKBACK + 1)])
+                _rsi_drop  = _rsi_prior - _rsi_now
+                if direction == "long" and _rsi_drop > PULL_RSI_COLLAPSE_THRESH:
+                    adjusted_score -= 1
+                    adjs.append((f"PULL RSI momentum collapsing ({_rsi_drop:.1f} pts drop over {PULL_RSI_LOOKBACK}bars)", -1))
+                elif direction == "short" and (-_rsi_drop) > PULL_RSI_COLLAPSE_THRESH:
+                    adjusted_score -= 1
+                    adjs.append((f"PULL RSI momentum reversing ({-_rsi_drop:.1f} pts rise over {PULL_RSI_LOOKBACK}bars)", -1))
+
+        # Phase 5 (Fix H) — PULL RSI lower-bound tightening (soft penalty version)
+        if ENABLE_PULL_RSI_TIGHTENING:
+            if direction == "long" and r15 < 44.0:
+                adjusted_score -= 1
+                adjs.append((f"PULL long RSI near oversold territory ({r15:.0f}) — momentum may have broken", -1))
+            elif direction == "short" and r15 > 56.0:
+                adjusted_score -= 1
+                adjs.append((f"PULL short RSI near overbought territory ({r15:.0f}) — momentum may have broken", -1))
+            # Hard-gate alternative (commented):
+            # if ENABLE_PULL_RSI_TIGHTENING:
+            #     RSI_PULL_LONG_MIN = 42.0
+            #     RSI_PULL_SHORT_MAX = 58.0
+            #     RSI_PULL_SHORT_MIN = 42.0
+
+        # Phase 9 — Quality-Stratified PULL Engine
+        if ENABLE_PULL_TIERING:
+            # Tier C — Prohibited PULL (hard gates)
+            if (res.signal_type == "PULL" and direction == "long"
+                    and ctx.get("h4_bear") and ctx.get("h4_trend_held_bear") and r15 < 44.0):
+                res.fire_long = False
+                return res
+            if (res.signal_type == "PULL" and direction == "short"
+                    and ctx.get("h4_bull") and ctx.get("h4_trend_held_bull") and r15 > 56.0):
+                res.fire_short = False
+                return res
+            if res.signal_type == "PULL" and direction == "long" and breadth_pct > 0.92:
+                res.fire_long = False
+                return res
+            if res.signal_type == "PULL" and direction == "short" and breadth_pct < 0.08:
+                res.fire_short = False
+                return res
+
+            # Structural support requirement
+            if res.signal_type == "PULL" and direction == "long":
+                has_structural_backing = False
+                if res.supports:
+                    nearest_sup = res.supports[0]
+                    sup_dist_atr = (res.entry - nearest_sup) / atr_val if atr_val > 0 else 999
+                    has_structural_backing = sup_dist_atr <= 1.0
+                if not has_structural_backing:
+                    adjusted_score -= 1
+                    adjs.append(("PULL long: no structural support within 1 ATR (weak zone entry)", -1))
+            elif res.signal_type == "PULL" and direction == "short":
+                has_structural_backing = False
+                if res.resistances:
+                    nearest_res = res.resistances[0]
+                    res_dist_atr = (nearest_res - res.entry) / atr_val if atr_val > 0 else 999
+                    has_structural_backing = res_dist_atr <= 1.0
+                if not has_structural_backing:
+                    adjusted_score -= 1
+                    adjs.append(("PULL short: no structural resistance within 1 ATR (weak zone entry)", -1))
+
+            # Pullback volume-quality filter
+            PULL_VOL_COMPARE_LOOKBACK = 3
+            _vol_during_pullback = [v15[-(i + 1)] for i in range(1, PULL_VOL_COMPARE_LOOKBACK + 1)]
+            _vol_before_pullback = [v15[-(i + 1)] for i in range(PULL_VOL_COMPARE_LOOKBACK + 1,
+                                                              PULL_VOL_COMPARE_LOOKBACK * 2 + 1)]
+            if _vol_before_pullback:
+                avg_pullback_vol  = sum(_vol_during_pullback) / len(_vol_during_pullback)
+                avg_pre_break_vol = sum(_vol_before_pullback) / len(_vol_before_pullback)
+                if avg_pullback_vol > avg_pre_break_vol * 1.2:
+                    adjusted_score -= 1
+                    adjs.append((f"PULL volume during pullback ({avg_pullback_vol:.0f}) not lower than "
+                                  f"impulse ({avg_pre_break_vol:.0f}) — possible distribution", -1))
+
+            # Tier A — High-Conviction PULL (bonus)
+            pull_depth_long = ctx.get("pull_depth_long", True)
+            pull_depth_short = ctx.get("pull_depth_short", True)
+            pull_recover_long = (cur_c > ctx["ef15"] + atr_val * get_pull_recover_mult(btc_regime)) and cur_c > cur_o
+            pull_recover_short = (cur_c < ctx["ef15"] - atr_val * get_pull_recover_mult(btc_regime)) and cur_c < cur_o
+            rv = daily_vwap(candles_15m_from_ind(ind), reference_ms=reference_ms)
+
+            if direction == "long":
+                tier_a = (
+                    ctx.get("h4_bull") and ctx.get("h4_trend_held_bull") and ctx.get("h1_bull")
+                    and 44.0 <= r15 <= 58.0
+                    and pull_depth_long
+                    and pull_recover_long
+                    and oi_data.get("oi_trend") != "falling"
+                    and cur_c > rv
+                    and not (direction == "long" and (safe(ind["ema_f15"][-1]) - safe(ind["ema_f15"][-(1 + EMA_VELOCITY_LOOKBACK)])) / atr_val < EMA_VELOCITY_WEAK_MAX)
+                )
+            else:
+                tier_a = (
+                    ctx.get("h4_bear") and ctx.get("h4_trend_held_bear") and ctx.get("h1_bear")
+                    and 44.0 <= r15 <= 58.0
+                    and pull_depth_short
+                    and pull_recover_short
+                    and oi_data.get("oi_trend") != "falling"
+                    and cur_c < rv
+                    and not (direction == "short" and (safe(ind["ema_f15"][-1]) - safe(ind["ema_f15"][-(1 + EMA_VELOCITY_LOOKBACK)])) / atr_val > -EMA_VELOCITY_WEAK_MAX)
+                )
+
+            if tier_a:
+                adjusted_score += 1
+                adjs.append(("Tier A PULL — full quality confirmation", +1))
+                res.pull_tier = "A"
+            else:
+                res.pull_tier = "B"
+
     if res.signal_type == "BREAK":
         if vol_ratio is not None and vol_ratio < BREAK_VOL_MULT:
             adjusted_score -= 1
@@ -2868,6 +3263,81 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
         if oi_data.get("oi_trend") == "flat" and (vol_ratio is None or vol_ratio < BREAK_OI_FLAT_VOL_THRESHOLD):
             adjusted_score -= 1
             adjs.append(("OI flat + low vol on BREAK (low conviction)", -1))
+
+        # Phase 1 (Fix A) — Overextension/Blow-off Suppression for BREAK
+        if ENABLE_OVEREXTENSION_GATE and res.signal_type == "BREAK":
+            _bar_range_mult = (cur_h - cur_l) / atr_val if atr_val > 0 else 0.0
+            _ema_dist_mult  = abs(cur_c - safe(ind["ema_f15"][-1])) / atr_val if atr_val > 0 else 0.0
+            _lb = BREAK_OVEREXT_LOOKBACK
+            _multibar_move  = (abs(cur_c - ind["c15"][-(_lb + 1)]) / atr_val
+                               if len(ind["c15"]) > _lb and atr_val > 0 else 0.0)
+
+            OVEREXT_CHECKS = [
+                _bar_range_mult >= BREAK_OVEREXT_ATR_MULT,
+                _ema_dist_mult  >= BREAK_MA_DIST_ATR_MULT,
+                _multibar_move  >= BREAK_MULTIBAR_ATR_MULT,
+                _atr_pctile     >= 0.95,
+            ]
+            _n_overext = sum(OVEREXT_CHECKS)
+            if _n_overext >= 2:
+                adjusted_score -= 3
+                adjs.append(("Multiple overextension signals — likely exhaustion", -3))
+            elif _n_overext == 1:
+                adjusted_score -= 1
+                adjs.append(("Single overextension signal — BREAK quality reduced", -1))
+
+            # Breakout-trap detection (liquidity grab + close-back-below-level, weak OI)
+            TRAP_SWH_MULT: float = 0.3
+            if direction == "long":
+                _prior_high_5 = max(h15[-(i + 2)] for i in range(5))
+                _wick_above_prior = cur_h > _prior_high_5 and cur_c < _prior_high_5
+                _wick_ratio = (cur_h - max(cur_o, cur_c)) / (cur_h - cur_l) if (cur_h - cur_l) > 0 else 0
+                _trap_signal = (
+                    _wick_above_prior
+                    and _wick_ratio > 0.30
+                    and (vol_ratio or 0) > 1.5
+                    and oi_data.get("oi_trend") != "rising"
+                )
+                if _trap_signal:
+                    adjusted_score -= 3
+                    adjs.append(("Possible breakout trap — wick above prior high with closing fail", -3))
+            elif direction == "short":
+                _prior_low_5 = min(l15[-(i + 2)] for i in range(5))
+                _wick_below_prior = cur_l < _prior_low_5 and cur_c > _prior_low_5
+                _wick_ratio = (min(cur_o, cur_c) - cur_l) / (cur_h - cur_l) if (cur_h - cur_l) > 0 else 0
+                _trap_signal = (
+                    _wick_below_prior
+                    and _wick_ratio > 0.30
+                    and (vol_ratio or 0) > 1.5
+                    and oi_data.get("oi_trend") != "rising"
+                )
+                if _trap_signal:
+                    adjusted_score -= 3
+                    adjs.append(("Possible breakout trap — wick below prior low with closing fail", -3))
+
+        # Phase 5 (Fix B) — BREAK RSI extended zone discount
+        if res.signal_type == "BREAK" and direction == "long" and r15 > 75:
+            adjusted_score -= 1
+            adjs.append((f"BREAK RSI elevated ({r15:.0f} > 75, momentum potentially exhausted)", -1))
+        elif res.signal_type == "BREAK" and direction == "short" and r15 < 25:
+            adjusted_score -= 1
+            adjs.append((f"BREAK RSI elevated ({r15:.0f} < 25, momentum potentially exhausted)", -1))
+
+        # Phase 7 (Fix I) — ADX expanding reward
+        if res.signal_type == "BREAK":
+            adx15_rising = ctx.get("adx15_rising", False)
+            if adx15_rising and adx15 < ADX_BREAK_GATE:
+                adjusted_score += 1
+                adjs.append((f"ADX expanding ({adx15:.0f}, rising trend energy)", +1))
+            elif adx15 >= 30.0:
+                adjusted_score += 1
+                adjs.append((f"ADX strong ({adx15:.0f})", +1))
+
+        # Phase 8 (Fix J) — Early BREAK tier scoring
+        if hasattr(res, 'break_tier') and res.break_tier == "early":
+            adjusted_score -= 1
+            adjs.append(("Early BREAK (intra-candle, no close confirmation)", -1))
+            _sl_m *= 1.10   # widen SL multiplier for unconfirmed intra-candle entry (Phase 8)
 
         rs_pct = rs_data.get("rs_pct")
         if rs_pct is not None:
@@ -3002,6 +3472,14 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             elif abs(_ef_velocity) < EMA_VELOCITY_WEAK_MAX:
                 adjusted_score -= 1
                 adjs.append((f"EMA flattening ({_ef_velocity:+.3f}×ATR) on BREAK", -1))
+        # Phase 4 (Fix E) — PULL EMA Velocity Check
+        elif ENABLE_PULL_EMA_VELOCITY_CHECK and res.signal_type == "PULL":
+            if direction == "long" and _ef_velocity < EMA_VELOCITY_WEAK_MAX:
+                adjusted_score -= 1
+                adjs.append((f"EMA velocity weakening on PULL long ({_ef_velocity:+.3f}×ATR)", -1))
+            elif direction == "short" and _ef_velocity > -EMA_VELOCITY_WEAK_MAX:
+                adjusted_score -= 1
+                adjs.append((f"EMA velocity weakening on PULL short ({_ef_velocity:+.3f}×ATR)", -1))
 
     rsi4h_arr = ind["rsi4h"]
     _r4h_raw  = rsi4h_arr[-1] if len(rsi4h_arr) >= 1 else float("nan")
@@ -3490,20 +3968,32 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
         res.fire_short = False
         return res
 
-    if SR_CLEARANCE_ATR_MULT > 0 and (res.fire_long or res.fire_short):
+    # Cross-cutting: SR clearance fix (Medium/M2)
+    if ENABLE_SR_CLEARANCE_FIX and SR_CLEARANCE_ATR_MULT > 0 and (res.fire_long or res.fire_short):
         min_clearance = atr_val * SR_CLEARANCE_ATR_MULT
         if res.fire_long and res.resistances:
             nearest_res = res.resistances[0]
-            if nearest_res - res.entry < min_clearance:
+            # Only block when resistance is ABOVE entry (not yet cleared)
+            if nearest_res > res.entry and nearest_res - res.entry < min_clearance:
                 print(f"  [SR FILTER] {symbol} LONG suppressed — resistance {nearest_res:.4f} "
-                      f"too close to entry {res.entry:.4f}")
+                      f"too close above entry {res.entry:.4f}")
                 res.fire_long = False
         if res.fire_short and res.supports:
             nearest_sup = res.supports[0]
-            if res.entry - nearest_sup < min_clearance:
+            # Only block when support is BELOW entry (not yet cleared)
+            if nearest_sup < res.entry and res.entry - nearest_sup < min_clearance:
                 print(f"  [SR FILTER] {symbol} SHORT suppressed — support {nearest_sup:.4f} "
-                      f"too close to entry {res.entry:.4f}")
+                      f"too close below entry {res.entry:.4f}")
                 res.fire_short = False
+
+    # Cross-cutting: continuation_probability (audit §11)
+    cont_prob = continuation_probability(res, ind, ctx, oi_data, btc_regime)
+    res.continuation_prob_score = cont_prob
+    # Optional suppression gate (default False per audit recommendation)
+    if ENABLE_CONTINUATION_PROB_GATE and cont_prob < 4:
+        print(f"  [CONTINUATION PROB] {symbol} suppressed — score {cont_prob} < 4")
+        res.fire_long = False
+        res.fire_short = False
 
     if hasattr(res, '_ind'):
         del res._ind
@@ -3511,6 +4001,64 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
         del res._ctx
 
     return res
+
+# Cross-cutting: continuation_probability helper (audit §11)
+def continuation_probability(res: SignalResult, ind: dict, ctx: dict,
+                            oi_data: dict, btc_regime: dict | None) -> int:
+    """
+    Compute continuation probability score (0-10 scale, baseline 5).
+    Factors: RSI slope, volume ratio, EMA velocity, HTF alignment, OI confirmation, BTC regime tailwind.
+    """
+    score = 5  # baseline
+
+    # RSI momentum via slope
+    rsi15 = ind["rsi15"]
+    if len(rsi15) > 4:
+        rsi_slope = rsi15[-1] - rsi15[-4]
+        if rsi_slope > 5:
+            score += 1
+        elif rsi_slope < -5:
+            score -= 1
+
+    # Volume via vol_ratio
+    vol_ratio = ctx.get("vol_ratio")
+    if vol_ratio:
+        if vol_ratio > 1.5:
+            score += 1
+        elif vol_ratio < 0.5:
+            score -= 1
+
+    # EMA velocity
+    atr_val = ctx.get("atr_val", 1.0)
+    ema_f15 = ind["ema_f15"]
+    if len(ema_f15) > 5:
+        ef_velocity = (safe(ema_f15[-1]) - safe(ema_f15[-5])) / atr_val
+        if ef_velocity > 0.05:
+            score += 1
+        elif ef_velocity < -0.05:
+            score -= 1
+
+    # HTF alignment
+    if ctx.get("full_long_align") or ctx.get("full_short_align"):
+        score += 1
+    elif ctx.get("exhaustion_long_align") or ctx.get("exhaustion_short_align"):
+        score -= 0.5
+
+    # OI confirmation
+    if oi_data.get("oi_trend") == "rising":
+        score += 1
+    elif oi_data.get("oi_trend") == "falling":
+        score -= 1
+
+    # BTC regime tailwind
+    if btc_regime:
+        if btc_regime.get("bullish"):
+            score += 1
+        elif btc_regime.get("bearish"):
+            score -= 1
+
+    # Clamp to 0-10 range
+    return max(0, min(10, int(score)))
 
 def compute_signals(symbol, candles_15m, candles_1h, candles_4h, candles_d,
                     state: dict, record_market_inputs: bool = True,
@@ -3866,6 +4414,7 @@ def format_signal(symbol: str, sig: SignalResult, engine_tag: str = "V5", rank: 
         f"<b>Leverage Range:</b> {lev_band}\n"
         f"<b>Score:</b> {sig.final_score}/{sig.score}+adj  |  {sig.breakdown}\n"
         f"<b>Gates:</b> {sig.v10_gates}\n"
+        f"<b>Cont. Prob:</b> {sig.continuation_prob_score}/10  |  <b>Tier:</b> {sig.signal_type}-{sig.pull_tier if sig.signal_type == 'PULL' else sig.break_tier}\n"
         f"\n<b>Signal Context</b>\n"
         f"{oi_line}\n"
         f"{btc_line}\n"
