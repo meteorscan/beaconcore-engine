@@ -3334,10 +3334,14 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                 adjs.append((f"ADX strong ({ctx['adx15']:.0f})", +1))
 
         # Phase 8 (Fix J) — Early BREAK tier scoring
+        # [Fix-J-defer] _sl_m is assigned later (get_regime_aware_multipliers); reading it
+        # here caused UnboundLocalError whenever break_tier=="early" fired. Defer the widen
+        # via a flag and apply it after _sl_m is defined below.
+        _early_break_sl_widen = False
         if hasattr(res, 'break_tier') and res.break_tier == "early":
             adjusted_score -= 1
             adjs.append(("Early BREAK (intra-candle, no close confirmation)", -1))
-            _sl_m *= 1.10   # widen SL multiplier for unconfirmed intra-candle entry (Phase 8)
+            _early_break_sl_widen = True   # SL widened 10% below after get_regime_aware_multipliers()
 
         rs_pct = rs_data.get("rs_pct")
         if rs_pct is not None:
@@ -3602,6 +3606,8 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
     )
     if atr_pct > HIGH_ATR_THRESHOLD:
         _sl_m = SL_HIGH_ATR_MULT
+    if _early_break_sl_widen:
+        _sl_m *= 1.10   # widen SL multiplier for unconfirmed intra-candle entry (Phase 8 / Fix J)
 
     if res.fire_long:
         res.tp1 = cur_c + atr_val * _tp1_m
