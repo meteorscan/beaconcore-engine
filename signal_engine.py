@@ -3326,12 +3326,12 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
         # Phase 7 (Fix I) — ADX expanding reward
         if res.signal_type == "BREAK":
             adx15_rising = ctx.get("adx15_rising", False)
-            if adx15_rising and adx15 < ADX_BREAK_GATE:
+            if adx15_rising and ctx["adx15"] < ADX_BREAK_GATE:
                 adjusted_score += 1
-                adjs.append((f"ADX expanding ({adx15:.0f}, rising trend energy)", +1))
-            elif adx15 >= 30.0:
+                adjs.append((f"ADX expanding ({ctx['adx15']:.0f}, rising trend energy)", +1))
+            elif ctx["adx15"] >= 30.0:
                 adjusted_score += 1
-                adjs.append((f"ADX strong ({adx15:.0f})", +1))
+                adjs.append((f"ADX strong ({ctx['adx15']:.0f})", +1))
 
         # Phase 8 (Fix J) — Early BREAK tier scoring
         if hasattr(res, 'break_tier') and res.break_tier == "early":
