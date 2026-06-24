@@ -3154,12 +3154,12 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
 
         # Phase 5 (Fix H) — PULL RSI lower-bound tightening (soft penalty version)
         if ENABLE_PULL_RSI_TIGHTENING:
-            if direction == "long" and r15 < 44.0:
+            if direction == "long" and ctx["r15"] < 44.0:
                 adjusted_score -= 1
-                adjs.append((f"PULL long RSI near oversold territory ({r15:.0f}) — momentum may have broken", -1))
-            elif direction == "short" and r15 > 56.0:
+                adjs.append((f"PULL long RSI near oversold territory ({ctx['r15']:.0f}) — momentum may have broken", -1))
+            elif direction == "short" and ctx["r15"] > 56.0:
                 adjusted_score -= 1
-                adjs.append((f"PULL short RSI near overbought territory ({r15:.0f}) — momentum may have broken", -1))
+                adjs.append((f"PULL short RSI near overbought territory ({ctx['r15']:.0f}) — momentum may have broken", -1))
             # Hard-gate alternative (commented):
             # if ENABLE_PULL_RSI_TIGHTENING:
             #     RSI_PULL_LONG_MIN = 42.0
@@ -3170,11 +3170,11 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
         if ENABLE_PULL_TIERING:
             # Tier C — Prohibited PULL (hard gates)
             if (res.signal_type == "PULL" and direction == "long"
-                    and ctx.get("h4_bear") and ctx.get("h4_trend_held_bear") and r15 < 44.0):
+                    and ctx.get("h4_bear") and ctx.get("h4_trend_held_bear") and ctx["r15"] < 44.0):
                 res.fire_long = False
                 return res
             if (res.signal_type == "PULL" and direction == "short"
-                    and ctx.get("h4_bull") and ctx.get("h4_trend_held_bull") and r15 > 56.0):
+                    and ctx.get("h4_bull") and ctx.get("h4_trend_held_bull") and ctx["r15"] > 56.0):
                 res.fire_short = False
                 return res
             if res.signal_type == "PULL" and direction == "long" and breadth_pct > 0.92:
@@ -3227,7 +3227,7 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             if direction == "long":
                 tier_a = (
                     ctx.get("h4_bull") and ctx.get("h4_trend_held_bull") and ctx.get("h1_bull")
-                    and 44.0 <= r15 <= 58.0
+                    and 44.0 <= ctx["r15"] <= 58.0
                     and pull_depth_long
                     and pull_recover_long
                     and oi_data.get("oi_trend") != "falling"
@@ -3237,7 +3237,7 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             else:
                 tier_a = (
                     ctx.get("h4_bear") and ctx.get("h4_trend_held_bear") and ctx.get("h1_bear")
-                    and 44.0 <= r15 <= 58.0
+                    and 44.0 <= ctx["r15"] <= 58.0
                     and pull_depth_short
                     and pull_recover_short
                     and oi_data.get("oi_trend") != "falling"
@@ -3316,12 +3316,12 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                     adjs.append(("Possible breakout trap — wick below prior low with closing fail", -3))
 
         # Phase 5 (Fix B) — BREAK RSI extended zone discount
-        if res.signal_type == "BREAK" and direction == "long" and r15 > 75:
+        if res.signal_type == "BREAK" and direction == "long" and ctx["r15"] > 75:
             adjusted_score -= 1
-            adjs.append((f"BREAK RSI elevated ({r15:.0f} > 75, momentum potentially exhausted)", -1))
-        elif res.signal_type == "BREAK" and direction == "short" and r15 < 25:
+            adjs.append((f"BREAK RSI elevated ({ctx['r15']:.0f} > 75, momentum potentially exhausted)", -1))
+        elif res.signal_type == "BREAK" and direction == "short" and ctx["r15"] < 25:
             adjusted_score -= 1
-            adjs.append((f"BREAK RSI elevated ({r15:.0f} < 25, momentum potentially exhausted)", -1))
+            adjs.append((f"BREAK RSI elevated ({ctx['r15']:.0f} < 25, momentum potentially exhausted)", -1))
 
         # Phase 7 (Fix I) — ADX expanding reward
         if res.signal_type == "BREAK":
