@@ -14,7 +14,7 @@ from zoneinfo import ZoneInfo
 # removed below in utils.py.
 from utils import safe, atr
 
-__version__ = "15.8.1.2"  # Rollback pass (2026-06-20): reverted the Section 6
+__version__ = "15.8.1.5"  # tp1_then_sl removed; SL-after-TP1 resolves as plain tp1
 # frequency-tuning constants (MIN_RR_RATIO, ADX_SCORE_MIN, MIN_DAILY_ADX,
 # ADX_BREAK_GATE, TREND_HOLD_BARS, SIGNAL_COOLDOWN_BARS[_HIGHSCORE],
 # MAX_SIGNALS_DEFAULT/BULL_TREND) back to their pre-Section-6 originals. See
@@ -1447,7 +1447,7 @@ def compute_win_rates(state: dict) -> dict:
 
     with _state_lock:
         raw_hist = [e for e in state.get("signal_history", [])
-                    if e.get("result") in ("tp1", "tp2", "sl", "tp1_then_sl")
+                    if e.get("result") in ("tp1", "tp2", "sl")
                     and e.get("timestamp", 0) >= lookback_cut
                     and e.get("sent", True)]
 
@@ -1464,15 +1464,9 @@ def compute_win_rates(state: dict) -> dict:
 
     def wr_for(entries):
         n = len(entries)
-        # [Fix-12] Explicit, documented choice for "tp1_then_sl": counted as a HALF-WIN
-        # (weight 0.5) rather than folded into a clean "tp1" win (old, buggy behavior)
-        # or a clean loss. Rationale: the trade did capture partial profit before
-        # reversing, so calling it a full loss overstates the damage, but calling it a
-        # full win overstates the quality of the signal. TUNABLE — this weighting is a
-        # judgment call, not a derived value; revisit once enough tp1_then_sl samples
-        # exist to check whether it behaves more like a win or a loss empirically.
+        # tp1_then_sl is gone — SL-after-TP1 now resolves as plain "tp1".
         wins = sum(
-            1.0 if e["result"] in ("tp1", "tp2") else 0.5 if e["result"] == "tp1_then_sl" else 0.0
+            1.0 if e["result"] in ("tp1", "tp2") else 0.0
             for e in entries
         )
         # [Fix-28] Track the most recent contributing entry's timestamp so callers
@@ -3619,10 +3613,6 @@ def check_cooldown(state, coin, direction, bar_index, signal_type: str = "",
 
     if last_bar is not None:
         bars_elapsed = bar_index - last_bar
-        # [Fix-12] "tp1_then_sl" deliberately does NOT qualify for the shorter
-        # post-win cooldown below — it reversed into the stop after partial profit,
-        # so it falls through to the default/high-score branches like any other
-        # non-clean-win outcome.
         if prev_outcome in ("tp1", "tp2"):
             required_bars = SIGNAL_COOLDOWN_POST_WIN_BARS
         elif candidate_score >= SIGNAL_HIGHSCORE_THRESHOLD:
@@ -3993,7 +3983,7 @@ def check_active_signals(state: dict, bar_index_now: int,
                     "resolved_at": int(time.time()),
                 })
             sig["resolved"] = True
-            if outcome in ("tp1", "tp2", "sl", "tp1_then_sl"):
+            if outcome in ("tp1", "tp2", "sl"):
                 cooldown_key = f"{symbol}_{direction}"
                 with _state_lock:
                     state.setdefault("last_signal_outcome", {})[cooldown_key] = outcome
@@ -4002,11 +3992,6 @@ def check_active_signals(state: dict, bar_index_now: int,
                 if outcome == "sl":
                     signal_type = sig.get("signal_type", "UNKNOWN")
                     record_failed_breakout(state, symbol, direction, signal_type, bar_index_now)
-                # [Fix-12] "tp1_then_sl" is deliberately NOT routed into post_loss_cooldown
-                # or record_failed_breakout — it took partial profit before reversing, which
-                # is a materially different failure mode than a clean stop-out. This is a
-                # judgment call; revisit if data shows tp1_then_sl trades cluster the same
-                # way clean losses do.
 
         for candle in new_candles:
             c_high = candle["h"]
@@ -4043,11 +4028,8 @@ def check_active_signals(state: dict, bar_index_now: int,
                     break
 
                 if tp1_hit and not sig.get("resolved", False) and c_low <= sl:
-                    # [Fix-12] Distinct outcome from a clean "tp1" win — this trade hit
-                    # SL after already taking TP1 partial profit. Previously folded into
-                    # "tp1", making it indistinguishable from a clean win in win-rate stats.
-                    print(f"  [TRACK] {symbol} SL hit after TP1 — resolving as tp1_then_sl")
-                    resolve_signal("tp1_then_sl")
+                    print(f"  [TRACK] {symbol} SL hit after TP1 — resolving as tp1 (full win)")
+                    resolve_signal("tp1")
                     break
             else:
                 if not tp1_hit:
@@ -4077,9 +4059,8 @@ def check_active_signals(state: dict, bar_index_now: int,
                     break
 
                 if tp1_hit and not sig.get("resolved", False) and c_high >= sl:
-                    # [Fix-12] See long-side comment above — same distinct-outcome fix.
-                    print(f"  [TRACK] {symbol} SL hit after TP1 — resolving as tp1_then_sl")
-                    resolve_signal("tp1_then_sl")
+                    print(f"  [TRACK] {symbol} SL hit after TP1 — resolving as tp1 (full win)")
+                    resolve_signal("tp1")
                     break
 
         if not sig.get("resolved", False):
@@ -4135,24 +4116,20 @@ def send_summary(state: dict):
     with _state_lock:
         recent = [e for e in state.get("resolved_signals", []) if e["resolved_at"] >= cutoff_24h]
         all_history = [e for e in state.get("signal_history", [])
-                        if e.get("result") in ("tp1", "tp2", "sl", "tp1_then_sl")]
-    tp1_count        = sum(1 for e in recent if e["outcome"] == "tp1")
-    tp2_count        = sum(1 for e in recent if e["outcome"] == "tp2")
-    sl_count         = sum(1 for e in recent if e["outcome"] == "sl")
-    tp1_then_sl_count = sum(1 for e in recent if e["outcome"] == "tp1_then_sl")
+                        if e.get("result") in ("tp1", "tp2", "sl")]
+    tp1_count  = sum(1 for e in recent if e["outcome"] == "tp1")
+    tp2_count  = sum(1 for e in recent if e["outcome"] == "tp2")
+    sl_count   = sum(1 for e in recent if e["outcome"] == "sl")
     winners    = tp1_count + tp2_count
-    # [Fix-12] tp1_then_sl shown as its own line, not silently merged into either
-    # winners or losers — see wr_for() for the weighting convention (counted as a
-    # half-win) used in the overall win-rate figure below.
     losers     = sl_count
-    if winners == 0 and losers == 0 and tp1_then_sl_count == 0:
+    if winners == 0 and losers == 0:
         return
 
-    total       = len(all_history)
-    overall_wr  = None
+    total      = len(all_history)
+    overall_wr = None
     if total >= WIN_RATE_MIN_SAMPLE:
         wins       = sum(
-            1.0 if r.get("result") in ("tp1", "tp2") else 0.5 if r.get("result") == "tp1_then_sl" else 0.0
+            1.0 if r.get("result") in ("tp1", "tp2") else 0.0
             for r in all_history
         )
         overall_wr = wins / total
@@ -4161,7 +4138,6 @@ def send_summary(state: dict):
         f"📊 Signal Summary (last 24h)  •  v{__version__} - Liquidity Confluence ON",
         f"✅ Winners: {winners} (🔥×{tp1_count}  🏆×{tp2_count})",
         f"❌ Losers:  {losers} (😭×{sl_count})",
-        f"🟡 TP1-then-SL: {tp1_then_sl_count} (counted as half-win in overall WR)",
     ]
     if overall_wr is not None:
         lines.append(f"📈 Overall Win Rate: {overall_wr*100:.0f}% ({total} trades)")
@@ -4170,9 +4146,8 @@ def send_summary(state: dict):
         return sum(
             +2 if e["result"] == "tp2"
             else +1 if e["result"] == "tp1"
-            else +0.5 if e["result"] == "tp1_then_sl"
             else -1
-            for e in entries if e.get("result") in ("tp1", "tp2", "sl", "tp1_then_sl")
+            for e in entries if e.get("result") in ("tp1", "tp2", "sl")
         )
 
     breakdown_lines = []
@@ -4182,7 +4157,7 @@ def send_summary(state: dict):
                       if e.get("signal_type") == sig_type and e.get("direction") == dirn]
             if len(subset) >= 5:
                 wins = sum(
-                    1.0 if e["result"] in ("tp1", "tp2") else 0.5 if e["result"] == "tp1_then_sl" else 0.0
+                    1.0 if e["result"] in ("tp1", "tp2") else 0.0
                     for e in subset
                 )
                 wr   = wins / len(subset)
