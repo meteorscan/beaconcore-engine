@@ -3289,7 +3289,7 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             # Breakout-trap detection (liquidity grab + close-back-below-level, weak OI)
             TRAP_SWH_MULT: float = 0.3
             if direction == "long":
-                _prior_high_5 = max(h15[-(i + 2)] for i in range(5))
+                _prior_high_5 = max(ind["h15"][-(i + 2)] for i in range(5))
                 _wick_above_prior = cur_h > _prior_high_5 and cur_c < _prior_high_5
                 _wick_ratio = (cur_h - max(cur_o, cur_c)) / (cur_h - cur_l) if (cur_h - cur_l) > 0 else 0
                 _trap_signal = (
@@ -3302,7 +3302,7 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                     adjusted_score -= 3
                     adjs.append(("Possible breakout trap — wick above prior high with closing fail", -3))
             elif direction == "short":
-                _prior_low_5 = min(l15[-(i + 2)] for i in range(5))
+                _prior_low_5 = min(ind["l15"][-(i + 2)] for i in range(5))
                 _wick_below_prior = cur_l < _prior_low_5 and cur_c > _prior_low_5
                 _wick_ratio = (min(cur_o, cur_c) - cur_l) / (cur_h - cur_l) if (cur_h - cur_l) > 0 else 0
                 _trap_signal = (
@@ -4684,7 +4684,7 @@ def send_summary(state: dict):
         overall_wr = wins / total
 
     lines = [
-        f"📊 Signal Summary (last 24h)  •  v{__version__} - Liquidity Confluence ON",
+        f"📊 Signal Summary (last 24h)  •  v{__version__}",
         f"✅ Winners: {winners} (🔥×{tp1_count}  🏆×{tp2_count})",
         f"❌ Losers:  {losers} (😭×{sl_count})",
     ]
