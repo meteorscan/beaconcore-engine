@@ -4497,14 +4497,7 @@ def format_signal(symbol: str, sig: SignalResult, engine_tag: str = "V5", rank: 
     vol_ratio_line = (f"Volume Ratio: {sig.vol_ratio:.1f}x" if sig.vol_ratio is not None
                       else "Volume Ratio: N/A")
 
-    score_trail = ""
-    if sig.score_adjustments:
-        parts = []
-        for lbl, adj in sig.score_adjustments:
-            sign = "+" if adj > 0 else ""
-            safe_lbl = lbl.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-            parts.append(f"{safe_lbl}: {sign}{adj}")
-        score_trail = "\n<i>Adjustments: " + "  |  ".join(parts) + "</i>"
+    score_trail = ""  # Adjustments block removed from Telegram output
 
     # ── Liquidity confluence block ──
     liq_block = ""
