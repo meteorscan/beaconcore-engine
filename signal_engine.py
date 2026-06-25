@@ -4536,23 +4536,20 @@ def format_signal(symbol: str, sig: SignalResult, engine_tag: str = "V5", rank: 
     medal        = RANK_MEDALS.get(rank, "")
     rank_tag     = f"{medal} <b>Priority #{rank}</b>\n" if rank else ""
     counter_tag  = "⚠️ " if "counter-trend" in (sig.btc_regime_label or "") else ""
+    liq_conf_str = "ON" if ENABLE_LIQUIDITY_CONFLUENCE else "OFF"
 
     return (
         f"{rank_tag}{counter_tag}{emoji} <b>{direction} [{sig.signal_type}]</b>  {stars(sig.final_score)}\n"
-        f"<b>Pair:</b> {symbol}   <b>Score:</b> {sig.final_score}   <b>Lev:</b> {lev_band}\n\n"
+        f"<b>Pair:</b> {symbol}\n\n"
         f"<b>Entry:</b> <code>{fmt(sig.entry)}</code>\n"
-        f"<b>Zone:</b> <code>{fmt(sig.entry_low)}</code> – <code>{fmt(sig.entry_high)}</code>\n"
-        f"{pull_entry_block}"
+        f"<b>Entry Zone:</b> <code>{fmt(sig.entry_low)}</code> – <code>{fmt(sig.entry_high)}</code>\n"
+        f"{pull_entry_block}\n"
         f"<b>TP1:</b> <code>{fmt(sig.tp1)}</code>\n"
         f"<b>TP2:</b> <code>{fmt(sig.tp2)}</code>\n"
         f"<b>SL:</b>  <code>{fmt(sig.sl)}</code>\n\n"
-        f"{oi_line}\n"
-        f"{btc_line}\n"
-        f"{breadth_line}\n"
-        f"{chk_funding} {funding_str}   📊 {format_oi(sig.open_interest)}\n"
-        f"{spread_line}"
-        f"{sr_block}"
-        f"{score_trail}\n"
+        f"{sr_lines}\n"
+        f"<b>Leverage:</b> {lev_band}\n"
+        f"<b>Liquidity Confluence:</b> {liq_conf_str}\n\n"
         f"<i>v{__version__} • {ts}</i>"
     )
 
