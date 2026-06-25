@@ -4546,39 +4546,21 @@ def format_signal(symbol: str, sig: SignalResult, engine_tag: str = "V5", rank: 
 
     return (
         f"{rank_tag}{counter_tag}{emoji} <b>{direction} [{sig.signal_type}]</b>  {stars(sig.final_score)}\n"
-        f"<b>Pair:</b>  {symbol}\n\n"
+        f"<b>Pair:</b> {symbol}   <b>Score:</b> {sig.final_score}   <b>Lev:</b> {lev_band}\n\n"
         f"<b>Entry:</b> <code>{fmt(sig.entry)}</code>\n"
-        f"<b>Entry Zone:</b> <code>{fmt(sig.entry_low)}</code> – <code>{fmt(sig.entry_high)}</code>\n"
+        f"<b>Zone:</b> <code>{fmt(sig.entry_low)}</code> – <code>{fmt(sig.entry_high)}</code>\n"
         f"{pull_entry_block}"
-        f"\n<b>TP1:</b>   <code>{fmt(sig.tp1)}</code>\n"
-        f"<b>TP2:</b>   <code>{fmt(sig.tp2)}</code>\n"
-        f"<b>SL:</b>    <code>{fmt(sig.sl)}</code>\n\n"
-        f"<b>Leverage:</b> {lev_range}\n"
-        f"<b>Leverage Range:</b> {lev_band}\n"
-        f"<b>Score:</b> {sig.final_score}/{sig.score}+adj  |  {sig.breakdown}\n"
-        f"<b>Gates:</b> {sig.v10_gates}\n"
-        f"<b>Cont. Prob:</b> {sig.continuation_prob_score}/10  |  <b>Tier:</b> {sig.signal_type}-{sig.pull_tier if sig.signal_type == 'PULL' else sig.break_tier}\n"
-        f"\n<b>Signal Context</b>\n"
+        f"<b>TP1:</b> <code>{fmt(sig.tp1)}</code>\n"
+        f"<b>TP2:</b> <code>{fmt(sig.tp2)}</code>\n"
+        f"<b>SL:</b>  <code>{fmt(sig.sl)}</code>\n\n"
         f"{oi_line}\n"
         f"{btc_line}\n"
         f"{breadth_line}\n"
-        f"{rs_line}\n"
-        f"{wr_line}\n"
-        f"{macro_line}\n"
-        f"{d200_line}\n"
-        f"{vol_ratio_line}"
+        f"{chk_funding} {funding_str}   📊 {format_oi(sig.open_interest)}\n"
         f"{spread_line}"
-        f"{liq_block}"
-        f"{score_trail}"
-        f"{sr_block}\n"
-        f"<b>Pre-Trade Checklist</b>\n"
-        f"✅ Trend identified (4H/1H/15m aligned)\n"
-        f"{'✅' if sig.supports or sig.resistances else '☐'} Key S/R marked\n"
-        f"✅ Clear entry signal ({sig.signal_type}, score {sig.final_score}/{sig.score}+adj)\n"
-        f"✅ Leverage appropriate ({lev_range})\n"
-        f"{chk_funding} {funding_str}\n"
-        f"📊 {format_oi(sig.open_interest)}\n\n"
-        f"<i>Scalp Swing v{__version__} [4H/15m] • Hyperliquid Perps • {ts}</i>"
+        f"{sr_block}"
+        f"{score_trail}\n"
+        f"<i>v{__version__} • {ts}</i>"
     )
 
 # ═══════════════════════════════════════════════════════════════
@@ -4831,7 +4813,7 @@ def send_summary(state: dict):
         overall_wr = wins / total
 
     lines = [
-        f"📊 Signal Summary (last 24h)  •  v{__version__} - Liquidity Confluence ON",
+        f"📊 Signal Summary (last 24h)  •  v{__version__}",
         f"✅ Winners: {winners} (🔥×{tp1_count}  🏆×{tp2_count})",
         f"❌ Losers:  {losers} (😭×{sl_count})",
     ]
