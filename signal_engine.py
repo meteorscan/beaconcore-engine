@@ -15,7 +15,7 @@ from collections import OrderedDict  # [AUDIT-P7-6] for LRU _indicator_cache evi
 # removed below in utils.py.
 from utils import safe, atr
 
-__version__ = "17.0.2"  # SL widening: BREAK 0.85->1.2, PULL 0.85->1.1, HIGH_ATR 0.90->1.25, REGIME_HIGH_VOL_SL 0.95->1.15; TP1 raised to match
+__version__ = "17.0.3"  # SL widening: BREAK 0.85->1.2, PULL 0.85->1.1, HIGH_ATR 0.90->1.25, REGIME_HIGH_VOL_SL 0.95->1.15; TP1 raised to match
 # frequency-tuning constants (MIN_RR_RATIO, ADX_SCORE_MIN, MIN_DAILY_ADX,
 # ADX_BREAK_GATE, TREND_HOLD_BARS, SIGNAL_COOLDOWN_BARS[_HIGHSCORE],
 # MAX_SIGNALS_DEFAULT/BULL_TREND) back to their pre-Section-6 originals. See
@@ -2606,7 +2606,7 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
 
     ef15 = safe(ema_f15[-1])
     es15 = safe(ema_s15[-1])
-    r15  = safe(rsi15_arr[-1])
+    r15  = safe(rsi15_arr[-1], 50.0)   # [Fix-ZEC-1] neutral fallback; prevents None >= float crash when RSI arr is short
     a15  = safe(atr15_arr[-1], 25.0)
     adx15 = safe(adx15_arr[-1], 25.0)
     bb_basis   = safe(bb_b15[-1])
@@ -2672,7 +2672,7 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
     ef1h = safe(ind["ema_f1h"][-1]); es1h = safe(ind["ema_s1h"][-1])
     h1_bull = ef1h > es1h
     h1_bear = ef1h < es1h
-    r1h = safe(ind["rsi1h"][-1])
+    r1h = safe(ind["rsi1h"][-1], 50.0)  # [Fix-ZEC-2] neutral fallback; prevents None >= float crash when 1H RSI arr is short
 
     rsi_divergence = {"type": None, "strength": 0}
     if USE_1H_RSI_DIVERGENCE:
@@ -4180,6 +4180,16 @@ def compute_signals(symbol, candles_15m, candles_1h, candles_4h, candles_d,
     res.symbol = symbol
 
     if not candles_15m or len(candles_15m) < 50:
+        return res
+
+    # [Fix-ZEC-3] Guard against thin 1H/4H history that would leave RSI/EMA arrays
+    # too short to produce a valid last value, causing safe() to return None and
+    # crashing any subsequent >= comparison.  14 bars is the minimum RSI lookback;
+    # 10 bars is the minimum for a meaningful 4H EMA.  Symbols that fail this check
+    # are skipped cleanly rather than crashing the whole scan worker.
+    if not candles_1h or len(candles_1h) < 14:
+        return res
+    if not candles_4h or len(candles_4h) < 10:
         return res
 
     ind = _compute_signal_indicators(symbol, candles_15m, candles_1h, candles_4h, candles_d)
