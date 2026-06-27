@@ -15,7 +15,7 @@ from collections import OrderedDict  # [AUDIT-P7-6] for LRU _indicator_cache evi
 # removed below in utils.py.
 from utils import safe, atr
 
-__version__ = "17.0.3"  # SL widening: BREAK 0.85->1.2, PULL 0.85->1.1, HIGH_ATR 0.90->1.25, REGIME_HIGH_VOL_SL 0.95->1.15; TP1 raised to match
+__version__ = "17.0.4"  # Tier1: PULL_REQUIRES_4H_OVERRIDE Bearish+Mixed=False; HIGHSCORE cooldown 2->1
 # frequency-tuning constants (MIN_RR_RATIO, ADX_SCORE_MIN, MIN_DAILY_ADX,
 # ADX_BREAK_GATE, TREND_HOLD_BARS, SIGNAL_COOLDOWN_BARS[_HIGHSCORE],
 # MAX_SIGNALS_DEFAULT/BULL_TREND) back to their pre-Section-6 originals. See
@@ -574,7 +574,10 @@ PULL_REQUIRES_4H  = True
 # decision itself; PULL_REQUIRES_4H above remains the global fallback
 # (True, unchanged) until a reviewer populates specific entries. See
 # get_pull_requires_4h().
-PULL_REQUIRES_4H_OVERRIDE: dict[str, bool] = {}
+PULL_REQUIRES_4H_OVERRIDE: dict[str, bool] = {
+    "Bearish": False,   # Bear regime has no 4H bull confirmation — don't require what can't exist
+    "Mixed":   False,   # Mixed/choppy regime flips too often to hold a valid 4H trend requirement
+}
 
 FUNDING_SUPPRESS_EXTREME: float = 0.0010
 SR_CLEARANCE_ATR_MULT: float    = 0.15
@@ -815,9 +818,13 @@ SR_LOOKBACK_BARS: int = 200
 # Original: SIGNAL_COOLDOWN_BARS_HIGHSCORE=2.
 # [ROLLBACK 2026-06-20] Per signal-quality review: re-firing the same
 # symbol/direction 15 min later just compounds a wrong read rather than
-# confirming it. Both reverted to 2.
+# confirming it. Base cooldown reverted to 2 and kept there.
+# [TIER1-FIX-1] SIGNAL_COOLDOWN_BARS_HIGHSCORE restored to 1: signals
+# scoring >= SIGNAL_HIGHSCORE_THRESHOLD (7) have already cleared every
+# quality gate at the highest bar — a 30-min lockout is overly conservative
+# for high-conviction setups. Base SIGNAL_COOLDOWN_BARS stays at 2.
 SIGNAL_COOLDOWN_BARS:           int = 2
-SIGNAL_COOLDOWN_BARS_HIGHSCORE: int = 2
+SIGNAL_COOLDOWN_BARS_HIGHSCORE: int = 1
 SIGNAL_HIGHSCORE_THRESHOLD:     int = 7
 SIGNAL_COOLDOWN_POST_WIN_BARS:  int = 1
 
