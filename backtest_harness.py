@@ -72,6 +72,36 @@ from signal_engine import (  # noqa: E402
     INTERVAL_MS,
     N_15M, N_1H, N_4H, N_1D,
 )
+import signal_engine as _signal_engine
+
+# ── Macro calendar rate-limit fix ─────────────────────────────────────────
+# In live mode, fetch_macro_calendar() caches results in the state dict for
+# 1 hour (MACRO_CACHE_TTL_S=3600). In backtest, state={} is passed on every
+# bar so the cache is wiped each time — causing thousands of HTTP requests
+# and 429 rate-limit errors from faireconomy.media.
+# Fix: monkey-patch fetch_macro_calendar() to fetch exactly once at startup
+# and reuse that result for all bars. Zero changes to signal_engine.py.
+_macro_once_cache: list = []
+_macro_fetched: bool = False
+
+def _macro_fetch_once(state: dict) -> list:  # noqa: ANN001
+    global _macro_once_cache, _macro_fetched
+    if not _macro_fetched:
+        try:
+            _macro_once_cache = _signal_engine.fetch_macro_calendar.__wrapped__(state) \
+                if hasattr(_signal_engine.fetch_macro_calendar, "__wrapped__") \
+                else _original_macro_fetch(state)
+        except Exception as exc:
+            print(f"[BT] Macro calendar pre-fetch failed ({exc}) — using empty cache")
+            _macro_once_cache = []
+        _macro_fetched = True
+        print(f"[BT] Macro calendar pre-fetched once ({len(_macro_once_cache)} event(s)) "
+              f"— will reuse for all replay bars")
+    return _macro_once_cache
+
+_original_macro_fetch = _signal_engine.fetch_macro_calendar
+_signal_engine.fetch_macro_calendar = _macro_fetch_once
+# ─────────────────────────────────────────────────────────────────────────
 
 # ── Constants ─────────────────────────────────────────────────────────────
 WARMUP_BARS  = 250   # bars skipped so EMA200 / ADX / ATR have valid history
