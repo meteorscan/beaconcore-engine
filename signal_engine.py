@@ -2510,7 +2510,8 @@ def record_failed_breakout(state: dict, symbol: str, direction: str,
 
 def get_regime_aware_multipliers(btc_regime: dict | None,
                                   atr_pctile: float | None,
-                                  signal_type: str) -> tuple[float, float, float]:
+                                  signal_type: str,
+                                  direction: str = "long") -> tuple[float, float, float]:
     if signal_type == "BREAK":
         tp1_mult = TP1_MULT_BREAK
         tp2_mult = TP2_MULT_BREAK
@@ -2534,7 +2535,11 @@ def get_regime_aware_multipliers(btc_regime: dict | None,
         sl_mult  *= REGIME_LOW_VOL_SL_MULT
 
     if btc_regime is not None:
-        if btc_regime.get("bearish"):
+        if btc_regime.get("bearish") and direction != "short":
+            # [v17.0.5] Gate bear TP1 penalty to longs only. Rationale: REGIME_BEAR_TP1_MULT
+            # conservatively clips upside targets when fighting a bear trend. Applying it to
+            # shorts (with-trend trades) shrinks TP1 while SL stays wide, structurally
+            # guaranteeing R:R < MIN_RR_RATIO=1.0 and suppressing valid bear-regime shorts.
             tp1_mult *= REGIME_BEAR_TP1_MULT
         if btc_regime.get("bullish"):
             tp2_mult *= REGIME_BULL_TP2_MULT
@@ -3706,7 +3711,7 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             adjusted_score = _adj(adjusted_score, adjs, f"Funding headwind rising on {res.signal_type} ({rate*100:+.4f}%/8h ↑)", -1)  # [FIX-AUDIT-D4]
 
     _tp1_m, _tp2_m, _sl_m = get_regime_aware_multipliers(
-        btc_regime, _atr_pctile, res.signal_type
+        btc_regime, _atr_pctile, res.signal_type, direction
     )
     if atr_pct > HIGH_ATR_THRESHOLD:
         _sl_m = SL_HIGH_ATR_MULT
