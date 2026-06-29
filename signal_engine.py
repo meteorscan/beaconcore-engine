@@ -15,7 +15,7 @@ from collections import OrderedDict  # [AUDIT-P7-6] for LRU _indicator_cache evi
 # removed below in utils.py.
 from utils import safe, atr
 
-__version__ = "17.0.4"  # Tier1: PULL_REQUIRES_4H_OVERRIDE Bearish+Mixed=False; HIGHSCORE cooldown 2->1
+__version__ = "17.0.5"  # Tier1: PULL_REQUIRES_4H_OVERRIDE Bearish+Mixed=False; HIGHSCORE cooldown 2->1
 # frequency-tuning constants (MIN_RR_RATIO, ADX_SCORE_MIN, MIN_DAILY_ADX,
 # ADX_BREAK_GATE, TREND_HOLD_BARS, SIGNAL_COOLDOWN_BARS[_HIGHSCORE],
 # MAX_SIGNALS_DEFAULT/BULL_TREND) back to their pre-Section-6 originals. See
