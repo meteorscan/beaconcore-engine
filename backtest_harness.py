@@ -6,45 +6,31 @@ to measure raw signal quality WITHOUT modifying any engine code.
 
 Usage
 -----
-    # Quick check — BTC only, 30 days (run this first):
     python backtest_harness.py
-
-    # Full watchlist, 90 days:
     python backtest_harness.py --days 90 --symbols all
-
-    # Single symbol:
     python backtest_harness.py --days 60 --symbols BTCUSDT
-
-    # Multiple symbols:
     python backtest_harness.py --days 60 --symbols BTCUSDT,ETHUSDT,SOLUSDT
 
 KNOWN LIMITATIONS (read before interpreting results)
 -----------------------------------------------------
 1. OI / Funding unavailable historically.
-   compute_signals() receives funding_rate=None and an empty state dict
-   (no OI history). OI score adjustments return 0 and oi_trend="unknown".
-   Signals suppressed in live trading by extreme funding will NOT be
-   suppressed here. All signals are tagged oi_dependent=True.
+   compute_signals() receives funding_rate=None and an empty state dict.
+   OI score adjustments return 0 and oi_trend="unknown".
+   All signals are tagged oi_dependent=True.
 
 2. No market breadth / RS in replay.
-   get_btc_regime(), compute_market_breadth(), finalize_rs_cache() all read
-   from global caches populated by the live scan loop. In backtest those
-   caches are empty — BTC regime returns neutral/unknown and breadth
-   defaults to 0.5. Regime-gated signals (Tier C breadth hard-gates,
-   dynamic max signals) will score differently than live.
+   BTC regime returns neutral/unknown and breadth defaults to 0.5.
+   Regime-gated signals will score differently than live.
 
 3. Empty state = no cooldowns, no win-rate adaptive scoring.
-   Raw signal frequency will be higher than live. This is intentional —
-   you are measuring signal quality, not simulated live frequency.
+   Raw signal frequency will be higher than live. This is intentional.
 
 4. No SPREAD filter.
-   scan_symbol()'s spread check requires a live mark price. Only
-   compute_signals() is called here so spread penalties do not apply.
+   Only compute_signals() is called here so spread penalties do not apply.
 
 5. Entry at bar close.
-   Entry price is the close of the signal bar. Live entry is slightly
-   above/below close due to slippage. Results will be marginally optimistic
-   on RR.
+   Entry price is the close of the signal bar. Results will be marginally
+   optimistic on RR.
 """
 
 from __future__ import annotations
@@ -56,10 +42,6 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-# ── Import from the engine (no modifications to engine code) ──────────────
-# signal_engine.py raises RuntimeError at import if TG_BOT_TOKEN/TG_CHAT_ID
-# env vars are missing. Stub them before import so the harness can run
-# standalone without a live Telegram config.
 import os
 os.environ.setdefault("TG_BOT_TOKEN", "backtest_stub")
 os.environ.setdefault("TG_CHAT_ID",   "backtest_stub")
@@ -74,17 +56,10 @@ from signal_engine import (  # noqa: E402
 )
 import signal_engine as _signal_engine
 
-# ── Macro calendar rate-limit fix ─────────────────────────────────────────
-# In live mode, fetch_macro_calendar() caches results in the state dict for
-# 1 hour (MACRO_CACHE_TTL_S=3600). In backtest, state={} is passed on every
-# bar so the cache is wiped each time — causing thousands of HTTP requests
-# and 429 rate-limit errors from faireconomy.media.
-# Fix: monkey-patch fetch_macro_calendar() to fetch exactly once at startup
-# and reuse that result for all bars. Zero changes to signal_engine.py.
 _macro_once_cache: list = []
 _macro_fetched: bool = False
 
-def _macro_fetch_once(state: dict) -> list:  # noqa: ANN001
+def _macro_fetch_once(state: dict) -> list:
     global _macro_once_cache, _macro_fetched
     if not _macro_fetched:
         try:
@@ -101,18 +76,11 @@ def _macro_fetch_once(state: dict) -> list:  # noqa: ANN001
 
 _original_macro_fetch = _signal_engine.fetch_macro_calendar
 _signal_engine.fetch_macro_calendar = _macro_fetch_once
-# ─────────────────────────────────────────────────────────────────────────
 
-# ── Constants ─────────────────────────────────────────────────────────────
-WARMUP_BARS  = 250   # bars skipped so EMA200 / ADX / ATR have valid history
-OUTCOME_BARS = 48    # bars forward to evaluate TP / SL (48 × 15m = 12 hours)
-REPLAY_STEP  = 1     # advance 1 bar per iteration (most accurate, slowest)
-                     # set to 2 for ~2× speed with minimal accuracy loss
+WARMUP_BARS  = 250
+OUTCOME_BARS = 48
+REPLAY_STEP  = 1
 
-
-# ══════════════════════════════════════════════════════════════════════════
-# CANDLE FETCHING
-# ══════════════════════════════════════════════════════════════════════════
 
 def fetch_backtest_candles(
     symbol: str,
@@ -120,14 +88,9 @@ def fetch_backtest_candles(
     days: int,
     end_reference_ms: int,
 ) -> list[dict]:
-    """
-    Fetch `days` of closed candles up to `end_reference_ms` using the
-    engine's existing get_candles() with an explicit start_time_ms.
-    Adds a 50-bar warmup buffer beyond the requested window.
-    """
     iv_ms        = INTERVAL_MS.get(interval, 60 * 60 * 1000)
     bars_per_day = (24 * 60 * 60 * 1000) // iv_ms
-    n_bars       = days * bars_per_day + WARMUP_BARS + 50   # warmup + safety buffer
+    n_bars       = days * bars_per_day + WARMUP_BARS + 50
     start_ms     = end_reference_ms - (n_bars * iv_ms)
 
     return get_candles(
@@ -139,50 +102,28 @@ def fetch_backtest_candles(
     )
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# LOOKAHEAD-SAFE CANDLE SLICER
-# ══════════════════════════════════════════════════════════════════════════
-
 def slice_before(candles: list[dict], before_ms: int, min_bars: int) -> list[dict] | None:
-    """
-    Return all candles with open timestamp strictly < before_ms.
-    Returns None if fewer than min_bars survive (insufficient history at
-    this bar — skip it rather than producing invalid indicator values).
-
-    Uses timestamp filtering, NOT index arithmetic, to prevent lookahead
-    across timeframe boundaries (e.g. i // 4 is approximate and wrong near
-    hourly closes).
-    """
     sliced = [c for c in candles if c["t"] < before_ms]
     return sliced if len(sliced) >= min_bars else None
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# OUTCOME EVALUATOR
-# ══════════════════════════════════════════════════════════════════════════
-
 def evaluate_outcome(
     direction: str,
-    entry: float,      # noqa: ARG001  (kept for caller clarity / future use)
+    entry: float,
     tp1: float,
     tp2: float,
     sl: float,
     future_bars: list[dict],
 ) -> str:
     """
-    Walk future_bars and return the first resolved outcome.
+    Walk future_bars and return the first resolved outcome:
+      'tp2'         — TP2 hit after TP1
+      'tp1'         — TP1 hit, price did not return to SL within OUTCOME_BARS
+      'tp1_then_sl' — TP1 hit, then SL hit on a later bar
+      'sl'          — SL hit before TP1
+      'open'        — neither target hit within OUTCOME_BARS
 
-    Return values
-    -------------
-    'tp2'         — TP2 hit after TP1
-    'tp1'         — TP1 hit, price did not return to SL within OUTCOME_BARS
-    'tp1_then_sl' — TP1 hit, then SL hit on a later bar
-    'sl'          — SL hit before TP1
-    'open'        — neither target hit within OUTCOME_BARS
-
-    Same-bar TP1 + SL tie-breaking: whichever level is closer to the bar's
-    open price wins. This mirrors the live bot's check_active_signals()
-    resolution exactly (see the c_open distance comparison there).
+    Same-bar TP1 + SL: whichever level is closer to the bar's open wins.
     """
     tp1_hit = False
 
@@ -194,10 +135,9 @@ def evaluate_outcome(
         if direction == "long":
             if not tp1_hit:
                 if c_high >= tp1 and c_low <= sl:
-                    # Same bar: closer to open wins
                     if abs(sl - c_open) < abs(tp1 - c_open):
                         return "sl"
-                    return "tp1"   # conservative — don't expose to TP2
+                    return "tp1"
                 if c_high >= tp1:
                     tp1_hit = True
                 elif c_low <= sl:
@@ -208,7 +148,7 @@ def evaluate_outcome(
                 if c_low <= sl:
                     return "tp1_then_sl"
 
-        else:  # short
+        else:
             if not tp1_hit:
                 if c_low <= tp1 and c_high >= sl:
                     if abs(sl - c_open) < abs(tp1 - c_open):
@@ -227,10 +167,6 @@ def evaluate_outcome(
     return "tp1" if tp1_hit else "open"
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# SINGLE-SYMBOL REPLAY
-# ══════════════════════════════════════════════════════════════════════════
-
 def replay_symbol(
     symbol: str,
     all_15m: list[dict],
@@ -239,28 +175,12 @@ def replay_symbol(
     all_1d:  list[dict],
     verbose: bool = False,
 ) -> list[dict]:
-    """
-    Slide bar-by-bar over pre-fetched candles, calling compute_signals()
-    at each bar with only the history available up to that point.
-
-    Returns a list of signal dicts (outcomes evaluated separately in
-    run_backtest so future_bars can be stripped before JSON serialisation).
-
-    Notes
-    -----
-    - state={} on every call: no cooldowns, no OI/funding history.
-      This is intentional — we measure raw signal quality.
-    - record_market_inputs=False: prevents writes to the global breadth /
-      RS caches that the live scan loop maintains.
-    - reference_ms is set to the bar's open timestamp so daily_vwap() and
-      filter_closed_candles() behave correctly without lookahead.
-    """
     signals: list[dict] = []
     end_idx = len(all_15m) - OUTCOME_BARS
 
     for i in range(WARMUP_BARS, end_idx, REPLAY_STEP):
         bar    = all_15m[i]
-        ref_ms = bar["t"]   # this bar's open = "now"
+        ref_ms = bar["t"]
 
         w15 = slice_before(all_15m, ref_ms, min_bars=50)
         w1h = slice_before(all_1h,  ref_ms, min_bars=14)
@@ -268,7 +188,7 @@ def replay_symbol(
         w1d = slice_before(all_1d,  ref_ms, min_bars=1)
 
         if w15 is None or w1h is None or w4h is None:
-            continue   # not enough history yet
+            continue
 
         try:
             result = compute_signals(
@@ -277,10 +197,10 @@ def replay_symbol(
                 candles_1h           = w1h,
                 candles_4h           = w4h,
                 candles_d            = w1d,
-                state                = {},      # empty: no cooldowns
-                record_market_inputs = False,   # don't pollute global caches
+                state                = {},
+                record_market_inputs = False,
                 reference_ms         = ref_ms,
-                funding_rate         = None,    # not available historically
+                funding_rate         = None,
             )
         except Exception as exc:
             if verbose:
@@ -293,7 +213,7 @@ def replay_symbol(
             continue
 
         direction   = "long" if result.fire_long else "short"
-        entry_price = w15[-1]["c"]   # close of the signal bar
+        entry_price = w15[-1]["c"]
         future_bars = all_15m[i + 1 : i + 1 + OUTCOME_BARS]
 
         sig_record = {
@@ -320,8 +240,7 @@ def replay_symbol(
             "rr_tp2":       round(abs(result.tp2 - entry_price) /
                                   abs(entry_price - result.sl), 2)
                             if abs(entry_price - result.sl) > 0 else None,
-            "oi_dependent": True,   # always True: OI/funding unavailable historically
-            # outcome and future_bars filled by run_backtest()
+            "oi_dependent": True,
             "outcome":      None,
             "future_bars":  future_bars,
         }
@@ -337,16 +256,7 @@ def replay_symbol(
     return signals
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# RESULTS AGGREGATOR
-# ══════════════════════════════════════════════════════════════════════════
-
 def aggregate_results(signals: list[dict]) -> dict:
-    """
-    Compute win rate, frequency, and per-type / per-score / per-symbol
-    breakdowns. Call after outcomes have been evaluated and future_bars
-    stripped.
-    """
     total = len(signals)
     if total == 0:
         return {"total": 0}
@@ -369,7 +279,6 @@ def aggregate_results(signals: list[dict]) -> dict:
         "by_symbol":    {},
     }
 
-    # ── By signal type ────────────────────────────────────────────────────
     for sig_type in ("BREAK", "PULL"):
         subset = [s for s in signals if s.get("signal_type") == sig_type]
         if subset:
@@ -380,7 +289,6 @@ def aggregate_results(signals: list[dict]) -> dict:
                 "win_rate": round(w / len(subset), 4),
             }
 
-    # ── By direction ──────────────────────────────────────────────────────
     for dirn in ("long", "short"):
         subset = [s for s in signals if s.get("direction") == dirn]
         if subset:
@@ -391,7 +299,6 @@ def aggregate_results(signals: list[dict]) -> dict:
                 "win_rate": round(w / len(subset), 4),
             }
 
-    # ── By minimum final_score ────────────────────────────────────────────
     for floor in range(3, 11):
         subset = [s for s in signals if (s.get("final_score") or 0) >= floor]
         if subset:
@@ -402,7 +309,6 @@ def aggregate_results(signals: list[dict]) -> dict:
                 "win_rate": round(w / len(subset), 4),
             }
 
-    # ── By symbol ─────────────────────────────────────────────────────────
     for sym in sorted(set(s["symbol"] for s in signals)):
         subset = [s for s in signals if s["symbol"] == sym]
         w = sum(1 for s in subset if s["outcome"] in ("tp2", "tp1"))
@@ -471,30 +377,12 @@ def print_results(agg: dict, days: int, symbols: list[str]) -> None:
     print()
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# MAIN ENTRY POINT
-# ══════════════════════════════════════════════════════════════════════════
-
 def run_backtest(
     symbols: list[str] | None = None,
     days: int = 30,
     output_file: str = "backtest_results.json",
     verbose: bool = False,
 ) -> dict:
-    """
-    Full backtest run.
-
-    Parameters
-    ----------
-    symbols     : List of WATCHLIST symbols. None → ["BTCUSDT"] (safe default).
-    days        : Calendar days of history to fetch and replay.
-    output_file : Path to write JSON results (signals + aggregate stats).
-    verbose     : Print each signal as it's found during replay.
-
-    Returns
-    -------
-    Aggregate results dict.
-    """
     if symbols is None:
         symbols = ["BTCUSDT"]
 
@@ -526,7 +414,6 @@ def run_backtest(
         signals = replay_symbol(symbol, c15, c1h, c4h, c1d, verbose=verbose)
         print(f"  → {len(signals)} raw signal(s) found")
 
-        # Evaluate outcomes and strip future_bars before serialisation
         for sig in signals:
             future = sig.pop("future_bars", [])
             sig["outcome"] = evaluate_outcome(
@@ -543,7 +430,6 @@ def run_backtest(
     agg = aggregate_results(all_signals)
     print_results(agg, days, symbols)
 
-    # Save full signal log + aggregate stats to JSON
     output = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "engine_file":  "signal_engine.py",
@@ -560,10 +446,6 @@ def run_backtest(
     return agg
 
 
-# ══════════════════════════════════════════════════════════════════════════
-# CLI
-# ══════════════════════════════════════════════════════════════════════════
-
 def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
         description="Backtest harness for beaconcore signal_engine.py",
@@ -571,16 +453,9 @@ def _parse_args() -> argparse.Namespace:
         epilog="""
 Examples
 --------
-  # Start here — BTC only, 30 days:
   python backtest_harness.py
-
-  # Full watchlist, 90 days:
   python backtest_harness.py --days 90 --symbols all
-
-  # Single symbol, verbose:
   python backtest_harness.py --days 60 --symbols BTCUSDT --verbose
-
-  # Multiple symbols:
   python backtest_harness.py --days 60 --symbols BTCUSDT,ETHUSDT,SOLUSDT
         """,
     )
@@ -590,10 +465,7 @@ Examples
     )
     p.add_argument(
         "--symbols", type=str, default="BTCUSDT",
-        help=(
-            'Comma-separated symbols, or "all" for full WATCHLIST. '
-            'Default: BTCUSDT'
-        ),
+        help='Comma-separated symbols, or "all" for full WATCHLIST. Default: BTCUSDT',
     )
     p.add_argument(
         "--output", type=str, default="backtest_results.json",
@@ -614,7 +486,6 @@ if __name__ == "__main__":
     else:
         target_symbols = [s.strip().upper() for s in args.symbols.split(",")]
 
-    # Validate symbols against WATCHLIST
     invalid = [s for s in target_symbols if s not in WATCHLIST]
     if invalid:
         print(f"[BT] WARNING: these symbols are not in WATCHLIST and may "
