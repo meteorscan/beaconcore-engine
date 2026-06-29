@@ -15,7 +15,23 @@ from collections import OrderedDict  # [AUDIT-P7-6] for LRU _indicator_cache evi
 # removed below in utils.py.
 from utils import safe, atr
 
-__version__ = "17.0.5"  # Tier1: PULL_REQUIRES_4H_OVERRIDE Bearish+Mixed=False; HIGHSCORE cooldown 2->1
+__version__ = "17.0.7"  # [v17.0.7] MAX_SIGNALS_DEFAULT 5->3, MAX_SIGNALS_BULL_TREND 8->5: best-of-best selection only.
+# - ENABLE_EARLY_BREAK_TIER disabled: early-tier fires weak BREAK signals with only -1 penalty,
+#   causing losses. Full-gate BREAK already covers genuine breakouts.
+# - ADX_BREAK_GATE 25->22: restores the Phase 7 (Fix I) intent — rising ADX ≥20 was already
+#   accepted, but 25 hard-gate was blocking valid breakouts in trending conditions.
+# - BREAK_OVEREXT_ATR_MULT 2.0->2.5, BREAK_MA_DIST_ATR_MULT 3.5->4.5,
+#   BREAK_MULTIBAR_ATR_MULT 3.5->4.5: loosen overextension thresholds — current values were
+#   firing on normal strong breakout candles, penalizing -1/-3 on valid setups.
+# - BREAK_VOL_MULT 1.2->1.0: removes soft -1 vol penalty on signals just below 1.2x avg;
+#   1.0x vol on a breakout is fine — the overextension gate already handles blow-offs.
+# - BREAK_OI_FLAT_VOL_THRESHOLD 1.5->2.0: OI flat + vol < 2x is now required to trigger
+#   the -1 OI-flat penalty, reducing false penalty fires on moderate-vol breakouts.
+# - MIN_DAILY_ADX 18.0->16.0: reduces daily ADX gate; 18 was blocking valid setups in
+#   coins that trend well at lower ADX values.
+# - SIGNAL_COOLDOWN_BARS 2->1: reduces 30min cooldown to 15min for faster re-entry on
+#   missed or expired signals in fast-moving breakout conditions.
+# - MAX_SIGNALS_DEFAULT 4->5->3, MAX_SIGNALS_BULL_TREND 7->8->5: tightened to best-of-best selection only.
 # frequency-tuning constants (MIN_RR_RATIO, ADX_SCORE_MIN, MIN_DAILY_ADX,
 # ADX_BREAK_GATE, TREND_HOLD_BARS, SIGNAL_COOLDOWN_BARS[_HIGHSCORE],
 # MAX_SIGNALS_DEFAULT/BULL_TREND) back to their pre-Section-6 originals. See
@@ -419,9 +435,9 @@ USE_DYNAMIC_MAX_SIGNALS: bool = True
 # [ROLLBACK 2026-06-20] Per signal-quality review: this is a sizing lever, not a
 # quality lever — tightening it buys breathing room while the Section 8 score
 # logic fixes are validated, without touching the actual signal logic. 9/5 -> 7/4.
-MAX_SIGNALS_BULL_TREND: int = 7
+MAX_SIGNALS_BULL_TREND: int = 5   # [v17.0.6] 7->8; tightened 8->5: fewer slots forces priority_score() to keep only top-ranked (score × win_rate × OI × liquidity) in bull regime
 MAX_SIGNALS_BEAR_TREND: int = 5  # [FIX-AUDIT-D5] separate cap for bear regime (was incorrectly using bull value=7)
-MAX_SIGNALS_DEFAULT: int = 4
+MAX_SIGNALS_DEFAULT: int = 3     # [v17.0.6] 4->5; tightened 5->3: enforces best-of-best selection — pending_signals are already sorted by priority_score() so only the 3 highest-quality signals fire
 BREADTH_BULL_THRESHOLD: float = 0.70
 
 USE_FALSE_BREAKOUT_DETECTION: bool = True
@@ -442,14 +458,14 @@ FALSE_BREAKOUT_BONUS: int = 1
 # bar (in place since v15.1.0 for a documented reason, FIX-M8) was the gate that
 # kept weak-trend setups from scoring as high as strong ones in the BREAK path.
 # Reverted to originals.
-ADX_BREAK_GATE  = 25.0
+ADX_BREAK_GATE  = 22.0  # [v17.0.6] 25->22: restores Phase 7 (Fix I) intent; rising ADX ≥20 path was already there but 25 hard-gate was blocking valid breakouts
 ADX_SCORE_MIN   = 20.0
 
 # Phase 1 (Fix A) — Overextension/Blow-off Suppression for BREAK
 ENABLE_OVEREXTENSION_GATE: bool = True
-BREAK_OVEREXT_ATR_MULT: float = 2.0
-BREAK_MA_DIST_ATR_MULT: float = 3.5
-BREAK_MULTIBAR_ATR_MULT: float = 3.5
+BREAK_OVEREXT_ATR_MULT: float = 2.5   # [v17.0.6] 2.0->2.5: 2.0 was firing on normal strong breakout candles
+BREAK_MA_DIST_ATR_MULT: float = 4.5  # [v17.0.6] 3.5->4.5: less aggressive on valid momentum candles
+BREAK_MULTIBAR_ATR_MULT: float = 4.5 # [v17.0.6] 3.5->4.5: matches MA dist loosening
 BREAK_OVEREXT_LOOKBACK: int = 4
 
 # Phase 2 (Fix F) — Suppress Counter-4H-Trend PULL
@@ -484,7 +500,7 @@ ADX_RISING_LOOKBACK: int = 2
 ENABLE_SCORE_REBALANCE: bool = True
 
 # Phase 8 (Fix J) — Two-Tier BREAK Engine
-ENABLE_EARLY_BREAK_TIER: bool = True
+ENABLE_EARLY_BREAK_TIER: bool = False  # [v17.0.6] disabled: fires weak BREAK signals with only -1 soft penalty; full-gate BREAK covers genuine breakouts without the loss rate
 EARLY_BREAK_PRIOR_HIGHS_LOOKBACK: int = 3
 EARLY_BREAK_REQUIRE_ADX_RISING: bool = True
 
@@ -562,7 +578,7 @@ USE_DAILY_ADX     = True
 # higher signal frequency is wanted. Original: 18.0.
 # [ROLLBACK 2026-06-20] Per signal-quality review: the daily trend filter got
 # weakened twice in a row across versions. Reverted to original 18.0.
-MIN_DAILY_ADX     = 18.0
+MIN_DAILY_ADX     = 16.0  # [v17.0.6] 18->16: reduces false blocks on coins that trend at lower daily ADX
 PULL_REQUIRES_4H  = True
 # [Fix-37] TUNABLE — needs validation. Section 6 Item 10: per-symbol or
 # per-BTC-regime-label override for PULL_REQUIRES_4H, rather than a single
@@ -583,13 +599,13 @@ FUNDING_SUPPRESS_EXTREME: float = 0.0010
 SR_CLEARANCE_ATR_MULT: float    = 0.15
 SUPPORT_PROXIMITY_ATR: float    = 0.75
 
-BREAK_OI_FLAT_VOL_THRESHOLD: float = 1.5
+BREAK_OI_FLAT_VOL_THRESHOLD: float = 2.0  # [v17.0.6] 1.5->2.0: require higher vol before OI-flat penalty fires
 FUNDING_PULL_WARN_MIN: float        = 0.0005
 
 OI_HISTORY_DEPTH: int        = 6
 OI_CHANGE_THRESHOLD_PCT: float = 1.0
 
-BREAK_VOL_MULT: float = 1.2
+BREAK_VOL_MULT: float = 1.0  # [v17.0.6] 1.2->1.0: removes -1 penalty on signals with average vol; overextension gate handles blow-offs separately
 BREAK_VOL_ACCEL_BARS: int = 2
 
 RS_TOP_PERCENTILE: float    = 0.20
@@ -823,7 +839,7 @@ SR_LOOKBACK_BARS: int = 200
 # scoring >= SIGNAL_HIGHSCORE_THRESHOLD (7) have already cleared every
 # quality gate at the highest bar — a 30-min lockout is overly conservative
 # for high-conviction setups. Base SIGNAL_COOLDOWN_BARS stays at 2.
-SIGNAL_COOLDOWN_BARS:           int = 2
+SIGNAL_COOLDOWN_BARS:           int = 1   # [v17.0.6] 2->1: 15min cooldown (was 30min); faster re-entry in breakout conditions
 SIGNAL_COOLDOWN_BARS_HIGHSCORE: int = 1
 SIGNAL_HIGHSCORE_THRESHOLD:     int = 7
 SIGNAL_COOLDOWN_POST_WIN_BARS:  int = 1
