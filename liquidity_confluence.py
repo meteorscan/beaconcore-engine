@@ -7,19 +7,6 @@ from typing import Optional, Iterable
 
 from utils import safe, atr
 
-# ─────────────────────────────────────────────────────────────
-# [Fix-45] MSSResult.direction / BOSResult.direction / FVGResult.direction
-# are produced as "bullish"/"bearish" (see detect_mss/detect_bos/detect_fvg
-# below), but the trade-side `direction` threaded through analyze() is
-# "long"/"short". Every comparison in this module used to do
-# `mss.direction == direction` directly, which is a vocabulary mismatch
-# that can NEVER be true ("bullish" != "long"), and for MSS specifically
-# meant a genuinely aligned MSS fell into the *counter-direction* branch
-# and got hard-suppressed instead of rewarded. _dir_matches() is the single
-# place that translates between the two vocabularies — sweep alignment
-# already did this translation correctly inline; MSS/BOS/FVG now route
-# through the same helper instead of a raw ==/!= on mismatched vocab.
-# ─────────────────────────────────────────────────────────────
 def _dir_matches(struct_direction: str | None, trade_direction: str) -> bool:
     """True if a 'bullish'/'bearish' structure direction agrees with a
     'long'/'short' trade direction."""
@@ -27,7 +14,6 @@ def _dir_matches(struct_direction: str | None, trade_direction: str) -> bool:
         return False
     return (struct_direction == "bullish" and trade_direction == "long") or \
            (struct_direction == "bearish" and trade_direction == "short")
-
 
 # ─────────────────────────────────────────────────────────────
 # CONFIGURATION (all weights configurable, no hardcoded scoring)
@@ -47,10 +33,6 @@ class LiquidityConfig:
 
     # EQH/EQL
     eqh_eql_atr_mult: float = 0.15
-    # [Fix-21] TUNABLE — needs validation. Raised from 2 to 3 per audit Section 5
-    # Item 3. This will reduce how often the eqh_eql_weight bonus and the
-    # eqh_eql_strength_mult multiplier apply (fewer clusters qualify as "equal
-    # highs/lows"), trading some frequency for a stricter equal-highs/lows definition.
     eqh_eql_min_touches: int = 3
     eqh_eql_strength_mult: float = 1.5
 
@@ -99,15 +81,8 @@ class LiquidityConfig:
     # ── Scoring weights (no hardcoded scoring values anywhere) ──
     external_liquidity_weight: int = 2
     internal_liquidity_weight: int = 1
-    # [Fix-14] TUNABLE — needs validation. Gates for the existence-based bonuses
-    # above: a level only earns its bonus if within this many ATRs of price.
-    # Internal levels are expected closer-in by definition, hence the tighter default.
     external_liquidity_max_dist_atr: float = 3.0
     internal_liquidity_max_dist_atr: float = 1.5
-    # [Fix-14] TUNABLE — normalizes raw _cluster_strength() output (roughly 0-5 in
-    # typical conditions) to a 0..1 multiplier applied to the bonus weights above.
-    # A level with strength >= this value gets the full weight; weaker levels get
-    # proportionally less.
     liquidity_strength_norm: float = 2.0
     sweep_weight: int = 4
     mss_weight: int = 5
@@ -119,27 +94,11 @@ class LiquidityConfig:
     eqh_eql_weight: int = 1
     l2_imbalance_weight: int = 1
     premium_discount_weight: int = 2
-    # [Fix-41] TUNABLE — needs validation. Entering long into a premium zone or
-    # short into a discount zone (trading the wrong side of the HTF range) was
-    # only penalized at the same weight as the favorable-zone bonus (2), which
-    # wasn't enough to matter once HTF alignment/R:R/other bonuses stacked on
-    # top. Adverse zone entries get their own, larger penalty.
     premium_discount_adverse_weight: int = 4
     rr_weight: int = 2
     sweep_recency_weight: int = 2
     confidence_decay_penalty_per_bar: int = 1
 
-    # [Fix-43] HTF (1h/4h) liquidity layer — ADDITIVE, layered alongside the
-    # existing 15m-derived scoring above rather than replacing it (see
-    # premium_discount_weight / external_liquidity_weight, which remain
-    # 15m-only and unchanged). Previously candles_1h/candles_4h were accepted
-    # by analyze() but always passed as None at the call site, so the only
-    # "HTF" input was the htf_bull_flags EMA-cross boolean — no real 1h/4h
-    # dealing range, external BSL/SSL pools, or premium/discount zone was
-    # ever computed. This block runs the same LiquidityAnalyzer used for 15m
-    # against real 1h/4h candles instead. TUNABLE — needs validation; start
-    # by comparing reasons/score deltas against the pre-existing 15m-only
-    # behavior before promoting any of these from "additive" to "replacing."
     htf_min_candles: int = 30
     # Cache 1h/4h swing/level/sweep computation per (symbol, timeframe),
     # keyed by the last closed HTF candle's timestamp — 1h/4h structure does
@@ -170,38 +129,15 @@ class LiquidityConfig:
     htf_sweep_weight: int = 6
 
     # Caps
-    # [Fix-13] TUNABLE — needs validation. Was 20, which is 3-5x the typical core
-    # engine base score (4-6 points from the six-boolean long_score/short_score sum
-    # in _detect_raw_signals), letting the liquidity bonus dominate the final score
-    # rather than confirm it. Reduced to 10, the top of the audit's suggested 8-10
-    # range. MUST stay reconciled with MAX_POSITIVE_ADJUSTMENTS in the main bot file
-    # (see Fix-13 there) — if you change one, change the other.
     max_bonus: int = 10
     final_strength_cap: int = 100
 
-    # [Fix-27] TUNABLE, default off (opt-in). When True, the sweep/MSS/BOS
-    # confirmation bonuses only count if at least two of those three fire together
-    # aligned with the signal's direction, rather than each contributing
-    # independently. Additive — does not replace the independent-scoring behavior,
-    # so it can be A/B compared by toggling this flag alone.
     require_multi_component_confluence: bool = False
 
     # Hard-suppress toggle for false sweeps
-    # [Fix-16] TUNABLE either way, but an explicit decision: left at False on
-    # purpose. A false sweep is ambiguous/borderline by nature (see _is_false_sweep's
-    # pending-state handling, Fix-22), so hard-suppressing on it would discard
-    # signals on what is often a judgment call rather than a clear invalidation.
     hard_suppress_false_sweeps: bool = False
     # Hard-suppress toggle for counter-directional MSS
-    # [Fix-16] TUNABLE, flipped from False to True. Previously both toggles
-    # defaulted to False, meaning hard_suppress could never actually be set under
-    # shipped defaults — dead code. A counter-directional MSS (price structurally
-    # breaking against the signal's own direction) is a strong, fairly unambiguous
-    # invalidation signal, not a borderline call, so it's enabled by default. Confirm
-    # against your own data before shipping — this changes behavior (some signals
-    # that previously fired will now be suppressed).
     hard_suppress_counter_mss: bool = True
-
 
 # ─────────────────────────────────────────────────────────────
 # DATA STRUCTURES
@@ -217,7 +153,6 @@ class LiquidityLevel:
     touches: int = 1
     is_eqh_eql: bool = False
 
-
 @dataclass
 class SweepResult:
     sweep_detected: bool = False
@@ -227,30 +162,17 @@ class SweepResult:
     is_false_sweep: bool = False
     volume_confirmed: bool = False
     age_bars: int = 0
-    # [Fix-22] TUNABLE — needs validation. Explicit three-state tracking of the
-    # false-sweep ambiguity window (audit Section 7 Item 9 / Part 3). Previously
-    # `is_false_sweep` was a plain bool, and `_is_false_sweep()`'s early return
-    # (not enough bars closed yet to judge) collapsed onto `False`, which callers
-    # then read as "confirmed valid" — silently overstating confidence during the
-    # one-bar+ window where the sweep's outcome genuinely isn't known yet.
-    # `sweep_status` makes that window an explicit value instead of an implicit
-    # false. Kept alongside `is_false_sweep` (not replacing it) so existing
-    # callers/tests that read the bool keep working unchanged; `is_false_sweep`
-    # is derived as `sweep_status == "confirmed_false"`.
     sweep_status: str = "confirmed_valid"  # "confirmed_valid" | "confirmed_false" | "pending"
-
 
 @dataclass
 class MSSResult:
     mss_detected: bool = False
     direction: Optional[str] = None    # "bullish" | "bearish" | None
 
-
 @dataclass
 class BOSResult:
     bos_detected: bool = False
     direction: Optional[str] = None
-
 
 @dataclass
 class FVGResult:
@@ -259,7 +181,6 @@ class FVGResult:
     top: float = 0.0
     bottom: float = 0.0
     age_bars: int = 0
-
 
 @dataclass
 class ConfluenceOutput:
@@ -281,11 +202,6 @@ class ConfluenceOutput:
     reasons: list = field(default_factory=list)
     hard_suppress: bool = False
 
-    # [Fix-43] Real 1h/4h liquidity structure (separate from htf_alignment
-    # above, which is the borrowed EMA-cross boolean). "neutral"/None when
-    # candles_1h/candles_4h weren't supplied or didn't have enough bars —
-    # always backward compatible with the candles_1h=None/candles_4h=None
-    # call pattern.
     htf_liquidity_score: int = 0
     htf_1h_zone: str = "neutral"
     htf_4h_zone: str = "neutral"
@@ -295,7 +211,6 @@ class ConfluenceOutput:
     htf_4h_external_ssl: Optional[float] = None
     htf_1h_sweep: dict = field(default_factory=dict)
     htf_4h_sweep: dict = field(default_factory=dict)
-
 
 # ─────────────────────────────────────────────────────────────
 # LIQUIDITY ANALYZER
@@ -569,7 +484,7 @@ class LiquidityAnalyzer:
     def _is_false_sweep_status(self, candles: list[dict], level_price: float,
                         direction: str, atr_val: float,
                         sweep_bar_index: int, current_bar_index: int) -> str:
-        """[Fix-22] Returns one of "confirmed_valid" / "confirmed_false" /
+        """Returns one of "confirmed_valid" / "confirmed_false" /
         "pending" — see SweepResult.sweep_status docstring. A sweep is
         'confirmed_false' if price continued through the level rather than
         rejecting, evaluated using bars that closed *after* the sweep bar.
@@ -631,7 +546,6 @@ class LiquidityAnalyzer:
         else:
             zone = "neutral"
         return zone, range_high, range_low, equilibrium
-
 
 # ─────────────────────────────────────────────────────────────
 # STRUCTURE ANALYZER
@@ -775,7 +689,6 @@ class StructureAnalyzer:
 
         return FVGResult()
 
-
 # ─────────────────────────────────────────────────────────────
 # SIGNAL CONFLUENCE — Scoring engine (single integration point)
 # ─────────────────────────────────────────────────────────────
@@ -800,15 +713,6 @@ class SignalConfluence:
         self._cache: dict[str, dict] = {}
         self._lock = threading.Lock()
 
-    # [Fix-44] HTF (1h/4h) swing/level/sweep/zone computation, cached per
-    # (symbol, timeframe). Keyed off the last closed candle's timestamp —
-    # not a time-based TTL — so the cache is correct-by-construction: it
-    # only ever serves a result computed from the exact candle list it was
-    # asked about, and is invalidated for free the moment a new HTF bar
-    # closes. This is real liquidity analysis (actual dealing range, actual
-    # external BSL/SSL, actual sweep) on whatever candle list is passed in
-    # — LiquidityAnalyzer/StructureAnalyzer are stateless and already
-    # timeframe-agnostic, same as the existing 15m path uses.
     def _get_htf_analysis(
         self, symbol: str, candles: list[dict] | None,
         tf_label: str, current_price: float,
@@ -977,11 +881,7 @@ class SignalConfluence:
                 htf_aligned = bear_1h and bear_4h
         out.htf_alignment = htf_aligned
 
-        # 8b) [Fix-43] Real HTF (1h/4h) liquidity structure — separate from
-        # htf_aligned above. Backward compatible: candles_1h/candles_4h are
-        # None by default at most call sites, in which case this is a no-op
-        # and htf_data entries stay None (output fields keep their dataclass
-        # defaults, scoring section below contributes nothing).
+        # Real HTF (1h/4h) liquidity structure — backward compatible when candles are None.
         htf_data: dict[str, dict | None] = {
             "1h": self._get_htf_analysis(symbol, candles_1h, "1h", current_price),
             "4h": self._get_htf_analysis(symbol, candles_4h, "4h", current_price),
@@ -1014,15 +914,6 @@ class SignalConfluence:
         reasons: list[str] = []
 
         # External liquidity target existence
-        # [Fix-14] TUNABLE — needs validation. Previously this awarded the full
-        # external_liquidity_weight on a bare existence check (`if out.nearest_external_bsl:`),
-        # which is true on the overwhelming majority of scans (audit Part 5) and therefore
-        # added little real signal. Now gated by (a) proximity — only awarded if the level
-        # is within external_liquidity_max_dist_atr of price — and (b) scaled by the level's
-        # already-computed strength (touches/age/volume), so a weak, distant level contributes
-        # less or nothing. `external_target` itself (used below for the R:R check) is still set
-        # whenever a level exists, independent of whether the bonus was awarded — the RR check
-        # is a different question from "is this existence bonus-worthy."
         external_target = None
         if direction == "long" and out.nearest_external_bsl:
             external_target = out.nearest_external_bsl
@@ -1069,12 +960,6 @@ class SignalConfluence:
                     score += awarded
                     reasons.append(f"Internal SSL target {dist_atr:.1f} ATR away, strength {lvl.strength:.1f} +{awarded}")
 
-        # [Fix-43] HTF (1h/4h) external liquidity target + premium/discount
-        # zone — additive layer, independently scored from the 15m blocks
-        # above (which use 15m-derived levels/zone). Each timeframe is
-        # gated against its OWN ATR (see htf_external_liquidity_max_dist_atr
-        # comment), not the 15m atr_val_15m used everywhere else in this
-        # method — a 4h pool's "closeness" has to be judged in 4h-ATR units.
         htf_score_contribution = 0
         for tf_label, d in htf_data.items():
             if not d:
@@ -1122,11 +1007,6 @@ class SignalConfluence:
                 htf_score_contribution -= cfg.htf_zone_weight
                 reasons.append(f"{tf_label.upper()} discount zone (short) -{cfg.htf_zone_weight}")
 
-        # [Fix-27] TUNABLE, opt-in (default off) — additive toggle, not a replacement
-        # of the independent-scoring behavior below, so it can be A/B compared. When
-        # enabled, the sweep/MSS/BOS *bonuses* (not their counter-direction penalties,
-        # which remain independent risk controls regardless of this flag) only count
-        # if at least two of {sweep, MSS, BOS} fire together aligned with `direction`.
         _sweep_aligns_dir = (
             sweep.sweep_detected and not sweep.is_false_sweep
             and ((sweep.sweep_type == "bullish" and direction == "long")
@@ -1155,12 +1035,6 @@ class SignalConfluence:
                     age = min(sweep.age_bars, cfg.sweep_recency_max_bars)
                     recency_mult = cfg.sweep_recency_decay_per_bar ** age
                     sweep_pts = max(0, int(round(cfg.sweep_weight * recency_mult)))
-                    # [Fix-22] TUNABLE — needs validation. sweep_status == "pending"
-                    # means not enough bars have closed since the sweep to confirm it
-                    # didn't fail (see _is_false_sweep_status). Award half the
-                    # otherwise-earned bonus rather than the full amount, so the score
-                    # reflects the genuine one-bar+ uncertainty instead of treating
-                    # "not yet disproven" identically to "confirmed valid."
                     if sweep.sweep_status == "pending":
                         sweep_pts = sweep_pts // 2
                         status_note = " [pending confirmation]"
@@ -1183,11 +1057,6 @@ class SignalConfluence:
                 # confirmation bonus.
                 score -= cfg.sweep_weight
                 reasons.append(f"Counter-direction {sweep.sweep_type} sweep -{cfg.sweep_weight}")
-                # [Fix-40] A volume-confirmed counter-direction sweep is a strong
-                # reversal tell (fresh liquidity grab against our thesis with real
-                # participation) — treat it the same as a counter-direction MSS and
-                # hard-suppress rather than letting it be outvoted by unrelated
-                # bonuses (HTF alignment, zone, R:R, etc.) elsewhere in the score.
                 if cfg.hard_suppress_counter_mss and sweep.volume_confirmed:
                     out.hard_suppress = True
                     reasons.append("Volume-confirmed counter-sweep — hard suppress")
@@ -1204,12 +1073,6 @@ class SignalConfluence:
             if cfg.hard_suppress_counter_mss:
                 out.hard_suppress = True  # Strong counter-structure
 
-        # [Fix-43] HTF (1h/4h) sweep confirmed by 15m MSS — the actual
-        # "HTF liquidity grab -> LTF structure confirms -> enter" pattern.
-        # Deliberately gated on the 15m MSS already firing aligned with
-        # direction (not an independent HTF-only bonus), same recency decay
-        # curve as the 15m sweep bonus above, same pending-status halving
-        # as [Fix-22].
         if mss.mss_detected and _dir_matches(mss.direction, direction):
             for tf_label, d in htf_data.items():
                 if not d:
@@ -1322,7 +1185,6 @@ class SignalConfluence:
         out.reasons = reasons
         return out
 
-
 # ─────────────────────────────────────────────────────────────
 # OPTIONAL: HYPERLIQUID L2 ORDER BOOK IMBALANCE
 # ─────────────────────────────────────────────────────────────
@@ -1352,7 +1214,6 @@ def fetch_l2_imbalance(symbol: str, hl_post_fn, depth: int = 20) -> float | None
         return None
     return bid_vol / ask_vol
 
-
 # ─────────────────────────────────────────────────────────────
 # UNIT TESTS (run with: python -m pytest liquidity_confluence.py)
 # ─────────────────────────────────────────────────────────────
@@ -1367,9 +1228,8 @@ def _make_candles(prices: list[float], vol: float = 1.0) -> list[dict]:
         })
     return out
 
-
 def _make_candles_tf(prices: list[float], bar_ms: int, vol: float = 1.0) -> list[dict]:
-    """[Fix-43] Same as _make_candles but with a configurable bar spacing,
+    """Same as _make_candles but with a configurable bar spacing,
     so HTF tests use realistic 1h (3_600_000ms) / 4h (14_400_000ms)
     timestamps rather than reusing 15m spacing for non-15m data."""
     out = []
@@ -1379,7 +1239,6 @@ def _make_candles_tf(prices: list[float], bar_ms: int, vol: float = 1.0) -> list
             "o": p, "h": p * 1.001, "l": p * 0.999, "c": p, "v": vol,
         })
     return out
-
 
 def test_swing_detection_basic():
     cfg = LiquidityConfig(fractal_left=2, fractal_right=2)
@@ -1391,7 +1250,6 @@ def test_swing_detection_basic():
     candles[5]["h"] = 16
     highs, lows = la.detect_swings(candles)
     assert any(h["index"] == 5 for h in highs), "Peak at index 5 not detected"
-
 
 def test_bullish_sweep():
     cfg = LiquidityConfig(fractal_left=2, fractal_right=2)
@@ -1411,7 +1269,6 @@ def test_bullish_sweep():
     # This is a bullish sweep candidate
     assert sweep.sweep_type in (None, "bullish")
 
-
 def test_fvg_detection():
     cfg = LiquidityConfig()
     sa = StructureAnalyzer(cfg)
@@ -1423,7 +1280,6 @@ def test_fvg_detection():
     ]
     fvg = sa.detect_fvg(candles, atr_val=0.5)
     assert fvg.fvg_detected and fvg.direction == "bullish"
-
 
 def test_confluence_output_schema():
     cfg = LiquidityConfig(enable=True)
@@ -1447,7 +1303,6 @@ def test_confluence_output_schema():
     assert "mss_detected" in out.mss
     assert "bos_detected" in out.bos
 
-
 def test_no_future_leakage():
     """Ensure each swing is confirmed only with past + `fractal_right` bars."""
     cfg = LiquidityConfig(fractal_left=3, fractal_right=3)
@@ -1460,9 +1315,8 @@ def test_no_future_leakage():
     if lows:
         assert lows[-1]["index"] <= len(candles) - cfg.fractal_right - 1
 
-
 def test_sweep_status_pending_vs_confirmed():
-    """[Fix-22] A sweep with too few closed bars after it must report
+    """A sweep with too few closed bars after it must report
     sweep_status == "pending" (not silently "confirmed_valid"/False), and
     is_false_sweep must stay False during that window (it only becomes True
     on a genuine confirmed_false determination)."""
@@ -1495,9 +1349,8 @@ def test_sweep_status_pending_vs_confirmed():
             assert sweep_later.sweep_status in ("confirmed_valid", "confirmed_false")
             assert sweep_later.is_false_sweep == (sweep_later.sweep_status == "confirmed_false")
 
-
 def test_confluence_output_schema_with_htf():
-    """[Fix-43] analyze() with real candles_1h/candles_4h populates genuine
+    """analyze() with real candles_1h/candles_4h populates genuine
     HTF liquidity structure (not just the borrowed EMA htf_bull_flags
     boolean) — actual zone, actual external BSL/SSL, actual sweep summary
     per timeframe."""
@@ -1522,9 +1375,8 @@ def test_confluence_output_schema_with_htf():
     # is additive, not a separate budget.
     assert -cfg.max_bonus <= out.liquidity_score <= cfg.max_bonus
 
-
 def test_confluence_output_schema_with_htf_backward_compatible():
-    """[Fix-43] candles_1h=None/candles_4h=None (the pre-existing default at
+    """candles_1h=None/candles_4h=None (the pre-existing default at
     most call sites) must still work exactly as before — HTF fields stay at
     their neutral/None defaults and no exception is raised."""
     cfg = LiquidityConfig(enable=True)
@@ -1543,9 +1395,8 @@ def test_confluence_output_schema_with_htf_backward_compatible():
     assert out.htf_4h_external_bsl is None
     assert out.htf_liquidity_score == 0
 
-
 def test_no_future_leakage_htf():
-    """[Fix-43] The same no-future-leakage property test_no_future_leakage
+    """The same no-future-leakage property test_no_future_leakage
     proves on 15m candles must hold on HTF (1h/4h) candles too — detect_swings
     is the identical stateless method, but this is verified explicitly at
     HTF scale rather than just assumed from the 15m test."""
@@ -1559,9 +1410,8 @@ def test_no_future_leakage_htf():
         if lows:
             assert lows[-1]["index"] <= len(candles) - cfg.fractal_right - 1
 
-
 def test_htf_cache_reuse_and_invalidation():
-    """[Fix-44] _get_htf_analysis must return a cached result (no
+    """_get_htf_analysis must return a cached result (no
     recomputation) when called again with a candle list whose last closed
     bar's timestamp hasn't changed, and must recompute once a new HTF bar
     closes — verified via object identity, since a cache hit returns the
@@ -1584,16 +1434,14 @@ def test_htf_cache_reuse_and_invalidation():
     assert third is not None
     assert third is not first, "Expected recomputation after a new HTF bar closed"
 
-
 def test_htf_min_candles_gating():
-    """[Fix-43] Too few HTF candles (below htf_min_candles) must return None
+    """Too few HTF candles (below htf_min_candles) must return None
     rather than running fractal detection on an insufficient window."""
     cfg = LiquidityConfig(htf_min_candles=30)
     sc = SignalConfluence(cfg)
     short_candles = _make_candles_tf([100 + i for i in range(10)], 3_600_000)
     result = sc._get_htf_analysis("SHORTUSDT", short_candles, "1h", short_candles[-1]["c"])
     assert result is None
-
 
 if __name__ == "__main__":
     test_swing_detection_basic()
