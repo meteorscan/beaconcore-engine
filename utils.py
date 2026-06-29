@@ -1,6 +1,6 @@
-# utils.py
 from __future__ import annotations
 import math
+
 
 def safe(v, fallback=0.0):
     try:
@@ -11,6 +11,7 @@ def safe(v, fallback=0.0):
         return v
     except (TypeError, ValueError):
         return fallback
+
 
 def atr(highs, lows, closes, period):
     trs = [float("nan")]
@@ -27,6 +28,3 @@ def atr(highs, lows, closes, period):
     for i in range(period + 1, len(trs)):
         result[i] = (result[i - 1] * (period - 1) + trs[i]) / period
     return result
-# [Fix-20] sma() and _cluster_levels() removed — nothing imports them from utils.py
-# (the main bot file keeps its own local definitions with minor usage differences,
-# per audit guidance). Keeping unused, drift-prone copies here served no purpose.
