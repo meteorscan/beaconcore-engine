@@ -6,308 +6,12 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
-from collections import OrderedDict  # [AUDIT-P7-6] for LRU _indicator_cache eviction
-# [Fix-20] Import shared implementations instead of redefining locally — see audit
-# Part 1 LOW item on duplicated safe/atr/sma/_cluster_levels risking silent drift.
-# liquidity_confluence.py already imports safe/atr from utils.py the same way.
-# sma and _cluster_levels are left as local definitions for now (minor differences
-# in usage context per the audit) but their now-fully-dead utils.py copies are
-# removed below in utils.py.
+from collections import OrderedDict
 from utils import safe, atr
 
-__version__ = "17.0.7"  # [v17.0.7] MAX_SIGNALS_DEFAULT 5->3, MAX_SIGNALS_BULL_TREND 8->5: best-of-best selection only.
-# - ENABLE_EARLY_BREAK_TIER disabled: early-tier fires weak BREAK signals with only -1 penalty,
-#   causing losses. Full-gate BREAK already covers genuine breakouts.
-# - ADX_BREAK_GATE 25->22: restores the Phase 7 (Fix I) intent — rising ADX ≥20 was already
-#   accepted, but 25 hard-gate was blocking valid breakouts in trending conditions.
-# - BREAK_OVEREXT_ATR_MULT 2.0->2.5, BREAK_MA_DIST_ATR_MULT 3.5->4.5,
-#   BREAK_MULTIBAR_ATR_MULT 3.5->4.5: loosen overextension thresholds — current values were
-#   firing on normal strong breakout candles, penalizing -1/-3 on valid setups.
-# - BREAK_VOL_MULT 1.2->1.0: removes soft -1 vol penalty on signals just below 1.2x avg;
-#   1.0x vol on a breakout is fine — the overextension gate already handles blow-offs.
-# - BREAK_OI_FLAT_VOL_THRESHOLD 1.5->2.0: OI flat + vol < 2x is now required to trigger
-#   the -1 OI-flat penalty, reducing false penalty fires on moderate-vol breakouts.
-# - MIN_DAILY_ADX 18.0->16.0: reduces daily ADX gate; 18 was blocking valid setups in
-#   coins that trend well at lower ADX values.
-# - SIGNAL_COOLDOWN_BARS 2->1: reduces 30min cooldown to 15min for faster re-entry on
-#   missed or expired signals in fast-moving breakout conditions.
-# - MAX_SIGNALS_DEFAULT 4->5->3, MAX_SIGNALS_BULL_TREND 7->8->5: tightened to best-of-best selection only.
-# frequency-tuning constants (MIN_RR_RATIO, ADX_SCORE_MIN, MIN_DAILY_ADX,
-# ADX_BREAK_GATE, TREND_HOLD_BARS, SIGNAL_COOLDOWN_BARS[_HIGHSCORE],
-# MAX_SIGNALS_DEFAULT/BULL_TREND) back to their pre-Section-6 originals. See
-# SECTION 9 below.
+__version__ = "17.0.7"
 
-# ═══════════════════════════════════════════════════════════════
-# CHANGELOG — BREAK & PULL Engine Overhaul (2026-06-25)
-# Implementation of audit fixes for BREAK/PULL signal quality and timing
-# ═══════════════════════════════════════════════════════════════
-
-# PHASE 1 (Fix A) — Overextension/Blow-off Suppression for BREAK
-#   - ENABLE_OVEREXTENSION_GATE = True
-#   - BREAK_OVEREXT_ATR_MULT = 2.0
-#   - BREAK_MA_DIST_ATR_MULT = 3.5
-#   - BREAK_MULTIBAR_ATR_MULT = 3.5
-#   - BREAK_OVEREXT_LOOKBACK = 4
-#   - Soft penalty: -3 for 2+ overextension signals, -1 for 1 signal
-#   - Breakout-trap detection: -3 penalty for liquidity grabs with closing fail
-#   - Location: _apply_scoring_and_filters() BREAK section
-
-# PHASE 2 (Fix F) — Suppress Counter-4H-Trend PULL
-#   - ENABLE_COUNTERTREND_PULL_GATE = True
-#   - Soft penalty: -2 for PULL into active 4H counter-trend without OI+divergence
-#   - Hard-gate alternative commented for future validation
-#   - Location: _apply_scoring_and_filters() PULL section
-
-# PHASE 3 (Fix C) — Pullback Depth Gate
-#   - ENABLE_PULL_DEPTH_GATE = True
-#   - PULL_MIN_DEPTH_ATR = 0.15
-#   - Hard gate: requires minimum 0.15 ATR penetration below EMA21
-#   - Location: _detect_raw_signals() pull_touched block, folded into long_pull/short_pull
-
-# PHASE 4 (Fix D) — PULL Momentum Collapse Penalty
-#   - ENABLE_PULL_MOMENTUM_COLLAPSE_PENALTY = True
-#   - PULL_RSI_COLLAPSE_THRESH = 5.0
-#   - PULL_RSI_LOOKBACK = 4
-#   - Soft penalty: -1 for RSI dropping >5 pts over 4 bars on PULL
-#   - Location: _apply_scoring_and_filters() PULL section
-
-# PHASE 4 (Fix E) — PULL EMA Velocity Check
-#   - ENABLE_PULL_EMA_VELOCITY_CHECK = True
-#   - Soft penalty: -1 for weakening EMA velocity on PULL
-#   - Location: _apply_scoring_and_filters() EMA velocity block (extended BREAK-only logic)
-
-# PHASE 5 (Fix B) — BREAK RSI Ceiling Expansion
-#   - ENABLE_BREAK_RSI_WIDENING = True
-#   - RSI_BREAK_LONG_MAX: 75.0 → 82.0
-#   - RSI_BREAK_SHORT_MIN: 25.0 → 18.0
-#   - Soft penalty: -1 for BREAK in extended zone (RSI >75 long, <25 short)
-#   - Location: Constants section + _apply_scoring_and_filters() BREAK section
-
-# PHASE 5 (Fix H) — PULL RSI Lower-Bound Tightening
-#   - ENABLE_PULL_RSI_TIGHTENING = True
-#   - Soft penalty: -1 for PULL near oversold/overbought (RSI <44 long, >56 short)
-#   - Hard-gate alternative commented (constant changes)
-#   - Location: _apply_scoring_and_filters() PULL section
-
-# PHASE 6 (Fix G) — VWAP Restoration for Pullback Mode
-#   - ENABLE_PULL_VWAP_RESTORATION = True
-#   - Hard gate: VWAP check now applies to pullback mode (was bypassed)
-#   - Soft-penalty fallback commented for validation
-#   - Location: _detect_raw_signals() vwap_long/vwap_short logic
-
-# PHASE 7 (Fix I) — ADX Expanding Check
-#   - ENABLE_ADX_EXPANDING_CHECK = True
-#   - ADX_RISING_LOOKBACK = 3
-#   - ENABLE_SCORE_REBALANCE = True
-#   - ADX_BREAK_OK: now accepts ADX ≥20 if rising (was ≥25 only)
-#   - Soft bonus: +1 for expanding ADX, +1 for strong ADX ≥30
-#   - Score rebalance: replaced adx4h_score_ok with h4_vol_expansion in base score
-#   - Location: _detect_raw_signals() ADX logic + _apply_scoring_and_filters() BREAK section
-
-# PHASE 8 (Fix J) — Two-Tier BREAK Engine
-#   - ENABLE_EARLY_BREAK_TIER = True
-#   - EARLY_BREAK_PRIOR_HIGHS_LOOKBACK = 3
-#   - EARLY_BREAK_REQUIRE_ADX_RISING = True
-#   - Tier 2 (Early): close-confirmed breakout of a short prior-N-bar lookback, fired
-#     without the full BREAK quality gates — NOT live intra-candle/tick detection.
-#     [AUDIT-P5-1] relabeled; see _detect_raw_signals() early_break_long/short.
-#   - Tier 1 (Standard): unchanged close-confirmed BREAK
-#   - res.break_tier field added for labeling ("early" vs "standard")
-#   - Location: _detect_raw_signals() early_break logic + _apply_scoring_and_filters() scoring
-
-# PHASE 9 — Quality-Stratified PULL Engine
-#   - ENABLE_PULL_TIERING = True
-#   - Tier A: +1 bonus for full quality confirmation (MTF, RSI, depth, VWAP, momentum)
-#   - Tier B: standard PULL (default label)
-#   - Tier C: hard gates for prohibited conditions (counter-trend + bad RSI, extreme breadth)
-#   - Structural backing penalty: -1 if no support/resistance within 1 ATR
-#   - Volume-quality filter: -1 if pullback volume not lower than impulse
-#   - res.pull_tier field added ("A" or "B")
-#   - Location: _apply_scoring_and_filters() PULL section
-
-# CROSS-CUTTING ITEMS
-#   - ENABLE_SR_CLEARANCE_FIX = True: SR clearance only blocks when level not yet cleared
-#   - ENABLE_LIQUIDITY_CONFLUENCE = True: enabled HTF liquidity engine (was False)
-#   - 4H stale-bias penalty: increased from -1 to -2 for PULL signals
-#   - continuation_probability() function added (0-10 scale, baseline 5)
-#   - ENABLE_CONTINUATION_PROB_GATE = False (display-only until validated)
-#   - res.continuation_prob_score field added
-#   - Location: Constants, SR filter logic, 4H stale bias logic, new function
-
-# VALIDATION ORDER (per audit priority)
-#   1. Phase 1 (overextension) → 2. Phase 2 (countertrend PULL) → 3. Phase 3 (depth)
-#   4. Phase 4 (momentum/EMA) → 5. Phase 5 (RSI bands) → 7. Phase 7 (ADX expanding)
-#   8. Phase 8 (early BREAK - validate last, highest complexity)
-#   6. Phase 9 / cross-cutting as time allows
-
-# All new behaviors default to enabled (True) except ENABLE_CONTINUATION_PROB_GATE (False)
-# ═══════════════════════════════════════════════════════════════
-# CHANGELOG — scalp_swing_bot_audit.md implementation pass (2026-06-20)
-# One line per audit item, grouped by implementation_prompt.md section.
-# Full rationale/before-after is in each [Fix-N] inline comment at point of
-# change; this block is an index, not a substitute for reading those.
-# ═══════════════════════════════════════════════════════════════
-# SECTION 4 (deploy-blocking fixes):
-#   1. [Fix-11] ATR history keyed by `symbol` param, not res.symbol (was always "").
-#   2. [Fix-12] New "tp1_then_sl" outcome, distinct from clean "tp1" win.
-#   3. [Fix-13] LiquidityConfig.max_bonus 20->10; MAX_POSITIVE_ADJUSTMENTS 20->10.
-#   4. [Fix-14] External/internal liquidity bonus now gated by ATR-distance + strength.
-#   5. [Fix-15] Hard backstop clamp after bonus-cap loop: adjusted_score <= score+cap.
-#   6. [Fix-16] hard_suppress_counter_mss default False->True; false-sweep left False (documented).
-#   7. [Fix-17] Same-group long+short conflict guard added to deduplicate_correlated().
-#   8. [Fix-18] OI_STALE_CUTOFF_S=45min hard cutoff added to compute_oi_trend().
-#   9. [Fix-19] daily_vwap() now accepts/threads reference_ms.
-#  10. [Fix-20] Main bot imports safe/atr from utils.py; dead sma/_cluster_levels removed from utils.py.
-# SECTION 5 (quality improvements):
-#   2. [Fix-23] _get_data_driven_penalty_priority() — data-driven PENALTY_PRIORITY ordering.
-#   3. [Fix-21] eqh_eql_min_touches 2->3.
-#   5. [Fix-24] S/R system reconciliation — logging/visibility only, no scoring change.
-#   6. [Fix-25] backtest_harness.py scaffolded, then REMOVED in a later pass
-#      (2026-06-20): confirmed it has zero runtime dependency in this file (the
-#      bot never imports it — only the harness imported FROM the bot, to
-#      replay live scoring logic offline), so it's not needed to give signals
-#      and was deleted as unused/incomplete (historical candle ingestion was
-#      never wired up). The TUNABLE items below that mention "needs backtest
-#      validation" still mean exactly that in spirit — those tradeoffs remain
-#      unvalidated against historical data — there's just no in-repo harness
-#      for it anymore.
-#   7. [Fix-26] RSI band narrowing tracked via comment, no values changed (no data yet).
-#   9. [Fix-27] require_multi_component_confluence opt-in toggle (default off).
-#  10. [Fix-28] Win-rate staleness guard (WIN_RATE_STALE_DAYS) added to compute_win_rate_analytics.
-# SECTION 6 (frequency — conditional; user explicitly confirmed wanted on 2026-06-20):
-#   1. [Fix-29] TREND_HOLD_BARS 2->1.
-#   2. [Fix-30] ADX_BREAK_GATE 25->22, ADX_SCORE_MIN 20->17.5, MIN_DAILY_ADX 18->16.
-#   3. NOT implemented — flagged for user decision. Adding WATCHLIST symbols
-#      requires real liquidity/listing judgment outside the codebase; no
-#      starter list guessed. See implementation_prompt_section6.md Item 3.
-#   4. [Fix-31] MIN_RR_RATIO 0.9->0.8.
-#   5. [Fix-32] RS_BREAK_HARD_GATE_PCT hard-suppress (`return res`) converted to
-#      a heavy score penalty (RS_BREAK_HARD_GATE_PENALTY=-3) that flows through
-#      the existing [Fix-9] penalty-cap/PENALTY_PRIORITY machinery.
-#   6. [Fix-33] compute_pairwise_correlation_matrix()/cluster_by_correlation()
-#      added — DIAGNOSTIC LOGGING ONLY (LOG_DYNAMIC_CORR_GROUPS, default False).
-#      CORR_GROUPS["layer1"] hand-picked membership left UNCHANGED — actual
-#      regrouping still flagged as a decision requiring multi-scan data review
-#      or manual judgment, per audit instruction not to invent it.
-#   7. [Fix-34] MAX_SIGNALS_DEFAULT 4->5, MAX_SIGNALS_BULL_TREND 7->9 — flagged
-#      as a capital-allocation decision, not a code-quality fix.
-#   8. [Fix-35] SIGNAL_COOLDOWN_BARS_HIGHSCORE 2->1. SIGNAL_COOLDOWN_BARS left at
-#      1 (not lowered to 0) — see inline comment for why 0 wasn't taken.
-#   9. [Fix-36] SPREAD_DYNAMIC_AVG_THRESHOLD 0.10->0.15 (per-symbol, data-driven
-#      exemption widened) chosen INSTEAD OF relaxing the global SPREAD_WARN_PCT/
-#      SPREAD_SUPPRESS_PCT, which are left UNCHANGED — see inline comment.
-#  10. [Fix-37] PULL_REQUIRES_4H_OVERRIDE dict + get_pull_requires_4h() added
-#      (per-symbol or per-BTC-regime-label override). Empty by default — global
-#      PULL_REQUIRES_4H=True fallback unchanged until a reviewer populates it.
-# VERIFICATION PASS (2026-06-20, same day): the Section 6 changes above were
-# present in the file but UNVERIFIED — re-checked line-by-line against the
-# audit/implementation prompt rather than trusted at face value. One real bug
-# found and fixed:
-#   [Fix-38] get_pull_requires_4h() was CALLED (line ~2317, inside the Item 10
-#     PULL-alignment check) but never DEFINED anywhere in the file — a
-#     guaranteed NameError on every scan reaching that code path (i.e. every
-#     scan). Added the missing function next to get_dynamic_max_signals(),
-#     matching the behavior already documented in the PULL_REQUIRES_4H_OVERRIDE
-#     comment (exact-symbol match takes precedence over a regime-label
-#     substring match; falls back to the unchanged global PULL_REQUIRES_4H).
-#     Everything else in Items 3-10 checked out against the actual code
-#     (constants, gate-to-penalty conversion, penalty-cap wiring, diagnostic
-#     correlation helper, spread-exemption wiring) and needed no changes.
-# SECTION 7 (quality+frequency, "free wins"):
-#   9. [Fix-22] SweepResult.sweep_status three-state field ("confirmed_valid" /
-#      "confirmed_false" / "pending"); analyze() halves the sweep bonus when pending.
-#   (All other Section 7 items map 1:1 onto Section 4/5 items above — see table
-#   in delivery summary; no separate Fix-N tags since no separate code changed.)
-# SECTION 8 (signal-quality pass, 2026-06-20 — driven by review of 6 consecutive
-# SL losses across SUIUSDT/BTCUSDT/BNBUSDT/ETHUSDT/HYPEUSDT/SOLUSDT):
-#   1. [Fix-40] liquidity_confluence.py: a volume-confirmed counter-direction
-#      SWEEP now sets out.hard_suppress=True (previously only a counter-direction
-#      MSS could suppress; a fresh, volume-confirmed counter-sweep — one of the
-#      strongest reversal tells in the engine — was only ever a -4 score penalty
-#      that got outvoted by unrelated bonuses). Gated behind the existing
-#      hard_suppress_counter_mss config flag.
-#   2. [Fix-41] liquidity_confluence.py: new premium_discount_adverse_weight
-#      (default 4, vs the existing favorable-zone premium_discount_weight=2).
-#      Longing into a premium zone / shorting into a discount zone is now
-#      penalized twice as hard as the favorable case is rewarded.
-#   3. [Fix-42] Main bot: severe S/R-vs-liquidity-engine disagreement (>3.0 ATR,
-#      new SR_LIQUIDITY_DISAGREEMENT_SEVERE_ATR_MULT) now applies a real
-#      SR_LIQUIDITY_DISAGREEMENT_PENALTY (-3) routed through the normal
-#      adjs/penalty-cap path, instead of being log-only as in [Fix-24]. The
-#      original >1.0 ATR threshold still just logs (kept as-is, was working
-#      as visibility-only).
-# All three are TUNABLE — values are reasoned defaults, not backtested. Watch
-# the next batch of signals: if [LIQ-SUPPRESS] / severe-disagreement penalties
-# fire on setups that would have won, loosen; if losers like the 6 above still
-# slip through, tighten further.
-# SECTION 9 (rollback pass, 2026-06-20 — user-directed, undoing Section 6's
-# frequency-tuning constants now that Section 8's score-logic fixes are in):
-#   MIN_RR_RATIO        0.8  -> 1.0
-#   ADX_SCORE_MIN        17.5 -> 20.0
-#   ADX_BREAK_GATE       22.0 -> 25.0
-#   MIN_DAILY_ADX        16.0 -> 18.0
-#   TREND_HOLD_BARS      1    -> 2
-#   SIGNAL_COOLDOWN_BARS / _HIGHSCORE   1 -> 2 (both)
-#   MAX_SIGNALS_DEFAULT / _BULL_TREND   5/9 -> 4/7
-# This will reduce signal frequency relative to v15.7.2/15.8.0 — that's the
-# intent. The Section 8 score-logic fixes (counter-sweep suppression, adverse-
-# zone penalty, severe S/R disagreement penalty) are independent of these and
-# remain in place.
-# SECTION 10 (HTF liquidity wiring, 2026-06-20 — user request: "wire the
-# liquidity engine to also analyze 4h/1h candles for HTF liquidity pools
-# instead of just borrowing the EMA trend flag"):
-#   1. [Fix-43] liquidity_confluence.py: SignalConfluence.analyze() now runs
-#      real LiquidityAnalyzer/StructureAnalyzer passes over candles_1h/
-#      candles_4h (actual 1h/4h dealing range, external BSL/SSL pools,
-#      premium/discount zone, and sweep detection) instead of those params
-#      always being unused. ADDITIVE/layered, not a replacement of the
-#      existing 15m-only scoring: new htf_external_liquidity_weight (=2),
-#      htf_zone_weight (=2), and htf_sweep_weight (=6, higher than the 15m
-#      sweep_weight=4 — an HTF sweep is rarer and more decisive) score
-#      independently and flow through the same existing max_bonus=10 cap, so
-#      [Fix-13]'s MAX_POSITIVE_ADJUSTMENTS/max_bonus reconciliation still
-#      holds with no changes needed there. Distance gating
-#      (htf_external_liquidity_max_dist_atr) is computed against each
-#      timeframe's OWN ATR, not 15m ATR. The htf_sweep_weight bonus only
-#      fires when the 15m engine's own MSS already confirms direction (the
-#      "HTF grab -> LTF structure confirms -> enter" pattern), not as an
-#      independent HTF-only signal.
-#   2. [Fix-44] liquidity_confluence.py: SignalConfluence._cache/_lock
-#      (declared in __init__, previously never touched anywhere in the
-#      file) now actually cache 1h/4h swing/level/sweep computation per
-#      (symbol, timeframe), keyed by the last closed HTF candle's
-#      timestamp — avoids redoing fractal detection on the same 1h/4h
-#      candles on every 15m scan within an unchanged HTF bar.
-#   3. Call-site wiring: _apply_scoring_and_filters() now accepts
-#      candles_1h/candles_4h (threaded from compute_signals(), where both
-#      were already in scope but not passed down), and the
-#      _liq_engine.analyze() call no longer hardcodes candles_1h=None,
-#      candles_4h=None. htf_bull_flags / htf_weight (the EMA-cross
-#      alignment gate) are UNCHANGED — still a legitimate, cheap directional
-#      filter, kept alongside the new genuine HTF liquidity structure as a
-#      separate confluence input rather than one masquerading as the other.
-#   4. New SignalResult / liquidity_confluence_log fields for visibility:
-#      htf_liquidity_score, htf_1h_zone, htf_4h_zone, htf_1h_external_bsl/
-#      ssl, htf_4h_external_bsl/ssl, htf_1h_sweep, htf_4h_sweep.
-# All Section 10 weights are TUNABLE — reasoned defaults, not backtested.
-# Compare htf_liquidity_score / [LIQ] reasons against outcomes before
-# adjusting; consider promoting from "layer" to "replace" (using HTF zone/
-# external levels instead of the 15m-derived ones in the existing blocks)
-# only after that comparison, per the original design discussion.
-
-
-# ── LIQUIDITY CONFLUENCE FEATURE FLAG ─────────────────────────
-# Cross-cutting: Enable HTF liquidity confluence (audit §9)
 ENABLE_LIQUIDITY_CONFLUENCE: bool = True
-# [Fix-46] L2 order-book imbalance feature flag. fetch_l2_imbalance() was
-# fully implemented and imported, but the call site below hardcoded
-# `_l2_imb = None`, so l2_imbalance_weight/l2_imbalance_threshold never
-# contributed to any score. Now wired through hl_post (the existing
-# rate-limited/retrying Hyperliquid request function) when enabled.
-# Default False: this is a TUNABLE, unvalidated addition — and unlike the
-# other confluence inputs, it costs a synchronous network round-trip per
-# candidate signal, so it's opt-in rather than on-by-default until that
-# latency/rate-limit cost has been weighed against backtested edge.
 ENABLE_L2_IMBALANCE: bool = False
 try:
     from liquidity_confluence import (
@@ -320,9 +24,6 @@ except Exception as _e:
     print(f"[INIT] liquidity_confluence module not available: {_e}")
     _liq_engine = None
 
-# [AUDIT-P7-1] Tracks whether the "_liq_engine is None" operator alert has already been
-# sent this process lifetime, so a long-running scanner doesn't spam Telegram with the same
-# warning on every scan cycle if the module stays unavailable.
 _liq_engine_missing_alerted: bool = False
 
 _FF_TZ = ZoneInfo("America/New_York")
@@ -347,22 +48,9 @@ _hl_last_request_ts = 0.0
 _hl_min_interval_s  = HL_MIN_INTERVAL_S
 _hl_consecutive_successes = 0
 
-# [AUDIT-P7-3] _hl_session is a module-level requests.Session shared across scan threads
-# (SCAN_WORKERS threads call hl_post() concurrently during Phase 1/Phase 2 scanning).
-# requests.Session is documented as thread-safe for concurrent requests because its
-# underlying urllib3 connection pools are thread-safe. _hl_request_lock (above) guards only
-# the rate-limit timing state (_hl_last_request_ts, _hl_min_interval_s, _hl_consecutive_
-# successes) — the actual _hl_session.post() call in hl_post() happens OUTSIDE that lock,
-# and that's fine: it's relying on Session/urllib3's own thread safety, not on
-# _hl_request_lock, for the concurrent .post() calls themselves.
 _hl_session = requests.Session()
 
 # ── HARDCODED WATCHLIST ───────────────────────────────────────
-# Section 6 Item 3 (FLAGGED, NOT IMPLEMENTED): the audit suggests adding
-# additional symbols here, each paired with a CORR_GROUPS entry (even if a new
-# singleton group like "bnb"/"hype"/"oracle" below). This requires real
-# liquidity/listing judgment outside the codebase — no specific symbols are
-# guessed here. This is a decision for the user/reviewer to make explicitly.
 WATCHLIST = [
     "BTCUSDT", "ETHUSDT", "HYPEUSDT", "ZECUSDT", "NEARUSDT",
     "ONDOUSDT", "SUIUSDT", "PENGUUSDT", "BNBUSDT", "SOLUSDT",
@@ -402,16 +90,12 @@ MAX_SIGNAL_HISTORY   = 2000
 MIN_OI_USD: float = 500_000.0
 
 MAX_NEGATIVE_ADJUSTMENTS: int = 3
-# [Fix-23] TUNABLE — opt-in toggle for the data-driven penalty priority ordering.
-# Default True since it's a strict improvement where data exists and degrades
-# gracefully to the old hand-picked order otherwise; flip to False to fully revert
-# to the original static PENALTY_PRIORITY list for A/B comparison.
 DATA_DRIVEN_PENALTY_PRIORITY: bool = True
 # Mirrors MAX_NEGATIVE_ADJUSTMENTS. Without this, positive adjustment stacks
 # (e.g. liquidity-confluence bonus up to +20) are structurally uncapped while
 # negative stacks are capped at -3, biasing the system toward more signals
 # firing rather than better-filtered ones.
-MAX_POSITIVE_ADJUSTMENTS: int = 10  # [Fix-13] TUNABLE — reconciled with liquidity engine's max_bonus=10 (was 20; see liquidity_confluence.py LiquidityConfig.max_bonus comment)
+MAX_POSITIVE_ADJUSTMENTS: int = 10
 
 MAX_CONCURRENT_ACTIVE_SIGNALS: int = 18
 
@@ -425,89 +109,52 @@ FUNDING_CARRY_NEGATIVE_THRESHOLD: float = -0.0005
 FUNDING_CARRY_BONUS: int = 1
 
 USE_DYNAMIC_MAX_SIGNALS: bool = True
-# [Fix-34] TUNABLE — needs validation, and explicitly flagged as a
-# CAPITAL-ALLOCATION decision, not a code-quality fix: raising these caps lets
-# more concurrent signals fire, which only helps if downstream position-sizing
-# can actually support the new concurrent-signal count. Confirm that before
-# deploying — the codebase has no visibility into position-sizing/account
-# capital to validate this for you. Originals: MAX_SIGNALS_BULL_TREND=7,
-# MAX_SIGNALS_DEFAULT=4 (example +2/+1 bump applied here).
-# [ROLLBACK 2026-06-20] Per signal-quality review: this is a sizing lever, not a
-# quality lever — tightening it buys breathing room while the Section 8 score
-# logic fixes are validated, without touching the actual signal logic. 9/5 -> 7/4.
-MAX_SIGNALS_BULL_TREND: int = 5   # [v17.0.6] 7->8; tightened 8->5: fewer slots forces priority_score() to keep only top-ranked (score × win_rate × OI × liquidity) in bull regime
-MAX_SIGNALS_BEAR_TREND: int = 5  # [FIX-AUDIT-D5] separate cap for bear regime (was incorrectly using bull value=7)
-MAX_SIGNALS_DEFAULT: int = 3     # [v17.0.6] 4->5; tightened 5->3: enforces best-of-best selection — pending_signals are already sorted by priority_score() so only the 3 highest-quality signals fire
+MAX_SIGNALS_BULL_TREND: int = 5
+MAX_SIGNALS_BEAR_TREND: int = 5
+MAX_SIGNALS_DEFAULT: int = 3
 BREADTH_BULL_THRESHOLD: float = 0.70
 
 USE_FALSE_BREAKOUT_DETECTION: bool = True
 FALSE_BREAKOUT_LOOKBACK_BARS: int = 12
 FALSE_BREAKOUT_BONUS: int = 1
 
-# [Fix-30] TUNABLE — no backtest data yet, but user/reviewer has explicitly
-# confirmed (2026-06-20) that higher signal frequency is wanted, satisfying the
-# Section 6 preamble's "confirm before implementing" requirement. Section 6 Item 2:
-# lowered ~12% as a starting point pending evidence that the triple-ADX-gate
-# combination (this + MIN_DAILY_ADX below) is overly restrictive. Still a hypothesis
-# to test against real historical data, not a confirmed improvement — the
-# audit conditions the underlying tuning rationale on "if backtest data shows"
-# it's warranted, and no such data exists yet (the harness that would have
-# produced it, backtest_harness.py, was removed — see Fix-25 changelog entry
-# above). Originals: ADX_BREAK_GATE=25.0, ADX_SCORE_MIN=20.0.
-# [ROLLBACK 2026-06-20] Per signal-quality review: the original breakout-strength
-# bar (in place since v15.1.0 for a documented reason, FIX-M8) was the gate that
-# kept weak-trend setups from scoring as high as strong ones in the BREAK path.
-# Reverted to originals.
-ADX_BREAK_GATE  = 22.0  # [v17.0.6] 25->22: restores Phase 7 (Fix I) intent; rising ADX ≥20 path was already there but 25 hard-gate was blocking valid breakouts
+ADX_BREAK_GATE  = 22.0
 ADX_SCORE_MIN   = 20.0
 
-# Phase 1 (Fix A) — Overextension/Blow-off Suppression for BREAK
 ENABLE_OVEREXTENSION_GATE: bool = True
-BREAK_OVEREXT_ATR_MULT: float = 2.5   # [v17.0.6] 2.0->2.5: 2.0 was firing on normal strong breakout candles
-BREAK_MA_DIST_ATR_MULT: float = 4.5  # [v17.0.6] 3.5->4.5: less aggressive on valid momentum candles
-BREAK_MULTIBAR_ATR_MULT: float = 4.5 # [v17.0.6] 3.5->4.5: matches MA dist loosening
+BREAK_OVEREXT_ATR_MULT: float = 2.5
+BREAK_MA_DIST_ATR_MULT: float = 4.5
+BREAK_MULTIBAR_ATR_MULT: float = 4.5
 BREAK_OVEREXT_LOOKBACK: int = 4
 
-# Phase 2 (Fix F) — Suppress Counter-4H-Trend PULL
 ENABLE_COUNTERTREND_PULL_GATE: bool = True
 
-# Phase 3 (Fix C) — Pullback Depth Gate
 ENABLE_PULL_DEPTH_GATE: bool = True
 PULL_MIN_DEPTH_ATR: float = 0.15
 
-# Phase 4 (Fix D) — PULL Momentum Collapse Penalty
 ENABLE_PULL_MOMENTUM_COLLAPSE_PENALTY: bool = True
 PULL_RSI_COLLAPSE_THRESH: float = 5.0
 PULL_RSI_LOOKBACK: int = 4
 
-# Phase 4 (Fix E) — PULL EMA Velocity Check
 ENABLE_PULL_EMA_VELOCITY_CHECK: bool = True
 
-# Phase 5 (Fix B) — BREAK RSI ceiling expansion
 ENABLE_BREAK_RSI_WIDENING: bool = True
 
-# Phase 5 (Fix H) — PULL RSI lower-bound tightening
 ENABLE_PULL_RSI_TIGHTENING: bool = True
 
-# Phase 6 (Fix G) — VWAP Restoration for Pullback Mode
 ENABLE_PULL_VWAP_RESTORATION: bool = True
 
-# Phase 7 (Fix I) — ADX Expanding Check
 ENABLE_ADX_EXPANDING_CHECK: bool = True
-# [AUDIT-P5-3] 3->2 bars: 45-min lag on 15m reduced to 30-min for a more responsive
-# rising-ADX check at scalp timeframe.
 ADX_RISING_LOOKBACK: int = 2
 ENABLE_SCORE_REBALANCE: bool = True
 
-# Phase 8 (Fix J) — Two-Tier BREAK Engine
-ENABLE_EARLY_BREAK_TIER: bool = False  # [v17.0.6] disabled: fires weak BREAK signals with only -1 soft penalty; full-gate BREAK covers genuine breakouts without the loss rate
+ENABLE_EARLY_BREAK_TIER: bool = False
 EARLY_BREAK_PRIOR_HIGHS_LOOKBACK: int = 3
 EARLY_BREAK_REQUIRE_ADX_RISING: bool = True
 
 # Phase 9 — Quality-Stratified PULL Engine
 ENABLE_PULL_TIERING: bool = True
 
-# Cross-cutting items
 ENABLE_SR_CLEARANCE_FIX: bool = True
 ENABLE_CONTINUATION_PROB_GATE: bool = False
 
@@ -517,24 +164,8 @@ if ENABLE_BREAK_RSI_WIDENING:
 else:
     RSI_BREAK_LONG_MIN  = 50.0;  RSI_BREAK_LONG_MAX  = 75.0
     RSI_BREAK_SHORT_MIN = 25.0;  RSI_BREAK_SHORT_MAX = 50.0
-# [AUDIT-P4-1] RSI_PULL_LONG_MIN=38 looks like the floor, but ENABLE_PULL_RSI_TIGHTENING
-# (Phase 5/Fix H, see _apply_scoring_and_filters) applies a -1 penalty to every PULL long
-# with RSI < 44 unconditionally — the 38-43 band always eats that penalty. 44 is therefore
-# the real practical floor; 38 only matters for where the penalty starts being the *only*
-# gate (vs. Tier C's hard gate, which refuses entirely below 44 when also counter-trend).
-# Kept soft/38 rather than hard-gated at 44: the codebase already considered and declined
-# a hard-gate version here (see the commented "Hard-gate alternative" directly below
-# ENABLE_PULL_RSI_TIGHTENING in _apply_scoring_and_filters) — a non-counter-trend PULL
-# long at RSI 40 can still fire, just at -1, rather than being refused outright. This
-# preserves the distinction between "discouraged" (soft, non-counter-trend, 38-43) and
-# "prohibited" (hard, counter-trend + RSI<44, via Tier C a few hundred lines down).
-RSI_PULL_LONG_MIN   = 38.0;  RSI_PULL_LONG_MAX   = 58.0  # [PATCH-7a] 65→58: RSI 59–65 is recovery momentum, not a dip
+RSI_PULL_LONG_MIN   = 38.0;  RSI_PULL_LONG_MAX   = 58.0
 RSI_PULL_SHORT_MIN  = 38.0;  RSI_PULL_SHORT_MAX  = 62.0
-# [Fix-26] NOT changed in this pass — audit Section 5/6 flags these RSI bands as
-# candidates for narrowing "if backtest data supports it," but no such data exists
-# yet (the harness that would have produced it was removed — see Fix-25).
-# Tracked here so it isn't forgotten if that evidence becomes available another
-# way. Do not guess at new values without it.
 RSI_1H_PULL_LONG_MAX  = 70.0
 RSI_1H_PULL_SHORT_MIN = 30.0
 
@@ -544,19 +175,9 @@ MIN_ATR_PCT     = 0.2
 WICK_FILTER     = 0.45
 RANGE_PCT_BREAK = 0.20
 PULL_ZONE_MULT  = 0.25
-# [AUDIT-P5-4] 3->2 bars: tighter entry window, building on [PATCH-7b]'s earlier 5->3 cut.
 PULL_TOUCH_LOOKBACK   = 2
-PULL_RECOVER_ATR_MULT_TREND: float = 0.50  # [PATCH-7c] 0.25→0.50: require meaningful recovery, not a single tick
-PULL_RECOVER_ATR_MULT_MIXED: float = 0.25  # [PATCH-7c] 0.10→0.25: same ratio scaling as trend
-# [Fix-29] TUNABLE — needs backtest validation, but user/reviewer has explicitly
-# confirmed (2026-06-20) that higher signal frequency is wanted, satisfying the
-# Section 6 preamble's "confirm before implementing" requirement. Section 6 Item 1:
-# lowered from 2 to 1 bar to increase signal frequency by requiring less trend-hold
-# confirmation. This is a frequency/quality tradeoff — still validate against your
-# own historical data before trusting the tradeoff (no in-repo harness for
-# this anymore — see Fix-25 changelog entry); revert to 2 to undo.
-# [ROLLBACK 2026-06-20] Per signal-quality review: single-bar confirmation is
-# the easiest setting to whipsaw on. Reverted to 2.
+PULL_RECOVER_ATR_MULT_TREND: float = 0.50
+PULL_RECOVER_ATR_MULT_MIXED: float = 0.25
 TREND_HOLD_BARS = 2
 USE_EXHAUSTION_SHORT:       bool = True
 EXHAUSTION_SHORT_SCORE_ADJ: int  = -1
@@ -573,23 +194,8 @@ USE_D200_FILTER   = True
 D200_SOFT_ADJ     = 1
 
 USE_DAILY_ADX     = True
-# [Fix-30] TUNABLE — same hypothesis-not-evidence caveat as ADX_BREAK_GATE/
-# ADX_SCORE_MIN above; user/reviewer has explicitly confirmed (2026-06-20) that
-# higher signal frequency is wanted. Original: 18.0.
-# [ROLLBACK 2026-06-20] Per signal-quality review: the daily trend filter got
-# weakened twice in a row across versions. Reverted to original 18.0.
-MIN_DAILY_ADX     = 16.0  # [v17.0.6] 18->16: reduces false blocks on coins that trend at lower daily ADX
+MIN_DAILY_ADX     = 16.0
 PULL_REQUIRES_4H  = True
-# [Fix-37] TUNABLE — needs validation. Section 6 Item 10: per-symbol or
-# per-BTC-regime-label override for PULL_REQUIRES_4H, rather than a single
-# global flip of the default. Keys may be either an exact WATCHLIST symbol
-# ("ETHUSDT") or a substring of the BTC regime label (e.g. "Bullish",
-# "Bearish", "Mixed" — see compute_btc_regime()'s `label` values) matched via
-# `in`; an exact symbol match takes precedence over a regime-label match. Left
-# EMPTY by default — this is the override *mechanism*, not the tuning
-# decision itself; PULL_REQUIRES_4H above remains the global fallback
-# (True, unchanged) until a reviewer populates specific entries. See
-# get_pull_requires_4h().
 PULL_REQUIRES_4H_OVERRIDE: dict[str, bool] = {
     "Bearish": False,   # Bear regime has no 4H bull confirmation — don't require what can't exist
     "Mixed":   False,   # Mixed/choppy regime flips too often to hold a valid 4H trend requirement
@@ -599,37 +205,23 @@ FUNDING_SUPPRESS_EXTREME: float = 0.0010
 SR_CLEARANCE_ATR_MULT: float    = 0.15
 SUPPORT_PROXIMITY_ATR: float    = 0.75
 
-BREAK_OI_FLAT_VOL_THRESHOLD: float = 2.0  # [v17.0.6] 1.5->2.0: require higher vol before OI-flat penalty fires
+BREAK_OI_FLAT_VOL_THRESHOLD: float = 2.0
 FUNDING_PULL_WARN_MIN: float        = 0.0005
 
 OI_HISTORY_DEPTH: int        = 6
 OI_CHANGE_THRESHOLD_PCT: float = 1.0
 
-BREAK_VOL_MULT: float = 1.0  # [v17.0.6] 1.2->1.0: removes -1 penalty on signals with average vol; overextension gate handles blow-offs separately
+BREAK_VOL_MULT: float = 1.0
 BREAK_VOL_ACCEL_BARS: int = 2
 
 RS_TOP_PERCENTILE: float    = 0.20
 RS_BOTTOM_PERCENTILE: float = 0.20
 RS_BREAK_HARD_GATE_PCT: float = -6.0
-# [Fix-32] TUNABLE — needs validation; this is a hard-suppress-to-soft-penalty
-# CONVERSION, a real behavior change, not a pure config tweak. A BREAK signal
-# with rs_pct < RS_BREAK_HARD_GATE_PCT previously got an outright early
-# `return res` (fire_long/fire_short forced False, zero chance of firing).
-# It now instead receives this score penalty via the normal adjs/adjusted_score
-# path (see the RS GATE check below), so it discounts rather than outright
-# blocks, and flows through the existing [Fix-9] PENALTY STACKING CAP /
-# PENALTY_PRIORITY logic like every other adjustment.
 RS_BREAK_HARD_GATE_PENALTY: int = -3
 RS_BREAK_SOFT_PERCENTILE: float = 0.25
 
 BREADTH_WEAK_LONG_THRESHOLD:  float = 0.20
 BREADTH_WEAK_SHORT_THRESHOLD: float = 0.80
-# [AUDIT-P6-1] These two were declared but never read anywhere in the file before this
-# pass — an orphaned gate that was planned but never wired up. Tier C (Phase 9, PULL
-# section) already hard-gates PULL at breadth>0.92 / <0.08, but BREAK only ever got the
-# softer -2 BREADTH_RS_COMPOUND_PENALTY-style treatment via other paths; nothing hard-gated
-# BREAK at extreme breadth. Now wired into _apply_scoring_and_filters' BREAK block (mirrors
-# Tier C's intent for BREAK signals) instead of introducing new duplicate constants.
 BREADTH_BREAK_LONG_SUPPRESS:  float = 0.95   # suppress BREAK long above this breadth
 BREADTH_BREAK_SHORT_SUPPRESS: float = 0.05   # suppress BREAK short below this breadth
 BREADTH_CROWDED_LONG_THRESHOLD: float = 0.75
@@ -638,13 +230,6 @@ BREADTH_EXTREME_LONG_THRESHOLD: float = 0.90
 BREADTH_EXTREME_SHORT_THRESHOLD: float = 0.10
 BREADTH_RS_COMPOUND_PENALTY: int   = -2
 BREADTH_RS_NEGATIVE_THRESH: float  = 0.0
-# [AUDIT-P6-4] Named constants for Tier C's (Phase 9, PULL hard-gate) breadth-extreme
-# checks — these were previously hardcoded as bare 0.92 / 0.08 inline, inconsistent with
-# (and easy to confuse for) BREADTH_EXTREME_LONG_THRESHOLD=0.90 / BREADTH_EXTREME_SHORT_
-# THRESHOLD=0.10 above, which are a DIFFERENT, softer mechanism (a -2 score penalty via
-# apply_breadth_adjustment, not a hard refuse). Values kept at their original 0.92/0.08 —
-# this is a naming/consistency fix only, not a threshold change. Also distinct from
-# BREADTH_BREAK_LONG_SUPPRESS/_SHORT_SUPPRESS (0.95/0.05), which gate BREAK signals, not PULL.
 TIER_C_BREADTH_EXTREME_LONG_THRESHOLD: float = 0.92
 TIER_C_BREADTH_EXTREME_SHORT_THRESHOLD: float = 0.08
 
@@ -653,31 +238,12 @@ PULL_VOL_FLOOR_OVERBOUGHT: float  = 0.50
 PULL_VOL_OVERBOUGHT_BREADTH: float = 0.80
 PULL_REENTRY_COOLDOWN_S: int   = 900
 
-# [AUDIT-P6-5] -5.0 -> -2.0. Was lower than RS_PULL_HARD_GATE_PCT (-4.0, a local var inside
-# the PULL RS-gate branch in _apply_scoring_and_filters, ~line 3459) — a PULL signal at e.g.
-# RS=-4.5% already eats the -2 "RS strongly negative on PULL" penalty (rs_pct < -4.0) but
-# was STILL eligible for the +1 Support/Resistance proximity bonus below (rs_pct >= -5.0),
-# partially offsetting the penalty in the same scoring pass. Raised so the proximity bonus
-# only fires on genuinely positive-ish RS momentum, not RS that's already been flagged as
-# weak elsewhere. Constraint: PROXIMITY_RS_MIN must stay >= RS_PULL_HARD_GATE_PCT (currently
-# -4.0) — if that local var's value changes, re-check this constant against it.
 PROXIMITY_RS_MIN: float = -2.0
 TP1_WALL_MIN_CLEARANCE: float = 0.40
 
 PULL_LIMIT_TRANCHE_PCT: float  = 0.50
 PULL_LIMIT_MAX_ATR_DIST: float = 1.50
 
-# [Fix-36] Section 6 Item 9 ("relax spread checks for additional symbols") is
-# implemented via SPREAD_DYNAMIC_AVG_THRESHOLD below, NOT by widening these two
-# global thresholds. SPREAD_WARN_PCT/SPREAD_SUPPRESS_PCT are a risk control the
-# audit otherwise validated as sound (protects against trading illiquid/wide-
-# spread symbols) and apply uniformly to every non-exempt symbol regardless of
-# its own actual liquidity — widening them globally would relax that
-# protection even for symbols that deserve it. is_spread_exempt_dynamic()
-# already gives a less risky, per-symbol, data-driven path to the same
-# "more symbols get relaxed treatment" goal: a symbol earns exemption based on
-# its OWN observed recent spread history, not a uniform global cutoff. Left
-# UNCHANGED here.
 SPREAD_WARN_PCT: float     = 0.20
 SPREAD_SUPPRESS_PCT: float = 0.40
 SPREAD_EXEMPT: set[str] = {
@@ -685,54 +251,23 @@ SPREAD_EXEMPT: set[str] = {
     "XRPUSDT", "ADAUSDT", "DOGEUSDT",
 }
 SPREAD_DYNAMIC_HISTORY_LEN: int = 10
-# [Fix-36] TUNABLE — needs validation. Widened from 0.10 so more symbols can
-# qualify for is_spread_exempt_dynamic()'s per-symbol exemption based on their
-# own recent average spread, instead of relaxing SPREAD_WARN_PCT/
-# SPREAD_SUPPRESS_PCT globally above. Still trades off against the audit's
-# validated spread risk control — a wider threshold means a symbol with a
-# moderately-wide-but-not-extreme average spread can now skip the warn/suppress
-# checks entirely, not just get a smaller penalty. Original: 0.10.
 SPREAD_DYNAMIC_AVG_THRESHOLD: float = 0.15
 
 WIN_RATE_MIN_SAMPLE: int    = 20
 WIN_RATE_HIGH_THRESH: float = 0.65
 WIN_RATE_LOW_THRESH: float  = 0.45
-# [AUDIT-P6-2] 80->40: lowers the threshold that activates adaptive scoring (see
-# compute_win_rate_analytics, ~line 1773) sooner. 40 is statistically modest but practical —
-# this is a TUNABLE, not a backtested value; revisit if adaptive adjustments start firing
-# on too-thin samples.
 WIN_RATE_MIN_SAMPLE_FOR_ADJ: int = 40
-# [Fix-28] TUNABLE — needs validation. Suggested 14 per audit. See
-# compute_win_rate_analytics' staleness guard.
 WIN_RATE_STALE_DAYS: int = 14
 WIN_RATE_LOOKBACK_DAYS:  int   = 30
 WIN_RATE_RECENT_DAYS:    int   = 7
 WIN_RATE_RECENT_WEIGHT:  float = 2.0
 
 MAX_OI_SCALE: float = 3.0
-# [Fix-24] TUNABLE — needs validation. Threshold (in ATR multiples) above which
-# find_sr_levels()'s nearest level and the liquidity engine's nearest external
-# level are considered to "materially disagree" for logging purposes only.
 SR_LIQUIDITY_DISAGREEMENT_ATR_MULT: float = 1.0
-# [Fix-42] TUNABLE — needs validation. Disagreement beyond this (much larger)
-# threshold means the two structure systems aren't just using different
-# clustering tolerances — they don't agree on which side of price the nearest
-# real level even is. Past this point it's not noise, it's a sign the
-# structure read for this symbol/scan is unreliable, so it now costs real
-# score (see SR_LIQUIDITY_DISAGREEMENT_PENALTY) instead of just being logged.
 SR_LIQUIDITY_DISAGREEMENT_SEVERE_ATR_MULT: float = 3.0
 SR_LIQUIDITY_DISAGREEMENT_PENALTY: int = -3
-# [Fix-18] TUNABLE — needs validation. Hard cutoff for OI staleness in
-# compute_oi_trend(): past this many seconds since the last OI reading, treat OI
-# as "unknown" instead of damped-but-nonzero. 45 minutes = 3x OI_EXPECTED_INTERVAL_S.
 OI_STALE_CUTOFF_S: float = 45 * 60
-# [Fix-31] TUNABLE — needs validation. Widened the R:R filter's tolerance
-# modestly downward so marginally-sub-1:1 setups aren't auto-rejected.
-# Original: 0.9.
-# [ROLLBACK 2026-06-20] Per signal-quality review: this hits expectancy
-# directly — below 1:1 R:R you need a much higher win rate just to break even.
-# Held at 1.0 for 3+ versions before the 0.8 drop. Reverted to 1.0.
-MIN_RR_RATIO: float = 1.0  # [FIX-AUDIT-D2] rollback comment said 1.0; value corrected to match
+MIN_RR_RATIO: float = 1.0
 ATR_FALLBACK_PCT: float = 0.30
 
 MACRO_WINDOW_BEFORE_MINS: int   = 60
@@ -747,13 +282,6 @@ N_1H  = 200
 N_4H  = 200
 N_1D  = 600
 
-# [AUDIT-P7-4] Named indices for the (candles_15m, candles_1h, candles_4h, candles_d) tuple
-# returned by fetch_all_candles() / collect_market_inputs() and stored as candle_bundles[sym]
-# in main(). Both call sites that index into this tuple (main()'s BTCUSDT 4H block, and
-# compute_pairwise_correlation_matrix's candle_idx default) relied on the bare index 2 for
-# "4H" — fragile if fetch_all_candles' return order ever changes. Used with an assertion at
-# the actual unpack site to catch an order mismatch early instead of silently feeding the
-# wrong timeframe into BTC-correlation calculations.
 CANDLE_BUNDLE_IDX_15M, CANDLE_BUNDLE_IDX_1H, CANDLE_BUNDLE_IDX_4H, CANDLE_BUNDLE_IDX_1D = 0, 1, 2, 3
 
 REACT_TP1           = "🔥"
@@ -778,21 +306,17 @@ OI_SCORE_CAP: int              = 2
 SESSION_DEAD_ZONE_START_UTC: int = 3
 SESSION_DEAD_ZONE_END_UTC:   int = 6
 SESSION_LOW_ATR_PERCENTILE:  float = 0.10
-TP1_MULT_BREAK: float = 1.2   # [v17.0.2] 1.0->1.2: widen TP1 to preserve RR after SL widening
+TP1_MULT_BREAK: float = 1.2
 TP2_MULT_BREAK: float = 2.5
-SL_MULT_BREAK:  float = 1.2   # [v17.0.2] 0.85->1.2: wider SL to survive price spikes/wicks before reversal
-TP1_MULT_PULL:  float = 1.1   # [v17.0.2] 1.0->1.1: widen TP1 to preserve RR after SL widening
+SL_MULT_BREAK:  float = 1.2
+TP1_MULT_PULL:  float = 1.1
 TP2_MULT_PULL:  float = 2.0
-SL_MULT_PULL:   float = 1.1   # [v17.0.2] 0.85->1.1: wider SL to survive price spikes/wicks before reversal
+SL_MULT_PULL:   float = 1.1
 HIGH_ATR_THRESHOLD: float = 3.0
-SL_HIGH_ATR_MULT:   float = 1.25  # [v17.0.2] 0.90->1.25: high-vol regime needs wider SL, not tighter
+SL_HIGH_ATR_MULT:   float = 1.25
 ATR_HIST_DEPTH:     int   = 48
 ATR_LOW_PERCENTILE:  float = 0.10
 ATR_HIGH_PERCENTILE: float = 0.90
-# [AUDIT-P5-2] 4->2 bars: 60-min lag on 15m was too slow for scalp-timeframe strength
-# detection; 30-min lag is more responsive. Real constant name is EMA_VELOCITY_LOOKBACK
-# (no "_BARS" suffix) — used in both the Tier A pull-quality check (_apply_scoring_and_filters,
-# tier_a long/short) and the EMA velocity penalty block (~line 3437 area, _ef_velocity calc).
 EMA_VELOCITY_LOOKBACK:   int   = 2
 EMA_VELOCITY_STRONG_MIN: float = 0.05
 EMA_VELOCITY_WEAK_MAX:   float = 0.005
@@ -806,7 +330,7 @@ FUNDING_WARN_HIGH    = 0.0005
 USE_REGIME_AWARE_TP_SL: bool = True
 REGIME_HIGH_VOL_TP1_MULT: float = 1.2
 REGIME_HIGH_VOL_TP2_MULT: float = 1.15
-REGIME_HIGH_VOL_SL_MULT: float  = 1.15  # [v17.0.2] 0.95->1.15: was incorrectly tightening SL in high-vol; now widens it
+REGIME_HIGH_VOL_SL_MULT: float  = 1.15
 REGIME_LOW_VOL_TP1_MULT: float  = 0.85
 REGIME_LOW_VOL_TP2_MULT: float  = 0.90
 REGIME_LOW_VOL_SL_MULT: float   = 1.10
@@ -824,22 +348,7 @@ LEVERAGE_MAX: float = 15.0
 
 SR_LOOKBACK_BARS: int = 200
 
-# [Fix-35] TUNABLE — needs validation. SIGNAL_COOLDOWN_BARS is already at the
-# practical floor of 1 and is deliberately left there, NOT lowered to 0: 0
-# would mean re-entry is allowed on the very next bar with no separation at
-# all, which is a qualitatively different (and untested) behavior from "lower
-# the cooldown a bit" — flagging this explicitly rather than silently zeroing
-# it. SIGNAL_COOLDOWN_BARS_HIGHSCORE is lowered to match (was 2), removing the
-# extra bar of cooldown previously required for high-score signals specifically.
-# Original: SIGNAL_COOLDOWN_BARS_HIGHSCORE=2.
-# [ROLLBACK 2026-06-20] Per signal-quality review: re-firing the same
-# symbol/direction 15 min later just compounds a wrong read rather than
-# confirming it. Base cooldown reverted to 2 and kept there.
-# [TIER1-FIX-1] SIGNAL_COOLDOWN_BARS_HIGHSCORE restored to 1: signals
-# scoring >= SIGNAL_HIGHSCORE_THRESHOLD (7) have already cleared every
-# quality gate at the highest bar — a 30-min lockout is overly conservative
-# for high-conviction setups. Base SIGNAL_COOLDOWN_BARS stays at 2.
-SIGNAL_COOLDOWN_BARS:           int = 1   # [v17.0.6] 2->1: 15min cooldown (was 30min); faster re-entry in breakout conditions
+SIGNAL_COOLDOWN_BARS:           int = 1
 SIGNAL_COOLDOWN_BARS_HIGHSCORE: int = 1
 SIGNAL_HIGHSCORE_THRESHOLD:     int = 7
 SIGNAL_COOLDOWN_POST_WIN_BARS:  int = 1
@@ -1084,11 +593,6 @@ def compute_oi_trend(state: dict, symbol: str, current_price: float,
         }
     raw_change_pct = (recent - prior) / prior * 100.0
     elapsed_s      = max(1.0, oi_hist[-1]["ts"] - oi_hist[-2]["ts"])
-    # [Fix-18] TUNABLE — needs validation. The scale factor below damps stale OI
-    # readings (elapsed_s much larger than OI_EXPECTED_INTERVAL_S) but never zeroes
-    # them out, no matter how old — a reading from hours ago could still produce a
-    # nonzero, non-"unknown" score_adj. Add a hard cutoff: past OI_STALE_CUTOFF_S,
-    # treat it the same as having insufficient history at all.
     if elapsed_s > OI_STALE_CUTOFF_S:
         return {
             "oi_trend": "unknown", "oi_change_pct": None,
@@ -1096,7 +600,6 @@ def compute_oi_trend(state: dict, symbol: str, current_price: float,
             "label": "OI Trend: Unknown (stale)", "breakdown_tag": "OI?",
             "condition": "Unknown",
         }
-    # [FIX-AUDIT-D12] floor elapsed to at least 1/3 of expected interval to limit amplification
     MIN_ELAPSED_SCALE_FLOOR = OI_EXPECTED_INTERVAL_S / MAX_OI_SCALE   # = 300s when MAX_OI_SCALE=3
     effective_elapsed = max(elapsed_s, MIN_ELAPSED_SCALE_FLOOR)
     scale          = min(MAX_OI_SCALE, OI_EXPECTED_INTERVAL_S / effective_elapsed)
@@ -1353,36 +856,20 @@ def get_low_btc_corr_set() -> set[str]:
     return LOW_BTC_CORR_BASELINE.copy()
 
 # ═══════════════════════════════════════════════════════════════
-# [Fix-33] DATA-DRIVEN CORRELATION MATRIX — Section 6 Item 6
-# DIAGNOSTIC LOGGING ONLY. Does NOT replace CORR_GROUPS["layer1"]'s
-# hand-picked membership, and is NOT consulted by deduplicate_correlated().
-# CORR_GROUPS gates concurrent correlated-signal exposure (a risk control,
-# not just a cosmetic grouping), and a single scan's pairwise-correlation
-# snapshot is too thin a sample to auto-drive that without a reviewer looking
-# at it across multiple scans first. This generalizes the existing
-# update_dynamic_btc_correlation() (vs.-BTC-only) pairwise-correlation
-# approach above to all-pairs-within-a-group, using the same 4H candle
-# history already fetched per symbol in Phase 1 of main() — no new data
-# fetching required. Audit Section 6 Item 6 explicitly calls for NOT
-# inventing the actual "layer1" sub-group membership; this hands a reviewer
-# the data to make that call across a few scans, it does not make the call.
-# ═══════════════════════════════════════════════════════════════
-LAYER1_CLUSTER_CORR_THRESHOLD: float = 0.75  # [Fix-33] TUNABLE — needs validation; documented clustering threshold, not derived from data.
-CORR_MATRIX_MIN_SAMPLE: int = 20             # [Fix-33] TUNABLE — minimum overlapping-return sample size before a pair is scored at all.
-LOG_DYNAMIC_CORR_GROUPS: bool = False        # [Fix-33] opt-in diagnostic; off by default to avoid log noise/cost when unused.
+LAYER1_CLUSTER_CORR_THRESHOLD: float = 0.75
+CORR_MATRIX_MIN_SAMPLE: int = 20
+LOG_DYNAMIC_CORR_GROUPS: bool = False
 
 def compute_pairwise_correlation_matrix(
     symbols: list[str],
     candle_bundles: dict[str, tuple],
-    candle_idx: int = CANDLE_BUNDLE_IDX_4H,  # [AUDIT-P7-4] was bare 2
+    candle_idx: int = CANDLE_BUNDLE_IDX_4H,
     lookback: int = LOW_BTC_CORR_LOOKBACK_BARS,
 ) -> dict[tuple[str, str], float]:
-    """[Fix-33] Pairwise Pearson correlation of 4H close-to-close returns
+    """Pairwise Pearson correlation of 4H close-to-close returns
     across `symbols`, generalizing update_dynamic_btc_correlation() (vs-BTC
     only) to all pairs. `candle_bundles[sym][candle_idx]` is expected to be
-    the 4H candle list — matches the convention used at the
-    update_dynamic_btc_correlation() call site in main(), now both keyed off
-    CANDLE_BUNDLE_IDX_4H ([AUDIT-P7-4] named index, was bare bundle[2] in both places).
+    the 4H candle list, keyed off CANDLE_BUNDLE_IDX_4H.
     Pairs with insufficient overlapping history are simply omitted from the result
     rather than raising. Diagnostic helper only — see module-level comment
     above for why this isn't wired into CORR_GROUPS directly."""
@@ -1424,7 +911,7 @@ def cluster_by_correlation(
     corr_matrix: dict[tuple[str, str], float],
     threshold: float = LAYER1_CLUSTER_CORR_THRESHOLD,
 ) -> list[set[str]]:
-    """[Fix-33] Greedy union-find clustering: symbols end up in the same
+    """\2: symbols end up in the same
     cluster if a chain of pairwise correlations >= `threshold` connects them.
     This is a simple, reviewable clustering choice, not a claim that it's the
     "right" algorithm for this purpose (e.g. it can chain a long transitive
@@ -1454,7 +941,7 @@ def cluster_by_correlation(
     return list(clusters.values())
 
 def log_dynamic_layer1_clustering(candle_bundles: dict[str, tuple]) -> None:
-    """[Fix-33] Diagnostic-only: compute a data-driven clustering of the
+    """\2: compute a data-driven clustering of the
     current CORR_GROUPS["layer1"] members from this scan's 4H candles and
     print it for manual comparison against the hand-picked grouping. Does NOT
     mutate CORR_GROUPS and is NOT read by deduplicate_correlated(). Gated by
@@ -1664,12 +1151,6 @@ def record_signal_history(state: dict, symbol: str, direction: str,
                            structure_score: int = 0) -> str:
     with _state_lock:
         hist     = state.setdefault("signal_history", [])
-        # [AUDIT-P7-7] Milliseconds instead of whole seconds — two signals for the same
-        # symbol recorded within the same second (e.g. a dropped+fired pair, or rapid
-        # dedupe/re-record in the same scan cycle) previously collided on entry_id, with
-        # the second append silently overwriting any later lookup-by-id of the first
-        # (update_signal_result matches on "id", so a collision means the wrong entry's
-        # result gets updated).
         entry_id = f"{symbol}_{int(time.time() * 1000)}"
         hist.append({
             "id":              entry_id,
@@ -1728,9 +1209,6 @@ def compute_win_rates(state: dict) -> dict:
             1.0 if e["result"] in ("tp1", "tp2") else 0.0
             for e in entries
         )
-        # [Fix-28] Track the most recent contributing entry's timestamp so callers
-        # can apply a staleness check on top of the sample-size floor (see
-        # compute_win_rate_analytics / WIN_RATE_STALE_DAYS).
         most_recent_ts = max((e.get("timestamp", 0) for e in entries), default=0)
         return (wins / n if n > 0 else 0.0), n, most_recent_ts
 
@@ -1781,38 +1259,11 @@ def get_cached_win_rates(state: dict) -> dict:
             _win_rates_cache = compute_win_rates(state)
         return _win_rates_cache
 
-# [Fix-23] Known, honest mapping from a PENALTY_PRIORITY label substring to a
-# get_cached_win_rates() bucket that actually measures something related to it.
-# Most penalty labels (e.g. "BTC Regime", "OI", "RS negative") have no dedicated
-# win-rate bucket in compute_win_rate_analytics() — signal_history doesn't record which
-# adjustment labels fired on each entry, only symbol/type/direction/alignment_mode/
-# score. Rather than fabricate a spurious correlation for those, this mapping only
-# covers the one case where a real bucket exists ("Exhaustion" <-> the
-# alignment_mode="exhaustion" bucket, since SignalResult.alignment_mode is set to
-# "exhaustion" precisely when an exhaustion-style counter-signal fires). Extending
-# this to the other penalty types would require instrumenting record_signal_history
-# to also store which adjustment labels were applied — flagged as a follow-up, not
-# done here to keep this a minimal, targeted change.
-# [AUDIT-P6-3] Reviewed against both audit-suggested options:
-#   Option A (expand the map) as literally proposed — adding "Counter-4H"/"Trap"/"Macro"
-#   entries — does NOT apply here: none of those are real PENALTY_PRIORITY labels in this
-#   file (the actual _HANDPICKED_PENALTY_PRIORITY list is ["BTC Regime", "OI", "Exhaustion",
-#   "RS negative"]), and compute_win_rates()'s by_alignment_mode dict only ever populates
-#   "full"/"exhaustion"/"pullback" — there is no win-rate bucket those labels could map to
-#   without inventing one. Adding them would fabricate a correlation, which is exactly what
-#   this comment block above already says not to do.
-#   Option B (disable DATA_DRIVEN_PENALTY_PRIORITY) also doesn't fit: the feature isn't
-#   broken or unsupported — it correctly covers the one label ("Exhaustion") where
-#   signal_history really does carry the needed metadata (alignment_mode), and disabling it
-#   would regress a working, narrowly-scoped feature for no reason.
-# Conclusion: single-entry map is already the correct, complete state given what
-# signal_history currently records. No code change made; this note documents that the
-# P6-3 options were considered and neither applied as written.
 _PENALTY_LABEL_TO_ALIGNMENT_MODE = {"Exhaustion": "exhaustion"}
 
 def _get_data_driven_penalty_priority(state: dict, fallback: list[str]) -> list[str]:
     """
-    [Fix-23] TUNABLE / genuine algorithm change — needs validation. Reorders
+    Reorders
     `fallback` (the hand-picked PENALTY_PRIORITY list) by ascending historical win
     rate where a real win-rate bucket exists for a given label (lower win rate =
     that adjustment type has historically correlated with losses = higher priority
@@ -1862,11 +1313,6 @@ def compute_win_rate_analytics(state: dict, symbol: str, direction: str,
     if n < WIN_RATE_MIN_SAMPLE_FOR_ADJ:
         return {"win_rate": wr, "sample_size": n, "score_adj": 0,
                 "label": f"Win Rate: {wr*100:.0f}% (n={n}, insufficient for adj)"}
-    # [Fix-28] TUNABLE — needs validation. Overfitting guard on sample recency.
-    # WIN_RATE_LOOKBACK_DAYS=30 combined with low signal frequency (audit Part 7
-    # estimate: 3-7 signals/day) means a bucket can nominally clear
-    # WIN_RATE_MIN_SAMPLE_FOR_ADJ while its most recent contributing entry is
-    # already weeks stale. Treat that as insufficient too, even though `n` looks fine.
     stale_cutoff = int(time.time()) - WIN_RATE_STALE_DAYS * 86400
     if most_recent_ts < stale_cutoff:
         return {"win_rate": wr, "sample_size": n, "score_adj": 0,
@@ -2172,9 +1618,6 @@ def rolling_vwap(closes, volumes, period: int) -> list[float]:
 def daily_vwap(candles_15m: list[dict], reference_ms: int | None = None) -> float:
     if not candles_15m:
         return 0.0
-    # [Fix-19] Thread reference_ms through, matching the pattern used elsewhere in
-    # this file (e.g. apply_macro_filter) — previously called datetime.now() directly,
-    # which breaks reproducibility (e.g. for backtesting/replay against historical data).
     _ref_ts     = (reference_ms / 1000) if reference_ms is not None else time.time()
     today_start = datetime.fromtimestamp(_ref_ts, tz=timezone.utc).replace(
         hour=0, minute=0, second=0, microsecond=0
@@ -2186,16 +1629,16 @@ def daily_vwap(candles_15m: list[dict], reference_ms: int | None = None) -> floa
     total_vol = sum(c["v"] for c in today_candles)
     if total_vol == 0:
         return safe(candles_15m[-1]["c"])
-    total_pv = sum(((c["h"] + c["l"] + c["c"]) / 3.0) * c["v"] for c in today_candles)  # [FIX-AUDIT-D16] use (H+L+C)/3 typical price per standard VWAP definition
+    total_pv = sum(((c["h"] + c["l"] + c["c"]) / 3.0) * c["v"] for c in today_candles)
     return total_pv / total_vol
 
 # ═══════════════════════════════════════════════════════════════
 # INDICATOR CACHE
 # ═══════════════════════════════════════════════════════════════
 
-_indicator_cache: "OrderedDict[str, dict]" = OrderedDict()  # [AUDIT-P7-6] was a plain dict (FIFO eviction)
+_indicator_cache: "OrderedDict[str, dict]" = OrderedDict()
 _indicator_cache_lock = threading.Lock()
-INDICATOR_CACHE_MAX_SIZE: int = 200  # [AUDIT-P7-6] named constant, was a bare 200 inline
+INDICATOR_CACHE_MAX_SIZE: int = 200
 
 def _compute_all_indicators(candles: list[dict]) -> dict:
     o = [c["o"] for c in candles]
@@ -2231,11 +1674,6 @@ def get_cached_indicators(symbol: str, timeframe: str, candles: list[dict]) -> d
         first["t"], first["c"],
     )
 
-    # [AUDIT-P7-6] True LRU read: a cache hit moves the key to the end of the OrderedDict
-    # so it's marked as recently used. Previously this was a plain dict, and eviction below
-    # removed next(iter(cache)) — the oldest-INSERTED key (FIFO), not the least-recently-USED
-    # one, so a key that's read constantly but inserted long ago could still get evicted
-    # while a rarely-read-but-recently-inserted key survived.
     with _indicator_cache_lock:
         cached = _indicator_cache.get(cache_key)
         if cached and cached.get("sig") == cache_sig:
@@ -2287,9 +1725,7 @@ def get_atr_percentile(state: dict, symbol: str, atr_pct: float) -> float | None
 def prune_state(state: dict) -> None:
     now = int(time.time())
     with _state_lock:
-        # [Fix-11 cleanup] One-time discard of the stale "" bucket left behind by the
-        # pre-fix ATR-history key bug (update_atr_history was called with res.symbol,
-        # which was always "" at that point). Safe no-op once the bucket is gone.
+        # Discard any stale "" bucket left by an old ATR-history key bug. Safe no-op once gone.
         state.get("atr_history", {}).pop("", None)
 
         for sym in list(state.get("oi_history", {}).keys()):
@@ -2396,16 +1832,11 @@ class SignalResult:
         self.htf_alignment: bool = False
         self.liquidity_reasons: list[str] = []
         self.liquidity_hard_suppress: bool = False
-        # [Fix-24] Logging/visibility only — see SR_LIQUIDITY_DISAGREEMENT_ATR_MULT.
-        # Not used in scoring; reconciling which system is "right" is a separate
-        # tuning decision the audit didn't make for us.
         self.sr_liquidity_disagreement: str | None = None
         self.continuation_prob_score:   int         = 0
         self.break_tier:                str         = "standard"
         self.pull_tier:                 str         = "B"
 
-        # [Fix-43] Real 1h/4h liquidity structure (separate from
-        # htf_alignment above, which is the borrowed EMA-cross boolean).
         self.htf_liquidity_score: int = 0
         self.htf_1h_zone: str = "neutral"
         self.htf_4h_zone: str = "neutral"
@@ -2446,10 +1877,6 @@ def get_effective_min_score(btc_regime: dict | None, breadth_pct: float) -> int:
     if btc_regime is None:
         return MIN_SCORE
     bearish = btc_regime.get("bearish", False)
-    # [PATCH-6] Original condition (bearish AND breadth > 75%) was inverted for the
-    # real risk case: a confirmed bear regime with near-capitulation breadth (<10%)
-    # is the common loss environment and should raise the bar most. The old condition
-    # never fired in observed data (breadth was 4%). Both branches now preserved.
     if bearish and breadth_pct < 0.10:
         return MIN_SCORE + 2   # confirmed bear + near-capitulation breadth
     if bearish and breadth_pct > 0.75:
@@ -2466,15 +1893,9 @@ def get_dynamic_max_signals(btc_regime: dict | None, breadth_pct: float) -> int:
     if bullish and breadth_pct > BREADTH_BULL_THRESHOLD:
         return MAX_SIGNALS_BULL_TREND
     if bearish and breadth_pct < (1.0 - BREADTH_BULL_THRESHOLD):
-        return MAX_SIGNALS_BEAR_TREND   # [FIX-AUDIT-D5]
+        return MAX_SIGNALS_BEAR_TREND
     return MAX_SIGNALS_DEFAULT
 
-# [Fix-37] Section 6 Item 10 — per-symbol/per-BTC-regime-label override of
-# PULL_REQUIRES_4H. See PULL_REQUIRES_4H_OVERRIDE's definition for the key
-# convention (exact WATCHLIST symbol, or a substring of compute_btc_regime()'s
-# `label` field matched via `in`). An exact symbol match takes precedence over
-# a regime-label match; if neither is present (the default — the override dict
-# starts empty), this falls back to the global PULL_REQUIRES_4H unchanged.
 def get_pull_requires_4h(symbol: str, btc_regime: dict | None) -> bool:
     if symbol in PULL_REQUIRES_4H_OVERRIDE:
         return PULL_REQUIRES_4H_OVERRIDE[symbol]
@@ -2552,10 +1973,6 @@ def get_regime_aware_multipliers(btc_regime: dict | None,
 
     if btc_regime is not None:
         if btc_regime.get("bearish") and direction != "short":
-            # [v17.0.5] Gate bear TP1 penalty to longs only. Rationale: REGIME_BEAR_TP1_MULT
-            # conservatively clips upside targets when fighting a bear trend. Applying it to
-            # shorts (with-trend trades) shrinks TP1 while SL stays wide, structurally
-            # guaranteeing R:R < MIN_RR_RATIO=1.0 and suppressing valid bear-regime shorts.
             tp1_mult *= REGIME_BEAR_TP1_MULT
         if btc_regime.get("bullish"):
             tp2_mult *= REGIME_BULL_TP2_MULT
@@ -2585,10 +2002,6 @@ def _compute_signal_indicators(symbol: str, candles_15m, candles_1h, candles_4h,
     ind["ema_s1h"] = i1h["ema_slow"]
     ind["rsi1h"]   = i1h["rsi"]
     ind["h1h"], ind["l1h"], ind["c1h"], ind["v1h"] = i1h["h"], i1h["l"], i1h["c"], i1h["v"]
-    # [AUDIT-P4-3] ind["v1h"] was already wired above (this isn't new). vol_ma1h was the
-    # missing piece — added here for completeness alongside ind["vol_ma4h"] (Prompt 1 /
-    # FIX-AUDIT-D3) so any future multi-TF volume check has 1H volume-MA available without
-    # needing another _compute_signal_indicators pass.
     ind["vol_ma1h"] = i1h["vol_ma"]
 
     i4h = get_cached_indicators(symbol, "4h", candles_4h)
@@ -2597,7 +2010,6 @@ def _compute_signal_indicators(symbol: str, candles_15m, candles_1h, candles_4h,
     ind["adx4h_arr"] = i4h["adx"][2]
     ind["h4h"], ind["l4h"], ind["c4h"] = i4h["h"], i4h["l"], i4h["c"]
     ind["rsi4h"]   = i4h["rsi"]
-    # [FIX-AUDIT-D3] Wire 4H volume data into ind so Phase 7 h4_vol_expansion fires correctly
     ind["v4h"]      = i4h["v"]
     ind["vol_ma4h"] = i4h["vol_ma"]
 
@@ -2634,7 +2046,7 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
 
     ef15 = safe(ema_f15[-1])
     es15 = safe(ema_s15[-1])
-    r15  = safe(rsi15_arr[-1], 50.0)   # [Fix-ZEC-1] neutral fallback; prevents None >= float crash when RSI arr is short
+    r15  = safe(rsi15_arr[-1], 50.0)   # neutral fallback; prevents None >= float crash when RSI arr is short
     a15  = safe(atr15_arr[-1], 25.0)
     adx15 = safe(adx15_arr[-1], 25.0)
     bb_basis   = safe(bb_b15[-1])
@@ -2651,10 +2063,6 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
     atr_pct  = atr_val / cur_c * 100
     market_ok = MIN_ATR_PCT <= atr_pct <= MAX_ATR_PCT
 
-    # [Fix-11] Use the `symbol` parameter, not `res.symbol` (still "" here — only
-    # set by compute_signals() after this function returns). Previously this wrote
-    # every ATR reading into state["atr_history"][""], corrupting per-symbol
-    # volatility percentiles for every symbol, silently.
     update_atr_history(state, symbol, atr_pct)
 
     rv         = daily_vwap(candles_15m_from_ind(ind), reference_ms=reference_ms)
@@ -2684,13 +2092,6 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
         for i in range(_vol_accel_bars)
     ) if len(v15) > _vol_accel_bars + 1 else False
 
-    # [PATCH-2] Fix dead branch. For PULL signals, healthy volume is LOW
-    # (declining into the EMA is the classic retracement signature). Accept
-    # any vol_ratio in [0.10, 1.30] as "healthy" for PULL display purposes.
-    # Values > 1.30 on a pullback candle suggest distribution or reversal.
-    # The base score still uses vol_score_ok (BREAK threshold, >= 0.75x) —
-    # the PULL low-vol correction in _apply_scoring_and_filters (PATCH-3)
-    # restores the missed base-score point for the 0.10–0.75x band.
     PULL_VOL_RATIO_MIN: float = 0.10
     PULL_VOL_RATIO_MAX: float = 1.30
     vol_score_ok_pull = True if vm15 == 0 else (
@@ -2700,7 +2101,7 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
     ef1h = safe(ind["ema_f1h"][-1]); es1h = safe(ind["ema_s1h"][-1])
     h1_bull = ef1h > es1h
     h1_bear = ef1h < es1h
-    r1h = safe(ind["rsi1h"][-1], 50.0)  # [Fix-ZEC-2] neutral fallback; prevents None >= float crash when 1H RSI arr is short
+    r1h = safe(ind["rsi1h"][-1], 50.0)  # neutral fallback; prevents None >= float crash when 1H RSI arr is short
 
     rsi_divergence = {"type": None, "strength": 0}
     if USE_1H_RSI_DIVERGENCE:
@@ -2716,17 +2117,6 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
     adx4h_score_ok = adx4h >= ADX_SCORE_MIN
 
     def trend_held(ef_arr, es_arr, bull: bool) -> bool:
-        # [AUDIT-P5-5] With TREND_HOLD_BARS=2, offset ranges 1..2 so idx = -2, -3 only —
-        # this checks bars [-2] and [-3], NEVER the current/most-recent closed bar [-1].
-        # The current bar's EMA relationship is checked separately via h4_bull/h4_bear
-        # (computed above from ef4h/es4h, i.e. ef_arr[-1]/es_arr[-1]) and combined at call
-        # sites as e.g. "h4_bull and h4_trend_held_bull". Practical effect: if the 4H EMA
-        # pair just crossed on the current bar, h4_trend_held_* can still read True for up
-        # to TREND_HOLD_BARS bars after the cross, because it's only looking at the bars
-        # BEFORE the cross, not confirming the new direction has itself persisted yet. The
-        # combined h4_bull-and-h4_trend_held_bull check is what actually requires the new
-        # direction (current bar) AND a prior hold (bars -2/-3) — trend_held() alone does
-        # not guard against a freshly-reversed pair.
         for offset in range(1, TREND_HOLD_BARS + 1):
             idx = -(offset + 1)
             if len(ef_arr) < offset + 2:
@@ -2789,12 +2179,6 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
         pullback_long_align  = False
         pullback_short_align = False
 
-    # [Fix-37] Section 6 Item 10 — per-symbol/per-regime override of
-    # PULL_REQUIRES_4H instead of a single global flip. See
-    # PULL_REQUIRES_4H_OVERRIDE/get_pull_requires_4h() near PULL_REQUIRES_4H's
-    # definition; falls back to the global PULL_REQUIRES_4H (True) when no
-    # override is set for this symbol/regime, so behavior is unchanged until a
-    # reviewer populates PULL_REQUIRES_4H_OVERRIDE.
     _pull_requires_4h = get_pull_requires_4h(symbol, btc_regime)
     pull_long_align  = (h4_bull and h4_trend_held_bull and h1_bull) \
                         if _pull_requires_4h else (h4_trend_held_bull and h1_bull)
@@ -2814,7 +2198,6 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
 
     _is_pullback_long  = USE_PULLBACK_ALIGNMENT and pullback_long_align
     _is_pullback_short = USE_PULLBACK_ALIGNMENT and pullback_short_align
-    # Phase 6 (Fix G) — VWAP Restoration for Pullback Mode
     if ENABLE_PULL_VWAP_RESTORATION:
         vwap_long  = (cur_c > rv if USE_ROLLING_VWAP else True)
         vwap_short = (cur_c < rv if USE_ROLLING_VWAP else True)
@@ -2841,7 +2224,6 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
     def close_in_bot_range():
         return (cur_c - cur_l) / rng <= RANGE_PCT_BREAK
 
-    # Phase 7 (Fix I) — ADX Expanding Check
     if ENABLE_ADX_EXPANDING_CHECK:
         _adx15_now  = adx15
         _adx15_prev = (safe(adx15_arr[-(ADX_RISING_LOOKBACK + 1)], adx15)
@@ -2864,7 +2246,6 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
         h15[-(i + 1)] >= safe(ema_f15[-(i + 1)]) - pull_zone
         for i in range(0, PULL_TOUCH_LOOKBACK + 1)
     )
-    # Phase 3 (Fix C) — Pullback Depth Gate
     if ENABLE_PULL_DEPTH_GATE:
         pull_depth_long = any(
             safe(ema_f15[-(i + 1)]) - l15[-(i + 1)] >= atr_val * PULL_MIN_DEPTH_ATR
@@ -2882,7 +2263,6 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
     pull_bull_bar      = cur_c > cur_o and clean_bull_bar()
     pull_bear_bar      = cur_c < cur_o and clean_bear_bar()
 
-    # Phase 7 (Fix I) — Score rebalance: replace adx4h_score_ok with h4_vol_expansion
     if ENABLE_SCORE_REBALANCE:
         h4_vol_ma = ind.get("vol_ma4h")
         v4h = ind.get("v4h", [])
@@ -2917,7 +2297,6 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
                    and adx_break_ok and rsi_break_short
                    and short_score >= MIN_SCORE and market_ok)
 
-    # Phase 8 (Fix J) — Two-Tier BREAK Engine: Early (Tier 2) BREAK detection
     if ENABLE_EARLY_BREAK_TIER:
         prior_highs_max = max(h15[-(i + 2)] for i in range(EARLY_BREAK_PRIOR_HIGHS_LOOKBACK))
         prior_lows_min  = min(l15[-(i + 2)] for i in range(EARLY_BREAK_PRIOR_HIGHS_LOOKBACK))
@@ -2997,7 +2376,7 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
             res.signal_type = "BREAK"
             res.break_tier = "early"
         elif long_break and long_pull and pull_touched_long:
-            res.signal_type = "BREAK"    # [FIX-AUDIT-D9] BREAK has higher R:R; prefer it over PULL when both fire
+            res.signal_type = "BREAK"
             res.break_tier = "standard"
             print(f"[D9] Dual BREAK+PULL long on {res.symbol} — classified as BREAK (higher R:R)")
         elif long_break:
@@ -3014,7 +2393,7 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
             res.signal_type = "BREAK"
             res.break_tier = "early"
         elif short_break and short_pull and pull_touched_short:
-            res.signal_type = "BREAK"    # [FIX-AUDIT-D9] BREAK has higher R:R; prefer it over PULL when both fire
+            res.signal_type = "BREAK"
             res.break_tier = "standard"
             print(f"[D9] Dual BREAK+PULL short on {res.symbol} — classified as BREAK (higher R:R)")
         elif short_break:
@@ -3026,19 +2405,6 @@ def _detect_raw_signals(ind: dict, state: dict, reference_ms: int | None,
         res.score       = short_score
         _setup_signal_entry(res, cur_c, atr_val)
 
-    # [AUDIT-P4-2] This recalculation is NOT redundant with the vol_score_ok_pull computed
-    # earlier (pre-classification, ~line 2563-ish, stored into res._ctx below at "vol_score_ok_pull":
-    # vol_score_ok_pull). That earlier value always uses the PULL-style symmetric band
-    # (PULL_VOL_RATIO_MIN <= cur_v/vm15 <= PULL_VOL_RATIO_MAX, i.e. [0.10, 1.30]) because
-    # signal_type hasn't been decided yet at that point. Here, signal_type IS known, and a
-    # BREAK signal needs HIGH volume confirmation (cur_v >= vm15 * VOL_SCORE_MULT, i.e. >=
-    # 0.75x with no upper cap) rather than the PULL-style "not too high" band — those two
-    # conditions diverge for any BREAK signal with cur_v/vm15 outside [0.75, 1.30] (e.g. a
-    # legitimate high-volume breakout at 2.0x would be vol_score_ok_pull=True pre-classification
-    # under the old PULL band's upper bound check, but the signal-type-aware band here is the
-    # one actually consumed downstream by format_signal's VOL✓/VOL✗ display (ctx.get(
-    # "vol_score_ok_pull", True) at ~line 3879). Confirmed intentional override, not a bug —
-    # kept as-is, no removal.
     if res.fire_long or res.fire_short:
         res._ctx["vol_score_ok_pull"] = True if vm15 == 0 else (
             cur_v >= vm15 * VOL_SCORE_MULT if res.signal_type == "BREAK"
@@ -3065,11 +2431,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                                 symbol: str, reference_ms: int | None,
                                 funding_rate: float | None,
                                 candles_15m: list[dict],
-                                # [Fix-43] Threaded through so the liquidity
-                                # engine's analyze() call below can run real
-                                # HTF liquidity analysis instead of always
-                                # being passed None — see call site for the
-                                # previous candles_1h=None/candles_4h=None.
                                 candles_1h: list[dict] | None = None,
                                 candles_4h: list[dict] | None = None) -> SignalResult:
     def _adj(score: float, adjs: list, label: str, delta: float) -> float:
@@ -3078,7 +2439,7 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
         return score + delta
     ind = res._ind
     ctx = res._ctx
-    rsi_divergence = ctx.get("rsi_divergence")   # [FIX-AUDIT-D1] moved here — was used before assignment at ~line 3495
+    rsi_divergence = ctx.get("rsi_divergence")
     btc_regime = ctx["btc_regime"]
     breadth_pct = ctx["breadth_pct"]
 
@@ -3093,12 +2454,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
     cur_v = ind["v15"][-1]
     price_dir = "up" if cur_c > cur_o else "down"
     atr_val = res.atr_val
-    # [Fix-39] res.atr_pct was never populated before this point (only atr_val is
-    # copied onto res by _setup_signal_entry) — reading it here pulled the class
-    # default of 0.0 on every single signal, which made recommended_leverage()'s
-    # `sl_pct <= 0` guard fire unconditionally downstream, so leverage always
-    # displayed "1x" regardless of real volatility. The correct value was sitting
-    # unused in ctx["atr_pct"] the whole time (set by _detect_raw_signals).
     atr_pct = ctx["atr_pct"]
 
     oi_data = compute_oi_trend(state, symbol, cur_c, price_dir, direction)
@@ -3152,7 +2507,7 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
         if oi_data.get("oi_trend") == "falling":
             adjs.append(("Exhaustion + OI confirms (no penalty)", 0))
         else:
-            adjusted_score = _adj(adjusted_score, adjs, "Exhaustion short mode (4H spread narrowing, not yet confirmed)", EXHAUSTION_SHORT_SCORE_ADJ)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, "Exhaustion short mode (4H spread narrowing, not yet confirmed)", EXHAUSTION_SHORT_SCORE_ADJ)
 
     if (direction == "long"
             and USE_EXHAUSTION_LONG
@@ -3161,15 +2516,15 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
         if oi_data.get("oi_trend") == "rising":
             adjs.append(("Exhaustion + OI confirms (no penalty)", 0))
         else:
-            adjusted_score = _adj(adjusted_score, adjs, "Exhaustion long mode (4H spread narrowing, not yet confirmed)", EXHAUSTION_LONG_SCORE_ADJ)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, "Exhaustion long mode (4H spread narrowing, not yet confirmed)", EXHAUSTION_LONG_SCORE_ADJ)
 
     if (direction == "long" and USE_PULLBACK_ALIGNMENT
             and ctx["pullback_long_align"] and not ctx["full_long_align"]):
-        adjusted_score = _adj(adjusted_score, adjs, "Pullback mode (1H dip inside held 4H uptrend)", PULLBACK_SCORE_ADJ)  # [FIX-AUDIT-D4]
+        adjusted_score = _adj(adjusted_score, adjs, "Pullback mode (1H dip inside held 4H uptrend)", PULLBACK_SCORE_ADJ)
 
     if (direction == "short" and USE_PULLBACK_ALIGNMENT
             and ctx["pullback_short_align"] and not ctx["full_short_align"]):
-        adjusted_score = _adj(adjusted_score, adjs, "Pullback mode (1H bounce inside held 4H downtrend)", PULLBACK_SCORE_ADJ)  # [FIX-AUDIT-D4]
+        adjusted_score = _adj(adjusted_score, adjs, "Pullback mode (1H bounce inside held 4H downtrend)", PULLBACK_SCORE_ADJ)
 
     if direction == "short":
         if ctx["full_short_align"]:
@@ -3206,9 +2561,8 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                        and not btc_regime.get("bullish")
                        and not btc_regime.get("bearish"))
     if h4_stale_bias and not _is_mixed_local:
-        # Cross-cutting: Increase penalty for PULL signals (Low/L1)
         penalty = -2 if res.signal_type == "PULL" else -1
-        adjusted_score = _adj(adjusted_score, adjs, f"4H bias stale ({bar_age_frac*100:.0f}% into bar, 1H spread {_h1_spread:+.2f}x ATR)", penalty)  # [FIX-AUDIT-D4]
+        adjusted_score = _adj(adjusted_score, adjs, f"4H bias stale ({bar_age_frac*100:.0f}% into bar, 1H spread {_h1_spread:+.2f}x ATR)", penalty)
 
     adjusted_score += rs_data["score_adj"]
     if rs_data["score_adj"] != 0:
@@ -3240,14 +2594,13 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
     vol_accel_ok = ctx["vol_accel_ok"]
 
     if res.signal_type == "PULL":
-        # Phase 2 (Fix F) — Suppress Counter-4H-Trend PULL
         if ENABLE_COUNTERTREND_PULL_GATE and direction == "long" \
                 and ctx.get("h4_bear") and ctx.get("h4_trend_held_bear"):
             _oi_confirms  = oi_data.get("oi_trend") == "rising"
             _div_confirms = (rsi_divergence.get("type") == "bullish"
                              if isinstance(rsi_divergence, dict) else False)
             if not (_oi_confirms and _div_confirms):
-                adjusted_score = _adj(adjusted_score, adjs, "PULL long into active 4H downtrend (no OI+divergence confirmation)", -2)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, "PULL long into active 4H downtrend (no OI+divergence confirmation)", -2)
                 # Hard-gate alternative (use if -2 still leaks losing trades after backtest):
                 # res.fire_long = False; return res
 
@@ -3257,21 +2610,16 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             _div_confirms = (rsi_divergence.get("type") == "bearish"
                              if isinstance(rsi_divergence, dict) else False)
             if not (_oi_confirms and _div_confirms):
-                adjusted_score = _adj(adjusted_score, adjs, "PULL short into active 4H uptrend (no OI+divergence confirmation)", -2)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, "PULL short into active 4H uptrend (no OI+divergence confirmation)", -2)
                 # Hard-gate alternative (use if -2 still leaks losing trades after backtest):
                 # res.fire_short = False; return res
 
-        # [PATCH-8] Removed price_dir == "down" guard. On a PULL entry bar price
-        # is always "up" (green recovery bar is required by pull_recover_long), so
-        # the original condition was structurally always False — OI falling on PULL
-        # was never penalized. OI falling on the recovery bar means no institutional
-        # longs are being added as price recovers: genuinely low conviction.
         _oi_falling_bearish = (
             oi_data.get("oi_trend") == "falling"
             and oi_data.get("score_adj", 0) == 0
         )
         if _oi_falling_bearish:
-            adjusted_score = _adj(adjusted_score, adjs, "OI falling on PULL entry (no new longs on recovery)", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, "OI falling on PULL entry (no new longs on recovery)", -1)
 
         if vol_ratio is not None:
             _vol_floor = (PULL_VOL_FLOOR_OVERBOUGHT
@@ -3279,23 +2627,17 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                             else PULL_VOL_FLOOR)
             if vol_ratio <= _vol_floor:
                 # Very low volume — lack of buyer conviction.
-                adjusted_score = _adj(adjusted_score, adjs, f"Vol floor (ratio {vol_ratio:.2f}x <= {_vol_floor:.2f}x"                              f"{' overbought' if breadth_pct > PULL_VOL_OVERBOUGHT_BREADTH else ''})", -1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, f"Vol floor (ratio {vol_ratio:.2f}x <= {_vol_floor:.2f}x"                              f"{' overbought' if breadth_pct > PULL_VOL_OVERBOUGHT_BREADTH else ''})", -1)
             elif vol_ratio < VOL_SCORE_MULT:
-                # [PATCH-3] Restored from v15.5.5.1. Vol is between the floor and
-                # the BREAK threshold (0.40x–0.75x): classic declining-volume pullback
-                # signature. Base score penalised it (vol_score_ok failed), restore +1
-                # here. Mutually exclusive with floor check: floor fires ≤ 0.40x,
-                # this fires 0.40x < vol < 0.75x.
-                adjusted_score = _adj(adjusted_score, adjs, "PULL low-vol correction (healthy pullback volume)", 1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, "PULL low-vol correction (healthy pullback volume)", 1)
 
         candle_range = cur_h - cur_l
         body_size    = abs(cur_c - cur_o)
         body_ratio   = body_size / candle_range if candle_range > 0 else 1.0
         pull_body_ok = body_ratio >= PULL_BODY_MIN_RATIO
         if not pull_body_ok:
-            adjusted_score = _adj(adjusted_score, adjs, f"Weak candle body (ratio {body_ratio:.2f} < {PULL_BODY_MIN_RATIO})", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"Weak candle body (ratio {body_ratio:.2f} < {PULL_BODY_MIN_RATIO})", -1)
 
-        # Phase 4 (Fix D) — PULL Momentum Collapse Penalty
         if ENABLE_PULL_MOMENTUM_COLLAPSE_PENALTY:
             _rsi15 = ind["rsi15"]
             if len(_rsi15) > PULL_RSI_LOOKBACK + 1:
@@ -3303,16 +2645,15 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                 _rsi_prior = safe(_rsi15[-(PULL_RSI_LOOKBACK + 1)])
                 _rsi_drop  = _rsi_prior - _rsi_now
                 if direction == "long" and _rsi_drop > PULL_RSI_COLLAPSE_THRESH:
-                    adjusted_score = _adj(adjusted_score, adjs, f"PULL RSI momentum collapsing ({_rsi_drop:.1f} pts drop over {PULL_RSI_LOOKBACK}bars)", -1)  # [FIX-AUDIT-D4]
+                    adjusted_score = _adj(adjusted_score, adjs, f"PULL RSI momentum collapsing ({_rsi_drop:.1f} pts drop over {PULL_RSI_LOOKBACK}bars)", -1)
                 elif direction == "short" and (-_rsi_drop) > PULL_RSI_COLLAPSE_THRESH:
-                    adjusted_score = _adj(adjusted_score, adjs, f"PULL RSI momentum reversing ({-_rsi_drop:.1f} pts rise over {PULL_RSI_LOOKBACK}bars)", -1)  # [FIX-AUDIT-D4]
+                    adjusted_score = _adj(adjusted_score, adjs, f"PULL RSI momentum reversing ({-_rsi_drop:.1f} pts rise over {PULL_RSI_LOOKBACK}bars)", -1)
 
-        # Phase 5 (Fix H) — PULL RSI lower-bound tightening (soft penalty version)
         if ENABLE_PULL_RSI_TIGHTENING:
             if direction == "long" and ctx["r15"] < 44.0:
-                adjusted_score = _adj(adjusted_score, adjs, f"PULL long RSI near oversold territory ({ctx['r15']:.0f}) — momentum may have broken", -1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, f"PULL long RSI near oversold territory ({ctx['r15']:.0f}) — momentum may have broken", -1)
             elif direction == "short" and ctx["r15"] > 56.0:
-                adjusted_score = _adj(adjusted_score, adjs, f"PULL short RSI near overbought territory ({ctx['r15']:.0f}) — momentum may have broken", -1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, f"PULL short RSI near overbought territory ({ctx['r15']:.0f}) — momentum may have broken", -1)
             # Hard-gate alternative (commented):
             # if ENABLE_PULL_RSI_TIGHTENING:
             #     RSI_PULL_LONG_MIN = 42.0
@@ -3325,24 +2666,24 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             if (res.signal_type == "PULL" and direction == "long"
                     and ctx.get("h4_bear") and ctx.get("h4_trend_held_bear") and ctx["r15"] < 44.0):
                 res.fire_long = False
-                if hasattr(res, "_ind"): del res._ind  # [FIX-AUDIT-D10]
-                if hasattr(res, "_ctx"): del res._ctx  # [FIX-AUDIT-D10]
+                if hasattr(res, "_ind"): del res._ind
+                if hasattr(res, "_ctx"): del res._ctx
                 return res
             if (res.signal_type == "PULL" and direction == "short"
                     and ctx.get("h4_bull") and ctx.get("h4_trend_held_bull") and ctx["r15"] > 56.0):
                 res.fire_short = False
-                if hasattr(res, "_ind"): del res._ind  # [FIX-AUDIT-D10]
-                if hasattr(res, "_ctx"): del res._ctx  # [FIX-AUDIT-D10]
+                if hasattr(res, "_ind"): del res._ind
+                if hasattr(res, "_ctx"): del res._ctx
                 return res
             if res.signal_type == "PULL" and direction == "long" and breadth_pct > TIER_C_BREADTH_EXTREME_LONG_THRESHOLD:
                 res.fire_long = False
-                if hasattr(res, "_ind"): del res._ind  # [FIX-AUDIT-D10]
-                if hasattr(res, "_ctx"): del res._ctx  # [FIX-AUDIT-D10]
+                if hasattr(res, "_ind"): del res._ind
+                if hasattr(res, "_ctx"): del res._ctx
                 return res
             if res.signal_type == "PULL" and direction == "short" and breadth_pct < TIER_C_BREADTH_EXTREME_SHORT_THRESHOLD:
                 res.fire_short = False
-                if hasattr(res, "_ind"): del res._ind  # [FIX-AUDIT-D10]
-                if hasattr(res, "_ctx"): del res._ctx  # [FIX-AUDIT-D10]
+                if hasattr(res, "_ind"): del res._ind
+                if hasattr(res, "_ctx"): del res._ctx
                 return res
 
             # Structural support requirement
@@ -3353,7 +2694,7 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                     sup_dist_atr = (res.entry - nearest_sup) / atr_val if atr_val > 0 else 999
                     has_structural_backing = sup_dist_atr <= 1.0
                 if not has_structural_backing:
-                    adjusted_score = _adj(adjusted_score, adjs, "PULL long: no structural support within 1 ATR (weak zone entry)", -1)  # [FIX-AUDIT-D4]
+                    adjusted_score = _adj(adjusted_score, adjs, "PULL long: no structural support within 1 ATR (weak zone entry)", -1)
             elif res.signal_type == "PULL" and direction == "short":
                 has_structural_backing = False
                 if res.resistances:
@@ -3361,7 +2702,7 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                     res_dist_atr = (nearest_res - res.entry) / atr_val if atr_val > 0 else 999
                     has_structural_backing = res_dist_atr <= 1.0
                 if not has_structural_backing:
-                    adjusted_score = _adj(adjusted_score, adjs, "PULL short: no structural resistance within 1 ATR (weak zone entry)", -1)  # [FIX-AUDIT-D4]
+                    adjusted_score = _adj(adjusted_score, adjs, "PULL short: no structural resistance within 1 ATR (weak zone entry)", -1)
 
             # Pullback volume-quality filter
             PULL_VOL_COMPARE_LOOKBACK = 3
@@ -3372,14 +2713,14 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                 avg_pullback_vol  = sum(_vol_during_pullback) / len(_vol_during_pullback)
                 avg_pre_break_vol = sum(_vol_before_pullback) / len(_vol_before_pullback)
                 if avg_pullback_vol > avg_pre_break_vol * 1.2:
-                    adjusted_score = _adj(adjusted_score, adjs, f"PULL volume during pullback ({avg_pullback_vol:.0f}) not lower than "                                   f"impulse ({avg_pre_break_vol:.0f}) — possible distribution", -1)  # [FIX-AUDIT-D4]
+                    adjusted_score = _adj(adjusted_score, adjs, f"PULL volume during pullback ({avg_pullback_vol:.0f}) not lower than "                                   f"impulse ({avg_pre_break_vol:.0f}) — possible distribution", -1)
 
             # Tier A — High-Conviction PULL (bonus)
             pull_depth_long = ctx.get("pull_depth_long", True)
             pull_depth_short = ctx.get("pull_depth_short", True)
             pull_recover_long = (cur_c > ctx["ef15"] + atr_val * get_pull_recover_mult(btc_regime)) and cur_c > cur_o
             pull_recover_short = (cur_c < ctx["ef15"] - atr_val * get_pull_recover_mult(btc_regime)) and cur_c < cur_o
-            rv = daily_vwap(candles_15m, reference_ms=reference_ms)  # [FIX-AUDIT-D20] pass real closed candles — candles_15m_from_ind had t=0
+            rv = daily_vwap(candles_15m, reference_ms=reference_ms)
 
             if direction == "long":
                 tier_a = (
@@ -3403,17 +2744,12 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                 )
 
             if tier_a:
-                adjusted_score = _adj(adjusted_score, adjs, "Tier A PULL — full quality confirmation", 1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, "Tier A PULL — full quality confirmation", 1)
                 res.pull_tier = "A"
             else:
                 res.pull_tier = "B"
 
     if res.signal_type == "BREAK":
-        # [AUDIT-P6-1] BREAK hard gate at extreme breadth — mirrors Tier C's PULL intent
-        # (hard refuse, not just a soft penalty) for the same extreme-breadth condition.
-        # Placed first in the BREAK block, before any BREAK scoring/penalties and well
-        # before TP/SL calculation (_tp1_m/_tp2_m/_sl_m, get_regime_aware_multipliers call
-        # further down) so a gated signal never gets entry/TP/SL computed at all.
         if direction == "long" and breadth_pct >= BREADTH_BREAK_LONG_SUPPRESS:
             res.fire_long = False
             if hasattr(res, "_ind"): del res._ind
@@ -3425,15 +2761,14 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             if hasattr(res, "_ctx"): del res._ctx
             return res
         if vol_ratio is not None and vol_ratio < BREAK_VOL_MULT:
-            adjusted_score = _adj(adjusted_score, adjs, f"Break vol slightly low ({vol_ratio:.2f}x < {BREAK_VOL_MULT:.2f}x)", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"Break vol slightly low ({vol_ratio:.2f}x < {BREAK_VOL_MULT:.2f}x)", -1)
         if not vol_accel_ok:
-            adjusted_score = _adj(adjusted_score, adjs, "Vol acceleration low", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, "Vol acceleration low", -1)
 
         if oi_data.get("oi_trend") == "flat" and (vol_ratio is None or vol_ratio < BREAK_OI_FLAT_VOL_THRESHOLD):
-            adjusted_score = _adj(adjusted_score, adjs, "OI flat + low vol on BREAK (low conviction)", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, "OI flat + low vol on BREAK (low conviction)", -1)
 
-        # Phase 1 (Fix A) — Overextension/Blow-off Suppression for BREAK
-        if ENABLE_OVEREXTENSION_GATE:   # [FIX-AUDIT-D13] outer guard already ensures signal_type == "BREAK"
+        if ENABLE_OVEREXTENSION_GATE:
             _bar_range_mult = (cur_h - cur_l) / atr_val if atr_val > 0 else 0.0
             _ema_dist_mult  = abs(cur_c - safe(ind["ema_f15"][-1])) / atr_val if atr_val > 0 else 0.0
             _lb = BREAK_OVEREXT_LOOKBACK
@@ -3448,9 +2783,9 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             ]
             _n_overext = sum(OVEREXT_CHECKS)
             if _n_overext >= 2:
-                adjusted_score = _adj(adjusted_score, adjs, "Multiple overextension signals — likely exhaustion", -3)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, "Multiple overextension signals — likely exhaustion", -3)
             elif _n_overext == 1:
-                adjusted_score = _adj(adjusted_score, adjs, "Single overextension signal — BREAK quality reduced", -1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, "Single overextension signal — BREAK quality reduced", -1)
 
             # Breakout-trap detection (liquidity grab + close-back-below-level, weak OI)
             TRAP_SWH_MULT: float = 0.3
@@ -3465,7 +2800,7 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                     and oi_data.get("oi_trend") != "rising"
                 )
                 if _trap_signal:
-                    adjusted_score = _adj(adjusted_score, adjs, "Possible breakout trap — wick above prior high with closing fail", -3)  # [FIX-AUDIT-D4]
+                    adjusted_score = _adj(adjusted_score, adjs, "Possible breakout trap — wick above prior high with closing fail", -3)
             elif direction == "short":
                 _prior_low_5 = min(ind["l15"][-(i + 2)] for i in range(5))
                 _wick_below_prior = cur_l < _prior_low_5 and cur_c > _prior_low_5
@@ -3477,66 +2812,45 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                     and oi_data.get("oi_trend") != "rising"
                 )
                 if _trap_signal:
-                    adjusted_score = _adj(adjusted_score, adjs, "Possible breakout trap — wick below prior low with closing fail", -3)  # [FIX-AUDIT-D4]
+                    adjusted_score = _adj(adjusted_score, adjs, "Possible breakout trap — wick below prior low with closing fail", -3)
 
-        # Phase 5 (Fix B) — BREAK RSI extended zone discount
         if res.signal_type == "BREAK" and direction == "long" and ctx["r15"] > 75:
-            adjusted_score = _adj(adjusted_score, adjs, f"BREAK RSI elevated ({ctx['r15']:.0f} > 75, momentum potentially exhausted)", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"BREAK RSI elevated ({ctx['r15']:.0f} > 75, momentum potentially exhausted)", -1)
         elif res.signal_type == "BREAK" and direction == "short" and ctx["r15"] < 25:
-            adjusted_score = _adj(adjusted_score, adjs, f"BREAK RSI elevated ({ctx['r15']:.0f} < 25, momentum potentially exhausted)", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"BREAK RSI elevated ({ctx['r15']:.0f} < 25, momentum potentially exhausted)", -1)
 
-        # Phase 7 (Fix I) — ADX expanding reward
         if res.signal_type == "BREAK":
             adx15_rising = ctx.get("adx15_rising", False)
             if adx15_rising and ctx["adx15"] < ADX_BREAK_GATE:
-                adjusted_score = _adj(adjusted_score, adjs, f"ADX expanding ({ctx['adx15']:.0f}, rising trend energy)", 1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, f"ADX expanding ({ctx['adx15']:.0f}, rising trend energy)", 1)
             elif ctx["adx15"] >= 30.0:
-                adjusted_score = _adj(adjusted_score, adjs, f"ADX strong ({ctx['adx15']:.0f})", 1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, f"ADX strong ({ctx['adx15']:.0f})", 1)
 
-        # Phase 8 (Fix J) — Early BREAK tier scoring
-        # [Fix-J-defer] _sl_m is assigned later (get_regime_aware_multipliers); reading it
-        # here caused UnboundLocalError whenever break_tier=="early" fired. Defer the widen
-        # via a flag and apply it after _sl_m is defined below.
         _early_break_sl_widen = False
         if hasattr(res, 'break_tier') and res.break_tier == "early":
-            # [AUDIT-P5-1] Renamed: "early break" uses prior closed-bar high/low (cur_h/cur_l
-            # vs prior_highs_max/prior_lows_min over EARLY_BREAK_PRIOR_HIGHS_LOOKBACK bars),
-            # not live intra-candle/tick data. Detection fires on a close that breaks the
-            # prior N-bar high/low without requiring the full BREAK quality gates.
-            adjusted_score = _adj(adjusted_score, adjs, "Early BREAK (short lookback close-break, no full BREAK gate confirmation)", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, "Early BREAK (short lookback close-break, no full BREAK gate confirmation)", -1)
             _early_break_sl_widen = True   # SL widened 10% below after get_regime_aware_multipliers()
 
         rs_pct = rs_data.get("rs_pct")
         if rs_pct is not None:
             if rs_pct < RS_BREAK_HARD_GATE_PCT:
-                # [Fix-32] Previously: print + early `return res` (hard
-                # suppress — fire_long/fire_short forced False, zero chance of
-                # firing). Now: heavy score penalty instead, via the normal
-                # adjs/adjusted_score path so it flows through the [Fix-9]
-                # PENALTY STACKING CAP / PENALTY_PRIORITY logic below like any
-                # other adjustment, rather than bypassing it with an early
-                # return. The original print is preserved (reworded) so the
-                # behavior change stays visible in logs.
                 print(f"  [RS GATE] {symbol} BREAK heavily penalized (was hard-suppressed pre-Fix-32) — "
                       f"RS {rs_pct:+.1f}% < {RS_BREAK_HARD_GATE_PCT:.1f}%")
-                adjusted_score = _adj(adjusted_score, adjs, f"RS negative — hard-gate breach on BREAK ({rs_pct:+.1f}% < "                              f"{RS_BREAK_HARD_GATE_PCT:.1f}%)", RS_BREAK_HARD_GATE_PENALTY)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, f"RS negative — hard-gate breach on BREAK ({rs_pct:+.1f}% < "                              f"{RS_BREAK_HARD_GATE_PCT:.1f}%)", RS_BREAK_HARD_GATE_PENALTY)
             elif rs_pct < 0:
                 rs_percentile = rs_data.get("percentile")
                 if rs_percentile is not None and rs_percentile <= RS_BREAK_SOFT_PERCENTILE:
-                    adjusted_score = _adj(adjusted_score, adjs, f"RS negative on BREAK ({rs_pct:+.1f}%, "                                  f"{rs_percentile*100:.0f}th pct)", -1)  # [FIX-AUDIT-D4]
+                    adjusted_score = _adj(adjusted_score, adjs, f"RS negative on BREAK ({rs_pct:+.1f}%, "                                  f"{rs_percentile*100:.0f}th pct)", -1)
 
     elif res.signal_type == "PULL":
-        # [PATCH-4] PULL RS gate. BREAK has hard + soft gates; PULL had none.
-        # A coin underperforming BTC on a PULL entry suggests structural weakness,
-        # not healthy retracement. Softer thresholds than BREAK to preserve frequency.
         RS_PULL_SOFT_GATE_PCT: float = -1.0   # softer than BREAK's 0% bottom-pct check
         RS_PULL_HARD_GATE_PCT: float = -4.0   # softer than BREAK's -6.0%
         rs_pct = rs_data.get("rs_pct")
         if rs_pct is not None:
             if rs_pct < RS_PULL_HARD_GATE_PCT:
-                adjusted_score = _adj(adjusted_score, adjs, f"RS strongly negative on PULL ({rs_pct:+.1f}% < "                              f"{RS_PULL_HARD_GATE_PCT:.1f}%)", -2)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, f"RS strongly negative on PULL ({rs_pct:+.1f}% < "                              f"{RS_PULL_HARD_GATE_PCT:.1f}%)", -2)
             elif rs_pct < RS_PULL_SOFT_GATE_PCT:
-                adjusted_score = _adj(adjusted_score, adjs, f"RS negative on PULL ({rs_pct:+.1f}% < "                              f"{RS_PULL_SOFT_GATE_PCT:.1f}%)", -1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, f"RS negative on PULL ({rs_pct:+.1f}% < "                              f"{RS_PULL_SOFT_GATE_PCT:.1f}%)", -1)
 
     if res.signal_type == "BREAK":
         if direction == "long" and res.resistances:
@@ -3546,7 +2860,7 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                 if tp_range > 0:
                     blocked_pct = (nearest_res - res.entry) / tp_range
                     if blocked_pct >= TP1_WALL_MIN_CLEARANCE:
-                        adjusted_score = _adj(adjusted_score, adjs, f"Resistance blocks TP1 ({blocked_pct*100:.0f}%)", -1)  # [FIX-AUDIT-D4]
+                        adjusted_score = _adj(adjusted_score, adjs, f"Resistance blocks TP1 ({blocked_pct*100:.0f}%)", -1)
         elif direction == "short" and res.supports:
             nearest_sup = res.supports[0]
             if res.tp1 < nearest_sup < res.entry:
@@ -3554,13 +2868,9 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                 if tp_range > 0:
                     blocked_pct = (res.entry - nearest_sup) / tp_range
                     if blocked_pct >= TP1_WALL_MIN_CLEARANCE:
-                        adjusted_score = _adj(adjusted_score, adjs, f"Support blocks TP1 ({blocked_pct*100:.0f}%)", -1)  # [FIX-AUDIT-D4]
+                        adjusted_score = _adj(adjusted_score, adjs, f"Support blocks TP1 ({blocked_pct*100:.0f}%)", -1)
 
     if res.signal_type == "PULL":
-        # [PATCH-5] PULL TP1 resistance wall check. Mirrors the BREAK check above.
-        # PULL entries sit closer to recent swing lows, making resistance overhead
-        # more likely to be within TP1 range. Uses the same TP1_WALL_MIN_CLEARANCE
-        # threshold (0.40): resistance blocking ≥ 40% of path to TP1 degrades R:R.
         if direction == "long" and res.resistances:
             nearest_res = res.resistances[0]
             if res.entry < nearest_res < res.tp1:
@@ -3568,7 +2878,7 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                 if tp_range > 0:
                     blocked_pct = (nearest_res - res.entry) / tp_range
                     if blocked_pct >= TP1_WALL_MIN_CLEARANCE:
-                        adjusted_score = _adj(adjusted_score, adjs, f"Resistance blocks PULL TP1 ({blocked_pct*100:.0f}%)", -1)  # [FIX-AUDIT-D4]
+                        adjusted_score = _adj(adjusted_score, adjs, f"Resistance blocks PULL TP1 ({blocked_pct*100:.0f}%)", -1)
         elif direction == "short" and res.supports:
             nearest_sup = res.supports[0]
             if res.tp1 < nearest_sup < res.entry:
@@ -3576,20 +2886,20 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                 if tp_range > 0:
                     blocked_pct = (res.entry - nearest_sup) / tp_range
                     if blocked_pct >= TP1_WALL_MIN_CLEARANCE:
-                        adjusted_score = _adj(adjusted_score, adjs, f"Support blocks PULL TP1 ({blocked_pct*100:.0f}%)", -1)  # [FIX-AUDIT-D4]
+                        adjusted_score = _adj(adjusted_score, adjs, f"Support blocks PULL TP1 ({blocked_pct*100:.0f}%)", -1)
 
     if USE_D200_FILTER:
         if direction == "long" and ctx["d200_above"]:
-            adjusted_score = _adj(adjusted_score, adjs, f"D200: Price above (+{D200_SOFT_ADJ})", D200_SOFT_ADJ)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"D200: Price above (+{D200_SOFT_ADJ})", D200_SOFT_ADJ)
             res.d200_label = f"D200: Price above (+{D200_SOFT_ADJ})"
         elif direction == "long" and ctx["d200_below"]:
-            adjusted_score = _adj(adjusted_score, adjs, f"D200: Price below (-{D200_SOFT_ADJ})", -D200_SOFT_ADJ)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"D200: Price below (-{D200_SOFT_ADJ})", -D200_SOFT_ADJ)
             res.d200_label = f"D200: Price below (-{D200_SOFT_ADJ})"
         elif direction == "short" and ctx["d200_below"]:
-            adjusted_score = _adj(adjusted_score, adjs, f"D200: Price below (+{D200_SOFT_ADJ})", D200_SOFT_ADJ)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"D200: Price below (+{D200_SOFT_ADJ})", D200_SOFT_ADJ)
             res.d200_label = f"D200: Price below (+{D200_SOFT_ADJ})"
         elif direction == "short" and ctx["d200_above"]:
-            adjusted_score = _adj(adjusted_score, adjs, f"D200: Price above (-{D200_SOFT_ADJ})", -D200_SOFT_ADJ)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"D200: Price above (-{D200_SOFT_ADJ})", -D200_SOFT_ADJ)
             res.d200_label = f"D200: Price above (-{D200_SOFT_ADJ})"
         else:
             res.d200_label = "D200: Neutral"
@@ -3607,25 +2917,23 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
     _low_atr        = atr_val <= _atr_pct_thresh
     session_penalty = _in_dead and _low_atr
     if session_penalty:
-        adjusted_score = _adj(adjusted_score, adjs, f"Low-liquidity session ({_now_utc.hour:02d}:xx UTC, thin ATR)", -1)  # [FIX-AUDIT-D4]
+        adjusted_score = _adj(adjusted_score, adjs, f"Low-liquidity session ({_now_utc.hour:02d}:xx UTC, thin ATR)", -1)
 
     ema_f15 = ind["ema_f15"]
     if len(ema_f15) >= EMA_VELOCITY_LOOKBACK + 2:
         _ef_velocity = (safe(ema_f15[-1]) - safe(ema_f15[-(1 + EMA_VELOCITY_LOOKBACK)])) / atr_val
         if res.signal_type == "BREAK":
             if _ef_velocity > EMA_VELOCITY_STRONG_MIN and direction == "long":
-                adjusted_score = _adj(adjusted_score, adjs, f"EMA accelerating up ({_ef_velocity:+.3f}×ATR)", 1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, f"EMA accelerating up ({_ef_velocity:+.3f}×ATR)", 1)
             elif _ef_velocity < -EMA_VELOCITY_STRONG_MIN and direction == "short":
-                adjusted_score = _adj(adjusted_score, adjs, f"EMA accelerating down ({_ef_velocity:+.3f}×ATR)", 1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, f"EMA accelerating down ({_ef_velocity:+.3f}×ATR)", 1)
             elif abs(_ef_velocity) < EMA_VELOCITY_WEAK_MAX:
-                adjusted_score = _adj(adjusted_score, adjs, f"EMA flattening ({_ef_velocity:+.3f}×ATR) on BREAK", -1)  # [FIX-AUDIT-D4]
-        # Phase 4 (Fix E) — PULL EMA Velocity Check
+                adjusted_score = _adj(adjusted_score, adjs, f"EMA flattening ({_ef_velocity:+.3f}×ATR) on BREAK", -1)
         elif ENABLE_PULL_EMA_VELOCITY_CHECK and res.signal_type == "PULL":
-            # [FIX-AUDIT-D8] only penalize actively declining EMA, not normal pullback dips
             if direction == "long" and _ef_velocity < -EMA_VELOCITY_WEAK_MAX:   # must be actively declining
-                adjusted_score = _adj(adjusted_score, adjs, f"EMA velocity weakening on PULL long ({_ef_velocity:+.3f}×ATR)", -1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, f"EMA velocity weakening on PULL long ({_ef_velocity:+.3f}×ATR)", -1)
             elif direction == "short" and _ef_velocity > EMA_VELOCITY_WEAK_MAX:  # must be actively rising
-                adjusted_score = _adj(adjusted_score, adjs, f"EMA velocity weakening on PULL short ({_ef_velocity:+.3f}×ATR)", -1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, f"EMA velocity weakening on PULL short ({_ef_velocity:+.3f}×ATR)", -1)
 
     rsi4h_arr = ind["rsi4h"]
     _r4h_raw  = rsi4h_arr[-1] if len(rsi4h_arr) >= 1 else float("nan")
@@ -3639,21 +2947,21 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
         div_type = rsi_divergence["type"]
         if res.signal_type == "PULL":
             if direction == "short" and div_type == "bearish":
-                adjusted_score = _adj(adjusted_score, adjs, "1H RSI bearish divergence (PULL short)", DIVERGENCE_BONUS)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, "1H RSI bearish divergence (PULL short)", DIVERGENCE_BONUS)
             elif direction == "long" and div_type == "bullish":
-                adjusted_score = _adj(adjusted_score, adjs, "1H RSI bullish divergence (PULL long)", DIVERGENCE_BONUS)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, "1H RSI bullish divergence (PULL long)", DIVERGENCE_BONUS)
         elif res.alignment_mode == "exhaustion":
             if direction == "short" and div_type == "bearish":
-                adjusted_score = _adj(adjusted_score, adjs, "1H RSI bearish divergence (exhaustion short)", DIVERGENCE_BONUS)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, "1H RSI bearish divergence (exhaustion short)", DIVERGENCE_BONUS)
             elif direction == "long" and div_type == "bullish":
-                adjusted_score = _adj(adjusted_score, adjs, "1H RSI bullish divergence (exhaustion long)", DIVERGENCE_BONUS)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, "1H RSI bullish divergence (exhaustion long)", DIVERGENCE_BONUS)
 
     if USE_FALSE_BREAKOUT_DETECTION and res.signal_type == "PULL":
         _ref_ms_for_pattern = reference_ms if reference_ms is not None else int(time.time() * 1000)
         _bar_index_pattern = _ref_ms_for_pattern // (15 * 60 * 1000)
         is_false_breakout, fb_desc = check_false_breakout_pattern(state, symbol, direction, _bar_index_pattern)
         if is_false_breakout:
-            adjusted_score = _adj(adjusted_score, adjs, fb_desc, FALSE_BREAKOUT_BONUS)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, fb_desc, FALSE_BREAKOUT_BONUS)
 
     if res.signal_type == "BREAK":
         rsi_15m_ok_long  = RSI_BREAK_LONG_MIN  <= r15 <= RSI_BREAK_LONG_MAX
@@ -3671,28 +2979,28 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
 
     if direction == "long":
         if rsi_confluence_long:
-            adjusted_score = _adj(adjusted_score, adjs, "RSI confluence 1H/4H", 1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, "RSI confluence 1H/4H", 1)
         elif r4h_valid and r4h > RSI_4H_PULL_LONG_MAX:
-            adjusted_score = _adj(adjusted_score, adjs, f"4H RSI overbought ({r4h:.0f})", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"4H RSI overbought ({r4h:.0f})", -1)
 
     if direction == "short":
         if rsi_confluence_short:
-            adjusted_score = _adj(adjusted_score, adjs, "RSI confluence 1H/4H", 1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, "RSI confluence 1H/4H", 1)
         elif r4h_valid and r4h < RSI_4H_PULL_SHORT_MIN:
-            adjusted_score = _adj(adjusted_score, adjs, f"4H RSI oversold ({r4h:.0f})", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"4H RSI oversold ({r4h:.0f})", -1)
 
     if _atr_pctile is not None:
         if res.signal_type == "BREAK" and _atr_pctile < ATR_LOW_PERCENTILE:
-            adjusted_score = _adj(adjusted_score, adjs, f"ATR low vs symbol history ({_atr_pctile*100:.0f}th pct)", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"ATR low vs symbol history ({_atr_pctile*100:.0f}th pct)", -1)
         elif res.signal_type == "PULL" and _atr_pctile > ATR_HIGH_PERCENTILE:
-            adjusted_score = _adj(adjusted_score, adjs, f"ATR high vs symbol history ({_atr_pctile*100:.0f}th pct)", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"ATR high vs symbol history ({_atr_pctile*100:.0f}th pct)", -1)
 
     if res.signal_type == "PULL" and res.supports and direction == "long":
         nearest_sup = res.supports[0]
         if (res.entry - nearest_sup) < atr_val * SUPPORT_PROXIMITY_ATR:
             _rs_pct = rs_data.get("rs_pct")
             if _rs_pct is None or _rs_pct >= PROXIMITY_RS_MIN:
-                adjusted_score = _adj(adjusted_score, adjs, "Support proximity", 1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, "Support proximity", 1)
             else:
                 adjs.append((f"Support proximity skipped (RS {_rs_pct:+.1f}% < {PROXIMITY_RS_MIN:.0f}%)", 0))
 
@@ -3701,7 +3009,7 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
         if (nearest_res - res.entry) < atr_val * SUPPORT_PROXIMITY_ATR:
             _rs_pct = rs_data.get("rs_pct")
             if _rs_pct is None or _rs_pct >= PROXIMITY_RS_MIN:
-                adjusted_score = _adj(adjusted_score, adjs, "Resistance proximity", 1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, "Resistance proximity", 1)
             else:
                 adjs.append((f"Resistance proximity skipped (RS {_rs_pct:+.1f}% < {PROXIMITY_RS_MIN:.0f}%)", 0))
 
@@ -3711,20 +3019,20 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             tailwind = (rate < 0 and direction == "long") or (rate > 0 and direction == "short")
             if tailwind:
                 if direction == "short" and rate >= FUNDING_CARRY_POSITIVE_THRESHOLD:
-                    adjusted_score = _adj(adjusted_score, adjs, f"Funding tailwind carry on {res.signal_type} ({rate*100:+.4f}%/8h)", FUNDING_CARRY_BONUS)  # [FIX-AUDIT-D4]
+                    adjusted_score = _adj(adjusted_score, adjs, f"Funding tailwind carry on {res.signal_type} ({rate*100:+.4f}%/8h)", FUNDING_CARRY_BONUS)
                 elif direction == "long" and rate <= FUNDING_CARRY_NEGATIVE_THRESHOLD:
-                    adjusted_score = _adj(adjusted_score, adjs, f"Funding tailwind carry on {res.signal_type} ({rate*100:+.4f}%/8h)", FUNDING_CARRY_BONUS)  # [FIX-AUDIT-D4]
+                    adjusted_score = _adj(adjusted_score, adjs, f"Funding tailwind carry on {res.signal_type} ({rate*100:+.4f}%/8h)", FUNDING_CARRY_BONUS)
 
         if FUNDING_PULL_WARN_MIN is not None:
             rate = funding_rate
             headwind = (rate > 0 and direction == "long") or (rate < 0 and direction == "short")
             if headwind and FUNDING_PULL_WARN_MIN <= abs(rate) < FUNDING_SUPPRESS_EXTREME:
-                adjusted_score = _adj(adjusted_score, adjs, f"Funding headwind on {res.signal_type} ({rate*100:+.4f}%/8h)", -1)  # [FIX-AUDIT-D4]
+                adjusted_score = _adj(adjusted_score, adjs, f"Funding headwind on {res.signal_type} ({rate*100:+.4f}%/8h)", -1)
 
         rate = funding_rate
         headwind = (rate > 0 and direction == "long") or (rate < 0 and direction == "short")
         if headwind and get_funding_trend(state, symbol) == "rising":
-            adjusted_score = _adj(adjusted_score, adjs, f"Funding headwind rising on {res.signal_type} ({rate*100:+.4f}%/8h ↑)", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"Funding headwind rising on {res.signal_type} ({rate*100:+.4f}%/8h ↑)", -1)
 
     _tp1_m, _tp2_m, _sl_m = get_regime_aware_multipliers(
         btc_regime, _atr_pctile, res.signal_type, direction
@@ -3732,7 +3040,7 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
     if atr_pct > HIGH_ATR_THRESHOLD:
         _sl_m = SL_HIGH_ATR_MULT
     if _early_break_sl_widen:
-        _sl_m *= 1.10   # [AUDIT-P5-1] widen SL for early-tier entry (short-lookback close-break, not full BREAK gates) — was mislabeled "intra-candle" (Phase 8 / Fix J)
+        _sl_m *= 1.10
 
     if res.fire_long:
         res.tp1 = cur_c + atr_val * _tp1_m
@@ -3789,9 +3097,9 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                         (direction == "short" and rsi_confluence_short)
     if res.signal_type == "PULL" and not _rsi_conf_awarded:
         if direction == "long" and r1h > RSI_1H_PULL_LONG_MAX:
-            adjusted_score = _adj(adjusted_score, adjs, f"1H RSI extended ({r1h:.0f} > {RSI_1H_PULL_LONG_MAX:.0f})", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"1H RSI extended ({r1h:.0f} > {RSI_1H_PULL_LONG_MAX:.0f})", -1)
         elif direction == "short" and r1h < RSI_1H_PULL_SHORT_MIN:
-            adjusted_score = _adj(adjusted_score, adjs, f"1H RSI extended ({r1h:.0f} < {RSI_1H_PULL_SHORT_MIN:.0f})", -1)  # [FIX-AUDIT-D4]
+            adjusted_score = _adj(adjusted_score, adjs, f"1H RSI extended ({r1h:.0f} < {RSI_1H_PULL_SHORT_MIN:.0f})", -1)
 
     # ══════════════════════════════════════════════════════════════
     # LIQUIDITY & MARKET STRUCTURE CONFLUENCE LAYER
@@ -3806,14 +3114,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                 "4h_bull": ctx.get("h4_bull", False),
                 "4h_bear": ctx.get("h4_bear", False),
             }
-            # [Fix-46] Previously hardcoded to None — fetch_l2_imbalance()
-            # was fully implemented and imported but never called, so
-            # l2_imbalance_weight/l2_imbalance_threshold in LiquidityConfig
-            # never contributed to any score. Gated on ENABLE_L2_IMBALANCE
-            # (default off) since this adds a synchronous HL API call per
-            # candidate signal; failures inside fetch_l2_imbalance already
-            # degrade to None rather than raising, so this can't itself
-            # break signal generation when the network call fails.
             _l2_imb = None
             if ENABLE_L2_IMBALANCE:
                 _l2_imb = fetch_l2_imbalance(symbol, hl_post)
@@ -3821,13 +3121,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             _liq_out: ConfluenceOutput = _liq_engine.analyze(
                 symbol=symbol,
                 candles_15m=candles_15m,
-                # [Fix-43] Previously always None — the liquidity engine's
-                # candles_1h/candles_4h params were accepted but never fed,
-                # so HTF liquidity structure was never actually analyzed
-                # (only the EMA-cross htf_bull_flags boolean below was used
-                # as a stand-in). Now threaded through from compute_signals()
-                # via _apply_scoring_and_filters so the engine can run real
-                # 1h/4h dealing-range / external-BSL-SSL / sweep analysis.
                 candles_1h=candles_1h,
                 candles_4h=candles_4h,
                 direction=direction,
@@ -3856,10 +3149,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             res.liquidity_reasons     = _liq_out.reasons
             res.liquidity_hard_suppress = _liq_out.hard_suppress
 
-            # [Fix-43] Real HTF liquidity structure — for logging/dashboard
-            # visibility, same as the other liquidity_* fields above. Already
-            # folded into adjusted_score via liquidity_bonus (see below); not
-            # added again here.
             res.htf_liquidity_score   = _liq_out.htf_liquidity_score
             res.htf_1h_zone           = _liq_out.htf_1h_zone
             res.htf_4h_zone           = _liq_out.htf_4h_zone
@@ -3884,12 +3173,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             # adjusted_score = res.score + sum(adjs), so adding it both
             # ways would double-count the bonus on capped signals.
             if _liq_out.liquidity_bonus != 0:
-                # [PATCH-1] Cap the liquidity bonus when HTF structure is not
-                # aligned with trade direction. The discount-zone/BOS/FVG stack
-                # can reach +10, overwhelming all environmental penalties in a
-                # counter-trend regime. When HTF aligned = False, cap at +4 so
-                # structural confluence still contributes without masking weak
-                # base quality. Source: cross-arbitrated from three audits.
                 _LIQ_HTF_MISALIGN_CAP = 4
                 _effective_liq_bonus = (
                     min(_liq_out.liquidity_bonus, _LIQ_HTF_MISALIGN_CAP)
@@ -3911,13 +3194,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             for reason in _liq_out.reasons:
                 adjs.append((f"[LIQ] {reason}", 0))
 
-            # [Fix-24] Reconcile the two independent S/R systems — find_sr_levels()
-            # (main bot, its own clustering tolerance) and the liquidity engine's
-            # external BSL/SSL (different clustering tolerance) are computed
-            # independently and never cross-checked. Log (and surface via
-            # res.sr_liquidity_disagreement) when they disagree materially on where
-            # the nearest level is. Logging/visibility only in this pass — does NOT
-            # change scoring or filtering behavior.
             _sr_cmp_level = res.resistances[0] if (direction == "long" and res.resistances) else \
                             (res.supports[0] if (direction == "short" and res.supports) else None)
             _liq_cmp_level = res.nearest_external_bsl if direction == "long" else res.nearest_external_ssl
@@ -3930,11 +3206,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                     )
                     print(f"  [SR-LIQ DISAGREEMENT] {symbol} {direction.upper()} — "
                           f"{res.sr_liquidity_disagreement}")
-                    # [Fix-42] Severe disagreement (the two systems don't even
-                    # agree which side of price the nearest level is on) now
-                    # costs real score instead of being log-only, routed through
-                    # the standard adjs/penalty-cap machinery like every other
-                    # penalty.
                     if _sr_liq_dist_atr > SR_LIQUIDITY_DISAGREEMENT_SEVERE_ATR_MULT:
                         adjs.append((
                             f"S/R vs liquidity engine severe disagreement "
@@ -3947,8 +3218,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             print(f"  [LIQ-ERROR] {symbol} {direction.upper()}: {_liq_err}")
 
     # ══════════════════════════════════════════════════════════════
-    # [Fix-9] PENALTY STACKING CAP
-    # ══════════════════════════════════════════════════════════════
     total_neg = sum(adj for _, adj in adjs if adj < 0)
     if total_neg < -MAX_NEGATIVE_ADJUSTMENTS:
         _HANDPICKED_PENALTY_PRIORITY = [
@@ -3957,8 +3226,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
             "Exhaustion",
             "RS negative",
         ]
-        # [Fix-23] Toggleable: data-driven ordering where a real win-rate bucket
-        # exists, hand-picked fallback otherwise. See _get_data_driven_penalty_priority.
         PENALTY_PRIORITY = (
             _get_data_driven_penalty_priority(state, _HANDPICKED_PENALTY_PRIORITY)
             if DATA_DRIVEN_PENALTY_PRIORITY else _HANDPICKED_PENALTY_PRIORITY
@@ -3974,7 +3241,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                     kept_indices.add(i)
                     current_sum += adj
 
-        # [FIX-AUDIT-D15] Sort non-priority penalties by magnitude so largest penalties fill cap first
         non_priority_penalties = sorted(
             [(i, lbl, adj) for i, (lbl, adj) in enumerate(adjs)
              if adj < 0 and i not in kept_indices],
@@ -3996,8 +3262,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                   f"trimmed {trimmed_count} secondary penalty(ies) to stay within "
                   f"-{MAX_NEGATIVE_ADJUSTMENTS} cap. Final neg total: {current_sum}")
 
-    # ══════════════════════════════════════════════════════════════
-    # [Fix-10] BONUS STACKING CAP (mirrors [Fix-9] penalty cap)
     # ══════════════════════════════════════════════════════════════
     total_pos = sum(adj for _, adj in adjs if adj > 0)
     if total_pos > MAX_POSITIVE_ADJUSTMENTS:
@@ -4040,12 +3304,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                   f"trimmed {trimmed_count} secondary bonus(es) to stay within "
                   f"+{MAX_POSITIVE_ADJUSTMENTS} cap. Final pos total: {current_sum}")
 
-    # [Fix-15] Hard backstop: the `elif not kept_indices:` branch above can let a
-    # single oversized bonus push current_sum above `cap` with no subsequent clamp,
-    # since it intentionally keeps that one bonus even when it alone exceeds the cap.
-    # This makes the +MAX_POSITIVE_ADJUSTMENTS ceiling structurally guaranteed rather
-    # than dependent on every individual contributor staying under it by convention.
-    # Runs unconditionally, whether or not the capping block above was entered.
     adjusted_score = min(adjusted_score, res.score + MAX_POSITIVE_ADJUSTMENTS)
 
     res.final_score = adjusted_score
@@ -4102,7 +3360,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
         res.fire_short = False
         return res
 
-    # Cross-cutting: SR clearance fix (Medium/M2)
     if ENABLE_SR_CLEARANCE_FIX and SR_CLEARANCE_ATR_MULT > 0 and (res.fire_long or res.fire_short):
         min_clearance = atr_val * SR_CLEARANCE_ATR_MULT
         if res.fire_long and res.resistances:
@@ -4120,8 +3377,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
                       f"too close below entry {res.entry:.4f}")
                 res.fire_short = False
 
-    # Cross-cutting: continuation_probability (audit §11)
-    # [FIX-AUDIT-D18] Early return if SR clearance suppressed both directions — avoid running dead code
     if not res.fire_long and not res.fire_short:
         if hasattr(res, "_ind"): del res._ind
         if hasattr(res, "_ctx"): del res._ctx
@@ -4142,7 +3397,6 @@ def _apply_scoring_and_filters(res: SignalResult, state: dict,
 
     return res
 
-# Cross-cutting: continuation_probability helper (audit §11)
 def continuation_probability(res: SignalResult, ind: dict, ctx: dict,
                             oi_data: dict, btc_regime: dict | None) -> int:
     """
@@ -4210,10 +3464,9 @@ def compute_signals(symbol, candles_15m, candles_1h, candles_4h, candles_d,
     if not candles_15m or len(candles_15m) < 50:
         return res
 
-    # [Fix-ZEC-3] Guard against thin 1H/4H history that would leave RSI/EMA arrays
-    # too short to produce a valid last value, causing safe() to return None and
-    # crashing any subsequent >= comparison.  14 bars is the minimum RSI lookback;
-    # 10 bars is the minimum for a meaningful 4H EMA.  Symbols that fail this check
+    # Guard against thin 1H/4H history: arrays too short give safe() None,
+    # crashing any >= comparison. 14 bars = min RSI lookback; 10 = min 4H EMA.
+    # Symbols that fail this check
     # are skipped cleanly rather than crashing the whole scan worker.
     if not candles_1h or len(candles_1h) < 14:
         return res
@@ -4241,16 +3494,6 @@ def compute_signals(symbol, candles_15m, candles_1h, candles_4h, candles_d,
 # COOLDOWN STATE
 # ═══════════════════════════════════════════════════════════════
 
-# [AUDIT-P7-2] Schema validation beyond the existing version-number check. Real state key
-# names used here (not the generic placeholder names from the audit prompt) — note the
-# cooldowns key is "signal_cooldowns", not "cooldowns"; there's no separate "cooldowns" key
-# in this schema. These five are the keys most load-bearing for correct operation: losing
-# any of them silently (e.g. a truncated/corrupted write that still parses as valid JSON and
-# still carries the right _version) would make active-signal tracking, history-based win
-# rates, OI trend, or ATR-percentile logic silently operate on missing data rather than
-# failing loudly. The .setdefault() calls below this in load_state() would mask that by
-# quietly inventing empty containers — this check catches it before that happens and falls
-# back to a fresh state instead.
 REQUIRED_STATE_KEYS = {"active_signals", "signal_history", "oi_history", "atr_history", "signal_cooldowns"}
 
 def _validate_state(s: dict) -> bool:
@@ -4271,10 +3514,6 @@ def load_state() -> dict:
                 if s.get("_version", 1) != STATE_VERSION:
                     print(f"[STATE] Schema version mismatch in {path}. Starting fresh.")
                     continue
-                # [AUDIT-P7-2] Validate required keys are present before trusting this file —
-                # checked after the version check (so a deliberate version bump still takes
-                # the "starting fresh" path above) but before .setdefault() below would mask
-                # missing keys with quietly-invented empty containers.
                 if not _validate_state(s):
                     print(f"[STATE] Schema invalid in {path} — missing required keys "
                           f"({REQUIRED_STATE_KEYS - set(s.keys())}). Starting fresh.")
@@ -4314,14 +3553,6 @@ def check_cooldown(state, coin, direction, bar_index, signal_type: str = "",
                    candidate_score: int = 0) -> bool:
     symbol = coin if coin.endswith("USDT") else coin + "USDT"
 
-    # [AUDIT-P7-8] active_count and the same-symbol-direction scan now run INSIDE the same
-    # _state_lock acquisition that produces `active`, instead of snapshotting active under
-    # the lock and then checking it after release. check_cooldown runs concurrently across
-    # SCAN_WORKERS threads in main()'s Phase 2 pool — without this, two threads could both
-    # read active_count just under MAX_CONCURRENT_ACTIVE_SIGNALS, both pass the check, and
-    # both then have track_signal() append a new active signal, overshooting the cap (a
-    # classic TOCTOU race: Time-Of-Check vs Time-Of-Use on `active`/active_count diverging
-    # because of the lock release in between).
     with _state_lock:
         active = list(state.get("active_signals", []))
         _cd_key    = f"{symbol}_{direction}_{signal_type}" if signal_type in ("BREAK", "PULL") else f"{symbol}_{direction}"
@@ -4478,13 +3709,6 @@ def format_signal(symbol: str, sig: SignalResult, engine_tag: str = "V5", rank: 
         sl_atr_mult = SL_HIGH_ATR_MULT if atr_pct > HIGH_ATR_THRESHOLD else (
             SL_MULT_BREAK if signal_type == "BREAK" else SL_MULT_PULL
         )
-        # [Fix-39] Dropped the stray /100.0 here. account_risk_pct (e.g. 2.0,
-        # meaning "2%") and atr_pct (e.g. 1.5, meaning "1.5%") are both already
-        # in the same "percent-number" convention used elsewhere in this file
-        # (see HIGH_ATR_THRESHOLD comparisons above). Dividing sl_pct down into
-        # a 0-1 fraction while leaving account_risk_pct un-scaled made the ratio
-        # ~100x too large, so leverage saturated at LEVERAGE_MAX for virtually
-        # any nonzero ATR% instead of producing a real 1x-10x gradient.
         sl_pct = atr_pct * sl_atr_mult
         if sl_pct <= 0:
             return 1.0
@@ -4550,7 +3774,6 @@ def format_signal(symbol: str, sig: SignalResult, engine_tag: str = "V5", rank: 
         if sig.nearest_external_ssl is not None:
             liq_lines.append(f"  Nearest ext. SSL: <code>{fmt(sig.nearest_external_ssl)}</code>")
         if sig.sr_liquidity_disagreement:
-            # [Fix-24] Visibility only — does not affect scoring/filtering.
             liq_lines.append(f"  ⚠️ S/R vs liquidity engine disagree: {sig.sr_liquidity_disagreement}")
         sw = sig.liquidity_sweep
         if sw.get("sweep_detected"):
@@ -4712,7 +3935,6 @@ def check_active_signals(state: dict, bar_index_now: int,
                             resolve_signal("sl")
                             break
                         else:
-                            # [FIX-AUDIT-D14] SL was also touched same bar — resolve conservatively as TP1; do not wait for TP2
                             print(f"  [TRACK] {symbol} LONG same-bar TP1+SL — resolving as tp1 (SL touched, not exposing to TP2)")
                             react_to_message(msg_id, REACT_TP1)
                             resolve_signal("tp1")  # partial win; conservative resolution
@@ -4745,7 +3967,6 @@ def check_active_signals(state: dict, bar_index_now: int,
                             resolve_signal("sl")
                             break
                         else:
-                            # [FIX-AUDIT-D14] SL was also touched same bar — resolve conservatively as TP1; do not wait for TP2
                             print(f"  [TRACK] {symbol} SHORT same-bar TP1+SL — resolving as tp1 (SL touched, not exposing to TP2)")
                             react_to_message(msg_id, REACT_TP1)
                             resolve_signal("tp1")  # partial win; conservative resolution
@@ -4923,10 +4144,6 @@ def log_liquidity_confluence(state: dict, symbol: str, direction: str,
             "zone": getattr(sig, 'premium_discount', 'neutral'),
             "htf_aligned": getattr(sig, 'htf_alignment', False),
             "reasons": getattr(sig, 'liquidity_reasons', []),
-            # [Fix-43] Real HTF (1h/4h) liquidity structure — logged
-            # alongside the existing fields above for the same backtesting
-            # comparison purpose (e.g. "did the HTF zone/sweep correlate
-            # with win rate" once enough history accumulates).
             "htf_liquidity_score": getattr(sig, 'htf_liquidity_score', 0),
             "htf_1h_zone": getattr(sig, 'htf_1h_zone', 'neutral'),
             "htf_4h_zone": getattr(sig, 'htf_4h_zone', 'neutral'),
@@ -5062,14 +4279,6 @@ def deduplicate_correlated(signals: list[tuple]) -> list[tuple]:
             seen_groups.add((group, direction))
             result.append(sig_tuple)
 
-    # [Fix-17] The pass above only dedupes by (group, direction), so a long on one
-    # symbol and a short on a correlated symbol in the same CORR_GROUPS entry could
-    # both survive and fire in the same scan — a silent, emergent hedge pair rather
-    # than a deliberate decision. Explicitly detect any group with both a surviving
-    # long and a surviving short, and drop the lower-priority_score() one of the
-    # pair (more conservative than keeping both). The alternative — keep both but
-    # tag them as a "correlated hedge pair" in the Telegram message / signal
-    # history — was not implemented here; flag for reviewer if that's preferred.
     group_of = lambda sym: next(
         (g for g, members in CORR_GROUPS.items() if sym in members), sym
     )
@@ -5108,11 +4317,6 @@ def main():
     print(f"[{datetime.now(timezone.utc).isoformat()}] Scanner starting…")
     print(f"Watchlist ({len(WATCHLIST)} pairs): {[hl_coin(s) for s in WATCHLIST]}")
 
-    # [AUDIT-P7-1] Operator alert if the liquidity engine failed to load — every liquidity
-    # score (including hard suppress) silently does nothing for the rest of this process if
-    # so. Uses send_telegram() (the real function in this file takes just `text`, no
-    # parse_mode kwarg — HTML is hardcoded inside it). Gated on the module-level flag so a
-    # long-running process only sends this once, not every scan cycle.
     global _liq_engine_missing_alerted
     if _liq_engine is None and not _liq_engine_missing_alerted:
         send_telegram(
@@ -5167,10 +4371,6 @@ def main():
 
     print("[PHASE 1] Collecting market breadth / RS inputs…")
     candle_bundles: dict[str, tuple] = {}
-    # [AUDIT-P7-5] Track per-scan worker error count and alert if all (or most) symbols
-    # fail — a strong signal of a systematic API outage rather than isolated per-symbol
-    # issues (e.g. one bad/delisted pair). Uses send_telegram() (real signature: just
-    # `text`, no parse_mode kwarg).
     _phase1_errors = 0
     with ThreadPoolExecutor(max_workers=max(1, SCAN_WORKERS)) as ex:
         futures = {
@@ -5206,8 +4406,6 @@ def main():
 
     btc_4h_bundle = candle_bundles.get("BTCUSDT")
     if btc_4h_bundle:
-        # [AUDIT-P7-4] named index with assertion to catch a fetch_all_candles order
-        # change early instead of silently feeding the wrong timeframe into BTC correlation.
         btc_4h_candles = btc_4h_bundle[CANDLE_BUNDLE_IDX_4H]
         assert len(btc_4h_bundle[CANDLE_BUNDLE_IDX_4H]) > 0 and btc_4h_bundle[CANDLE_BUNDLE_IDX_4H][0].get("t"), \
             "BTC 4H candle bundle index mismatch — check fetch_all_candles return order"
@@ -5216,8 +4414,6 @@ def main():
                 continue
             update_dynamic_btc_correlation(sym, bundle[CANDLE_BUNDLE_IDX_4H], btc_4h_candles)
 
-    # [Fix-33] Section 6 Item 6 diagnostic — see LOG_DYNAMIC_CORR_GROUPS and
-    # log_dynamic_layer1_clustering() above. No-op unless explicitly enabled.
     log_dynamic_layer1_clustering(candle_bundles)
 
     if _shutdown:
@@ -5229,8 +4425,6 @@ def main():
     get_meta_and_asset_ctxs()
 
     pending_signals: list[tuple] = []
-    # [AUDIT-P7-5] Same per-scan error aggregation as Phase 1, applied to the signal-scanning
-    # loop — a separate failure mode (scan_symbol failing vs. collect_market_inputs failing).
     _phase2_errors = 0
     with ThreadPoolExecutor(max_workers=max(1, SCAN_WORKERS)) as ex:
         futures = {
