@@ -11,7 +11,7 @@ from utils import safe, atr
 
 __version__ = "17.0.7"
 
-ENABLE_LIQUIDITY_CONFLUENCE: bool = False
+ENABLE_LIQUIDITY_CONFLUENCE: bool = True
 ENABLE_L2_IMBALANCE: bool = False
 try:
     from liquidity_confluence import (
