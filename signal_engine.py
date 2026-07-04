@@ -109,7 +109,15 @@ signal.signal(signal.SIGINT, _handle_shutdown)
 # HYPERLIQUID API LAYER
 # ============================================================================
 
+_LAST_HL_CALL_TS = [0.0]
+_HL_MIN_INTERVAL_S = 0.15  # ~6-7 req/s ceiling, keeps us under HL's burst limits
+
+
 def hl_post(payload: dict, retries: int = 3, timeout: int = 12) -> dict | list | None:
+    # simple pacing so bursts of sequential candle fetches don't trip the 429 limiter
+    elapsed = time.time() - _LAST_HL_CALL_TS[0]
+    if elapsed < _HL_MIN_INTERVAL_S:
+        time.sleep(_HL_MIN_INTERVAL_S - elapsed)
     body = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
         HL_API_URL, data=body,
@@ -118,10 +126,20 @@ def hl_post(payload: dict, retries: int = 3, timeout: int = 12) -> dict | list |
     for attempt in range(retries):
         try:
             with urllib.request.urlopen(req, timeout=timeout) as resp:
+                _LAST_HL_CALL_TS[0] = time.time()
                 return json.loads(resp.read().decode("utf-8"))
-        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, ValueError) as e:
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                backoff = 2.0 * (attempt + 1)
+                log.warning("HL API 429 (rate limited), backing off %.1fs (attempt %d/%d)", backoff, attempt + 1, retries)
+                time.sleep(backoff)
+                continue
             log.warning("HL API attempt %d/%d failed: %s", attempt + 1, retries, e)
             time.sleep(1.5 * (attempt + 1))
+        except (urllib.error.URLError, TimeoutError, ValueError) as e:
+            log.warning("HL API attempt %d/%d failed: %s", attempt + 1, retries, e)
+            time.sleep(1.5 * (attempt + 1))
+    _LAST_HL_CALL_TS[0] = time.time()
     log.error("HL API call failed after %d retries: %s", retries, payload)
     return None
 
@@ -163,9 +181,11 @@ def get_candles(symbol: str, interval: str, n: int, reference_ms: Optional[int] 
     return out[-n:]
 
 
-def fetch_all_candles(symbol: str, reference_ms: Optional[int] = None) -> dict[str, list[dict]]:
+def fetch_all_candles(symbol: str, reference_ms: Optional[int] = None,
+                       tfs: Optional[tuple[str, ...]] = None) -> dict[str, list[dict]]:
+    tfs = tfs or ("5m", "15m", "1h", "4h", "1d")
     bundle = {}
-    for tf in ("5m", "15m", "1h", "4h", "1d"):
+    for tf in tfs:
         bundle[tf] = get_candles(symbol, tf, CANDLE_COUNT[tf], reference_ms)
     return bundle
 
@@ -607,27 +627,31 @@ def premium_discount_zone(candles: list[dict], lookback: int = 50) -> dict:
     return {"high": hi, "low": lo, "eq": eq, "zone": zone}
 
 
-def detect_mss(candles_exec: list[dict], direction: str, lookback: int = 20) -> Optional[dict]:
+def detect_mss(candles_exec: list[dict], direction: str, lookback: int = 30) -> Optional[dict]:
     """Market structure shift on the execution timeframe after a sweep:
-    a break of the most recent minor swing in the trade direction."""
-    swings = find_swings(candles_exec[-lookback - 5:], left=1, right=1)
+    a break of a recent minor swing in the trade direction. Uses a small
+    ATR-relative buffer so we count a decisive close *through* the swing,
+    not requiring it to clear by a wide margin, and looks back further than
+    a single most-recent fractal so a slightly older confirmed shift still
+    counts (avoids discarding otherwise-complete setups over one bar of
+    definitional strictness)."""
+    window = candles_exec[-lookback - 5:]
+    swings = find_swings(window, left=1, right=1)
     if not swings:
         return None
     last_close = candles_exec[-1]["c"]
+    atr_vals = atr(candles_exec[-(lookback + 5):])
+    buf = (atr_vals[-1] * 0.1) if atr_vals else 0.0
     if direction == "bullish":
-        highs = [s for s in swings if s.kind == "high"]
-        if not highs:
-            return None
-        ref = highs[-1].price
-        if last_close > ref:
-            return {"level": ref, "confirmed": True}
+        highs = sorted([s for s in swings if s.kind == "high"], key=lambda s: s.index)
+        for ref_swing in reversed(highs[-3:]):
+            if last_close > ref_swing.price - buf:
+                return {"level": ref_swing.price, "confirmed": True}
     else:
-        lows = [s for s in swings if s.kind == "low"]
-        if not lows:
-            return None
-        ref = lows[-1].price
-        if last_close < ref:
-            return {"level": ref, "confirmed": True}
+        lows = sorted([s for s in swings if s.kind == "low"], key=lambda s: s.index)
+        for ref_swing in reversed(lows[-3:]):
+            if last_close < ref_swing.price + buf:
+                return {"level": ref_swing.price, "confirmed": True}
     return None
 
 
@@ -1075,19 +1099,37 @@ def send_telegram(text: str) -> Optional[int]:
 # ============================================================================
 
 def scan_symbol(symbol: str, state: dict, market_snap: dict, btc_bundle: dict,
-                 btc_bias: str, btc_strength: float, breadth: float, threshold: float) -> Optional[Candidate]:
+                 btc_bias: str, btc_strength: float, breadth: float, threshold: float,
+                 seed_1h: Optional[list[dict]] = None) -> Optional[Candidate]:
     ok, reason = passes_hard_filters(symbol, market_snap)
     if not ok:
         log.info("%s skipped: %s", symbol, reason)
         return None
 
-    bundle = fetch_all_candles(symbol)
-    if not bundle or any(len(bundle.get(tf, [])) < 30 for tf in ("15m", "1h", "4h", "1d")):
+    # Reuse the 1h candles already pulled during the breadth pass instead of
+    # re-fetching. Only 1h is needed up front to build the regime vector and
+    # pick a combo; the other timeframes are fetched afterward, and only the
+    # ones the selected combo actually requires.
+    bundle: dict[str, list[dict]] = {}
+    if seed_1h is not None and len(seed_1h) >= 30:
+        bundle["1h"] = seed_1h
+    else:
+        bundle["1h"] = get_candles(symbol, "1h", CANDLE_COUNT["1h"])
+    if len(bundle["1h"]) < 30:
         log.info("%s skipped: insufficient candle history", symbol)
         return None
 
     regime = build_regime_vector(state, symbol, bundle, btc_bias, btc_strength, breadth)
     combo_name = select_combo(regime)
+    combo = COMBOS[combo_name]
+
+    needed_tfs = {combo["bias"], combo["struct"], combo["exec"]}
+    for tf in needed_tfs - set(bundle.keys()):
+        bundle[tf] = get_candles(symbol, tf, CANDLE_COUNT[tf])
+
+    if any(len(bundle.get(tf, [])) < 30 for tf in needed_tfs):
+        log.info("%s skipped: insufficient candle history", symbol)
+        return None
 
     orderbook = analyze_orderbook(symbol)
     cand = build_pathway(symbol, bundle, combo_name, regime, btc_bias, orderbook, market_snap)
@@ -1135,16 +1177,17 @@ def run_scan():
     state = load_state()
     market_snap = get_market_snapshot()
 
-    btc_bundle = fetch_all_candles("BTC")
+    btc_bundle = fetch_all_candles("BTC", tfs=("4h",))
     btc_bias, btc_strength = compute_btc_regime(btc_bundle)
     log.info("BTC regime: %s (strength %.2f)", btc_bias, btc_strength)
 
     # crude breadth proxy: fraction of watchlist above their 1h EMA50
+    # (these 1h pulls are reused per-symbol below instead of re-fetched)
     breadth_hits, breadth_total = 0, 0
     breadth_cache = {}
     for sym in WATCHLIST:
         try:
-            c1h = get_candles(sym, "1h", 60)
+            c1h = get_candles(sym, "1h", CANDLE_COUNT["1h"])
             if len(c1h) < 55:
                 continue
             ind = compute_indicators(c1h)
@@ -1164,7 +1207,9 @@ def run_scan():
     produced = 0
     for symbol in WATCHLIST:
         try:
-            cand = scan_symbol(symbol, state, market_snap, btc_bundle, btc_bias, btc_strength, breadth, threshold)
+            seed_1h = breadth_cache.get(symbol)
+            cand = scan_symbol(symbol, state, market_snap, btc_bundle, btc_bias, btc_strength,
+                                breadth, threshold, seed_1h=seed_1h)
         except Exception as e:
             log.exception("Unhandled error scanning %s: %s", symbol, e)
             continue
