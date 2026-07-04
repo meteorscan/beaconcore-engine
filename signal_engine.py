@@ -34,15 +34,16 @@ from typing import Optional
 # ============================================================================
 
 HL_API_URL = "https://api.hyperliquid.xyz/info"
-TELEGRAM_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID = os.environ.get("TG_CHAT_ID", "")
+TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "")
+TG_CHAT_ID = os.environ.get("TG_CHAT_ID", "")
 
 STATE_PATH = os.environ.get("ZENITH_STATE_PATH", "state.json")
 LOG_PATH = os.environ.get("ZENITH_LOG_PATH", "zenith_prime.log")
 
 WATCHLIST = [
-    "BTC", "ETH", "SOL", "AVAX", "LINK", "ARB", "OP", "DOGE",
-    "SUI", "APT", "NEAR", "INJ", "TIA", "SEI", "WLD", "ORDI",
+    "BTC", "ETH", "HYPE", "ZEC", "NEAR", "ONDO", "SUI", "PENGU", "BNB", "SOL",
+    "TRX", "BCH", "DOGE", "ADA", "DOT", "TAO", "AVAX", "LINK", "AAVE", "XRP",
+    "XLM", "UNI", "LTC", "APT", "PENDLE",
 ]
 
 # Timeframe combos: (bias_tf, structure_tf, execution_tf)
@@ -828,6 +829,7 @@ def build_pathway(symbol: str, bundle: dict, combo_name: str, regime: RegimeVect
     else:
         htf_dir = "neutral"
     if htf_dir == "neutral":
+        log.info("%s [%s] no signal: killer=HTF_BIAS_NEUTRAL", symbol, combo_name)
         return None
 
     pd_zone = premium_discount_zone(c_bias)
@@ -837,6 +839,7 @@ def build_pathway(symbol: str, bundle: dict, combo_name: str, regime: RegimeVect
     pools = build_liquidity_pools(struct_swings)
     sweep = detect_sweep(c_struct, pools, htf_dir)
     if not sweep:
+        log.info("%s [%s] no signal: killer=NO_SWEEP bias=%s pd=%s", symbol, combo_name, htf_dir, pd_zone["zone"])
         return None
 
     # --- POI confluence: order blocks + FVGs on structure tf ---
@@ -845,6 +848,10 @@ def build_pathway(symbol: str, bundle: dict, combo_name: str, regime: RegimeVect
     obs = mark_untested(obs, c_struct)
     fvgs = mark_untested(fvgs, c_struct)
     same_dir_zones = [z for z in (obs + fvgs) if z.direction == htf_dir and not z.tested]
+    if not same_dir_zones:
+        log.info("%s [%s] near-miss: killer=NO_UNTESTED_POI bias=%s sweep_level=%.6g",
+                  symbol, combo_name, htf_dir, sweep["level"])
+        # not a hard block here (nearest_zone stays None below); MSS can still confirm
 
     last_price = c_exec[-1]["c"]
     nearest_zone = None
@@ -854,6 +861,8 @@ def build_pathway(symbol: str, bundle: dict, combo_name: str, regime: RegimeVect
     # --- Execution timeframe: MSS confirmation ---
     mss = detect_mss(c_exec, htf_dir)
     if not mss:
+        log.info("%s [%s] no signal: killer=NO_MSS bias=%s sweep_level=%.6g poi_found=%s",
+                  symbol, combo_name, htf_dir, sweep["level"], bool(same_dir_zones))
         return None
 
     direction = "LONG" if htf_dir == "bullish" else "SHORT"
@@ -958,12 +967,20 @@ def classify_style_duration(style: str) -> str:
 # HARD FILTERS / DEDUP / COOLDOWN
 # ============================================================================
 
-def passes_hard_filters(symbol: str, market_snap: dict, min_day_vol_usd: float = 3_000_000) -> tuple[bool, str]:
+def passes_hard_filters(symbol: str, market_snap: dict, min_day_vol_usd: float = 750_000,
+                         min_oi_usd: float = 500_000) -> tuple[bool, str]:
     snap = market_snap.get(symbol)
     if not snap:
         return False, "no market snapshot"
-    if snap.get("day_vol_usd", 0.0) < min_day_vol_usd:
-        return False, "insufficient liquidity"
+    # Liquidity gate: pass on EITHER day volume OR open interest clearing its floor,
+    # rather than requiring a single high day-volume bar. This matches the more
+    # permissive OI-floor approach used elsewhere (e.g. Nyx's $500k OI floor) and
+    # avoids over-filtering mid-cap alts that trade in bursts rather than
+    # sustained volume (SEI/TIA/INJ/ORDI/ARB/OP/APT class names).
+    vol_ok = snap.get("day_vol_usd", 0.0) >= min_day_vol_usd
+    oi_ok = snap.get("oi_usd", 0.0) >= min_oi_usd
+    if not (vol_ok or oi_ok):
+        return False, f"insufficient liquidity (vol=${snap.get('day_vol_usd', 0.0):,.0f}, oi=${snap.get('oi_usd', 0.0):,.0f})"
     if abs(snap.get("funding", 0.0)) > 0.006:
         return False, "extreme funding"
     return True, "ok"
@@ -1036,12 +1053,12 @@ def format_signal_message(cand: Candidate, snapshot: dict) -> str:
 
 
 def send_telegram(text: str) -> Optional[int]:
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+    if not TG_BOT_TOKEN or not TG_CHAT_ID:
         log.info("Telegram not configured; message suppressed:\n%s", text)
         return None
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
     payload = json.dumps({
-        "chat_id": TELEGRAM_CHAT_ID, "text": text, "parse_mode": "Markdown",
+        "chat_id": TG_CHAT_ID, "text": text, "parse_mode": "Markdown",
     }).encode("utf-8")
     req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"}, method="POST")
     try:
