@@ -894,8 +894,17 @@ def build_pathway(symbol: str, bundle: dict, combo_name: str, regime: RegimeVect
     atr_exec = ind_exec["atr"][-1]
     entry = last_price
     if nearest_zone:
-        # anchor entry near the POI mid for better R:R, bounded by current price
-        entry = nearest_zone.mid() if abs(nearest_zone.mid() - last_price) / last_price < 0.01 else last_price
+        zone_mid = nearest_zone.mid()
+        close_enough = abs(zone_mid - last_price) / last_price < 0.01
+        # A pullback entry must sit on the correct side of current price:
+        # for a LONG we only anchor to a zone AT OR BELOW market (buying a
+        # dip into support), never above; symmetric for SHORT. Anchoring to
+        # a zone on the wrong side would place a limit entry at a worse
+        # price than simply taking the market, which defeats the purpose.
+        right_side = (direction == "LONG" and zone_mid <= last_price) or \
+                     (direction == "SHORT" and zone_mid >= last_price)
+        if close_enough and right_side:
+            entry = zone_mid
 
     sl_buffer = atr_exec * 1.1
     if direction == "LONG":
@@ -1157,6 +1166,67 @@ def scan_symbol(symbol: str, state: dict, market_snap: dict, btc_bundle: dict,
     return cand
 
 
+def get_last_price(symbol: str) -> Optional[float]:
+    c = get_candles(symbol, "5m", 3)
+    if not c:
+        return None
+    return c[-1]["c"]
+
+
+def check_active_signals(state: dict):
+    """Runs before new-signal generation each scan. For every signal still
+    marked 'open', checks current price against SL/TP1/TP2 and updates status.
+    A signal is never re-alerted as an entry while open; this only fires a
+    message when its status actually changes (TP1 hit / TP2 hit / SL hit),
+    matching the requested behavior of "only call again on an outcome, not
+    on every scan while still active"."""
+    open_signals = [(sid, rec) for sid, rec in state["signals"].items() if rec.get("status") == "open"]
+    if not open_signals:
+        return
+    price_cache: dict[str, float] = {}
+    for sid, rec in open_signals:
+        symbol = rec["symbol"]
+        if symbol not in price_cache:
+            px = get_last_price(symbol)
+            if px is None:
+                continue
+            price_cache[symbol] = px
+        price = price_cache[symbol]
+        direction = rec["direction"]
+        sl, tp1, tp2 = rec["sl"], rec["tp1"], rec["tp2"]
+        tp1_hit_already = rec.get("tp1_hit", False)
+
+        hit_sl = (direction == "LONG" and price <= sl) or (direction == "SHORT" and price >= sl)
+        hit_tp1 = (not tp1_hit_already) and ((direction == "LONG" and price >= tp1) or (direction == "SHORT" and price <= tp1))
+        hit_tp2 = (direction == "LONG" and price >= tp2) or (direction == "SHORT" and price <= tp2)
+
+        if hit_sl:
+            rec["status"] = "closed_sl_after_tp1" if tp1_hit_already else "closed_sl"
+            result_txt = "🟡 Closed at breakeven/SL after TP1" if tp1_hit_already else "🔴 Stop Loss hit"
+            send_telegram(f"{result_txt}\n\n*{symbol}-PERP* {direction}\nSL: `{sl:.6g}` | Price: `{price:.6g}`")
+            _record_outcome(state, rec, "loss" if not tp1_hit_already else "partial_win")
+        elif hit_tp2:
+            rec["status"] = "closed_tp2"
+            send_telegram(f"🟢 TP2 hit — target reached\n\n*{symbol}-PERP* {direction}\nTP2: `{tp2:.6g}` | Price: `{price:.6g}`")
+            _record_outcome(state, rec, "win")
+        elif hit_tp1:
+            rec["tp1_hit"] = True
+            send_telegram(f"🟢 TP1 hit — consider moving SL to breakeven\n\n*{symbol}-PERP* {direction}\nTP1: `{tp1:.6g}` | Price: `{price:.6g}`")
+            # not closed yet; remains 'open' and continues to be monitored for TP2/SL
+
+
+def _record_outcome(state: dict, rec: dict, outcome: str):
+    grade = rec.get("grade", "C")
+    setup = rec.get("setup_family", "unknown")
+    win = outcome in ("win", "partial_win")
+    by_grade = state["win_history"]["by_grade"].setdefault(grade, {"wins": 0, "n": 0})
+    by_setup = state["win_history"]["by_setup"].setdefault(setup, {"wins": 0, "n": 0})
+    for bucket in (by_grade, by_setup):
+        bucket["n"] += 1
+        if win:
+            bucket["wins"] += 1
+
+
 def record_signal(state: dict, cand: Candidate):
     now = int(time.time() * 1000)
     sid = f"{cand.symbol}-{cand.direction}-{now}"
@@ -1176,6 +1246,8 @@ def run_scan():
     log.info("=== Zenith Prime scan started ===")
     state = load_state()
     market_snap = get_market_snapshot()
+
+    check_active_signals(state)
 
     btc_bundle = fetch_all_candles("BTC", tfs=("4h",))
     btc_bias, btc_strength = compute_btc_regime(btc_bundle)
