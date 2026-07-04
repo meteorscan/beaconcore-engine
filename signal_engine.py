@@ -1085,14 +1085,15 @@ def format_signal_message(cand: Candidate, snapshot: dict) -> str:
     return "\n".join(lines)
 
 
-def send_telegram(text: str) -> Optional[int]:
+def send_telegram(text: str, reply_to_message_id: Optional[int] = None) -> Optional[int]:
     if not TG_BOT_TOKEN or not TG_CHAT_ID:
         log.info("Telegram not configured; message suppressed:\n%s", text)
         return None
     url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
-    payload = json.dumps({
-        "chat_id": TG_CHAT_ID, "text": text, "parse_mode": "Markdown",
-    }).encode("utf-8")
+    body = {"chat_id": TG_CHAT_ID, "text": text, "parse_mode": "Markdown"}
+    if reply_to_message_id:
+        body["reply_to_message_id"] = reply_to_message_id
+    payload = json.dumps(body).encode("utf-8")
     req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"}, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=10) as resp:
@@ -1101,6 +1102,25 @@ def send_telegram(text: str) -> Optional[int]:
     except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, ValueError) as e:
         log.error("Telegram send failed: %s", e)
         return None
+
+
+def set_telegram_reaction(message_id: int, emoji: str) -> bool:
+    """Sets a single emoji reaction on an existing message, matching the
+    🔥/🏆/💀-style reaction tracking used by the reference engines."""
+    if not TG_BOT_TOKEN or not TG_CHAT_ID or not message_id:
+        return False
+    url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/setMessageReaction"
+    payload = json.dumps({
+        "chat_id": TG_CHAT_ID, "message_id": message_id,
+        "reaction": [{"type": "emoji", "emoji": emoji}],
+    }).encode("utf-8")
+    req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"}, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=10):
+            return True
+    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, ValueError) as e:
+        log.warning("Telegram reaction failed: %s", e)
+        return False
 
 
 # ============================================================================
@@ -1195,6 +1215,7 @@ def check_active_signals(state: dict):
         direction = rec["direction"]
         sl, tp1, tp2 = rec["sl"], rec["tp1"], rec["tp2"]
         tp1_hit_already = rec.get("tp1_hit", False)
+        orig_msg_id = rec.get("message_id")
 
         hit_sl = (direction == "LONG" and price <= sl) or (direction == "SHORT" and price >= sl)
         hit_tp1 = (not tp1_hit_already) and ((direction == "LONG" and price >= tp1) or (direction == "SHORT" and price <= tp1))
@@ -1203,15 +1224,21 @@ def check_active_signals(state: dict):
         if hit_sl:
             rec["status"] = "closed_sl_after_tp1" if tp1_hit_already else "closed_sl"
             result_txt = "🟡 Closed at breakeven/SL after TP1" if tp1_hit_already else "🔴 Stop Loss hit"
-            send_telegram(f"{result_txt}\n\n*{symbol}-PERP* {direction}\nSL: `{sl:.6g}` | Price: `{price:.6g}`")
+            send_telegram(f"{result_txt}\n\n*{symbol}-PERP* {direction}\nSL: `{sl:.6g}` | Price: `{price:.6g}`",
+                          reply_to_message_id=orig_msg_id)
+            set_telegram_reaction(orig_msg_id, "😭" if not tp1_hit_already else "👍")
             _record_outcome(state, rec, "loss" if not tp1_hit_already else "partial_win")
         elif hit_tp2:
             rec["status"] = "closed_tp2"
-            send_telegram(f"🟢 TP2 hit — target reached\n\n*{symbol}-PERP* {direction}\nTP2: `{tp2:.6g}` | Price: `{price:.6g}`")
+            send_telegram(f"🟢 TP2 hit — target reached\n\n*{symbol}-PERP* {direction}\nTP2: `{tp2:.6g}` | Price: `{price:.6g}`",
+                          reply_to_message_id=orig_msg_id)
+            set_telegram_reaction(orig_msg_id, "🏆")
             _record_outcome(state, rec, "win")
         elif hit_tp1:
             rec["tp1_hit"] = True
-            send_telegram(f"🟢 TP1 hit — consider moving SL to breakeven\n\n*{symbol}-PERP* {direction}\nTP1: `{tp1:.6g}` | Price: `{price:.6g}`")
+            send_telegram(f"🟢 TP1 hit — consider moving SL to breakeven\n\n*{symbol}-PERP* {direction}\nTP1: `{tp1:.6g}` | Price: `{price:.6g}`",
+                          reply_to_message_id=orig_msg_id)
+            set_telegram_reaction(orig_msg_id, "🔥")
             # not closed yet; remains 'open' and continues to be monitored for TP2/SL
 
 
@@ -1227,14 +1254,14 @@ def _record_outcome(state: dict, rec: dict, outcome: str):
             bucket["wins"] += 1
 
 
-def record_signal(state: dict, cand: Candidate):
+def record_signal(state: dict, cand: Candidate, message_id: Optional[int] = None):
     now = int(time.time() * 1000)
     sid = f"{cand.symbol}-{cand.direction}-{now}"
     state["signals"][sid] = {
         "symbol": cand.symbol, "direction": cand.direction, "style": cand.style,
         "entry": cand.entry, "sl": cand.sl, "tp1": cand.tp1, "tp2": cand.tp2,
         "grade": cand.grade, "confidence": cand.confidence, "setup_family": cand.setup_family,
-        "status": "open", "t": now,
+        "status": "open", "t": now, "message_id": message_id,
     }
     state["recent_by_symbol"].setdefault(cand.symbol, []).append({
         "t": now, "dir": cand.direction, "price": cand.entry, "combo": cand.style,
@@ -1287,8 +1314,8 @@ def run_scan():
             continue
         if cand:
             msg = format_signal_message(cand, market_snap)
-            send_telegram(msg)
-            record_signal(state, cand)
+            msg_id = send_telegram(msg)
+            record_signal(state, cand, message_id=msg_id)
             produced += 1
             log.info("Signal produced: %s %s grade=%s conf=%.1f", cand.symbol, cand.direction, cand.grade, cand.confidence)
 
