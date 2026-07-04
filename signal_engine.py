@@ -34,8 +34,8 @@ from typing import Optional
 # ============================================================================
 
 HL_API_URL = "https://api.hyperliquid.xyz/info"
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
+TELEGRAM_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = os.environ.get("TG_CHAT_ID", "")
 
 STATE_PATH = os.environ.get("ZENITH_STATE_PATH", "state.json")
 LOG_PATH = os.environ.get("ZENITH_LOG_PATH", "zenith_prime.log")
