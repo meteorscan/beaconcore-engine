@@ -11,7 +11,7 @@ independent timeframe combos in parallel:
           -> Execution-TF Market Structure Shift (confirmation)
             -> Breaker / Mitigation Block entry
               -> Structure-based Stop Loss
-                -> Minimum 2R Target, dynamically extended to 3R / 4R
+                -> Single 2R Target (TP)
 
 Combos:
     H4 / 15m   (original)
@@ -32,11 +32,26 @@ delivery + reaction system, cron-per-run scan architecture, state.json
 persistence) mirrors the operator's existing engines. The trading model
 itself is entirely original to Meridian.
 
+Trade management (v1.1.0 — single TP, no partial win):
+    - Every signal carries exactly one take-profit (fixed at 2R) and one
+      stop loss. Whichever is touched first resolves the signal — there
+      is no partial-exit / runner state to track.
+    - A dynamically extended target (2R-4R, based on room to the next
+      opposing HTF zone) is still computed per setup, but purely as an
+      internal setup-quality score used to rank/sort signals within a
+      scan (see MAX_SIGNALS_PER_SCAN below) — it is never shown to the
+      user and never waited on for an exit.
+    - On resolution, Meridian both reacts to the original Telegram
+      message (🏆 TP hit / 😭 SL hit) and sends a short reply to that
+      message confirming the outcome in plain text.
+    - A rolling 24h performance recap is sent once per day at/after
+      08:00 UTC (see DAILY_SUMMARY_HOUR_UTC / should_send_daily_summary).
+
 Signal quality controls:
-    - Scan results are ranked by a quality metric (TP2 R-multiple, then
-      HTF POI confluence quality) before truncation to
-      MAX_SIGNALS_PER_SCAN, rather than truncating in whatever order
-      symbols happened to resolve in.
+    - Scan results are ranked by a quality metric (the dynamically
+      extended R-multiple described above, then HTF POI confluence
+      quality) before truncation to MAX_SIGNALS_PER_SCAN, rather than
+      truncating in whatever order symbols happened to resolve in.
     - A sector/correlated-asset diversification cap (MAX_PER_SECTOR)
       stops a single scan from firing all its signal slots into one
       correlated basket (e.g. all L1s).
@@ -55,7 +70,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 ENGINE_NAME = "Meridian"
 
 # ── CONFIG ──────────────────────────────────────────────────────────
@@ -117,9 +132,12 @@ INTERVAL_MS = {
 
 N_D   = 400     # ~13 months of daily — PDH/PDL/PWH/PWL/PMH/PML
 
-REACT_TP1 = "🔥"
-REACT_TP2 = "🏆"
-REACT_SL  = "😭"
+REACT_TP = "🏆"
+REACT_SL = "😭"
+
+# Rolling 24h performance recap is sent once per day, on the first scan
+# that runs at or after this UTC hour (see should_send_daily_summary).
+DAILY_SUMMARY_HOUR_UTC = 8
 
 STATE_VERSION = 1
 
@@ -783,8 +801,16 @@ def build_trade_plan(direction: str, sfp: SFPEvent, breaker: POIZone,
     if risk <= 0:
         return None
 
+    # tp1 is the ONE real target: it's what gets shown as "TP" in the
+    # Telegram message and what actually resolves the signal (see
+    # check_active_signals). There is no partial exit at this level.
     tp1 = entry + MIN_RR * risk if direction == "long" else entry - MIN_RR * risk
 
+    # tp2 / best_rr are NOT a second target to wait for. They're a
+    # ranking-only quality score (how much room this setup has to run,
+    # 2R-4R) used to sort/prioritize signals within a scan — see
+    # results.sort(...) in main(). Never surfaced to the user, never
+    # checked against live price.
     room = room_to_next_opposing_level(entry, direction, sfp, zones, liquidity_levels)
     best_rr = MIN_RR
     if room is not None:
@@ -873,6 +899,19 @@ def react_to_message(message_id: int, emoji: str):
     except Exception as e:
         print(f"  [REACT ERROR] msg_id {message_id}: {_sanitize_error(e)}")
 
+def reply_to_telegram(message_id: int, text: str):
+    """Sends a short text reply to a specific Telegram message (used to
+    confirm TP/SL hits in plain text, alongside the emoji reaction)."""
+    url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
+    try:
+        r = requests.post(url, json={
+            "chat_id": TG_CHAT_ID, "text": text, "parse_mode": "HTML",
+            "reply_to_message_id": message_id,
+        }, timeout=10)
+        r.raise_for_status()
+    except Exception as e:
+        print(f"  [REPLY ERROR] msg_id {message_id}: {_sanitize_error(e)}")
+
 def fmt_px(v: float) -> str:
     if v >= 1000: return f"{v:,.2f}"
     if v >= 1:    return f"{v:,.4f}"
@@ -904,7 +943,7 @@ def format_signal(symbol: str, direction: str, plan: TradePlan, htf: HTFBias, zo
         f"{price_line}"
         f"Entry (breaker zone): <code>{fmt_px(plan.entry)}</code>\n"
         f"Stop Loss (structure): <code>{fmt_px(plan.sl)}</code>\n"
-        f"TP1 (2R): <code>{fmt_px(plan.tp1)}</code>\n"
+        f"TP (2R): <code>{fmt_px(plan.tp1)}</code>\n"
         f"Risk distance: {fmt_px(risk)}\n\n"
         f"{ts}"
     )
@@ -913,6 +952,10 @@ def format_signal(symbol: str, direction: str, plan: TradePlan, htf: HTFBias, zo
 # ══════════════════════════════════════════════════════════════════
 # SIGNAL LIFECYCLE: PENDING SETUPS -> ACTIVE SIGNALS -> RESOLUTION
 # ══════════════════════════════════════════════════════════════════
+
+def _combo_label(combo_id: str) -> str:
+    combo = COMBOS.get(combo_id)
+    return combo.label if combo else combo_id
 
 def check_cooldown(state: dict, symbol: str, direction: str, bar_index_htf: int, combo: Combo) -> bool:
     active = state.get("active_signals", [])
@@ -986,8 +1029,8 @@ def process_symbol(symbol: str, combo: Combo, state: dict, bundle: tuple, refere
             return None
 
         print(f"    MERIDIAN SIGNAL [{combo.label}]: {coin} {setup['direction'].upper()} "
-              f"entry={fmt_px(plan.entry)} sl={fmt_px(plan.sl)} "
-              f"tp1={fmt_px(plan.tp1)} tp2={fmt_px(plan.tp2)} ({plan.r_multiple_tp2:.0f}R)")
+              f"entry={fmt_px(plan.entry)} sl={fmt_px(plan.sl)} tp={fmt_px(plan.tp1)} (2R) "
+              f"[ranking-only ext. quality: {plan.r_multiple_tp2:.0f}R]")
         return {"symbol": symbol, "direction": setup["direction"], "plan": plan,
                 "zone_kind": zone.kind, "zone_quality": zone.quality,
                 "bar_index_exec": bar_index_exec, "combo": combo}
@@ -1033,17 +1076,53 @@ def track_signal(state: dict, symbol: str, direction: str, msg_id: int,
         "combo": combo.id, "exec_tf": combo.exec_tf,
         "signal_max_age_hours": combo.signal_max_age_hours,
         "bar_index": bar_index_exec, "signal_bar_time": bar_index_exec * exec_iv_ms,
-        "entry": plan.entry, "tp1": plan.tp1, "tp2": plan.tp2, "sl": plan.sl,
-        "tp1_hit": False, "resolved": False,
+        "entry": plan.entry, "tp1": plan.tp1, "sl": plan.sl,
+        # tp2 is stored for reference only (what the extended target would
+        # have been) — it is never checked against price. See build_trade_plan.
+        "tp2_reference_only": plan.tp2,
+        "resolved": False,
     })
 
 def check_active_signals(state: dict, reference_ms: int):
+    """
+    Single-TP resolution: whichever of TP or SL is touched first resolves
+    the signal completely — there is no partial-win / runner state.
+    On resolution, Meridian reacts to the original message with the TP/SL
+    emoji AND sends a short text reply to it confirming the outcome.
+    """
     signals = list(state.get("active_signals", []))
     if not signals:
         return
     still_active = []
     for sig in signals:
         if sig.get("resolved", False):
+            continue
+
+        symbol, direction, msg_id = sig["symbol"], sig["direction"], sig["msg_id"]
+        combo_id = sig.get("combo", "h4_15m")
+        combo_lbl = _combo_label(combo_id)
+        coin = hl_coin(symbol)
+
+        def resolve(outcome):
+            state.setdefault("resolved_signals", []).append(
+                {"symbol": symbol, "direction": direction, "combo": combo_id,
+                 "outcome": outcome, "resolved_at": int(time.time())})
+            sig["resolved"] = True
+
+        def announce(outcome):
+            emoji = REACT_TP if outcome == "tp" else REACT_SL
+            label = "TP hit" if outcome == "tp" else "SL hit"
+            react_to_message(msg_id, emoji)
+            reply_to_telegram(msg_id, f"{emoji} {label} — {coin} {direction.upper()} ({combo_lbl})")
+
+        # -- Migration guard: a signal carried over from before v1.1.0 may
+        #    already have its old TP1 checkpoint flagged as hit, mid-flight
+        #    under the previous partial-win model. Under the new single-TP
+        #    model that checkpoint IS the win condition, so resolve it now
+        #    instead of continuing to wait on the old (removed) TP2 logic. --
+        if sig.get("tp1_hit", False):
+            print(f"  [TRACK] {coin} ({combo_lbl}) carried over with legacy TP1 already hit — resolving as TP")
+            announce("tp"); resolve("tp")
             continue
 
         # Legacy signals (pre-multi-combo) default to the H4/15m combo's
@@ -1053,19 +1132,13 @@ def check_active_signals(state: dict, reference_ms: int):
         signal_bar_time_ms = sig.get("signal_bar_time")
         age_hours = (reference_ms - signal_bar_time_ms) / 3_600_000.0 if signal_bar_time_ms else 0.0
         if age_hours > max_age_hours:
-            print(f"  [TRACK] {sig['symbol']} ({sig.get('combo', 'h4_15m')}) expired "
-                  f"after {age_hours:.1f}h — dropping")
-            state.setdefault("resolved_signals", []).append(
-                {"symbol": sig["symbol"], "direction": sig.get("direction", ""),
-                 "combo": sig.get("combo", "h4_15m"),
-                 "outcome": "expired", "resolved_at": int(time.time())})
+            print(f"  [TRACK] {coin} ({combo_lbl}) expired after {age_hours:.1f}h — dropping")
+            resolve("expired")
             continue
 
-        symbol, direction, msg_id = sig["symbol"], sig["direction"], sig["msg_id"]
-        tp1, tp2, sl = sig["tp1"], sig["tp2"], sig["sl"]
-        tp1_hit = sig.get("tp1_hit", False)
+        tp, sl = sig["tp1"], sig["sl"]
         last_ts = sig.get("last_processed_candle_ts", signal_bar_time_ms or 0)
-        exec_n = COMBOS.get(sig.get("combo", "h4_15m"), COMBOS["h4_15m"]).n_exec
+        exec_n = COMBOS.get(combo_id, COMBOS["h4_15m"]).n_exec
 
         try:
             candles = get_candles(symbol, exec_tf, exec_n, start_time_ms=signal_bar_time_ms, reference_ms=reference_ms)
@@ -1078,41 +1151,22 @@ def check_active_signals(state: dict, reference_ms: int):
             still_active.append(sig)
             continue
 
-        def resolve(outcome):
-            state.setdefault("resolved_signals", []).append(
-                {"symbol": symbol, "direction": direction, "outcome": outcome, "resolved_at": int(time.time())})
-            sig["resolved"] = True
-
         for c in new_candles:
             last_ts = c["t"]
             if direction == "long":
-                if not tp1_hit:
-                    if c["h"] >= tp1 and c["l"] <= sl:
-                        if abs(sl - c["o"]) < abs(tp1 - c["o"]):
-                            react_to_message(msg_id, REACT_SL); resolve("sl"); break
-                        react_to_message(msg_id, REACT_TP1); tp1_hit = True; sig["tp1_hit"] = True
-                    elif c["h"] >= tp1:
-                        react_to_message(msg_id, REACT_TP1); tp1_hit = True; sig["tp1_hit"] = True
-                    elif c["l"] <= sl:
-                        react_to_message(msg_id, REACT_SL); resolve("sl"); break
-                if tp1_hit and c["h"] >= tp2:
-                    react_to_message(msg_id, REACT_TP2); resolve("tp2"); break
-                if tp1_hit and not sig.get("resolved", False) and c["l"] <= sl:
-                    resolve("tp1"); break
+                hit_tp, hit_sl = c["h"] >= tp, c["l"] <= sl
             else:
-                if not tp1_hit:
-                    if c["l"] <= tp1 and c["h"] >= sl:
-                        if abs(sl - c["o"]) < abs(tp1 - c["o"]):
-                            react_to_message(msg_id, REACT_SL); resolve("sl"); break
-                        react_to_message(msg_id, REACT_TP1); tp1_hit = True; sig["tp1_hit"] = True
-                    elif c["l"] <= tp1:
-                        react_to_message(msg_id, REACT_TP1); tp1_hit = True; sig["tp1_hit"] = True
-                    elif c["h"] >= sl:
-                        react_to_message(msg_id, REACT_SL); resolve("sl"); break
-                if tp1_hit and c["l"] <= tp2:
-                    react_to_message(msg_id, REACT_TP2); resolve("tp2"); break
-                if tp1_hit and not sig.get("resolved", False) and c["h"] >= sl:
-                    resolve("tp1"); break
+                hit_tp, hit_sl = c["l"] <= tp, c["h"] >= sl
+
+            if hit_tp and hit_sl:
+                # Same candle touched both — resolve toward whichever level
+                # sits closer to the candle's open (same tie-break as before).
+                outcome = "sl" if abs(sl - c["o"]) < abs(tp - c["o"]) else "tp"
+                announce(outcome); resolve(outcome); break
+            elif hit_tp:
+                announce("tp"); resolve("tp"); break
+            elif hit_sl:
+                announce("sl"); resolve("sl"); break
 
         if not sig.get("resolved", False):
             sig["last_processed_candle_ts"] = last_ts
@@ -1121,47 +1175,109 @@ def check_active_signals(state: dict, reference_ms: int):
     state["active_signals"] = still_active
 
 
+WIN_OUTCOMES = {"tp", "tp1", "tp2"}  # "tp1"/"tp2" are legacy (pre-v1.1.0) win codes
+
 def get_outcome_summary(state: dict) -> str:
     """
-    Aggregate win-rate summary computed from state["resolved_signals"],
-    which check_active_signals() has already been populating all along.
+    Aggregate win-rate summary computed from state["resolved_signals"].
 
-    Outcome semantics (see resolve() in check_active_signals):
-      "tp2"     -> full win (TP1 then TP2)
-      "tp1"     -> partial win (TP1 secured, later stopped out at/after BE)
-      "sl"      -> loss (stopped before TP1)
+      "tp"      -> win (single TP hit)
+      "sl"      -> loss (stopped out before TP)
       "expired" -> no outcome reached before max age — excluded from win rate
+
+    Entries recorded before v1.1.0 may carry legacy "tp1"/"tp2" outcome
+    codes from the old partial-win model — both count as wins here so
+    historical stats aren't lost or skewed by the schema change.
     """
     resolved = state.get("resolved_signals", [])
     if not resolved:
         return "[OUTCOMES] No resolved signals tracked yet."
 
-    counts = {"tp2": 0, "tp1": 0, "sl": 0, "expired": 0}
+    counts = {"tp": 0, "sl": 0, "expired": 0}
     per_combo: dict[str, dict[str, int]] = {}
     for r in resolved:
         outcome = r.get("outcome", "expired")
-        counts[outcome] = counts.get(outcome, 0) + 1
+        key = "tp" if outcome in WIN_OUTCOMES else outcome
+        counts[key] = counts.get(key, 0) + 1
         combo_id = r.get("combo", "unknown")
-        bucket = per_combo.setdefault(combo_id, {"tp2": 0, "tp1": 0, "sl": 0, "expired": 0})
-        bucket[outcome] = bucket.get(outcome, 0) + 1
+        bucket = per_combo.setdefault(combo_id, {"tp": 0, "sl": 0, "expired": 0})
+        bucket[key] = bucket.get(key, 0) + 1
 
-    wins = counts["tp2"] + counts["tp1"]
-    losses = counts["sl"]
+    wins = counts.get("tp", 0)
+    losses = counts.get("sl", 0)
     decided = wins + losses
     win_rate = (wins / decided * 100) if decided else 0.0
 
     lines = [
         f"[OUTCOMES] {wins}W / {losses}L ({win_rate:.1f}%) — "
-        f"{counts['tp2']} full TP2, {counts['tp1']} partial TP1, "
-        f"{counts['expired']} expired — {len(resolved)} resolved total"
+        f"{counts.get('expired', 0)} expired — {len(resolved)} resolved total"
     ]
     for combo_id, bucket in per_combo.items():
-        c_wins = bucket["tp2"] + bucket["tp1"]
-        c_losses = bucket["sl"]
+        c_wins = bucket.get("tp", 0)
+        c_losses = bucket.get("sl", 0)
         c_decided = c_wins + c_losses
         c_rate = (c_wins / c_decided * 100) if c_decided else 0.0
-        label = COMBOS[combo_id].label if combo_id in COMBOS else combo_id
-        lines.append(f"           {label}: {c_wins}W / {c_losses}L ({c_rate:.1f}%)")
+        lines.append(f"           {_combo_label(combo_id)}: {c_wins}W / {c_losses}L ({c_rate:.1f}%)")
+    return "\n".join(lines)
+
+
+def should_send_daily_summary(state: dict, now: datetime) -> bool:
+    """True on the first scan run at/after DAILY_SUMMARY_HOUR_UTC each UTC
+    day. Works regardless of exact cron cadence — as long as at least one
+    scan runs after that hour daily, the summary fires exactly once."""
+    if now.hour < DAILY_SUMMARY_HOUR_UTC:
+        return False
+    return state.get("last_daily_summary_date") != now.strftime("%Y-%m-%d")
+
+
+def build_daily_summary(state: dict, now: datetime) -> str:
+    """Rolling 24h performance recap (trailing window from `now`, not
+    'since the last summary'), sent once per day via should_send_daily_summary."""
+    cutoff_ts = int(now.timestamp()) - 24 * 3600
+    resolved = [r for r in state.get("resolved_signals", []) if r.get("resolved_at", 0) >= cutoff_ts]
+    active_count = sum(1 for s in state.get("active_signals", []) if not s.get("resolved", False))
+    ts = now.strftime("%Y-%m-%d %H:%M UTC")
+    header = f"📊 <b>{ENGINE_NAME} v{__version__} — 24H Summary</b>"
+
+    if not resolved:
+        return f"{header}\n\nNo signals resolved in the last 24h.\nCurrently active: {active_count}\n\n{ts}"
+
+    counts = {"tp": 0, "sl": 0, "expired": 0}
+    per_combo: dict[str, dict[str, int]] = {}
+    for r in resolved:
+        outcome = r.get("outcome", "expired")
+        key = "tp" if outcome in WIN_OUTCOMES else outcome
+        counts[key] = counts.get(key, 0) + 1
+        combo_id = r.get("combo", "unknown")
+        bucket = per_combo.setdefault(combo_id, {"tp": 0, "sl": 0, "expired": 0})
+        bucket[key] = bucket.get(key, 0) + 1
+
+    wins, losses = counts.get("tp", 0), counts.get("sl", 0)
+    decided = wins + losses
+    win_rate = (wins / decided * 100) if decided else 0.0
+
+    lines = [
+        header, "",
+        f"{wins}W / {losses}L ({win_rate:.1f}%) — {counts.get('expired', 0)} expired — {len(resolved)} resolved",
+    ]
+    for combo_id, bucket in per_combo.items():
+        c_wins, c_losses = bucket.get("tp", 0), bucket.get("sl", 0)
+        c_decided = c_wins + c_losses
+        c_rate = (c_wins / c_decided * 100) if c_decided else 0.0
+        lines.append(f"  {_combo_label(combo_id)}: {c_wins}W / {c_losses}L ({c_rate:.1f}%)")
+
+    lines.append("")
+    for r in sorted(resolved, key=lambda r: r.get("resolved_at", 0)):
+        outcome = r.get("outcome", "expired")
+        tag = "✅ TP" if outcome in WIN_OUTCOMES else ("❌ SL" if outcome == "sl" else "⌛ EXP")
+        coin = hl_coin(r.get("symbol", "?"))
+        direction = (r.get("direction") or "").upper()
+        lines.append(f"  {tag} — {coin} {direction} ({_combo_label(r.get('combo', 'unknown'))})")
+
+    lines.append("")
+    lines.append(f"Currently active: {active_count}")
+    lines.append("")
+    lines.append(ts)
     return "\n".join(lines)
 
 
@@ -1181,6 +1297,15 @@ def main():
     print("[TRACK] Checking active signals…")
     check_active_signals(state, reference_ms)
     save_state(state)
+
+    now_utc = datetime.now(timezone.utc)
+    if should_send_daily_summary(state, now_utc):
+        print("[SUMMARY] Sending 24H performance summary…")
+        if send_telegram(build_daily_summary(state, now_utc)):
+            state["last_daily_summary_date"] = now_utc.strftime("%Y-%m-%d")
+            save_state(state)
+        else:
+            print("[SUMMARY] Telegram send failed — will retry next run")
 
     print("[INIT] Fetching market context…")
     get_meta_and_asset_ctxs()
@@ -1292,7 +1417,7 @@ def main():
             update_cooldown(state, symbol, direction, bar_index_by_tf[combo.htf_tf], combo)
             track_signal(state, symbol, direction, msg_id, plan, res["bar_index_exec"], combo)
             print(f"  [FIRED] {hl_coin(symbol)} {direction.upper()} [{combo.label}] "
-                  f"TP1={fmt_px(plan.tp1)} TP2={fmt_px(plan.tp2)} SL={fmt_px(plan.sl)}")
+                  f"TP={fmt_px(plan.tp1)} SL={fmt_px(plan.sl)}")
             signals_fired += 1
         else:
             print(f"  [TG FAIL] {hl_coin(symbol)} {direction.upper()} [{combo.label}] — Telegram send failed")
