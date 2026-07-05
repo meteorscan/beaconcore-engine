@@ -1,32 +1,7 @@
 {
   "_version": 1,
   "pending_setups": {
-    "h4_15m": {
-      "AVAXUSDT": {
-        "direction": "long",
-        "zone_low": 6.8232,
-        "zone_high": 6.8511,
-        "zone_quality": 1,
-        "sweep_extreme": 6.7729,
-        "sfp_time": 1783238400000,
-        "range_low": 6.79,
-        "range_high": 7.113,
-        "eq": 6.9515,
-        "atr_h4": 0.11946599454860884
-      },
-      "UNIUSDT": {
-        "direction": "short",
-        "zone_low": 3.2189,
-        "zone_high": 3.2232,
-        "zone_quality": 1,
-        "sweep_extreme": 3.2809,
-        "sfp_time": 1783108800000,
-        "range_low": 2.7189,
-        "range_high": 3.3099,
-        "eq": 3.0144,
-        "atr_h4": 0.06981745658847639
-      }
-    },
+    "h4_15m": {},
     "12h_1h": {
       "TRXUSDT": {
         "direction": "long",
@@ -75,7 +50,7 @@
       "sl": 0.7793203433040351,
       "tp1_hit": false,
       "resolved": false,
-      "last_processed_candle_ts": 1783268100000
+      "last_processed_candle_ts": 1783269000000
     }
   ],
   "resolved_signals": [],
