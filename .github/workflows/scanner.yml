@@ -1,48 +1,36 @@
 name: Scalp Swing Scanner
+
 on:
   workflow_dispatch:
-    inputs:
-      run_backtest:
-        description: 'Run backtest instead of live scan?'
-        required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'false'
-          - 'true'
-      backtest_days:
-        description: 'Backtest: days of history'
-        required: false
-        default: '30'
-      backtest_symbols:
-        description: 'Backtest: symbols (comma-separated or "all")'
-        required: false
-        default: 'BTCUSDT'
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   scan:
-    if: ${{ github.event.inputs.run_backtest != 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4.2.2
+
       - name: Set up Python
         uses: actions/setup-python@v5.6.0
         with:
           python-version: "3.11"
           cache: pip
+
       - name: Install dependencies
         run: pip install -r requirements.txt
+
       - name: Run signal scanner
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID:   ${{ secrets.TG_CHAT_ID }}
         run: python signal_engine.py
+        
       - name: Persist cooldown state
         if: always()
         run: |
@@ -52,33 +40,3 @@ jobs:
           git add state.json || true
           git diff --staged --quiet || git commit -m "chore: update scanner state [skip ci]"
           git push || true
-
-  backtest:
-    if: ${{ github.event.inputs.run_backtest == 'true' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 120
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4.2.2
-      - name: Set up Python
-        uses: actions/setup-python@v5.6.0
-        with:
-          python-version: "3.11"
-          cache: pip
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-      - name: Run backtest
-        env:
-          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-          TG_CHAT_ID:   ${{ secrets.TG_CHAT_ID }}
-        run: |
-          python backtest_harness.py \
-            --days ${{ github.event.inputs.backtest_days }} \
-            --symbols "${{ github.event.inputs.backtest_symbols }}" \
-            --output backtest_results.json
-      - name: Upload results
-        uses: actions/upload-artifact@v4
-        with:
-          name: backtest-results-${{ github.event.inputs.backtest_days }}d
-          path: backtest_results.json
-          retention-days: 30
