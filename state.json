@@ -32,7 +32,8 @@
       "tp2": 0.7543830847098922,
       "sl": 0.553558457645054,
       "tp1_hit": false,
-      "resolved": false
+      "resolved": false,
+      "last_processed_candle_ts": 1783242000000
     },
     {
       "symbol": "SUIUSDT",
