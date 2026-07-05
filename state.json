@@ -49,7 +49,8 @@
       "tp2": 0.6774993133919299,
       "sl": 0.7793203433040351,
       "tp1_hit": false,
-      "resolved": false
+      "resolved": false,
+      "last_processed_candle_ts": 1783245600000
     }
   ],
   "resolved_signals": [],
