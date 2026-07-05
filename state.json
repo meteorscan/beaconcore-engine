@@ -14,18 +14,6 @@
         "range_high": 0.33418,
         "eq": 0.32404999999999995,
         "atr_h4": 0.003192796024504677
-      },
-      "APTUSDT": {
-        "direction": "long",
-        "zone_low": 0.5743,
-        "zone_high": 0.5779,
-        "zone_quality": 1,
-        "sweep_extreme": 0.559,
-        "sfp_time": 1782864000000,
-        "range_low": 0.5538,
-        "range_high": 0.6854,
-        "eq": 0.6195999999999999,
-        "atr_h4": 0.02637655036038542
       }
     }
   },
@@ -44,12 +32,28 @@
       "sl": 3.2948634913176953,
       "tp2_reference_only": 3.025573017364609,
       "resolved": false,
-      "last_processed_candle_ts": 1783281600000
+      "last_processed_candle_ts": 1783282500000
+    },
+    {
+      "symbol": "APTUSDT",
+      "direction": "long",
+      "msg_id": 1602,
+      "combo": "12h_1h",
+      "exec_tf": "1h",
+      "signal_max_age_hours": 96,
+      "bar_index": 495356,
+      "signal_bar_time": 1783281600000,
+      "entry": 0.6205,
+      "tp1": 0.7540506201441541,
+      "sl": 0.553724689927923,
+      "tp2_reference_only": 0.7540506201441541,
+      "resolved": false
     }
   ],
   "resolved_signals": [],
   "signal_cooldowns": {
-    "h4_15m:UNIUSDT_short": 123838
+    "h4_15m:UNIUSDT_short": 123838,
+    "12h_1h:APTUSDT_long": 41279
   },
   "signal_history": [],
   "last_daily_summary_date": "2026-07-05"
