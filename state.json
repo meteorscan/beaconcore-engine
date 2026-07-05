@@ -27,23 +27,30 @@
         "range_high": 0.33418,
         "eq": 0.32404999999999995,
         "atr_h4": 0.003286162757969502
-      },
-      "APTUSDT": {
-        "direction": "long",
-        "zone_low": 0.5743,
-        "zone_high": 0.5779,
-        "zone_quality": 1,
-        "sweep_extreme": 0.559,
-        "sfp_time": 1782864000000,
-        "range_low": 0.5538,
-        "range_high": 0.6854,
-        "eq": 0.6195999999999999,
-        "atr_h4": 0.02720771177473035
       }
     }
   },
-  "active_signals": [],
+  "active_signals": [
+    {
+      "symbol": "APTUSDT",
+      "direction": "long",
+      "msg_id": 1549,
+      "combo": "12h_1h",
+      "exec_tf": "1h",
+      "signal_max_age_hours": 96,
+      "bar_index": 495344,
+      "signal_bar_time": 1783238400000,
+      "entry": 0.6205,
+      "tp1": 0.7543830847098922,
+      "tp2": 0.7543830847098922,
+      "sl": 0.553558457645054,
+      "tp1_hit": false,
+      "resolved": false
+    }
+  ],
   "resolved_signals": [],
-  "signal_cooldowns": {},
+  "signal_cooldowns": {
+    "12h_1h:APTUSDT_long": 41278
+  },
   "signal_history": []
 }
