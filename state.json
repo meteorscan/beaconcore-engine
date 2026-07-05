@@ -13,30 +13,6 @@
         "range_high": 0.32647,
         "eq": 0.320685,
         "atr_h4": 0.0014983865194179557
-      },
-      "TAOUSDT": {
-        "direction": "short",
-        "zone_low": 213.91,
-        "zone_high": 215.72,
-        "zone_quality": 1,
-        "sweep_extreme": 215.92,
-        "sfp_time": 1783137600000,
-        "range_low": 195.53,
-        "range_high": 219.2,
-        "eq": 207.365,
-        "atr_h4": 4.393758810891849
-      },
-      "UNIUSDT": {
-        "direction": "short",
-        "zone_low": 3.2189,
-        "zone_high": 3.2232,
-        "zone_quality": 1,
-        "sweep_extreme": 3.2809,
-        "sfp_time": 1783108800000,
-        "range_low": 2.7189,
-        "range_high": 3.3099,
-        "eq": 3.0144,
-        "atr_h4": 0.07089572217749758
       }
     },
     "12h_1h": {
@@ -87,7 +63,7 @@
       "sl": 0.7793203433040351,
       "tp1_hit": false,
       "resolved": false,
-      "last_processed_candle_ts": 1783255500000
+      "last_processed_candle_ts": 1783256400000
     }
   ],
   "resolved_signals": [],
