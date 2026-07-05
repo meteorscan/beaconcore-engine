@@ -1,20 +1,7 @@
 {
   "_version": 1,
   "pending_setups": {
-    "h4_15m": {
-      "SUIUSDT": {
-        "direction": "short",
-        "zone_low": 0.76223,
-        "zone_high": 0.76515,
-        "zone_quality": 1,
-        "sweep_extreme": 0.77627,
-        "sfp_time": 1783195200000,
-        "range_low": 0.72931,
-        "range_high": 0.78353,
-        "eq": 0.75642,
-        "atr_h4": 0.015251716520175571
-      }
-    },
+    "h4_15m": {},
     "12h_1h": {
       "TRXUSDT": {
         "direction": "long",
@@ -46,11 +33,28 @@
       "sl": 0.553558457645054,
       "tp1_hit": false,
       "resolved": false
+    },
+    {
+      "symbol": "SUIUSDT",
+      "direction": "short",
+      "msg_id": 1559,
+      "combo": "h4_15m",
+      "exec_tf": "15m",
+      "signal_max_age_hours": 24,
+      "bar_index": 1981383,
+      "signal_bar_time": 1783244700000,
+      "entry": 0.74538,
+      "tp1": 0.6774993133919299,
+      "tp2": 0.6774993133919299,
+      "sl": 0.7793203433040351,
+      "tp1_hit": false,
+      "resolved": false
     }
   ],
   "resolved_signals": [],
   "signal_cooldowns": {
-    "12h_1h:APTUSDT_long": 41278
+    "12h_1h:APTUSDT_long": 41278,
+    "h4_15m:SUIUSDT_short": 123836
   },
   "signal_history": []
 }
