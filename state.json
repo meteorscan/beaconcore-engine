@@ -2,20 +2,7 @@
   "_version": 1,
   "pending_setups": {
     "h4_15m": {},
-    "12h_1h": {
-      "TRXUSDT": {
-        "direction": "long",
-        "zone_low": 0.32029,
-        "zone_high": 0.32266,
-        "zone_quality": 2,
-        "sweep_extreme": 0.32006,
-        "sfp_time": 1782561600000,
-        "range_low": 0.31392,
-        "range_high": 0.33418,
-        "eq": 0.32404999999999995,
-        "atr_h4": 0.003192796024504677
-      }
-    }
+    "12h_1h": {}
   },
   "active_signals": [
     {
@@ -32,7 +19,7 @@
       "sl": 3.2948634913176953,
       "tp2_reference_only": 3.025573017364609,
       "resolved": false,
-      "last_processed_candle_ts": 1783294200000
+      "last_processed_candle_ts": 1783295100000
     },
     {
       "symbol": "APTUSDT",
@@ -48,7 +35,7 @@
       "sl": 0.553724689927923,
       "tp2_reference_only": 0.7540506201441541,
       "resolved": false,
-      "last_processed_candle_ts": 1783288800000
+      "last_processed_candle_ts": 1783292400000
     }
   ],
   "resolved_signals": [],
