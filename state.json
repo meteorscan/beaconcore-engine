@@ -19,7 +19,7 @@
       "sl": 3.2948634913176953,
       "tp2_reference_only": 3.025573017364609,
       "resolved": false,
-      "last_processed_candle_ts": 1783312200000
+      "last_processed_candle_ts": 1783313100000
     },
     {
       "symbol": "APTUSDT",
@@ -35,7 +35,7 @@
       "sl": 0.553724689927923,
       "tp2_reference_only": 0.7540506201441541,
       "resolved": false,
-      "last_processed_candle_ts": 1783306800000
+      "last_processed_candle_ts": 1783310400000
     }
   ],
   "resolved_signals": [],
