@@ -32,7 +32,7 @@
       "sl": 3.2948634913176953,
       "tp2_reference_only": 3.025573017364609,
       "resolved": false,
-      "last_processed_candle_ts": 1783359000000
+      "last_processed_candle_ts": 1783359900000
     },
     {
       "symbol": "APTUSDT",
@@ -48,7 +48,7 @@
       "sl": 0.553724689927923,
       "tp2_reference_only": 0.7540506201441541,
       "resolved": false,
-      "last_processed_candle_ts": 1783353600000
+      "last_processed_candle_ts": 1783357200000
     },
     {
       "symbol": "LTCUSDT",
@@ -64,7 +64,7 @@
       "sl": 43.86476481320377,
       "tp2_reference_only": 48.050470373592454,
       "resolved": false,
-      "last_processed_candle_ts": 1783359000000
+      "last_processed_candle_ts": 1783359900000
     }
   ],
   "resolved_signals": [],
