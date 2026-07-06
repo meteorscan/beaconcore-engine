@@ -12,7 +12,7 @@
         "range_low": 537.1,
         "range_high": 593.3,
         "eq": 565.2,
-        "atr_h4": 7.632145895777842
+        "atr_h4": 7.359135360237966
       },
       "UNIUSDT": {
         "direction": "short",
@@ -24,7 +24,7 @@
         "range_low": 3.1,
         "range_high": 3.3099,
         "eq": 3.20495,
-        "atr_h4": 0.0720164191865414
+        "atr_h4": 0.07032238947940303
       }
     },
     "12h_1h": {}
@@ -44,7 +44,7 @@
       "sl": 0.553724689927923,
       "tp2_reference_only": 0.7540506201441541,
       "resolved": false,
-      "last_processed_candle_ts": 1783360800000
+      "last_processed_candle_ts": 1783364400000
     },
     {
       "symbol": "LTCUSDT",
@@ -60,7 +60,7 @@
       "sl": 43.86476481320377,
       "tp2_reference_only": 48.050470373592454,
       "resolved": false,
-      "last_processed_candle_ts": 1783366200000
+      "last_processed_candle_ts": 1783367100000
     }
   ],
   "resolved_signals": [
