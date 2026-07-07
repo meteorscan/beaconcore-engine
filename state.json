@@ -2,18 +2,6 @@
   "_version": 1,
   "pending_setups": {
     "h4_15m": {
-      "XLMUSDT": {
-        "direction": "short",
-        "zone_low": 0.20687,
-        "zone_high": 0.20925,
-        "zone_quality": 3,
-        "sweep_extreme": 0.20955,
-        "sfp_time": 1783152000000,
-        "range_low": 0.19588,
-        "range_high": 0.21594,
-        "eq": 0.20590999999999998,
-        "atr_h4": 0.0051056801005343
-      },
       "BCHUSDT": {
         "direction": "long",
         "zone_low": 226.73,
@@ -26,17 +14,17 @@
         "eq": 236.62,
         "atr_h4": 6.229417705500436
       },
-      "DOTUSDT": {
+      "XLMUSDT": {
         "direction": "short",
-        "zone_low": 0.86897,
-        "zone_high": 0.8841,
-        "zone_quality": 1,
-        "sweep_extreme": 0.88804,
-        "sfp_time": 1783296000000,
-        "range_low": 0.84846,
-        "range_high": 0.89922,
-        "eq": 0.87384,
-        "atr_h4": 0.017778814264617422
+        "zone_low": 0.20687,
+        "zone_high": 0.20925,
+        "zone_quality": 3,
+        "sweep_extreme": 0.20955,
+        "sfp_time": 1783152000000,
+        "range_low": 0.19588,
+        "range_high": 0.21594,
+        "eq": 0.20590999999999998,
+        "atr_h4": 0.004959559961743186
       }
     },
     "12h_1h": {}
@@ -57,6 +45,21 @@
       "tp2_reference_only": 0.7540506201441541,
       "resolved": false,
       "last_processed_candle_ts": 1783407600000
+    },
+    {
+      "symbol": "DOTUSDT",
+      "direction": "short",
+      "msg_id": 1721,
+      "combo": "h4_15m",
+      "exec_tf": "15m",
+      "signal_max_age_hours": 24,
+      "bar_index": 1981569,
+      "signal_bar_time": 1783412100000,
+      "entry": 0.86911,
+      "tp1": 0.8241384742941531,
+      "sl": 0.8915957628529235,
+      "tp2_reference_only": 0.8241384742941531,
+      "resolved": false
     }
   ],
   "resolved_signals": [
@@ -78,7 +81,8 @@
   "signal_cooldowns": {
     "h4_15m:UNIUSDT_short": 123838,
     "12h_1h:APTUSDT_long": 41279,
-    "h4_15m:LTCUSDT_long": 123843
+    "h4_15m:LTCUSDT_long": 123843,
+    "h4_15m:DOTUSDT_short": 123848
   },
   "signal_history": [],
   "last_daily_summary_date": "2026-07-07"
