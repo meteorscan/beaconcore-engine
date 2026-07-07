@@ -44,7 +44,7 @@
       "sl": 0.553724689927923,
       "tp2_reference_only": 0.7540506201441541,
       "resolved": false,
-      "last_processed_candle_ts": 1783425600000
+      "last_processed_candle_ts": 1783429200000
     },
     {
       "symbol": "DOTUSDT",
@@ -60,7 +60,7 @@
       "sl": 0.8915957628529235,
       "tp2_reference_only": 0.8241384742941531,
       "resolved": false,
-      "last_processed_candle_ts": 1783431000000
+      "last_processed_candle_ts": 1783431900000
     }
   ],
   "resolved_signals": [
