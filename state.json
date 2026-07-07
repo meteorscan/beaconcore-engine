@@ -2,18 +2,6 @@
   "_version": 1,
   "pending_setups": {
     "h4_15m": {
-      "BCHUSDT": {
-        "direction": "long",
-        "zone_low": 226.73,
-        "zone_high": 230.66,
-        "zone_quality": 1,
-        "sweep_extreme": 226.26,
-        "sfp_time": 1783094400000,
-        "range_low": 224.04,
-        "range_high": 249.2,
-        "eq": 236.62,
-        "atr_h4": 6.483988270631433
-      },
       "XLMUSDT": {
         "direction": "short",
         "zone_low": 0.20687,
@@ -25,6 +13,30 @@
         "range_high": 0.21594,
         "eq": 0.20590999999999998,
         "atr_h4": 0.0051056801005343
+      },
+      "BCHUSDT": {
+        "direction": "long",
+        "zone_low": 226.73,
+        "zone_high": 230.66,
+        "zone_quality": 1,
+        "sweep_extreme": 226.26,
+        "sfp_time": 1783094400000,
+        "range_low": 224.04,
+        "range_high": 249.2,
+        "eq": 236.62,
+        "atr_h4": 6.229417705500436
+      },
+      "DOTUSDT": {
+        "direction": "short",
+        "zone_low": 0.86897,
+        "zone_high": 0.8841,
+        "zone_quality": 1,
+        "sweep_extreme": 0.88804,
+        "sfp_time": 1783296000000,
+        "range_low": 0.84846,
+        "range_high": 0.89922,
+        "eq": 0.87384,
+        "atr_h4": 0.017778814264617422
       }
     },
     "12h_1h": {}
@@ -44,7 +56,7 @@
       "sl": 0.553724689927923,
       "tp2_reference_only": 0.7540506201441541,
       "resolved": false,
-      "last_processed_candle_ts": 1783404000000
+      "last_processed_candle_ts": 1783407600000
     }
   ],
   "resolved_signals": [
@@ -69,5 +81,5 @@
     "h4_15m:LTCUSDT_long": 123843
   },
   "signal_history": [],
-  "last_daily_summary_date": "2026-07-06"
+  "last_daily_summary_date": "2026-07-07"
 }
