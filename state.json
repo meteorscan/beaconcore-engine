@@ -2,17 +2,29 @@
   "_version": 1,
   "pending_setups": {
     "h4_15m": {
-      "BNBUSDT": {
+      "BCHUSDT": {
         "direction": "long",
-        "zone_low": 559.22,
-        "zone_high": 559.81,
+        "zone_low": 226.73,
+        "zone_high": 230.66,
         "zone_quality": 1,
-        "sweep_extreme": 556.78,
-        "sfp_time": 1783036800000,
-        "range_low": 537.1,
-        "range_high": 593.3,
-        "eq": 565.2,
-        "atr_h4": 7.440625567442139
+        "sweep_extreme": 226.26,
+        "sfp_time": 1783094400000,
+        "range_low": 224.04,
+        "range_high": 249.2,
+        "eq": 236.62,
+        "atr_h4": 6.483988270631433
+      },
+      "XLMUSDT": {
+        "direction": "short",
+        "zone_low": 0.20687,
+        "zone_high": 0.20925,
+        "zone_quality": 3,
+        "sweep_extreme": 0.20955,
+        "sfp_time": 1783152000000,
+        "range_low": 0.19588,
+        "range_high": 0.21594,
+        "eq": 0.20590999999999998,
+        "atr_h4": 0.0051056801005343
       }
     },
     "12h_1h": {}
@@ -32,7 +44,7 @@
       "sl": 0.553724689927923,
       "tp2_reference_only": 0.7540506201441541,
       "resolved": false,
-      "last_processed_candle_ts": 1783389600000
+      "last_processed_candle_ts": 1783393200000
     },
     {
       "symbol": "LTCUSDT",
@@ -48,7 +60,7 @@
       "sl": 43.86476481320377,
       "tp2_reference_only": 48.050470373592454,
       "resolved": false,
-      "last_processed_candle_ts": 1783395000000
+      "last_processed_candle_ts": 1783395900000
     }
   ],
   "resolved_signals": [
