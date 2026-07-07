@@ -45,22 +45,6 @@
       "tp2_reference_only": 0.7540506201441541,
       "resolved": false,
       "last_processed_candle_ts": 1783396800000
-    },
-    {
-      "symbol": "LTCUSDT",
-      "direction": "long",
-      "msg_id": 1685,
-      "combo": "h4_15m",
-      "exec_tf": "15m",
-      "signal_max_age_hours": 24,
-      "bar_index": 1981503,
-      "signal_bar_time": 1783352700000,
-      "entry": 45.26,
-      "tp1": 48.050470373592454,
-      "sl": 43.86476481320377,
-      "tp2_reference_only": 48.050470373592454,
-      "resolved": false,
-      "last_processed_candle_ts": 1783400400000
     }
   ],
   "resolved_signals": [
@@ -70,6 +54,13 @@
       "combo": "h4_15m",
       "outcome": "expired",
       "resolved_at": 1783362664
+    },
+    {
+      "symbol": "LTCUSDT",
+      "direction": "long",
+      "combo": "h4_15m",
+      "outcome": "sl",
+      "resolved_at": 1783402265
     }
   ],
   "signal_cooldowns": {
