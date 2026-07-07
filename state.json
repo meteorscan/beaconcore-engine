@@ -2,18 +2,6 @@
   "_version": 1,
   "pending_setups": {
     "h4_15m": {
-      "BCHUSDT": {
-        "direction": "long",
-        "zone_low": 226.73,
-        "zone_high": 230.66,
-        "zone_quality": 1,
-        "sweep_extreme": 226.26,
-        "sfp_time": 1783094400000,
-        "range_low": 224.04,
-        "range_high": 251.0,
-        "eq": 237.51999999999998,
-        "atr_h4": 6.079702188847439
-      },
       "XLMUSDT": {
         "direction": "short",
         "zone_low": 0.20687,
@@ -24,7 +12,7 @@
         "range_low": 0.19588,
         "range_high": 0.21594,
         "eq": 0.20590999999999998,
-        "atr_h4": 0.004887375660052742
+        "atr_h4": 0.004863277330190328
       }
     },
     "12h_1h": {}
