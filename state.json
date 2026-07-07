@@ -44,7 +44,7 @@
       "sl": 0.553724689927923,
       "tp2_reference_only": 0.7540506201441541,
       "resolved": false,
-      "last_processed_candle_ts": 1783393200000
+      "last_processed_candle_ts": 1783396800000
     },
     {
       "symbol": "LTCUSDT",
@@ -60,7 +60,7 @@
       "sl": 43.86476481320377,
       "tp2_reference_only": 48.050470373592454,
       "resolved": false,
-      "last_processed_candle_ts": 1783398600000
+      "last_processed_candle_ts": 1783399500000
     }
   ],
   "resolved_signals": [
