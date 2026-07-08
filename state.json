@@ -14,21 +14,6 @@
       "opened_ts": 1783528276.0075035,
       "risk_pct": 1.0,
       "tp1_hit": false
-    },
-    {
-      "hist_id": "XRP-1783536337-9737",
-      "symbol": "XRP",
-      "direction": "short",
-      "pathway": "trend_continuation",
-      "entry": 1.0846,
-      "stop": 1.089544934450154,
-      "tp1": 1.0766881048797536,
-      "tp2": 1.0707541835395689,
-      "risk": 0.004944934450153982,
-      "message_id": 1910,
-      "opened_ts": 1783536337.0560584,
-      "risk_pct": 1.0,
-      "tp1_hit": false
     }
   ],
   "history": [
@@ -85,12 +70,12 @@
       "confidence": 99.27176841586147,
       "grade": "A+",
       "timestamp": "2026-07-08T18:45:35.768998+00:00",
-      "outcome": null
+      "outcome": "loss"
     }
   ],
   "governor": {
-    "threshold": 0.24,
-    "last_adjust_ts": 1783534536.6487257,
+    "threshold": 0.32,
+    "last_adjust_ts": 1783537272.9417915,
     "scan_counts": [
       0,
       1,
@@ -107,7 +92,8 @@
       0,
       0,
       0,
-      1
+      1,
+      0
     ],
     "last_signal_ts": 1783536337.056249
   },
@@ -117,7 +103,7 @@
       "wins": 0
     },
     "trend_continuation": {
-      "n": 2,
+      "n": 3,
       "wins": 0
     }
   },
@@ -131,14 +117,14 @@
       "wins": 0
     },
     "XRP:short": {
-      "n": 1,
+      "n": 2,
       "wins": 0
     }
   },
   "daily": {
     "2026-07-08": {
       "signal_count": 5,
-      "realized_pnl_pct": -3.0,
+      "realized_pnl_pct": -4.0,
       "paused": false
     }
   },
