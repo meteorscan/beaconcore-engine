@@ -100,8 +100,8 @@
     }
   ],
   "governor": {
-    "threshold": 0.72,
-    "last_adjust_ts": 1783549870.8895621,
+    "threshold": 0.7999999999999999,
+    "last_adjust_ts": 1783551672.4875474,
     "scan_counts": [
       0,
       1,
@@ -130,6 +130,7 @@
       0,
       0,
       1,
+      0,
       0,
       0,
       0,
@@ -169,7 +170,7 @@
       "paused": false
     }
   },
-  "last_summary_day": null,
+  "last_summary_day": "2026-07-08",
   "pathway_weights": {
     "liquidity_reversal": 1.0,
     "trend_continuation": 1.0,
