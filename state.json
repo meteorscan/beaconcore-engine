@@ -1,1 +1,54 @@
-{}
+{
+  "active_signals": [
+    {
+      "hist_id": "XRP-1783500337-9737",
+      "symbol": "XRP",
+      "direction": "short",
+      "pathway": "momentum_breakout",
+      "entry": 1.0799,
+      "stop": 1.088635617208786,
+      "tp1": 1.0676701359076997,
+      "tp2": 1.0589345186989136,
+      "message_id": 1853,
+      "opened_ts": 1783500337.2309756,
+      "risk_pct": 1.0,
+      "tp1_hit": false
+    }
+  ],
+  "history": [
+    {
+      "id": "XRP-1783500337-9737",
+      "symbol": "XRP",
+      "direction": "short",
+      "pathway": "momentum_breakout",
+      "pipeline": "slow",
+      "confidence": 99.90796108974517,
+      "grade": "A+",
+      "timestamp": "2026-07-08T08:45:36.014866+00:00",
+      "outcome": null
+    }
+  ],
+  "governor": {
+    "threshold": 0.0,
+    "last_adjust_ts": 0,
+    "scan_counts": [
+      1
+    ],
+    "last_signal_ts": 1783500337.2311718
+  },
+  "pathway_stats": {},
+  "symbol_dir_stats": {},
+  "daily": {
+    "2026-07-08": {
+      "signal_count": 1,
+      "realized_pnl_pct": 0.0,
+      "paused": false
+    }
+  },
+  "last_summary_day": null,
+  "pathway_weights": {
+    "liquidity_reversal": 1.0,
+    "trend_continuation": 1.0,
+    "momentum_breakout": 1.0
+  }
+}
