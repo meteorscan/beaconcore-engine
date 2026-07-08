@@ -36,6 +36,20 @@ fee/slippage-aware net performance, +-10% parameter-sensitivity
 overfitting check, minimum-sample-size flags, MA-crossover baseline)
 for validating and re-tuning the constants below against your own
 historical window before sizing real risk.
+
+v1.3.0: the backtest simulator previously took the first non-None pathway
+result with no ATR%%-range, MIN_RR, or stop-distance gating -- none of the
+filters `evaluate_symbol` enforces live via `liquidity_ok` / MIN_RR /
+`stop_distance_ok`. That let it price trades the live engine would never
+send (including near-zero-stop-distance setups whose fee/slippage cost,
+expressed in R, dwarfs the trade itself), which was the main driver of the
+extreme net-R outliers seen in earlier backtest runs, and it also silently
+neutered the MIN_RR sensitivity check (perturbing MIN_RR had zero effect on
+which trades were simulated). The simulator now applies the same ATR-pct
+gate, MIN_RR floor, and a new MIN_STOP_PCT floor (`stop_distance_ok`), and
+picks the best-RR pathway of the three rather than a fixed priority order,
+matching live selection logic. Re-run `backtest all` after upgrading --
+prior result files are not comparable to this version's output.
 """
 
 from __future__ import annotations
@@ -70,7 +84,7 @@ LOG_PATH = os.environ.get("LODESTAR_LOG_PATH", "lodestar_engine.log")
 # Dry-run: full scan + logging, no Telegram sends, no state commits.
 DRY_RUN = os.environ.get("LODESTAR_DRY_RUN", "0") == "1"
 
-VERSION = "1.2.0"
+VERSION = "1.4.0"
 ENGINE_NAME = "Lodestar"
 
 logging.basicConfig(
@@ -143,6 +157,17 @@ MAX_ATR_PCT = 0.09
 MIN_RR = 1.2
 MAX_SPREAD_PCT = 0.0012
 MIN_REL_VOLUME = 0.55                # vs. rolling median same-hour volume
+# Hard floor on realized stop distance as a fraction of entry price, added in
+# v1.3.0. The ATR-pct gate below constrains the *indicator* used to build a
+# stop, but several pathways place the stop a small fraction of ATR away from
+# a structural level (0.15-0.3 x ATR) rather than a full ATR away, so an
+# ATR-pct that passes the gate can still yield an unrealistically tight final
+# stop. At MIN_RR=1.2 with round-trip costs of ~0.21% (2x taker fee + 2x
+# slippage), any stop tighter than ~0.7% of price burns a large -- and
+# sometimes dominant -- fraction of the trade's edge in costs alone. This is
+# the leading explanation for the gross/net gap in backtest_results.json
+# (e.g. BTC window 1: gross avg_r ~0, net avg_r -14.65).
+MIN_STOP_PCT = 0.004                  # 0.4% minimum entry-to-stop distance
 MAX_ENTRY_DRIFT_R = 0.5              # freshness/decay re-check before send
 DEDUP_TIME_WINDOW_HOURS = 6
 DEDUP_PRICE_TOL_PCT = 0.006
@@ -1257,6 +1282,16 @@ def liquidity_ok(symbol: str, ctx: dict, ind_trig: dict, spread_pct: float, dept
     return True
 
 
+def stop_distance_ok(cand: Candidate) -> bool:
+    """Reject candidates whose stop is so tight that fee+slippage costs would
+    dominate the trade's R outcome. Applied identically live and in backtest
+    (v1.3.0) so the two can no longer disagree on what counts as a valid setup."""
+    if not cand.entry:
+        return False
+    risk_pct = abs(cand.entry - cand.stop) / cand.entry
+    return risk_pct >= MIN_STOP_PCT
+
+
 def freshness_ok(cand: Candidate, live_price: Optional[float]) -> bool:
     if live_price is None:
         return True  # fail open on missing mid rather than silently dropping every signal
@@ -1472,20 +1507,24 @@ def format_signal_message(sig: Signal) -> str:
     c = sig.candidate
     arrow = "🟢 LONG" if c.direction == "long" else "🔴 SHORT"
     conf_str = ", ".join(c.tags)
-    floor_note = ("\n⚠️ <i>Frequency-floor release -- market has been quiet beyond the "
+    floor_note = ("\n\n⚠️ <i>Frequency-floor release -- market has been quiet beyond the "
                   "silence window; normal threshold bypassed</i>") if sig.frequency_floor else ""
     return (
+        f"<i>{ENGINE_NAME} v{VERSION}</i>\n"
         f"<b>{arrow} — {c.symbol}</b>\n"
-        f"Pathway: <b>{c.pathway}</b> | Pipeline: {PIPELINES[c.pipeline_id].label}\n"
+        f"{PIPELINES[c.pipeline_id].label} | {c.pathway}\n"
+        f"\n"
         f"Entry: <code>{c.entry:.6g}</code>\n"
         f"Stop: <code>{c.stop:.6g}</code>\n"
-        f"TP1: <code>{c.tp1:.6g}</code>  TP2: <code>{c.tp2:.6g}</code>\n"
+        f"\n"
+        f"TP1: <code>{c.tp1:.6g}</code>\n"
+        f"TP2: <code>{c.tp2:.6g}</code>\n"
         f"R:R: {c.rr:.2f}\n"
-        f"Confidence: <b>{sig.confidence:.1f}</b>  Grade: <b>{sig.grade}</b>\n"
+        f"\n"
+        f"Confidence: <b>{sig.confidence:.1f}</b> | Grade: <b>{sig.grade}</b>\n"
         f"Ensemble: {sig.ensemble_label}\n"
         f"Confluences: {conf_str}"
-        f"{floor_note}\n"
-        f"<i>{ENGINE_NAME} v{VERSION}</i>"
+        f"{floor_note}"
     )
 
 
@@ -1511,6 +1550,43 @@ def send_telegram_plain(text: str):
         return
     url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
     http_post_json(url, {"chat_id": TG_CHAT_ID, "text": text})
+
+
+def reply_telegram(text: str, reply_to_message_id: Optional[int]) -> Optional[int]:
+    """Sends a message threaded as a reply to the original signal post (if
+    we have its message_id), so TP/SL/close-out updates show up attached to
+    the trade they belong to instead of as standalone messages."""
+    if DRY_RUN:
+        log.info(f"[DRY-RUN] Would send Telegram reply:\n{text}")
+        return None
+    if not TG_BOT_TOKEN or not TG_CHAT_ID:
+        log.warning("Telegram not configured -- skipping reply")
+        return None
+    url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
+    payload = {"chat_id": TG_CHAT_ID, "text": text, "parse_mode": "HTML"}
+    if reply_to_message_id:
+        payload["reply_to_message_id"] = reply_to_message_id
+    resp = http_post_json(url, payload)
+    if resp and resp.get("ok"):
+        return resp["result"]["message_id"]
+    return None
+
+
+def react_telegram(message_id: Optional[int], emoji: str) -> None:
+    """Best-effort emoji reaction on the original signal message. Uses only
+    emoji from Telegram's allowed reaction set. Failures are logged and
+    swallowed -- a missing reaction should never break signal tracking."""
+    if DRY_RUN:
+        log.info(f"[DRY-RUN] Would react {emoji} to message {message_id}")
+        return
+    if not TG_BOT_TOKEN or not TG_CHAT_ID or not message_id:
+        return
+    url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/setMessageReaction"
+    payload = {
+        "chat_id": TG_CHAT_ID, "message_id": message_id,
+        "reaction": [{"type": "emoji", "emoji": emoji}],
+    }
+    http_post_json(url, payload)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1592,6 +1668,7 @@ def track_signal(state: dict, sig: Signal, message_id: Optional[int], hist_id: s
     state.setdefault("active_signals", []).append({
         "hist_id": hist_id, "symbol": c.symbol, "direction": c.direction, "pathway": c.pathway,
         "entry": c.entry, "stop": c.stop, "tp1": c.tp1, "tp2": c.tp2,
+        "risk": abs(c.entry - c.stop),
         "message_id": message_id, "opened_ts": time.time(), "risk_pct": PER_TRADE_RISK_PCT,
         "tp1_hit": False,
     })
@@ -1608,39 +1685,107 @@ def update_pathway_and_symbol_stats(state: dict, pathway: str, symbol: str, dire
     ss["wins"] += 1 if won else 0
 
 
+def _r_multiple(a: dict, price: float) -> float:
+    risk = a.get("risk") or abs(a["entry"] - a["stop"])
+    if not risk:
+        return 0.0
+    raw = (price - a["entry"]) if a["direction"] == "long" else (a["entry"] - price)
+    return round(raw / risk, 2)
+
+
+def _notify_tp1(a: dict, price: float):
+    r = _r_multiple(a, price)
+    text = (f"\U0001F525 <b>TP1 hit</b> \u2014 {a['symbol']} {a['direction'].upper()}\n"
+            f"Price: <code>{price:.6g}</code> | +{r:.2f}R banked\n"
+            f"Stop moved to breakeven (<code>{a['entry']:.6g}</code>).")
+    reply_telegram(text, a.get("message_id"))
+    react_telegram(a.get("message_id"), "\U0001F525")
+    log.info(f"TP1 hit: {a['symbol']} {a['direction']} +{r:.2f}R, stop -> breakeven")
+
+
+def _notify_close(a: dict, price: float, result: str):
+    r = _r_multiple(a, price)
+    if result == "win":
+        headline = "\u2705 <b>TP2 hit \u2014 WIN</b>"
+        emoji = "\U0001F44D"
+    elif a.get("tp1_hit"):
+        headline = "\u2696\ufe0f <b>Stopped at breakeven</b>"
+        emoji = "\U0001F44D"
+    else:
+        headline = "\u274C <b>Stop hit \u2014 LOSS</b>"
+        emoji = "\U0001F44E"
+    text = (f"{headline} \u2014 {a['symbol']} {a['direction'].upper()}\n"
+            f"Exit: <code>{price:.6g}</code> | Result: {r:+.2f}R")
+    reply_telegram(text, a.get("message_id"))
+    react_telegram(a.get("message_id"), emoji)
+    log.info(f"Signal resolved: {a['symbol']} {a['direction']} {a['pathway']} -> {result} ({r:+.2f}R)")
+
+
+def _bar_high_low(symbol: str, cache: dict) -> Optional[tuple[float, float]]:
+    """Fetches the high/low of the most recent 15m candles for `symbol`,
+    caching per-symbol within a single check_active_signals() pass so we
+    don't refetch for every active signal on the same symbol. Using a small
+    window of recent closed bars (rather than the current mid/mark price)
+    means a wick that pierces SL/TP1/TP2 intrabar and then recovers is still
+    correctly detected as a hit, instead of being missed by a snapshot price
+    check."""
+    if symbol in cache:
+        return cache[symbol]
+    candles = fetch_candles(symbol, "15m", 4)
+    if not candles:
+        cache[symbol] = None
+        return None
+    result = (max(c["h"] for c in candles), min(c["l"] for c in candles))
+    cache[symbol] = result
+    return result
+
+
 def check_active_signals(state: dict):
-    mids = fetch_all_mids()
     still_active = []
+    bar_cache: dict[str, Optional[tuple[float, float]]] = {}
     for a in state.get("active_signals", []):
         sym = a["symbol"]
-        price = mids.get(sym)
-        if price is None:
+        hl = _bar_high_low(sym, bar_cache)
+        if hl is None:
             still_active.append(a)
             continue
+        bar_high, bar_low = hl
         d = a["direction"]
-        hit_stop = (price <= a["stop"]) if d == "long" else (price >= a["stop"])
-        hit_tp2 = (price >= a["tp2"]) if d == "long" else (price <= a["tp2"])
-        hit_tp1 = (price >= a["tp1"]) if d == "long" else (price <= a["tp1"])
+
+        # Detection uses the candle's high/low so intrabar wicks that touch
+        # SL/TP1/TP2 and reverse are still caught -- a mid/mark snapshot can
+        # miss those entirely.
+        hit_stop = (bar_low <= a["stop"]) if d == "long" else (bar_high >= a["stop"])
+        hit_tp2 = (bar_high >= a["tp2"]) if d == "long" else (bar_low <= a["tp2"])
+        hit_tp1 = (not a.get("tp1_hit")) and (
+            (bar_high >= a["tp1"]) if d == "long" else (bar_low <= a["tp1"])
+        )
 
         if hit_stop:
+            # Exit is assumed filled at the stop level itself, since we only
+            # know the level was crossed intrabar -- not the exact fill price.
+            exit_price = a["stop"]
             update_pathway_and_symbol_stats(state, a["pathway"], sym, d, won=False)
-            risk = abs(a["entry"] - a["stop"])
             pnl_pct = -PER_TRADE_RISK_PCT if a.get("tp1_hit") is False else -PER_TRADE_RISK_PCT * 0.3
             daily_bucket(state)["realized_pnl_pct"] += pnl_pct
             for h in state.get("history", []):
                 if h["id"] == a["hist_id"]:
                     h["outcome"] = "loss"
+            _notify_close(a, exit_price, "loss")
             continue
         if hit_tp2:
+            exit_price = a["tp2"]
             update_pathway_and_symbol_stats(state, a["pathway"], sym, d, won=True)
             daily_bucket(state)["realized_pnl_pct"] += PER_TRADE_RISK_PCT * 2.0
             for h in state.get("history", []):
                 if h["id"] == a["hist_id"]:
                     h["outcome"] = "win"
+            _notify_close(a, exit_price, "win")
             continue
-        if hit_tp1 and not a.get("tp1_hit"):
+        if hit_tp1:
             a["tp1_hit"] = True
             a["stop"] = a["entry"]  # move to breakeven
+            _notify_tp1(a, a["tp1"])
         still_active.append(a)
     state["active_signals"] = still_active
 
@@ -1721,6 +1866,9 @@ def evaluate_symbol(symbol: str, bundle: dict, ctx: dict, state: dict, base_regi
                 continue
             if cand.rr < MIN_RR:
                 near_miss[f"{pid}:{pname}:rr_below_min"] += 1
+                continue
+            if not stop_distance_ok(cand):
+                near_miss[f"{pid}:{pname}:stop_too_tight"] += 1
                 continue
             pipeline_candidates.setdefault(pid, []).append(cand)
             if best_cand is None or cand.rr > best_cand.rr:
@@ -1836,10 +1984,18 @@ def run_scan(state: dict) -> list[Signal]:
     governor_adjust_threshold(state)
     tune_pathway_weights(state)
 
+    # v1.2.1: a symbol with an unresolved active signal must not be re-fired.
+    # check_active_signals() has already run this cycle (see main()) and
+    # dropped anything that hit stop/TP2, so this reflects the current state.
+    active_symbols = {a["symbol"] for a in state.get("active_signals", [])}
+
     all_signals: list[Signal] = []
     pipeline_candidates: dict[str, list[Candidate]] = {}
     floor_candidates: list[Signal] = []
     for sym, bundle in bundles.items():
+        if sym in active_symbols:
+            near_miss[f"{sym}:already_active"] += 1
+            continue
         try:
             sigs = evaluate_symbol(sym, bundle, ctx, state, regime, near_miss, pipeline_candidates, floor_candidates)
             all_signals.extend(sigs)
@@ -1939,12 +2095,31 @@ def _simulate_pathway_on_candles(candles_15m, candles_1h, candles_4h, candles_1d
 
         clear_indicator_cache()
         pipeline = PIPELINES["fast"]
-        try:
-            cand = pathway_trend_continuation(symbol, pipeline, bundle) or \
-                   pathway_liquidity_reversal(symbol, pipeline, bundle) or \
-                   pathway_momentum_breakout(symbol, pipeline, bundle)
-        except Exception:
-            cand = None
+        # v1.3.0: mirror the live dispatch loop (see evaluate_symbol) instead of
+        # a first-match priority chain over an ungated pathway list. Previously
+        # this function accepted the first non-None pathway result with no
+        # ATR-pct, RR, or stop-distance gating at all -- none of the filters
+        # that the live engine enforces via liquidity_ok / MIN_RR / stop_distance_ok.
+        # That let the backtest trade setups the live engine would never send,
+        # which is the main driver of the extreme net-R outliers in
+        # backtest_results.json and also silently neutered the MIN_RR
+        # sensitivity check (perturbing MIN_RR had no effect on candidate
+        # generation, so -10%/+10% always returned identical numbers).
+        ind_trig_now = get_indicators(symbol, pipeline.trigger_tf, bundle[pipeline.trigger_tf])
+        a_pct_now = atr_pct(ind_trig_now)
+        if not (MIN_ATR_PCT <= a_pct_now <= MAX_ATR_PCT):
+            continue
+        best = None
+        for fn in (pathway_trend_continuation, pathway_liquidity_reversal, pathway_momentum_breakout):
+            try:
+                c = fn(symbol, pipeline, bundle)
+            except Exception:
+                c = None
+            if c is None or c.rr < MIN_RR or not stop_distance_ok(c):
+                continue
+            if best is None or c.rr > best.rr:
+                best = c
+        cand = best
         if cand is None:
             continue
         open_trade = {
@@ -2065,10 +2240,16 @@ def walk_forward_backtest(symbol: str, n_windows: int = 4) -> dict:
         "sensitivity_check": sensitivity,
         "sensitivity_flags_overfitting": collapsed,
         "baseline_ma_crossover_holdout": baseline_summary,
+        # v1.3.0: previously this only checked baseline_summary["n"] > 0 truthy,
+        # so a baseline built from as few as 1-19 trades (below MIN_SAMPLE_SIZE,
+        # i.e. "meaningful": false) could still yield a True/False verdict here.
+        # HYPE's baseline (n=17) is exactly this case in backtest_results.json --
+        # its outperforms_baseline reads False, but that comparison was never
+        # statistically reliable to begin with and should read None instead.
         "outperforms_baseline": (
             holdout_summary["net"]["avg_r"] is not None and baseline_summary.get("avg_r") is not None and
             holdout_summary["net"]["avg_r"] > baseline_summary["avg_r"]
-        ) if baseline_summary.get("n", 0) else None,
+        ) if baseline_summary.get("meaningful") else None,
         "min_sample_size": MIN_SAMPLE_SIZE,
     }
 
