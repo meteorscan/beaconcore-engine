@@ -1,21 +1,6 @@
 {
   "active_signals": [
     {
-      "hist_id": "ETH-1783523736-9737",
-      "symbol": "ETH",
-      "direction": "short",
-      "pathway": "trend_continuation",
-      "entry": 1717.1,
-      "stop": 1734.4720938541918,
-      "tp1": 1689.3046498332928,
-      "tp2": 1668.4581372082625,
-      "risk": 17.372093854191917,
-      "message_id": 1887,
-      "opened_ts": 1783523736.3513052,
-      "risk_pct": 1.0,
-      "tp1_hit": false
-    },
-    {
       "hist_id": "XRP-1783524668-9737",
       "symbol": "XRP",
       "direction": "short",
@@ -56,7 +41,7 @@
       "confidence": 99.97327143249903,
       "grade": "A+",
       "timestamp": "2026-07-08T15:15:34.766125+00:00",
-      "outcome": null
+      "outcome": "loss"
     },
     {
       "id": "XRP-1783524668-9737",
@@ -102,12 +87,17 @@
       1,
       0,
       0,
-      1
+      1,
+      0
     ],
     "last_signal_ts": 1783528276.007685
   },
   "pathway_stats": {
     "momentum_breakout": {
+      "n": 1,
+      "wins": 0
+    },
+    "trend_continuation": {
       "n": 1,
       "wins": 0
     }
@@ -116,12 +106,16 @@
     "SOL:short": {
       "n": 1,
       "wins": 0
+    },
+    "ETH:short": {
+      "n": 1,
+      "wins": 0
     }
   },
   "daily": {
     "2026-07-08": {
       "signal_count": 4,
-      "realized_pnl_pct": -1.0,
+      "realized_pnl_pct": -2.0,
       "paused": false
     }
   },
