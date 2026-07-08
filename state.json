@@ -2,30 +2,6 @@
   "_version": 1,
   "pending_setups": {
     "h4_15m": {
-      "BTCUSDT": {
-        "direction": "short",
-        "zone_low": 62900.0,
-        "zone_high": 63198.0,
-        "zone_quality": 2,
-        "sweep_extreme": 63460.0,
-        "sfp_time": 1783396800000,
-        "range_low": 61342.0,
-        "range_high": 64698.0,
-        "eq": 63020.0,
-        "atr_h4": 832.0678782456874
-      },
-      "HYPEUSDT": {
-        "direction": "short",
-        "zone_low": 70.461,
-        "zone_high": 70.838,
-        "zone_quality": 1,
-        "sweep_extreme": 72.0,
-        "sfp_time": 1783382400000,
-        "range_low": 68.21,
-        "range_high": 72.914,
-        "eq": 70.562,
-        "atr_h4": 1.625614178621774
-      },
       "XLMUSDT": {
         "direction": "short",
         "zone_low": 0.20687,
