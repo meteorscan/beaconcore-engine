@@ -14,6 +14,21 @@
       "opened_ts": 1783528276.0075035,
       "risk_pct": 1.0,
       "tp1_hit": false
+    },
+    {
+      "hist_id": "XRP-1783546265-9737",
+      "symbol": "XRP",
+      "direction": "short",
+      "pathway": "liquidity_reversal",
+      "entry": 1.0876,
+      "stop": 1.0971003305704246,
+      "tp1": 1.073349504144363,
+      "tp2": 1.0638491735739382,
+      "risk": 0.009500330570424653,
+      "message_id": 1917,
+      "opened_ts": 1783546265.9837224,
+      "risk_pct": 1.0,
+      "tp1_hit": false
     }
   ],
   "history": [
@@ -71,6 +86,17 @@
       "grade": "A+",
       "timestamp": "2026-07-08T18:45:35.768998+00:00",
       "outcome": "loss"
+    },
+    {
+      "id": "XRP-1783546265-9737",
+      "symbol": "XRP",
+      "direction": "short",
+      "pathway": "liquidity_reversal",
+      "pipeline": "slow",
+      "confidence": 99.35432824770353,
+      "grade": "A+",
+      "timestamp": "2026-07-08T21:31:04.924176+00:00",
+      "outcome": null
     }
   ],
   "governor": {
@@ -102,9 +128,10 @@
       0,
       0,
       0,
-      0
+      0,
+      1
     ],
-    "last_signal_ts": 1783536337.056249
+    "last_signal_ts": 1783546265.9839478
   },
   "pathway_stats": {
     "momentum_breakout": {
@@ -132,7 +159,7 @@
   },
   "daily": {
     "2026-07-08": {
-      "signal_count": 5,
+      "signal_count": 6,
       "realized_pnl_pct": -4.0,
       "paused": false
     }
