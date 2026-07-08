@@ -76,7 +76,7 @@ ENGINE_NAME = "Lodestar"
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.FileHandler(LOG_PATH), logging.StreamHandler(sys.stdout)],
+    handlers=[logging.FileHandler(LOG_PATH), logging.StreamHandler(sys.stderr)],
 )
 log = logging.getLogger(ENGINE_NAME)
 
@@ -2100,18 +2100,26 @@ def _shutdown_handler(signum, frame):
 
 
 def main():
-    print("=" * 78)
-    print(f"  {ENGINE_NAME} Engine v{VERSION} -- dual-pipeline, three-pathway, ensemble-scored")
-    print(f"  Pipelines: {', '.join(p.label for p in PIPELINES.values())}")
-    print(f"  Pathways: {', '.join(PATHWAYS.keys())}")
-    print(f"  Target: {int(TARGET_SIGNALS_MIN)}-{int(TARGET_SIGNALS_MAX)} signals/day | "
-          f"Top {TOP_N_SIGNALS_PER_SCAN}/scan | Sector cap {MAX_PER_SECTOR} | Same-dir cap {MAX_SAME_DIRECTION}")
-    print(f"  Concurrency cap: {MAX_CONCURRENT_ACTIVE_SIGNALS} | OI floor: ${MIN_OI_USD:,.0f} | "
-          f"Dry-run: {DRY_RUN}")
-    print("=" * 78)
+    is_backtest = len(sys.argv) > 1 and sys.argv[1] == "backtest"
+    banner_stream = sys.stderr if is_backtest else sys.stdout
 
-    if len(sys.argv) > 1 and sys.argv[1] == "backtest":
-        syms = sys.argv[2:] or None
+    print("=" * 78, file=banner_stream)
+    print(f"  {ENGINE_NAME} Engine v{VERSION} -- dual-pipeline, three-pathway, ensemble-scored", file=banner_stream)
+    print(f"  Pipelines: {', '.join(p.label for p in PIPELINES.values())}", file=banner_stream)
+    print(f"  Pathways: {', '.join(PATHWAYS.keys())}", file=banner_stream)
+    print(f"  Target: {int(TARGET_SIGNALS_MIN)}-{int(TARGET_SIGNALS_MAX)} signals/day | "
+          f"Top {TOP_N_SIGNALS_PER_SCAN}/scan | Sector cap {MAX_PER_SECTOR} | Same-dir cap {MAX_SAME_DIRECTION}",
+          file=banner_stream)
+    print(f"  Concurrency cap: {MAX_CONCURRENT_ACTIVE_SIGNALS} | OI floor: ${MIN_OI_USD:,.0f} | "
+          f"Dry-run: {DRY_RUN}", file=banner_stream)
+    print("=" * 78, file=banner_stream)
+
+    if is_backtest:
+        raw_args = sys.argv[2:]
+        if raw_args and raw_args[0].lower() == "all":
+            syms = WATCHLIST
+        else:
+            syms = raw_args or None
         results = run_backtest_suite(syms)
         print(json.dumps(results, indent=2, default=str))
         return
