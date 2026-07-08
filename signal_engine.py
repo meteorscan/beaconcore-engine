@@ -1,159 +1,41 @@
 #!/usr/bin/env python3
-# pip install pandas numpy requests
 """
 LODESTAR ENGINE v1.2.0
-================================================================================
-A lodestar is the fixed point sailors triangulate position against -- this
-engine's thesis is that a trustworthy signal is one that stays consistent
-across independent vantage points (timeframe, setup pathway, and derivatives
-positioning), rather than one that merely clears the highest single score.
 
-PHILOSOPHY
-    Institutional-grade crypto signal generation lives or dies on one
-    tension: quality vs. frequency. Lodestar resolves it structurally rather
-    than by picking a lane:
-      - THREE independent pathways (liquidity reversal / trend continuation
-        / momentum breakout) compete per symbol per scan; each is a genuine,
-        differently-shaped edge, not a variation on the same idea.
-      - TWO timeframe pipelines (fast intraday 4h->15m, slow swing 1d->1h)
-        run in parallel so the engine is never structurally blind to either
-        trading style.
-      - Agreement across pathways/pipelines/derivatives signals is scored as
-        real information (an ensemble-agreement bonus), not discarded as a
-        duplicate. Disagreement is scored as real information too (a
-        confidence penalty), not averaged away.
-    A single adaptive frequency governor -- not a maze of independent ad-hoc
-    gates -- nudges one global acceptance threshold toward a target signal
-    band using a slow EMA of realized daily count. Every other adjustment
-    (regime, session, macro, liquidity) feeds the SAME scoring vector that
-    threshold is compared against, so there is one place tension gets
-    resolved, not several that can silently diverge.
+Crypto perpetuals signal engine on Hyperliquid. Runs two timeframe
+pipelines (fast intraday 4h->15m, slow swing 1d->1h), each evaluating
+three setup pathways (liquidity reversal / trend continuation / momentum
+breakout) per symbol per scan. Candidates are scored with ensemble
+agreement across trend/momentum/volume/structure families, funding/OI
+regime, session/macro context, and cross-sectional relative strength,
+then filtered by liquidity, correlation clustering, and portfolio caps
+before a freshness re-check and Telegram dispatch.
 
-KEY INNOVATIONS
-    1. Funding-rate + open-interest regime layer (both natively available
-       from Hyperliquid's own info endpoint -- no third-party data source).
-       Extreme funding against price, or OI expansion/contraction divergent
-       from price, feeds regime detection AND confluence scoring as a first
-       class input, surfacing squeeze/unwind setups pure price-action would
-       never see. This is frequency-ADDITIVE: it opens a new valid signal
-       source, it does not gate existing ones.
-    2. Ensemble agreement scoring across four independent signal families
-       (trend, momentum, volume, structure): when 3-4 agree, confidence gets
-       a real bonus that can let a borderline pathway score through a
-       single-method threshold; when families conflict, the candidate is
-       suppressed rather than blindly averaged. This is different from, and
-       sits on top of, cross-pathway/cross-pipeline convergence.
-    3. Correlation control that treats clustered signals as ONE effective
-       bet for portfolio-cap purposes (frequency-neutral: it never inflates
-       apparent opportunity, it only prevents double-counting one bet as
-       many).
-    4. Liquidity-aware suppression (order-book depth + spread + relative
-       volume) and a false-breakout/follow-through filter requiring a
-       confirmation candle before a breakout-class signal is accepted --
-       both frequency-RESTRICTIVE by design, applied only where they
-       indicate genuinely elevated failure risk, never as blanket vetoes.
-    5. Signal freshness/decay: every candidate is re-validated against a
-       live mid price immediately before Telegram dispatch and discarded if
-       price has run more than a fraction-of-stop away from the plan.
-    6. A walk-forward backtest/evaluation module with a held-out final
-       window, fee+slippage-aware net performance, a parameter-sensitivity
-       (+-10%) overfitting check, minimum-sample-size flags per
-       regime/window/asset, and a moving-average-crossover baseline
-       comparison -- so "institutional-quality" is a measured claim, not an
-       assertion from the confidence score itself.
-    7. v1.1.0 ports one piece from the Lucerna lineage that this engine's
-       ADX-only compression read didn't have: a Bollinger-bandwidth
-       percentile + noise-index regime classifier (`classify_symbol_regime`)
-       that distinguishes a genuine squeeze-no-resolution-yet chop from a
-       plain directionless grind -- two conditions ADX alone reads
-       identically. `clean` tape loosens the acceptance threshold and
-       liquidity floor; `choppy` tightens both; `high_vol` (ATR percentile
-       > 85) widens SL/TP instead of blocking signals and raises the
-       breakout pathway's follow-through bar. All three are a fixed lookup
-       table decided from backtesting, exactly like every other threshold
-       in this file -- see ADAPTIVE FREQUENCY MECHANISM below.
-    8. v1.2.0 ports four pieces identified by cross-engine review against
-       the Axis and Parallax lineages:
-         a. Session volume profile POC now feeds TP clipping (value-area
-            high/low already did); session VWAP -- computed since v1.0 but
-            never consumed -- now feeds a scoring confluence term (ported
-            from Axis Engine v2.1.0's `_clip_tp_to_liquidity` / VWAP-
-            alignment check).
-         b. `pathway_prior_multiplier`'s raw all-time win/loss readout is
-            replaced by `tune_pathway_weights`: a persisted, slowly-drifting
-            per-pathway multiplier updated once per scan from a recent
-            (last-40) window, shrunk toward a neutral prior and bounded
-            (ported from Axis Engine v2.1.0's `tune_pathway_weights`). This
-            is materially more resistant to short-streak overfitting than
-            recomputing a shrunk ratio fresh off cumulative stats every
-            candidate.
-         c. Cross-sectional relative strength (`rs_percentile`, already
-            computed but previously unused) now feeds scoring directly, and
-            interacts with market breadth the way Parallax v1.1.1's
-            `breadth_score_adjustment` does: extreme breadth alignment
-            combined with top/bottom-decile RS is flagged as a crowded/late
-            entry and penalized beyond the two factors' independent sum.
-            (Macro-calendar proximity was already a scoring input as of
-            v1.1.0; this item completes the "macro + breadth + RS" trio.)
-         d. A new explicit frequency FLOOR (`frequency_floor_signal`),
-            complementing the governor's existing threshold CEIL. The
-            ceiling on `governor.threshold` already implicitly bounds how
-            quiet the engine can get *when candidates exist to score* --
-            but a genuinely dead market (no pathway anywhere clearing its
-            own structural gate) gives the threshold nothing to bite on,
-            and the engine could in principle go silent indefinitely, the
-            same gap a hard frequency cap with no floor would have. If no
-            signal has fired in `MAX_SILENCE_HOURS`, the single best
-            near-miss candidate from the scan (one that cleared every gate
-            except the adaptive confidence threshold) is released instead.
+Quality thresholds (pathway gates, regime multipliers, grade floors,
+minimum RR, liquidity floors) are fixed and regime-conditioned, set from
+backtesting rather than adapted online. The one online-adaptive quantity
+is `governor.threshold`, nudged by an EMA of realized signal rate toward
+a target signals/day band (see GOVERNOR_* constants and
+`adaptive_threshold`). An explicit frequency floor
+(`frequency_floor_signal`) releases the best near-miss candidate if the
+engine has gone silent past MAX_SILENCE_HOURS.
 
-ADAPTIVE FREQUENCY MECHANISM (how quality/frequency balance is achieved --
-this section exists so the tradeoff logic is inspectable, not a black box)
-    - All EDGE-relevant thresholds (pathway gates, regime multipliers, grade
-      floors, minimum RR, liquidity floors) are FIXED, regime-conditioned
-      rules decided once from backtesting (see `REGIME_ADJUSTMENTS` and
-      pathway gate constants below). They do not change based on the
-      engine's own live results -- that would be curve-fitting against
-      recent outcomes in production, which the spec explicitly rules out.
-    - Exactly one quantity adapts online: `governor.threshold`, a scalar
-      added to the raw confidence-score comparison. Every scan computes the
-      realized trailing signal rate (EMA over `GOVERNOR_LOOKBACK_SCANS`
-      scans) and nudges the threshold by at most `GOVERNOR_STEP` per
-      adjustment, clamped to [`GOVERNOR_FLOOR`, `GOVERNOR_CEIL`], no more
-      often than `GOVERNOR_MIN_INTERVAL_S`. If the trailing rate is below
-      `TARGET_SIGNALS_MIN`/day the threshold is nudged DOWN (more
-      permissive); above `TARGET_SIGNALS_MAX`/day it is nudged UP. This
-      reacts to sustained frequency drift, never to whether recent signals
-      won or lost, so it cannot become a live curve-fit against outcomes.
-    - Session/regime/macro effects (`adaptive_threshold`) are additive
-      offsets to the SAME comparison, computed fresh every scan from
-      current conditions (session liquidity, BTC regime, macro-calendar
-      proximity, volatility percentile) -- not learned, not persisted,
-      not path-dependent on past signals.
-    - Net effect: quality bar is fixed by design; only the acceptance rate
-      knob adapts, and only toward a frequency target, never toward "what
-      would have made recent trades look better."
+Architecture: Hyperliquid info API -> per-symbol candle bundle
+(15m/1h/4h/1d) + funding + OI + L2 book -> two timeframe pipelines ->
+three pathways per pipeline -> ensemble-agreement + confluence scoring ->
+correlation clustering -> portfolio caps -> freshness re-check ->
+Telegram -> state.json.
 
-ARCHITECTURE (single file, immediately runnable, scan-per-run)
-    Hyperliquid info API -> per-symbol candle bundle (15m/1h/4h/1d) + funding
-    + OI + L2 book -> two timeframe pipelines -> three pathways per pipeline
-    -> ensemble-agreement + confluence scoring -> correlation clustering ->
-    portfolio caps -> freshness re-check -> Telegram -> state.json.
+Data source: Hyperliquid info endpoint only (no third-party data, which
+is why long/short ratio is absent -- Hyperliquid doesn't expose it).
+Scheduler: external cron, every 15 minutes. State: state.json, with
+.bak fallback.
 
-INFRASTRUCTURE (unchanged, per spec)
-    Data source : Hyperliquid API (info endpoint) -- single source, no
-                  undisclosed third parties (this is why long/short ratio,
-                  which Hyperliquid does not expose, is deliberately absent).
-    Exchange    : Hyperliquid perpetuals
-    Scheduler   : external cron (e.g. cron-job.org), every 15 minutes
-    State       : state.json, read/written every run, with .bak fallback
-
-This file is standalone, contains no TODOs, and is meant to be run as-is.
-Numeric constants are reasonable starting points carried over by analogy
-from established SMC/ICT and quant-momentum practice; the included
-backtester is how you validate and, if needed, re-tune them against your
-own historical window before sizing real risk.
-================================================================================
+Includes a walk-forward backtest module (held-out final window,
+fee/slippage-aware net performance, +-10% parameter-sensitivity
+overfitting check, minimum-sample-size flags, MA-crossover baseline)
+for validating and re-tuning the constants below against your own
+historical window before sizing real risk.
 """
 
 from __future__ import annotations
@@ -185,10 +67,7 @@ HL_INFO_URL = os.environ.get("HL_INFO_URL", "https://api.hyperliquid.xyz/info")
 STATE_PATH = os.environ.get("LODESTAR_STATE_PATH", "state.json")
 LOG_PATH = os.environ.get("LODESTAR_LOG_PATH", "lodestar_engine.log")
 
-# Dry-run: full scan + logging, no Telegram sends, no state commits. Meant
-# for a short technical shakedown of API/Telegram/state wiring, not as a
-# mandatory validation gate -- the backtester is the primary performance
-# evidence and can be run immediately against history.
+# Dry-run: full scan + logging, no Telegram sends, no state commits.
 DRY_RUN = os.environ.get("LODESTAR_DRY_RUN", "0") == "1"
 
 VERSION = "1.2.0"
@@ -241,16 +120,10 @@ GOVERNOR_STEP = 0.08
 GOVERNOR_MIN_INTERVAL_S = 30 * 60
 GOVERNOR_LOOKBACK_SCANS = 96  # 24h of 15m scans
 
-# Explicit frequency FLOOR (v1.2.0), complementing the threshold ceiling
-# above. GOVERNOR_CEIL already implicitly bounds how quiet the engine can
-# get *when the pathways are producing candidates to score* -- but a
-# genuinely dead market where nothing clears any pathway's own structural
-# gate gives the threshold nothing to act on. If MAX_SILENCE_HOURS passes
-# with zero signals sent, the single best near-miss candidate this scan
-# (one that cleared every gate except the adaptive confidence threshold)
-# is released instead of doing nothing. See `frequency_floor_signal`.
+# If no signal fires within MAX_SILENCE_HOURS, release the best near-miss
+# candidate instead (see `frequency_floor_signal`).
 MAX_SILENCE_HOURS = 18.0
-FREQUENCY_FLOOR_MIN_CONFIDENCE = 38.0  # still well below the normal ~44-58 bar; not a coinflip
+FREQUENCY_FLOOR_MIN_CONFIDENCE = 38.0  # below the normal ~44-58 bar
 
 # ── PORTFOLIO / RISK CAPS ────────────────────────────────────────────────────
 TOP_N_SIGNALS_PER_SCAN = 4
@@ -299,15 +172,12 @@ ENSEMBLE_BONUS_3 = 0.9    # 3-of-4 families agree
 ENSEMBLE_BONUS_4 = 1.6    # all 4 agree
 ENSEMBLE_CONFLICT_PENALTY = -1.3  # >=2 families actively disagree
 
-# ── PATHWAY WEIGHT SELF-TUNING (ported from Axis Engine v2.1.0) ────────────
-# A persisted, slowly-drifting per-pathway scoring multiplier -- see
-# `tune_pathway_weights` -- replacing the old pathway_prior_multiplier's
-# direct raw-stats read.
+# ── PATHWAY WEIGHT SELF-TUNING ──────────────────────────────────────────────
 PATHWAY_WEIGHT_LEARNING_RATE = 0.04
 PATHWAY_WEIGHT_MIN, PATHWAY_WEIGHT_MAX = 0.75, 1.30
 
-# ── CROSS-SECTIONAL RS (ported from Parallax v1.1.1's breadth_score_adjustment) ─
-RS_CROWD_PERCENTILE = 0.80  # top/bottom-quintile RS combined with breadth extremes -> "crowded"
+# ── CROSS-SECTIONAL RS ───────────────────────────────────────────────────────
+RS_CROWD_PERCENTILE = 0.80  # top/bottom-quintile RS + breadth extremes -> "crowded"
 
 RNG = random.Random(1337)
 
@@ -534,11 +404,9 @@ def rsi(closes: list[float], period: int = 14) -> list[float]:
 
 
 def bollinger_bandwidth(closes: list[float], period: int = 20, n_std: float = 2.0) -> list[float]:
-    """(upper-lower)/mid, per bar -- a squeeze/expansion read independent of
-    ADX. Ported from Lucerna's regime layer: BB-width percentile catches
-    squeeze-no-resolution-yet chop that a trend-strength indicator alone
-    (ADX) can miss, since ADX can be low both in a genuine squeeze and in a
-    directionless grind -- bandwidth distinguishes the former."""
+    """(upper-lower)/mid, per bar -- a squeeze/expansion read independent
+    of ADX, which alone can't distinguish a squeeze from a plain
+    directionless grind."""
     out = []
     for i in range(len(closes)):
         lo = max(0, i - period + 1)
@@ -562,19 +430,15 @@ def bb_width_percentile(bandwidths: list[float], lookback: int = 100) -> float:
 
 
 def noise_index(closes: list[float], ema_mid: list[float], atr_vals: list[float], lookback: int = 20) -> float:
-    """Ported from Lucerna: how much price is just chopping around its own
-    mid EMA, normalized by ATR so it's comparable across symbols/vol
-    regimes. High noise index = directionless grind even when ADX/BB-width
-    look ambiguous; used as an independent chop signal, not a duplicate of
-    either."""
+    """How much price is chopping around its own mid EMA, normalized by ATR
+    so it's comparable across symbols/vol regimes. High = directionless
+    grind."""
     n = min(lookback, len(closes))
     if n < 5:
         return 0.5
     devs = [abs(closes[-i] - ema_mid[-i]) for i in range(1, n + 1)]
     a = atr_vals[-1] if atr_vals and atr_vals[-1] else 1e-9
     mean_dev_r = (sum(devs) / n) / a
-    # squash to a 0-1 "noisiness" score; empirically mean_dev_r of ~0.3R is
-    # calm trending, ~1.2R+ is chop bouncing across the mean repeatedly
     return clamp(mean_dev_r / 1.5, 0.0, 1.0)
 
 
@@ -843,10 +707,8 @@ def funding_oi_regime(symbol: str, ctx: dict, bundle: dict) -> dict:
     ind1h = get_indicators(symbol, "1h", bundle["1h"])
     closes = ind1h["closes"]
     oi_now = safe(info.get("open_interest"), 0.0)
-    # We only have current OI (snapshot API); approximate OI "slope" via the
-    # sign of recent price move combined with current funding sign, which is
-    # the standard OI-divergence heuristic when a historical OI series isn't
-    # persisted. This is intentionally conservative (label only, not a hard gate).
+    # Only current OI is available (snapshot API), so approximate OI slope
+    # via recent price move sign vs. current funding sign (label only).
     price_slope = pct(closes[-1], closes[-min(OI_DIVERGENCE_LOOKBACK, len(closes) - 1)])
     divergence = None
     if oi_now > 0 and abs(price_slope) > 0.01:
@@ -929,12 +791,10 @@ class RegimeVector:
 
 
 def classify_symbol_regime(adx_val: float, bb_pctile: float, noise: float, atr_pctile: float) -> str:
-    """Fixed, backtest-decided regime lookup ported from Lucerna -- ADX
-    alone can't tell a genuine squeeze (low ADX, low BB-width, resolution
-    pending) apart from a directionless grind (low ADX, but noise index
-    also high); combining all three closes that gap. This mapping is a
-    static rule table, not something the live engine adjusts from its own
-    results.
+    """Fixed, backtest-decided regime lookup. ADX alone can't tell a
+    genuine squeeze (low ADX, low BB-width, resolution pending) apart from
+    a directionless grind (low ADX, high noise index); combining all three
+    closes that gap.
       clean    : ADX >= 25, noise low (<0.45)          -> loosen (see adaptive_threshold)
       choppy   : ADX < 15, and (BB-width pctile < 20  i.e. squeeze-no-resolution,
                  OR noise index high >= 0.65)          -> tighten
@@ -1144,10 +1004,8 @@ def clip_targets_to_liquidity(direction: str, price: float, tp1: float, tp2: flo
     vp = ind["vp"]
     if vp.get("va_high") is not None:
         candidates += [vp["va_high"], vp["va_low"]]
-    # POC (point of control) into the clip set too (ported from Axis Engine
-    # v2.1.0's volume_profile/_clip_tp_to_liquidity): the highest-volume
-    # single price bucket is frequently a stronger magnet/reaction level
-    # than the value-area edges alone.
+    # POC (point of control): the highest-volume price bucket is often a
+    # stronger magnet/reaction level than the value-area edges alone.
     if vp.get("poc") is not None:
         candidates.append(vp["poc"])
     for ob in ind["obs"]:
@@ -1235,10 +1093,9 @@ def logistic(z: float) -> float:
 def tune_pathway_weights(state: dict):
     """Nudges each pathway's scoring multiplier toward its recent win-rate,
     shrunk toward the neutral prior (1.0) so a short streak can't push the
-    engine into an overfit corner (ported from Axis Engine v2.1.0). Bounds
-    are tight (PATHWAY_WEIGHT_MIN..MAX) and the step size is small, so
-    weights drift slowly instead of snapping to whatever the last few
-    outcomes happened to be.
+    engine into an overfit corner. Bounds are tight
+    (PATHWAY_WEIGHT_MIN..MAX) and the step size is small, so weights drift
+    slowly instead of snapping to whatever the last few outcomes were.
 
     This replaces the previous `pathway_prior_multiplier`, which read the
     raw all-time win/loss ratio directly off state at scoring time (with
@@ -1284,17 +1141,10 @@ def score_candidate(cand: Candidate, regime: RegimeVector, state: dict, funding_
     z["breadth"] = breadth_adj if cand.direction == "long" else -breadth_adj
     z["breadth"] = clamp(z["breadth"], -0.6, 0.6)
 
-    # Cross-sectional relative strength (ported from Parallax v1.1.1's
-    # breadth_score_adjustment): rs_percentile was computed since v1.0 but
-    # never read anywhere. On its own, a symbol outperforming (or
-    # underperforming) its peers over the RS lookback modestly supports a
-    # same-direction trade. Combined with an ALREADY-extreme breadth
-    # reading, though, top/bottom-decile RS stops being confirmation and
-    # starts looking like a late/crowded entry -- broad-market froth (or
-    # capitulation) plus a name that has already run hardest is exactly the
-    # profile of a move that's mostly over, not just getting started -- so
-    # that combination is scored as an extra penalty rather than added on
-    # top of the independent breadth and RS terms.
+    # Cross-sectional relative strength: outperformance vs. peers modestly
+    # supports a same-direction trade, but combined with already-extreme
+    # breadth it looks like a late/crowded entry instead, so that
+    # combination is penalized rather than added to the two terms.
     rs_pct = rs_percentile(cand.symbol)
     rs_adj = (rs_pct - 0.5) * 2.0
     z["rel_strength"] = clamp(rs_adj if cand.direction == "long" else -rs_adj, -0.4, 0.4)
@@ -1330,8 +1180,7 @@ def score_candidate(cand: Candidate, regime: RegimeVector, state: dict, funding_
     z["macro_penalty"] = -0.7 if regime.macro_hot else 0.0
     z["session"] = clamp((regime.session_w - 1.0) * 0.8, -0.3, 0.3)
 
-    # liquidity-aware down-weighting (not a hard veto here; the hard floor
-    # is applied separately in liquidity_ok() as a gate for genuinely thin books)
+    # Soft liquidity down-weighting; the hard floor is a separate gate in liquidity_ok().
     liq_penalty = 0.0
     if spread_pct > MAX_SPREAD_PCT * 0.6:
         liq_penalty -= 0.3
@@ -1339,13 +1188,8 @@ def score_candidate(cand: Candidate, regime: RegimeVector, state: dict, funding_
         liq_penalty -= 0.2
     z["liquidity"] = liq_penalty
 
-    # Session VWAP alignment (ported from Axis Engine v2.1.0): being on the
-    # "right side" of session VWAP for the trade direction is a session-
-    # level confluence the swing/structure/order-block checks don't capture
-    # on their own. Lodestar has computed VWAP since v1.0 but never
-    # consumed it anywhere -- this closes that gap. Asymmetric like Axis's
-    # version: aligned is rewarded more than misaligned is punished, since
-    # VWAP position is a soft confluence, not a hard invalidation signal.
+    # Session VWAP alignment: soft confluence, so aligned is rewarded more
+    # than misaligned is punished.
     z["vwap"] = 0.0
     if vwap_val:
         vwap_aligned = (cand.entry >= vwap_val) if cand.direction == "long" else (cand.entry <= vwap_val)
@@ -1592,9 +1436,7 @@ def frequency_floor_signal(state: dict, floor_candidates: list["Signal"]) -> Opt
 def adaptive_threshold(regime: RegimeVector, base_threshold: float) -> float:
     """Fixed, regime-conditioned additive rules on top of the governor's
     single learned scalar -- decided from backtesting, not adapted live.
-    The clean/choppy/high_vol adjustments below are ported from Lucerna's
-    rule table (see classify_symbol_regime docstring for the exact
-    conditions each label requires)."""
+    See classify_symbol_regime for the clean/choppy/high_vol conditions."""
     t = base_threshold + 45.0  # confidence-space base bar (logistic 0-100)
     if regime.macro_hot:
         t += 6.0
@@ -1606,17 +1448,15 @@ def adaptive_threshold(regime: RegimeVector, base_threshold: float) -> float:
         t -= 8.0   # clean trend, low noise: the tape itself is de-risking setups
     elif regime.symbol_regime == "choppy":
         t += 10.0  # squeeze-no-resolution or high noise: fewer, higher-conviction setups only
-    # high_vol does not raise the bar here -- it widens SL/TP (see pathway
-    # stop/target construction) and tightens the breakout follow-through
-    # requirement instead of blocking signals outright, per Lucerna's design.
+    # high_vol doesn't raise the bar here -- it widens SL/TP and tightens
+    # the breakout follow-through requirement instead of blocking signals.
     return t
 
 
 def liquidity_floor_multiplier(regime: RegimeVector) -> float:
-    """Fixed regime-conditioned liquidity floor adjustment, ported from
-    Lucerna: relax the OI/volume floor in a clean, well-confirmed tape;
-    tighten it in chop, where thin-book slippage risk is compounded by the
-    setup itself being lower-conviction."""
+    """Fixed regime-conditioned liquidity floor adjustment: relax the
+    OI/volume floor in a clean, well-confirmed tape; tighten it in chop,
+    where thin-book slippage risk is compounded by a lower-conviction setup."""
     if regime.symbol_regime == "clean":
         return 0.75
     if regime.symbol_regime == "choppy":
@@ -1890,12 +1730,8 @@ def evaluate_symbol(symbol: str, bundle: dict, ctx: dict, state: dict, base_regi
             continue
 
         if regime.symbol_regime == "high_vol":
-            # Ported from Lucerna: in a high-volatility regime, widen SL/TP
-            # rather than blocking the signal -- wide-but-real moves are
-            # exactly what swing/intraday trades want to catch here. A
-            # breakout-class candidate additionally needs a stronger
-            # follow-through bar, since wick fakeouts are more common when
-            # volatility itself is elevated.
+            # Widen SL/TP rather than blocking the signal; breakout
+            # candidates additionally need a stronger follow-through bar.
             entry = best_cand.entry
             risk = abs(entry - best_cand.stop)
             widen = 1.35
@@ -1934,11 +1770,8 @@ def evaluate_symbol(symbol: str, bundle: dict, ctx: dict, state: dict, base_regi
         threshold = adaptive_threshold(regime, base_threshold)
         if confidence < threshold:
             near_miss[f"{pid}:below_threshold"] += 1
-            # Frequency-floor fallback tracking (v1.2.0): only used if the
-            # engine has gone silent past MAX_SILENCE_HOURS this scan (see
-            # frequency_floor_signal / run_scan). Still respects the
-            # cold-streak grade floor -- that protection isn't suspended
-            # just because the market's been quiet.
+            # Track for possible frequency-floor release; still respects the
+            # cold-streak grade floor even when the market's been quiet.
             if confidence >= FREQUENCY_FLOOR_MIN_CONFIDENCE:
                 grade_floor = cold_streak_grade_floor(state, symbol, best_cand.direction)
                 candidate_grade = grade_for_confidence(confidence)
@@ -2001,7 +1834,7 @@ def run_scan(state: dict) -> list[Signal]:
 
     regime = build_regime_vector(btc_bias, btc_strength)
     governor_adjust_threshold(state)
-    tune_pathway_weights(state)  # ported from Axis Engine v2.1.0 -- see tune_pathway_weights docstring
+    tune_pathway_weights(state)
 
     all_signals: list[Signal] = []
     pipeline_candidates: dict[str, list[Candidate]] = {}
