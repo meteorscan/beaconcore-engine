@@ -97,6 +97,20 @@
       "opened_ts": 1783514734.3520563,
       "risk_pct": 1.0,
       "tp1_hit": false
+    },
+    {
+      "hist_id": "ETH-1783516536-9737",
+      "symbol": "ETH",
+      "direction": "short",
+      "pathway": "trend_continuation",
+      "entry": 1740.6,
+      "stop": 1747.4130795889141,
+      "tp1": 1729.6990726577371,
+      "tp2": 1721.5233771510402,
+      "message_id": 1878,
+      "opened_ts": 1783516536.774702,
+      "risk_pct": 1.0,
+      "tp1_hit": false
     }
   ],
   "history": [
@@ -176,11 +190,22 @@
       "grade": "A+",
       "timestamp": "2026-07-08T12:45:32.965773+00:00",
       "outcome": null
+    },
+    {
+      "id": "ETH-1783516536-9737",
+      "symbol": "ETH",
+      "direction": "short",
+      "pathway": "trend_continuation",
+      "pipeline": "slow",
+      "confidence": 97.95040768474915,
+      "grade": "A+",
+      "timestamp": "2026-07-08T13:15:35.122355+00:00",
+      "outcome": null
     }
   ],
   "governor": {
-    "threshold": 0.32,
-    "last_adjust_ts": 1783514732.7791617,
+    "threshold": 0.4,
+    "last_adjust_ts": 1783516535.0247755,
     "scan_counts": [
       1,
       0,
@@ -199,15 +224,16 @@
       1,
       1,
       1,
-      0
+      0,
+      1
     ],
-    "last_signal_ts": 1783514734.3522522
+    "last_signal_ts": 1783516536.7749183
   },
   "pathway_stats": {},
   "symbol_dir_stats": {},
   "daily": {
     "2026-07-08": {
-      "signal_count": 7,
+      "signal_count": 8,
       "realized_pnl_pct": 0.0,
       "paused": false
     }
