@@ -100,8 +100,8 @@
     }
   ],
   "governor": {
-    "threshold": 0.64,
-    "last_adjust_ts": 1783547135.5066223,
+    "threshold": 0.72,
+    "last_adjust_ts": 1783549870.8895621,
     "scan_counts": [
       0,
       1,
@@ -130,6 +130,7 @@
       0,
       0,
       1,
+      0,
       0,
       0,
       0
