@@ -2,6 +2,18 @@
   "_version": 1,
   "pending_setups": {
     "h4_15m": {
+      "HYPEUSDT": {
+        "direction": "short",
+        "zone_low": 70.461,
+        "zone_high": 70.838,
+        "zone_quality": 1,
+        "sweep_extreme": 72.0,
+        "sfp_time": 1783382400000,
+        "range_low": 68.21,
+        "range_high": 72.914,
+        "eq": 70.562,
+        "atr_h4": 1.6961999000819623
+      },
       "XLMUSDT": {
         "direction": "short",
         "zone_low": 0.20687,
