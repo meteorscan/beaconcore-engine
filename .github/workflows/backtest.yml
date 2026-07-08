@@ -1,0 +1,36 @@
+name: Lodestar Backtest
+
+on:
+  workflow_dispatch:
+    inputs:
+      symbols:
+        description: 'Space-separated symbols, "all" for the full watchlist, or blank for the default 6-symbol slice'
+        required: false
+        default: ''
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run backtest
+        run: |
+          python signal_engine.py backtest ${{ github.event.inputs.symbols }} > backtest_results.json
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: backtest-results-${{ github.run_id }}
+          path: backtest_results.json
+          retention-days: 30
