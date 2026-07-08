@@ -29,6 +29,21 @@
       "opened_ts": 1783524668.4791152,
       "risk_pct": 1.0,
       "tp1_hit": false
+    },
+    {
+      "hist_id": "SOL-1783525539-9737",
+      "symbol": "SOL",
+      "direction": "short",
+      "pathway": "momentum_breakout",
+      "entry": 76.473,
+      "stop": 76.81105630831905,
+      "tp1": 75.99972116835332,
+      "tp2": 75.66166486003426,
+      "risk": 0.33805630831905376,
+      "message_id": 1891,
+      "opened_ts": 1783525539.9378781,
+      "risk_pct": 1.0,
+      "tp1_hit": false
     }
   ],
   "history": [
@@ -53,6 +68,17 @@
       "grade": "A+",
       "timestamp": "2026-07-08T15:31:07.425920+00:00",
       "outcome": null
+    },
+    {
+      "id": "SOL-1783525539-9737",
+      "symbol": "SOL",
+      "direction": "short",
+      "pathway": "momentum_breakout",
+      "pipeline": "slow",
+      "confidence": 99.92832159245704,
+      "grade": "A+",
+      "timestamp": "2026-07-08T15:45:38.817895+00:00",
+      "outcome": null
     }
   ],
   "governor": {
@@ -61,15 +87,16 @@
     "scan_counts": [
       0,
       1,
+      1,
       1
     ],
-    "last_signal_ts": 1783524668.4793918
+    "last_signal_ts": 1783525539.9380918
   },
   "pathway_stats": {},
   "symbol_dir_stats": {},
   "daily": {
     "2026-07-08": {
-      "signal_count": 2,
+      "signal_count": 3,
       "realized_pnl_pct": 0.0,
       "paused": false
     }
