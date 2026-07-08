@@ -104,13 +104,13 @@
       "direction": "short",
       "pathway": "trend_continuation",
       "entry": 1740.6,
-      "stop": 1747.4130795889141,
+      "stop": 1740.6,
       "tp1": 1729.6990726577371,
       "tp2": 1721.5233771510402,
       "message_id": 1878,
       "opened_ts": 1783516536.774702,
       "risk_pct": 1.0,
-      "tp1_hit": false
+      "tp1_hit": true
     },
     {
       "hist_id": "XRP-1783517473-9737",
@@ -278,6 +278,7 @@
       1,
       1,
       1,
+      0,
       0,
       0,
       0
