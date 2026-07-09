@@ -1,36 +1,5 @@
 {
-  "active_signals": [
-    {
-      "hist_id": "BTC-1783528276-9737",
-      "symbol": "BTC",
-      "direction": "short",
-      "pathway": "trend_continuation",
-      "entry": 61939.0,
-      "stop": 62625.404857310874,
-      "tp1": 60840.752228302605,
-      "tp2": 60017.066399529554,
-      "risk": 686.4048573108739,
-      "message_id": 1900,
-      "opened_ts": 1783528276.0075035,
-      "risk_pct": 1.0,
-      "tp1_hit": false
-    },
-    {
-      "hist_id": "XRP-1783546265-9737",
-      "symbol": "XRP",
-      "direction": "short",
-      "pathway": "liquidity_reversal",
-      "entry": 1.0876,
-      "stop": 1.0971003305704246,
-      "tp1": 1.073349504144363,
-      "tp2": 1.0638491735739382,
-      "risk": 0.009500330570424653,
-      "message_id": 1917,
-      "opened_ts": 1783546265.9837224,
-      "risk_pct": 1.0,
-      "tp1_hit": false
-    }
-  ],
+  "active_signals": [],
   "history": [
     {
       "id": "ETH-1783523736-9737",
@@ -74,7 +43,7 @@
       "confidence": 97.68347471950726,
       "grade": "A+",
       "timestamp": "2026-07-08T16:31:14.563716+00:00",
-      "outcome": null
+      "outcome": "loss"
     },
     {
       "id": "XRP-1783536337-9737",
@@ -96,7 +65,7 @@
       "confidence": 99.35432824770353,
       "grade": "A+",
       "timestamp": "2026-07-08T21:31:04.924176+00:00",
-      "outcome": null
+      "outcome": "loss"
     },
     {
       "id": "HYPE-1783557934-9737",
@@ -154,6 +123,7 @@
       0,
       0,
       1,
+      0,
       0
     ],
     "last_signal_ts": 1783557934.4272864
@@ -164,7 +134,11 @@
       "wins": 0
     },
     "trend_continuation": {
-      "n": 4,
+      "n": 5,
+      "wins": 0
+    },
+    "liquidity_reversal": {
+      "n": 1,
       "wins": 0
     }
   },
@@ -178,10 +152,14 @@
       "wins": 0
     },
     "XRP:short": {
-      "n": 2,
+      "n": 3,
       "wins": 0
     },
     "HYPE:long": {
+      "n": 1,
+      "wins": 0
+    },
+    "BTC:short": {
       "n": 1,
       "wins": 0
     }
@@ -189,7 +167,7 @@
   "daily": {
     "2026-07-09": {
       "signal_count": 1,
-      "realized_pnl_pct": -1.0,
+      "realized_pnl_pct": -3.0,
       "paused": false
     }
   },
