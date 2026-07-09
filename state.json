@@ -1,21 +1,6 @@
 {
   "active_signals": [
     {
-      "hist_id": "XRP-1783560665-9737",
-      "symbol": "XRP",
-      "direction": "short",
-      "pathway": "liquidity_reversal",
-      "entry": 1.09,
-      "stop": 1.0987103512906387,
-      "tp1": 1.0769344730640422,
-      "tp2": 1.0682241217734036,
-      "risk": 0.008710351290638574,
-      "message_id": 1929,
-      "opened_ts": 1783560665.309464,
-      "risk_pct": 1.0,
-      "tp1_hit": false
-    },
-    {
       "hist_id": "BTC-1783575369-9737",
       "symbol": "BTC",
       "direction": "short",
@@ -118,7 +103,7 @@
       "confidence": 83.9527806665914,
       "grade": "A+",
       "timestamp": "2026-07-09T01:31:04.251939+00:00",
-      "outcome": null
+      "outcome": "loss"
     },
     {
       "id": "BTC-1783561533-9737",
@@ -206,6 +191,7 @@
       0,
       0,
       1,
+      0,
       0
     ],
     "last_signal_ts": 1783575369.8491702
@@ -220,7 +206,7 @@
       "wins": 0
     },
     "liquidity_reversal": {
-      "n": 1,
+      "n": 2,
       "wins": 0
     }
   },
@@ -234,7 +220,7 @@
       "wins": 0
     },
     "XRP:short": {
-      "n": 3,
+      "n": 4,
       "wins": 0
     },
     "HYPE:long": {
@@ -249,7 +235,7 @@
   "daily": {
     "2026-07-09": {
       "signal_count": 4,
-      "realized_pnl_pct": -4.0,
+      "realized_pnl_pct": -5.0,
       "paused": false
     }
   },
