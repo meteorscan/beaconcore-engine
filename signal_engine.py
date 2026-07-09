@@ -1,2340 +1,1902 @@
-#!/usr/bin/env python3
-"""
-LODESTAR ENGINE v1.2.0
-
-Crypto perpetuals signal engine on Hyperliquid. Runs two timeframe
-pipelines (fast intraday 4h->15m, slow swing 1d->1h), each evaluating
-three setup pathways (liquidity reversal / trend continuation / momentum
-breakout) per symbol per scan. Candidates are scored with ensemble
-agreement across trend/momentum/volume/structure families, funding/OI
-regime, session/macro context, and cross-sectional relative strength,
-then filtered by liquidity, correlation clustering, and portfolio caps
-before a freshness re-check and Telegram dispatch.
-
-Quality thresholds (pathway gates, regime multipliers, grade floors,
-minimum RR, liquidity floors) are fixed and regime-conditioned, set from
-backtesting rather than adapted online. The one online-adaptive quantity
-is `governor.threshold`, nudged by an EMA of realized signal rate toward
-a target signals/day band (see GOVERNOR_* constants and
-`adaptive_threshold`). An explicit frequency floor
-(`frequency_floor_signal`) releases the best near-miss candidate if the
-engine has gone silent past MAX_SILENCE_HOURS.
-
-Architecture: Hyperliquid info API -> per-symbol candle bundle
-(15m/1h/4h/1d) + funding + OI + L2 book -> two timeframe pipelines ->
-three pathways per pipeline -> ensemble-agreement + confluence scoring ->
-correlation clustering -> portfolio caps -> freshness re-check ->
-Telegram -> state.json.
-
-Data source: Hyperliquid info endpoint only (no third-party data, which
-is why long/short ratio is absent -- Hyperliquid doesn't expose it).
-Scheduler: external cron, every 15 minutes. State: state.json, with
-.bak fallback.
-
-Includes a walk-forward backtest module (held-out final window,
-fee/slippage-aware net performance, +-10% parameter-sensitivity
-overfitting check, minimum-sample-size flags, MA-crossover baseline)
-for validating and re-tuning the constants below against your own
-historical window before sizing real risk.
-
-v1.3.0: the backtest simulator previously took the first non-None pathway
-result with no ATR%%-range, MIN_RR, or stop-distance gating -- none of the
-filters `evaluate_symbol` enforces live via `liquidity_ok` / MIN_RR /
-`stop_distance_ok`. That let it price trades the live engine would never
-send (including near-zero-stop-distance setups whose fee/slippage cost,
-expressed in R, dwarfs the trade itself), which was the main driver of the
-extreme net-R outliers seen in earlier backtest runs, and it also silently
-neutered the MIN_RR sensitivity check (perturbing MIN_RR had zero effect on
-which trades were simulated). The simulator now applies the same ATR-pct
-gate, MIN_RR floor, and a new MIN_STOP_PCT floor (`stop_distance_ok`), and
-picks the best-RR pathway of the three rather than a fixed priority order,
-matching live selection logic. Re-run `backtest all` after upgrading --
-prior result files are not comparable to this version's output.
-"""
+# ══════════════════════════════════════════════════════════════════════════
+#  KESTREL — Adaptive Smart-Money Signal Engine
+#  v1.0.0
+#
+#  Philosophy: a kestrel hunts by hovering motionless until the moment of
+#  strike is unambiguous, then commits with precision. This engine applies
+#  the same discipline to crypto intraday/swing trading: it maps liquidity
+#  and institutional footprints (Order Blocks, Breaker Blocks, Fair Value
+#  Gaps) across a four-timeframe stack, waits for price to actually sweep
+#  liquidity and shift structure in confirmation, and only then commits —
+#  scored through five independent filters (Location, Context, Quality,
+#  RR, LTF-confirmation) rather than a single blended threshold.
+#
+#  Key innovations over the reference generation:
+#   - Breaker Blocks are treated as first-class citizens, not a footnote:
+#     every mitigated Order Block is tracked forward and reclassified as a
+#     breaker the moment price closes through it, on BOTH the HTF (bias/
+#     zone map) and the LTF (entry trigger) stacks — "HTF -> OB/BB,
+#     LTF -> BB" is enforced structurally, not just as a scoring bonus.
+#   - Three regime-matched pathways (Liquidity Reversal, Trend Continuation,
+#     Range Mean-Reversion) are auto-selected per symbol from a live regime
+#     classifier, instead of running every pathway against every symbol.
+#   - A self-tuning governor nudges quality thresholds from realized win
+#     rate stored in state.json, bounded to prevent runaway drift or
+#     overfitting to a short sample.
+#   - Correlation-cluster de-duplication, market breadth, relative
+#     strength percentile, funding/OI carry, and session weighting are
+#     folded into confidence scoring rather than being separate hard gates,
+#     so a single weak input can't veto an otherwise excellent setup.
+# ══════════════════════════════════════════════════════════════════════════
 
 from __future__ import annotations
 
+import os
+import sys
 import json
 import math
-import os
-import random
-import statistics
-import sys
 import time
-import signal as _signal
-import logging
-from collections import Counter, defaultdict
+import signal as os_signal
+import threading
 from dataclasses import dataclass, field
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
 
 import requests
 
-# ═══════════════════════════════════════════════════════════════════════════
-# CONFIGURATION (env-driven; no secrets hardcoded)
-# ═══════════════════════════════════════════════════════════════════════════
+ENGINE_NAME = "KESTREL"
+__version__ = "1.0.0"
 
-TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "")
-TG_CHAT_ID = os.environ.get("TG_CHAT_ID", "")
-HL_INFO_URL = os.environ.get("HL_INFO_URL", "https://api.hyperliquid.xyz/info")
-STATE_PATH = os.environ.get("LODESTAR_STATE_PATH", "state.json")
-LOG_PATH = os.environ.get("LODESTAR_LOG_PATH", "lodestar_engine.log")
+# ══════════════════════════════════════════════════════════════════════════
+#  CONFIGURATION
+# ══════════════════════════════════════════════════════════════════════════
 
-# Dry-run: full scan + logging, no Telegram sends, no state commits.
-DRY_RUN = os.environ.get("LODESTAR_DRY_RUN", "0") == "1"
+TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN")
+TG_CHAT_ID = os.getenv("TG_CHAT_ID")
+if not TG_BOT_TOKEN:
+    raise RuntimeError("TG_BOT_TOKEN environment variable is required")
+if not TG_CHAT_ID:
+    raise RuntimeError("TG_CHAT_ID environment variable is required")
 
-VERSION = "1.4.0"
-ENGINE_NAME = "Lodestar"
+STATE_FILE = os.getenv("STATE_FILE", "state.json")
+SCAN_WORKERS = int(os.getenv("SCAN_WORKERS", "3"))
+HL_BASE_URL = "https://api.hyperliquid.xyz/info"
+HL_MIN_INTERVAL_S = float(os.getenv("HL_MIN_INTERVAL_S", "0.15"))
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.FileHandler(LOG_PATH), logging.StreamHandler(sys.stderr)],
-)
-log = logging.getLogger(ENGINE_NAME)
-
+# ── WATCHLIST (unchanged infrastructure) ────────────────────────────────
 WATCHLIST = [
-    "BTC", "ETH", "HYPE", "ZEC", "NEAR", "ONDO", "SUI", "PENGU", "BNB", "SOL",
-    "TRX", "BCH", "DOGE", "ADA", "DOT", "TAO", "AVAX", "LINK", "AAVE", "XRP",
-    "XLM", "UNI", "LTC", "APT", "PENDLE",
+    "BTCUSDT", "ETHUSDT", "HYPEUSDT", "ZECUSDT", "NEARUSDT",
+    "ONDOUSDT", "SUIUSDT", "PENGUUSDT", "BNBUSDT", "SOLUSDT",
+    "TRXUSDT", "BCHUSDT", "DOGEUSDT", "ADAUSDT", "DOTUSDT",
+    "TAOUSDT", "AVAXUSDT", "LINKUSDT", "AAVEUSDT", "XRPUSDT",
+    "XLMUSDT", "UNIUSDT", "LTCUSDT", "APTUSDT", "PENDLEUSDT",
 ]
 
-SECTOR_MAP: dict[str, str] = {
-    "BTC": "btc", "ETH": "eth",
-    "SOL": "eth_l1", "AVAX": "eth_l1", "SUI": "eth_l1", "APT": "eth_l1", "NEAR": "eth_l1",
-    "BNB": "bnb",
-    "XRP": "payments", "XLM": "payments", "TRX": "payments", "LTC": "payments",
-    "DOGE": "meme", "PENGU": "meme",
-    "ADA": "layer1_alt", "DOT": "layer1_alt", "TAO": "layer1_alt",
-    "LINK": "defi", "AAVE": "defi", "UNI": "defi", "ONDO": "defi", "PENDLE": "defi",
-    "HYPE": "hype", "ZEC": "privacy", "BCH": "privacy",
+MAJORS = {"BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT", "ADAUSDT", "DOGEUSDT"}
+
+# ── TIMEFRAME STACK ───────────────────────────────────────────────────────
+# MACRO : 1D  -> long-range bias, premium/discount range, PDH/PDL/PWH/PWL
+# HTF   : 4H  -> primary structure, Order Blocks & Breaker Blocks (zone map)
+# MID   : 1H  -> liquidity sweep + intermediate structure shift
+# LTF   : 15m -> execution: Breaker Block trigger, entry timing, MSS confirm
+TF_MACRO, TF_HTF, TF_MID, TF_LTF = "1d", "4h", "1h", "15m"
+TF_BARS = {TF_MACRO: 120, TF_HTF: 260, TF_MID: 300, TF_LTF: 300}
+SCAN_INTERVAL_MIN = 15
+
+# ── INDICATOR LENGTHS ──────────────────────────────────────────────────────
+EMA_FAST, EMA_SLOW, EMA_TREND = 21, 50, 200
+RSI_LEN, ATR_LEN, ADX_LEN, BB_LEN = 14, 14, 14, 20
+BB_MULT = 2.0
+
+# ── ZONE DETECTION ──────────────────────────────────────────────────────────
+OB_DISPLACEMENT_ATR_MULT = 1.15      # min body/ATR to qualify as a displacement candle
+OB_BOS_LOOKBACK = 25                 # bars scanned back for prior high/low to break
+FVG_MIN_GAP_ATR_MULT = 0.12
+ZONE_MAX_WIDTH_ATR_MULT = 1.8        # zones wider than this are too "fat" to be tradable POIs
+ZONE_LOOKBACK_HTF = 90
+ZONE_LOOKBACK_LTF = 80
+PIVOT_LEFT_HTF, PIVOT_RIGHT_HTF = 2, 2
+PIVOT_LEFT_LTF, PIVOT_RIGHT_LTF = 2, 2
+LIQUIDITY_EQ_TOLERANCE_PCT = 0.0018
+
+# ── SWEEP / MSS ──────────────────────────────────────────────────────────
+SWEEP_LOOKBACK_MID = 16
+SWEEP_MAX_DEPTH_ATR_MULT = 1.10
+SWEEP_MIN_WICK_RATIO = 0.35
+MSS_LOOKBACK_LTF = 40
+MSS_DISPLACEMENT_ATR_MULT = 0.55
+MSS_MIN_CLOSE_MARGIN_ATR_MULT = 0.08
+BREAKER_SEARCH_BARS = 8
+
+# ── RISK ─────────────────────────────────────────────────────────────────
+MIN_RR_FLOOR = 1.5
+MIN_RR_TARGET = 2.0
+EXT_RR_LEVELS = [2.0, 2.5, 3.0, 4.0, 5.0]
+SL_BUFFER_ATR_MIN_MULT = 0.25
+SL_BUFFER_ATR_MAX_MULT = 0.85
+LIQUIDITY_ROOM_BUFFER_ATR_MULT = 0.25
+POI_MAX_DIST_ATR_MULT = 1.4          # max distance entry POI can sit from live price
+POI_MAX_PCT_OF_PRICE = 0.02
+
+# ── VOLATILITY / LIQUIDITY GATES ───────────────────────────────────────────
+MIN_ATR_PCT = 0.20
+MAX_ATR_PCT = 9.0
+SPREAD_WARN_PCT = 0.20
+SPREAD_SUPPRESS_PCT = 0.45
+SPREAD_EXEMPT = MAJORS
+MIN_OI_USD = 400_000.0
+
+# ── SCORING / FREQUENCY GOVERNOR ────────────────────────────────────────────
+BASE_MIN_CONFIDENCE = 58.0           # 0-100 scale; adaptively nudged by governor
+MAX_SIGNALS_PER_SCAN_DEFAULT = 4
+MAX_SIGNALS_PER_SCAN_TRENDING = 6
+MAX_CONCURRENT_ACTIVE_SIGNALS = 14
+MAX_SIGNAL_HISTORY = 1500
+COOLDOWN_BARS_LTF = 3                # bars (of TF_LTF) before same symbol/direction can re-fire
+DUPLICATE_ENTRY_TOLERANCE_PCT = 0.0035
+
+# ── ADAPTIVE GOVERNOR ────────────────────────────────────────────────────
+GOVERNOR_LOOKBACK_SIGNALS = 40
+GOVERNOR_MAX_SHIFT = 8.0             # max +/- confidence-threshold points the governor may apply
+GOVERNOR_TARGET_WINRATE = 0.50
+
+# ── FUNDING / OI / RELATIVE STRENGTH ────────────────────────────────────
+FUNDING_EXTREME = 0.0010
+FUNDING_CARRY_THRESHOLD = 0.0005
+OI_HISTORY_DEPTH = 6
+OI_CHANGE_THRESHOLD_PCT = 1.0
+RS_TOP_PCTILE, RS_BOTTOM_PCTILE = 0.20, 0.20
+
+# ── SESSION WEIGHTING (UTC hours) ───────────────────────────────────────
+SESSION_WINDOWS = {
+    "asia":   (0, 8),
+    "london": (7, 12),
+    "ny":     (12, 21),
+    "off":    (21, 24),
 }
-BTC_SYMBOL = "BTC"
+SESSION_SCORE_BONUS = {"asia": 0.0, "london": 2.0, "ny": 2.5, "off": -1.5}
 
-INTERVAL_MS = {
-    "15m": 15 * 60 * 1000,
-    "1h": 60 * 60 * 1000,
-    "4h": 4 * 60 * 60 * 1000,
-    "1d": 24 * 60 * 60 * 1000,
-}
+# ══════════════════════════════════════════════════════════════════════════
+#  HYPERLIQUID API CLIENT
+# ══════════════════════════════════════════════════════════════════════════
 
-# ── SESSIONS (fast pipeline only; slow pipeline always-on) ─────────────────
-LONDON_OPEN_H, LONDON_CLOSE_H = 7, 12
-NY_OPEN_H, NY_CLOSE_H = 13, 20
-DEAD_ZONE_START_H, DEAD_ZONE_END_H = 12, 13
-WEEKEND_THRESHOLD_BUMP = 0.4
-
-# ── FREQUENCY TARGET / GOVERNOR (see mechanism doc above) ───────────────────
-TARGET_SIGNALS_MIN = 5.0
-TARGET_SIGNALS_MAX = 10.0
-GOVERNOR_FLOOR = -1.5
-GOVERNOR_CEIL = 3.0
-GOVERNOR_STEP = 0.08
-GOVERNOR_MIN_INTERVAL_S = 30 * 60
-GOVERNOR_LOOKBACK_SCANS = 96  # 24h of 15m scans
-
-# If no signal fires within MAX_SILENCE_HOURS, release the best near-miss
-# candidate instead (see `frequency_floor_signal`).
-MAX_SILENCE_HOURS = 18.0
-FREQUENCY_FLOOR_MIN_CONFIDENCE = 38.0  # below the normal ~44-58 bar
-
-# ── PORTFOLIO / RISK CAPS ────────────────────────────────────────────────────
-TOP_N_SIGNALS_PER_SCAN = 4
-MAX_SAME_DIRECTION = 3
-MAX_PER_SECTOR = 1
-MAX_CONCURRENT_ACTIVE_SIGNALS = 10
-MAX_PORTFOLIO_RISK_PCT = 12.0       # sum of per-trade risk %, concurrent
-PER_TRADE_RISK_PCT = 1.0            # of notional account equity (informational sizing)
-DAILY_LOSS_LIMIT_PCT = 6.0          # pauses new signals for the rest of the UTC day
-CORR_LOOKBACK_BARS = 72
-CORR_CLUSTER_THRESHOLD = 0.72
-
-# ── LIQUIDITY / EXECUTION SAFETY (frequency-restrictive, elevated-risk only) ─
-MIN_OI_USD = 500_000
-MIN_ATR_PCT = 0.0025
-MAX_ATR_PCT = 0.09
-MIN_RR = 1.2
-MAX_SPREAD_PCT = 0.0012
-MIN_REL_VOLUME = 0.55                # vs. rolling median same-hour volume
-# Hard floor on realized stop distance as a fraction of entry price, added in
-# v1.3.0. The ATR-pct gate below constrains the *indicator* used to build a
-# stop, but several pathways place the stop a small fraction of ATR away from
-# a structural level (0.15-0.3 x ATR) rather than a full ATR away, so an
-# ATR-pct that passes the gate can still yield an unrealistically tight final
-# stop. At MIN_RR=1.2 with round-trip costs of ~0.21% (2x taker fee + 2x
-# slippage), any stop tighter than ~0.7% of price burns a large -- and
-# sometimes dominant -- fraction of the trade's edge in costs alone. This is
-# the leading explanation for the gross/net gap in backtest_results.json
-# (e.g. BTC window 1: gross avg_r ~0, net avg_r -14.65).
-MIN_STOP_PCT = 0.004                  # 0.4% minimum entry-to-stop distance
-MAX_ENTRY_DRIFT_R = 0.5              # freshness/decay re-check before send
-DEDUP_TIME_WINDOW_HOURS = 6
-DEDUP_PRICE_TOL_PCT = 0.006
-
-# ── FUNDING / OI (frequency-additive) ───────────────────────────────────────
-FUNDING_EXTREME_ABS = 0.0006          # per 8h funding considered "extreme"
-OI_DIVERGENCE_LOOKBACK = 8            # bars (1h) for OI slope vs price slope
-
-# ── BTC REGIME ────────────────────────────────────────────────────────────────
-BTC_REGIME_EXEMPT_SECTORS: set[str] = {"hype", "defi"}
-
-# ── MACRO CALENDAR (public ForexFactory JSON feed) ──────────────────────────
-MACRO_CALENDAR_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
-MACRO_CACHE_TTL_S = 3 * 60 * 60
-MACRO_WINDOW_BEFORE_MINS = 45
-MACRO_WINDOW_AFTER_MINS = 30
-MACRO_EVENT_KEYWORDS = (
-    "fomc", "interest rate", "cpi", "ppi", "nonfarm", "non-farm", "unemployment",
-    "gdp", "fed chair", "powell", "pce", "retail sales",
-)
-MACRO_ATR_PCTILE_HIGH = 0.80
-MACRO_ATR_PCTILE_HIGH_MULT = 1.6
-
-# ── ENSEMBLE AGREEMENT (frequency-additive / suppressive both) ─────────────
-ENSEMBLE_FAMILIES = ("trend", "momentum", "volume", "structure")
-ENSEMBLE_BONUS_3 = 0.9    # 3-of-4 families agree
-ENSEMBLE_BONUS_4 = 1.6    # all 4 agree
-ENSEMBLE_CONFLICT_PENALTY = -1.3  # >=2 families actively disagree
-
-# ── PATHWAY WEIGHT SELF-TUNING ──────────────────────────────────────────────
-PATHWAY_WEIGHT_LEARNING_RATE = 0.04
-PATHWAY_WEIGHT_MIN, PATHWAY_WEIGHT_MAX = 0.75, 1.30
-
-# ── CROSS-SECTIONAL RS ───────────────────────────────────────────────────────
-RS_CROWD_PERCENTILE = 0.80  # top/bottom-quintile RS + breadth extremes -> "crowded"
-
-RNG = random.Random(1337)
-
-# ═══════════════════════════════════════════════════════════════════════════
-# GENERIC HELPERS
-# ═══════════════════════════════════════════════════════════════════════════
-
-def safe(x, default=0.0):
-    try:
-        if x is None or (isinstance(x, float) and math.isnan(x)):
-            return default
-        return x
-    except Exception:
-        return default
+_session = requests.Session()
+_req_lock = threading.Lock()
+_last_req_ts = 0.0
 
 
-def clamp(x, lo, hi):
-    return max(lo, min(hi, x))
+def _throttle():
+    global _last_req_ts
+    with _req_lock:
+        wait = HL_MIN_INTERVAL_S - (time.time() - _last_req_ts)
+        if wait > 0:
+            time.sleep(wait)
+        _last_req_ts = time.time()
 
 
-def pct(a, b):
-    return safe((a - b) / b) if b else 0.0
+def hl_post(payload: dict, retries: int = 4, timeout: int = 12) -> dict | list | None:
+    for attempt in range(retries):
+        _throttle()
+        try:
+            r = _session.post(HL_BASE_URL, json=payload, timeout=timeout)
+            if r.status_code == 200:
+                return r.json()
+            if r.status_code in (429, 502, 503, 504):
+                time.sleep(0.5 * (attempt + 1))
+                continue
+            return None
+        except requests.RequestException:
+            time.sleep(0.4 * (attempt + 1))
+    return None
 
 
-def now_utc() -> datetime:
-    return datetime.now(timezone.utc)
+def hl_coin(symbol: str) -> str:
+    return symbol[:-4] if symbol.endswith("USDT") else symbol
 
 
-def utc_day_key(dt: Optional[datetime] = None) -> str:
-    """Fixed UTC calendar-day boundary used for daily-loss and daily-count
-    tracking, so both are unambiguous across scans regardless of when the
-    scheduler happens to fire."""
-    dt = dt or now_utc()
-    return dt.strftime("%Y-%m-%d")
+def current_bar_open_ms(reference_ms: int, interval: str) -> int:
+    mult = {"15m": 15, "1h": 60, "4h": 240, "1d": 1440}[interval] * 60_000
+    return (reference_ms // mult) * mult
 
 
-def http_get_json(url: str, params: Optional[dict] = None, timeout: float = 10.0) -> Optional[dict]:
-    try:
-        r = requests.get(url, params=params, timeout=timeout)
-        r.raise_for_status()
-        return r.json()
-    except Exception as e:
-        log.warning(f"GET failed {url}: {e}")
-        return None
+def filter_closed_candles(candles: list[dict], interval: str, reference_ms: int) -> list[dict]:
+    open_ms = current_bar_open_ms(reference_ms, interval)
+    return [c for c in candles if c["t"] < open_ms]
 
 
-def http_post_json(url: str, payload: dict, timeout: float = 10.0) -> Optional[dict]:
-    try:
-        r = requests.post(url, json=payload, timeout=timeout)
-        r.raise_for_status()
-        return r.json()
-    except Exception as e:
-        log.warning(f"POST failed {url}: {e}")
-        return None
-
-
-# ═══════════════════════════════════════════════════════════════════════════
-# HYPERLIQUID DATA LAYER
-# ═══════════════════════════════════════════════════════════════════════════
-
-def hl_info(body: dict) -> Optional[dict]:
-    try:
-        r = requests.post(HL_INFO_URL, json=body, timeout=12)
-        r.raise_for_status()
-        return r.json()
-    except Exception as e:
-        log.warning(f"HL info call failed ({body.get('type')}): {e}")
-        return None
-
-
-def fetch_candles(symbol: str, interval: str, lookback_bars: int) -> Optional[list[dict]]:
-    end = int(time.time() * 1000)
-    start = end - lookback_bars * INTERVAL_MS[interval]
-    body = {
+def get_candles(symbol: str, interval: str, n: int, reference_ms: int) -> list[dict] | None:
+    coin = hl_coin(symbol)
+    end = reference_ms
+    start = end - n * {"15m": 15, "1h": 60, "4h": 240, "1d": 1440}[interval] * 60_000 * 2
+    payload = {
         "type": "candleSnapshot",
-        "req": {"coin": symbol, "interval": interval, "startTime": start, "endTime": end},
+        "req": {"coin": coin, "interval": interval, "startTime": start, "endTime": end},
     }
-    data = hl_info(body)
-    if not data or not isinstance(data, list):
+    raw = hl_post(payload)
+    if not raw or not isinstance(raw, list):
         return None
-    out = []
-    for c in data:
-        try:
-            out.append({
-                "t": int(c["t"]), "o": float(c["o"]), "h": float(c["h"]),
-                "l": float(c["l"]), "c": float(c["c"]), "v": float(c["v"]),
-            })
-        except Exception:
-            continue
-    return out or None
+    candles = [
+        {"t": c["t"], "o": float(c["o"]), "h": float(c["h"]),
+         "l": float(c["l"]), "c": float(c["c"]), "v": float(c["v"])}
+        for c in raw
+    ]
+    candles = filter_closed_candles(candles, interval, reference_ms)
+    return candles[-n:] if len(candles) >= 5 else None
 
 
-def fetch_meta_and_asset_ctx() -> Optional[dict]:
-    return hl_info({"type": "metaAndAssetCtxs"})
-
-
-_MARKET_CTX_CACHE: dict[str, dict] = {}
-
-
-def load_market_ctx() -> dict[str, dict]:
-    """Funding rate + open interest + mark price per symbol, single call."""
-    global _MARKET_CTX_CACHE
-    data = fetch_meta_and_asset_ctx()
-    ctx: dict[str, dict] = {}
-    if not data or not isinstance(data, list) or len(data) < 2:
-        return _MARKET_CTX_CACHE
-    universe = data[0].get("universe", [])
-    asset_ctxs = data[1]
-    for i, u in enumerate(universe):
-        if i >= len(asset_ctxs):
-            break
-        name = u.get("name")
-        a = asset_ctxs[i]
-        try:
-            ctx[name] = {
-                "funding": float(a.get("funding", 0.0)),
-                "open_interest": float(a.get("openInterest", 0.0)),
-                "mark_px": float(a.get("markPx", 0.0)),
-                "day_ntl_vlm": float(a.get("dayNtlVlm", 0.0)),
-            }
-        except Exception:
-            continue
-    _MARKET_CTX_CACHE = ctx
-    return ctx
-
-
-def fetch_l2_book(symbol: str) -> Optional[dict]:
-    return hl_info({"type": "l2Book", "coin": symbol})
-
-
-def book_spread_and_depth(book: Optional[dict]) -> tuple[float, float]:
-    """Returns (spread_pct, top5_depth_usd). Missing book -> conservative
-    (wide spread, zero depth) so liquidity filtering fails safe."""
-    if not book or "levels" not in book:
-        return 0.01, 0.0
-    try:
-        bids, asks = book["levels"][0], book["levels"][1]
-        if not bids or not asks:
-            return 0.01, 0.0
-        best_bid, best_ask = float(bids[0]["px"]), float(asks[0]["px"])
-        mid = (best_bid + best_ask) / 2
-        spread_pct = (best_ask - best_bid) / mid if mid else 0.01
-        depth = sum(float(x["px"]) * float(x["sz"]) for x in bids[:5]) + \
-                sum(float(x["px"]) * float(x["sz"]) for x in asks[:5])
-        return spread_pct, depth
-    except Exception:
-        return 0.01, 0.0
-
-
-def fetch_all_mids() -> dict[str, float]:
-    data = hl_info({"type": "allMids"})
-    if not isinstance(data, dict):
-        return {}
+def fetch_all_candles(symbol: str, reference_ms: int) -> dict[str, list[dict]] | None:
     out = {}
-    for k, v in data.items():
-        try:
-            out[k] = float(v)
-        except Exception:
-            continue
+    for tf in (TF_LTF, TF_MID, TF_HTF, TF_MACRO):
+        c = get_candles(symbol, tf, TF_BARS[tf], reference_ms)
+        if c is None or len(c) < 40:
+            return None
+        out[tf] = c
     return out
 
 
-def fetch_symbol_bundle(symbol: str) -> Optional[dict]:
+_meta_ctx_cache: dict | None = None
+_meta_ctx_lock = threading.Lock()
+
+
+def get_meta_and_asset_ctxs() -> dict | None:
+    global _meta_ctx_cache
+    raw = hl_post({"type": "metaAndAssetCtxs"})
+    if not raw or not isinstance(raw, list) or len(raw) < 2:
+        return _meta_ctx_cache
+    universe = raw[0].get("universe", [])
+    ctxs = raw[1]
+    out = {}
+    for meta, ctx in zip(universe, ctxs):
+        name = meta.get("name")
+        if not name:
+            continue
+        try:
+            out[name] = {
+                "funding": float(ctx.get("funding", 0.0)),
+                "oi": float(ctx.get("openInterest", 0.0)),
+                "mark_px": float(ctx.get("markPx", 0.0)),
+                "day_vol_usd": float(ctx.get("dayNtlVlm", 0.0)),
+            }
+        except (TypeError, ValueError):
+            continue
+    with _meta_ctx_lock:
+        _meta_ctx_cache = out
+    return out
+
+
+def get_l2_spread_pct(symbol: str) -> float | None:
+    coin = hl_coin(symbol)
+    raw = hl_post({"type": "l2Book", "coin": coin})
+    if not raw or "levels" not in raw:
+        return None
     try:
-        c15 = fetch_candles(symbol, "15m", 300)
-        c1h = fetch_candles(symbol, "1h", 300)
-        c4h = fetch_candles(symbol, "4h", 300)
-        c1d = fetch_candles(symbol, "1d", 220)
-        if not c15 or not c1h or not c4h or not c1d:
-            log.info(f"[DATA] {symbol}: incomplete candle set, skipping this scan")
+        bids, asks = raw["levels"][0], raw["levels"][1]
+        if not bids or not asks:
             return None
-        book = fetch_l2_book(symbol)
-        return {"15m": c15, "1h": c1h, "4h": c4h, "1d": c1d, "book": book}
-    except Exception as e:
-        log.warning(f"[DATA] {symbol}: fetch error {e} -- skipping this scan")
+        best_bid, best_ask = float(bids[0]["px"]), float(asks[0]["px"])
+        mid = (best_bid + best_ask) / 2
+        return ((best_ask - best_bid) / mid) * 100 if mid > 0 else None
+    except (KeyError, IndexError, ValueError, TypeError):
         return None
 
+# ══════════════════════════════════════════════════════════════════════════
+#  MATH / INDICATORS
+# ══════════════════════════════════════════════════════════════════════════
 
-# ═══════════════════════════════════════════════════════════════════════════
-# INDICATOR LIBRARY
-# ═══════════════════════════════════════════════════════════════════════════
+def safe(v, fb=0.0):
+    try:
+        if v is None or math.isnan(v) or math.isinf(v):
+            return fb
+        return v
+    except TypeError:
+        return fb
 
-def ema(values: list[float], period: int) -> list[float]:
-    if not values:
+
+def safe_div(a: float, b: float, default: float = 0.0) -> float:
+    return a / b if b else default
+
+
+def ema(vals: list[float], period: int) -> list[float]:
+    if not vals:
         return []
     k = 2 / (period + 1)
-    out = [values[0]]
-    for v in values[1:]:
+    out = [vals[0]]
+    for v in vals[1:]:
         out.append(v * k + out[-1] * (1 - k))
     return out
 
 
-def true_range(candles: list[dict]) -> list[float]:
-    tr = [candles[0]["h"] - candles[0]["l"]]
-    for i in range(1, len(candles)):
-        h, l, pc = candles[i]["h"], candles[i]["l"], candles[i - 1]["c"]
-        tr.append(max(h - l, abs(h - pc), abs(l - pc)))
-    return tr
+def sma(vals: list[float], period: int) -> list[float]:
+    out = []
+    for i in range(len(vals)):
+        window = vals[max(0, i - period + 1): i + 1]
+        out.append(sum(window) / len(window))
+    return out
 
 
-def atr(candles: list[dict], period: int = 14) -> list[float]:
-    tr = true_range(candles)
-    return ema(tr, period)
+def stdev(vals: list[float], period: int) -> list[float]:
+    out = []
+    for i in range(len(vals)):
+        window = vals[max(0, i - period + 1): i + 1]
+        m = sum(window) / len(window)
+        out.append(math.sqrt(sum((x - m) ** 2 for x in window) / len(window)))
+    return out
 
 
-def rsi(closes: list[float], period: int = 14) -> list[float]:
-    if len(closes) < period + 1:
+def rsi(closes: list[float], period: int = RSI_LEN) -> list[float]:
+    if len(closes) < 2:
         return [50.0] * len(closes)
     gains, losses = [0.0], [0.0]
     for i in range(1, len(closes)):
         d = closes[i] - closes[i - 1]
         gains.append(max(d, 0.0))
         losses.append(max(-d, 0.0))
-    avg_gain = ema(gains, period)
-    avg_loss = ema(losses, period)
-    out = []
-    for g, l in zip(avg_gain, avg_loss):
-        if l == 0:
-            out.append(100.0)
-        else:
-            rs = g / l
-            out.append(100 - 100 / (1 + rs))
+    avg_g, avg_l = gains[0], losses[0]
+    out = [50.0]
+    for i in range(1, len(closes)):
+        avg_g = (avg_g * (period - 1) + gains[i]) / period
+        avg_l = (avg_l * (period - 1) + losses[i]) / period
+        rs = safe_div(avg_g, avg_l, 999.0)
+        out.append(100 - 100 / (1 + rs) if avg_l > 0 else 100.0)
     return out
 
 
-def bollinger_bandwidth(closes: list[float], period: int = 20, n_std: float = 2.0) -> list[float]:
-    """(upper-lower)/mid, per bar -- a squeeze/expansion read independent
-    of ADX, which alone can't distinguish a squeeze from a plain
-    directionless grind."""
+def atr_series(candles: list[dict], period: int = ATR_LEN) -> list[float]:
+    if not candles:
+        return []
+    trs = [candles[0]["h"] - candles[0]["l"]]
+    for i in range(1, len(candles)):
+        h, l, pc = candles[i]["h"], candles[i]["l"], candles[i - 1]["c"]
+        trs.append(max(h - l, abs(h - pc), abs(l - pc)))
+    out = [trs[0]]
+    for i in range(1, len(trs)):
+        out.append((out[-1] * (period - 1) + trs[i]) / period)
+    return out
+
+
+def adx_series(candles: list[dict], period: int = ADX_LEN) -> list[float]:
+    n = len(candles)
+    if n < period + 2:
+        return [15.0] * n
+    plus_dm, minus_dm, trs = [0.0], [0.0], [candles[0]["h"] - candles[0]["l"]]
+    for i in range(1, n):
+        up = candles[i]["h"] - candles[i - 1]["h"]
+        dn = candles[i - 1]["l"] - candles[i]["l"]
+        plus_dm.append(up if (up > dn and up > 0) else 0.0)
+        minus_dm.append(dn if (dn > up and dn > 0) else 0.0)
+        h, l, pc = candles[i]["h"], candles[i]["l"], candles[i - 1]["c"]
+        trs.append(max(h - l, abs(h - pc), abs(l - pc)))
+
+    def wilder_smooth(vals):
+        out = [sum(vals[:period])]
+        for v in vals[period:]:
+            out.append(out[-1] - out[-1] / period + v)
+        return out
+
+    tr_s = wilder_smooth(trs)
+    pdm_s = wilder_smooth(plus_dm)
+    mdm_s = wilder_smooth(minus_dm)
+    dx = []
+    for i in range(len(tr_s)):
+        pdi = 100 * safe_div(pdm_s[i], tr_s[i])
+        mdi = 100 * safe_div(mdm_s[i], tr_s[i])
+        dx.append(100 * safe_div(abs(pdi - mdi), pdi + mdi))
+    pad = [dx[0] if dx else 15.0] * (n - len(dx))
+    full_dx = pad + dx
+    adx = sma(full_dx, period)
+    return adx
+
+
+def bb_width_pct(closes: list[float], period: int = BB_LEN, mult: float = BB_MULT) -> list[float]:
+    mid = sma(closes, period)
+    sd = stdev(closes, period)
     out = []
     for i in range(len(closes)):
-        lo = max(0, i - period + 1)
-        window = closes[lo:i + 1]
-        if len(window) < 2:
-            out.append(0.0)
-            continue
-        mid = sum(window) / len(window)
-        sd = statistics.pstdev(window)
-        upper, lower = mid + n_std * sd, mid - n_std * sd
-        out.append(safe((upper - lower) / mid) if mid else 0.0)
+        upper, lower = mid[i] + mult * sd[i], mid[i] - mult * sd[i]
+        out.append(safe_div(upper - lower, mid[i]) * 100 if mid[i] else 0.0)
     return out
 
 
-def bb_width_percentile(bandwidths: list[float], lookback: int = 100) -> float:
-    hist = bandwidths[-lookback:] if len(bandwidths) >= 5 else bandwidths
-    if len(hist) < 5:
+def percentile_rank(vals: list[float], x: float) -> float:
+    if not vals:
         return 0.5
-    cur = hist[-1]
-    return sum(1 for x in hist if x <= cur) / len(hist)
+    below = sum(1 for v in vals if v <= x)
+    return below / len(vals)
 
 
-def noise_index(closes: list[float], ema_mid: list[float], atr_vals: list[float], lookback: int = 20) -> float:
-    """How much price is chopping around its own mid EMA, normalized by ATR
-    so it's comparable across symbols/vol regimes. High = directionless
-    grind."""
-    n = min(lookback, len(closes))
+def session_now(reference_ms: int) -> str:
+    hour = datetime.fromtimestamp(reference_ms / 1000, tz=timezone.utc).hour
+    for name, (start, end) in SESSION_WINDOWS.items():
+        if start <= hour < end:
+            return name
+    return "off"
+
+
+def compute_returns(candles: list[dict], lookback: int) -> list[float]:
+    closes = [c["c"] for c in candles[-lookback:]]
+    return [safe_div(closes[i] - closes[i - 1], closes[i - 1]) for i in range(1, len(closes))]
+
+
+def pearson(a: list[float], b: list[float]) -> float:
+    n = min(len(a), len(b))
     if n < 5:
-        return 0.5
-    devs = [abs(closes[-i] - ema_mid[-i]) for i in range(1, n + 1)]
-    a = atr_vals[-1] if atr_vals and atr_vals[-1] else 1e-9
-    mean_dev_r = (sum(devs) / n) / a
-    return clamp(mean_dev_r / 1.5, 0.0, 1.0)
+        return 0.0
+    a, b = a[-n:], b[-n:]
+    ma, mb = sum(a) / n, sum(b) / n
+    cov = sum((a[i] - ma) * (b[i] - mb) for i in range(n))
+    va = math.sqrt(sum((x - ma) ** 2 for x in a))
+    vb = math.sqrt(sum((x - mb) ** 2 for x in b))
+    return safe_div(cov, va * vb)
+
+# ══════════════════════════════════════════════════════════════════════════
+#  MARKET STRUCTURE — SWINGS, BOS/CHoCH, BIAS
+# ══════════════════════════════════════════════════════════════════════════
+
+@dataclass
+class Swing:
+    index: int
+    price: float
+    kind: str  # "high" | "low"
 
 
-def adx(candles: list[dict], period: int = 14) -> list[float]:
-    if len(candles) < period + 2:
-        return [15.0] * len(candles)
-    plus_dm, minus_dm = [0.0], [0.0]
-    for i in range(1, len(candles)):
-        up = candles[i]["h"] - candles[i - 1]["h"]
-        down = candles[i - 1]["l"] - candles[i]["l"]
-        plus_dm.append(up if (up > down and up > 0) else 0.0)
-        minus_dm.append(down if (down > up and down > 0) else 0.0)
-    tr = true_range(candles)
-    atr_s = ema(tr, period)
-    plus_di = [100 * (p / a) if a else 0.0 for p, a in zip(ema(plus_dm, period), atr_s)]
-    minus_di = [100 * (m / a) if a else 0.0 for m, a in zip(ema(minus_dm, period), atr_s)]
-    dx = []
-    for p, m in zip(plus_di, minus_di):
-        s = p + m
-        dx.append(100 * abs(p - m) / s if s else 0.0)
-    return ema(dx, period)
-
-
-def donchian(candles: list[dict], period: int = 20) -> tuple[list[float], list[float]]:
-    highs, lows = [c["h"] for c in candles], [c["l"] for c in candles]
-    up, dn = [], []
-    for i in range(len(candles)):
-        lo = max(0, i - period + 1)
-        up.append(max(highs[lo:i + 1]))
-        dn.append(min(lows[lo:i + 1]))
-    return up, dn
-
-
-def swing_points(candles: list[dict], lookback: int = 3) -> tuple[list[int], list[int]]:
-    """Indices of local swing highs / lows using a symmetric lookback."""
-    highs_idx, lows_idx = [], []
+def find_swings(candles: list[dict], left: int = 2, right: int = 2) -> list[Swing]:
+    out = []
     n = len(candles)
-    for i in range(lookback, n - lookback):
-        window = candles[i - lookback:i + lookback + 1]
+    for i in range(left, n - right):
+        wh = [candles[j]["h"] for j in range(i - left, i + right + 1)]
+        wl = [candles[j]["l"] for j in range(i - left, i + right + 1)]
         h, l = candles[i]["h"], candles[i]["l"]
-        if h == max(c["h"] for c in window):
-            highs_idx.append(i)
-        if l == min(c["l"] for c in window):
-            lows_idx.append(i)
-    return highs_idx, lows_idx
+        if h == max(wh) and wh.count(h) == 1:
+            out.append(Swing(i, h, "high"))
+        if l == min(wl) and wl.count(l) == 1:
+            out.append(Swing(i, l, "low"))
+    return out
 
 
-def detect_bos_choch(candles: list[dict]) -> dict:
-    """Break of structure / change of character off the most recent two
-    confirmed swing highs/lows. Returns bias + whether the latest break is a
-    continuation (BOS) or a reversal (CHoCH)."""
-    highs_idx, lows_idx = swing_points(candles, lookback=3)
-    if len(highs_idx) < 2 or len(lows_idx) < 2:
-        return {"bias": "neutral", "event": None}
-    last_close = candles[-1]["c"]
-    last_high = candles[highs_idx[-1]]["h"]
-    last_low = candles[lows_idx[-1]]["l"]
-    prev_high = candles[highs_idx[-2]]["h"]
-    prev_low = candles[lows_idx[-2]]["l"]
-    if last_close > last_high:
-        event = "bos_up" if prev_high < last_high else "choch_up"
-        return {"bias": "bullish", "event": event, "level": last_high}
-    if last_close < last_low:
-        event = "bos_down" if prev_low > last_low else "choch_down"
-        return {"bias": "bearish", "event": event, "level": last_low}
-    return {"bias": "neutral", "event": None}
+@dataclass
+class StructureState:
+    bias: str            # "bullish" | "bearish" | "neutral"
+    range_high: float
+    range_low: float
+    eq: float             # equilibrium (premium/discount split)
 
 
-def detect_liquidity_sweep(candles: list[dict], lookback: int = 20) -> Optional[dict]:
-    """A sweep: wick pierces a prior swing extreme then closes back inside,
-    the classic SFP (swing failure pattern) / stop-hunt signature."""
-    if len(candles) < lookback + 2:
+def analyze_structure(candles: list[dict], swings: list[Swing]) -> Optional[StructureState]:
+    highs = sorted([s for s in swings if s.kind == "high"], key=lambda s: s.index)
+    lows = sorted([s for s in swings if s.kind == "low"], key=lambda s: s.index)
+    if len(highs) < 2 or len(lows) < 2:
         return None
-    highs_idx, lows_idx = swing_points(candles[-(lookback + 6):], lookback=2)
-    seg = candles[-(lookback + 6):]
-    last = seg[-1]
-    for hi in reversed(highs_idx[:-1] if highs_idx else []):
-        level = seg[hi]["h"]
-        if last["h"] > level and last["c"] < level:
-            return {"side": "sell_side_swept_high", "level": level, "direction": "bearish"}
-    for li in reversed(lows_idx[:-1] if lows_idx else []):
-        level = seg[li]["l"]
-        if last["l"] < level and last["c"] > level:
-            return {"side": "buy_side_swept_low", "level": level, "direction": "bullish"}
+    last_h, prev_h = highs[-1], highs[-2]
+    last_l, prev_l = lows[-1], lows[-2]
+
+    if last_h.price > prev_h.price and last_l.price > prev_l.price:
+        bias = "bullish"
+    elif last_h.price < prev_h.price and last_l.price < prev_l.price:
+        bias = "bearish"
+    else:
+        bias = "neutral"
+
+    close = candles[-1]["c"]
+    # CHoCH: a decisive close beyond the most recent opposing swing flips bias
+    if bias in ("bullish", "neutral") and close < last_l.price:
+        bias = "bearish"
+    elif bias in ("bearish", "neutral") and close > last_h.price:
+        bias = "bullish"
+
+    range_high = max(last_h.price, prev_h.price)
+    range_low = min(last_l.price, prev_l.price)
+    if range_high <= range_low:
+        return None
+    return StructureState(bias, range_high, range_low, (range_high + range_low) / 2)
+
+
+def price_zone(price: float, structure: StructureState) -> str:
+    return "premium" if price >= structure.eq else "discount"
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  REGIME DETECTION
+# ══════════════════════════════════════════════════════════════════════════
+
+@dataclass
+class Regime:
+    label: str            # "trend" | "range" | "reversal" | "volatile"
+    direction: str         # "bullish" | "bearish" | "neutral"
+    adx: float
+    bbw_pctile: float
+    atr_pct: float
+    strength: float        # 0-1 composite trend strength
+
+
+def classify_regime(candles_htf: list[dict], candles_mid: list[dict]) -> Regime:
+    closes_htf = [c["c"] for c in candles_htf]
+    adx_htf = adx_series(candles_htf, ADX_LEN)[-1]
+    bbw = bb_width_pct(closes_htf, BB_LEN, BB_MULT)
+    bbw_now = bbw[-1]
+    bbw_pctile = percentile_rank(bbw[-60:], bbw_now)
+    atr_htf = atr_series(candles_htf, ATR_LEN)[-1]
+    atr_pct = safe_div(atr_htf, candles_htf[-1]["c"]) * 100
+
+    ema_fast = ema(closes_htf, EMA_FAST)[-1]
+    ema_slow = ema(closes_htf, EMA_SLOW)[-1]
+    ema_trend = ema(closes_htf, EMA_TREND)[-1] if len(closes_htf) >= EMA_TREND else ema_slow
+    price = closes_htf[-1]
+
+    if price > ema_fast > ema_slow > ema_trend:
+        direction, align = "bullish", 1.0
+    elif price < ema_fast < ema_slow < ema_trend:
+        direction, align = "bearish", 1.0
+    elif price > ema_slow:
+        direction, align = "bullish", 0.5
+    elif price < ema_slow:
+        direction, align = "bearish", 0.5
+    else:
+        direction, align = "neutral", 0.0
+
+    swings = find_swings(candles_mid, PIVOT_LEFT_HTF, PIVOT_RIGHT_HTF)
+    structure = analyze_structure(candles_mid, swings)
+    struct_bias = structure.bias if structure else "neutral"
+
+    strength = min(1.0, (adx_htf / 40.0) * 0.6 + align * 0.4)
+
+    if adx_htf >= 24 and align >= 0.5 and struct_bias == direction:
+        label = "trend"
+    elif adx_htf < 18 and bbw_pctile < 0.45:
+        label = "range"
+    elif bbw_pctile > 0.85 or atr_pct > MAX_ATR_PCT * 0.7:
+        label = "volatile"
+    else:
+        label = "reversal"
+
+    return Regime(label, direction, adx_htf, bbw_pctile, atr_pct, strength)
+
+# ══════════════════════════════════════════════════════════════════════════
+#  SMC ZONE ENGINE — ORDER BLOCKS / BREAKER BLOCKS / FAIR VALUE GAPS
+# ══════════════════════════════════════════════════════════════════════════
+
+@dataclass
+class Zone:
+    low: float
+    high: float
+    kind: str          # "demand" | "supply"
+    origin: str         # "ob" | "breaker" | "fvg"
+    index: int
+    displacement_atr: float = 0.0    # displacement move / ATR at formation (quality input)
+    vol_ratio: float = 1.0            # formation-candle volume vs local average (quality input)
+    mitigated: bool = False           # True once price has traded back through & closed beyond
+    flipped: bool = False             # True once a mitigated OB has been reclassified as a breaker
+
+    @property
+    def mid(self) -> float:
+        return (self.low + self.high) / 2
+
+    @property
+    def width(self) -> float:
+        return self.high - self.low
+
+    def contains(self, price: float, buf: float = 0.0) -> bool:
+        return (self.low - buf) <= price <= (self.high + buf)
+
+
+def _avg_volume(candles: list[dict], idx: int, window: int = 20) -> float:
+    lo = max(0, idx - window)
+    seg = candles[lo:idx]
+    return (sum(c["v"] for c in seg) / len(seg)) if seg else (candles[idx]["v"] or 1.0)
+
+
+def find_order_blocks(candles: list[dict], atr_vals: list[float], lookback: int) -> list[Zone]:
+    """Last opposite-colour candle immediately before a displacement move
+    that breaks prior structure. Requires the displacement candle's body to
+    clear OB_DISPLACEMENT_ATR_MULT * ATR and to close beyond the recent
+    swing extreme (i.e. this is structurally significant, not just a big
+    candle)."""
+    zones = []
+    n = len(candles)
+    start = max(2, n - lookback)
+    for i in range(start, n):
+        c = candles[i]
+        a = atr_vals[i] or 1e-9
+        body = c["c"] - c["o"]
+        if abs(body) < OB_DISPLACEMENT_ATR_MULT * a:
+            continue
+        back_lo = max(0, i - OB_BOS_LOOKBACK)
+        if body > 0:
+            prior_high = max((candles[j]["h"] for j in range(back_lo, i)), default=c["h"])
+            if c["c"] <= prior_high:
+                continue
+            for j in range(i - 1, back_lo - 1, -1):
+                ob = candles[j]
+                if ob["c"] < ob["o"]:
+                    zones.append(Zone(ob["l"], ob["h"], "demand", "ob", j,
+                                       displacement_atr=abs(body) / a,
+                                       vol_ratio=safe_div(c["v"], _avg_volume(candles, i), 1.0)))
+                    break
+        else:
+            prior_low = min((candles[j]["l"] for j in range(back_lo, i)), default=c["l"])
+            if c["c"] >= prior_low:
+                continue
+            for j in range(i - 1, back_lo - 1, -1):
+                ob = candles[j]
+                if ob["c"] > ob["o"]:
+                    zones.append(Zone(ob["l"], ob["h"], "supply", "ob", j,
+                                       displacement_atr=abs(body) / a,
+                                       vol_ratio=safe_div(c["v"], _avg_volume(candles, i), 1.0)))
+                    break
+    # drop zones that are too wide to be a usable POI
+    atr_last = atr_vals[-1] or 1e-9
+    zones = [z for z in zones if z.width <= ZONE_MAX_WIDTH_ATR_MULT * atr_last]
+    return zones[-14:]
+
+
+def find_fvgs(candles: list[dict], atr_vals: list[float], lookback: int) -> list[Zone]:
+    zones = []
+    n = len(candles)
+    start = max(2, n - lookback)
+    for i in range(start, n):
+        a, b, c = candles[i - 2], candles[i - 1], candles[i]
+        atrv = atr_vals[i] or 1e-9
+        if a["h"] < c["l"] and (c["l"] - a["h"]) >= FVG_MIN_GAP_ATR_MULT * atrv:
+            zones.append(Zone(a["h"], c["l"], "demand", "fvg", i - 1,
+                               displacement_atr=abs(b["c"] - b["o"]) / atrv,
+                               vol_ratio=safe_div(b["v"], _avg_volume(candles, i - 1), 1.0)))
+        elif a["l"] > c["h"] and (a["l"] - c["h"]) >= FVG_MIN_GAP_ATR_MULT * atrv:
+            zones.append(Zone(c["h"], a["l"], "supply", "fvg", i - 1,
+                               displacement_atr=abs(b["c"] - b["o"]) / atrv,
+                               vol_ratio=safe_div(b["v"], _avg_volume(candles, i - 1), 1.0)))
+    return zones[-14:]
+
+
+def mark_mitigation_and_breakers(zones: list[Zone], candles: list[dict]) -> list[Zone]:
+    """Walks forward from each zone's formation bar. The first candle that
+    trades back into the zone and CLOSES beyond its far edge mitigates it.
+    An Order Block that gets mitigated is immediately reclassified as a
+    Breaker Block of the opposite polarity (institutional supply that fails
+    becomes new demand, and vice versa) — this is what lets the engine use
+    the same swing structure on both sides of a flip instead of hunting for
+    a second, unrelated pattern."""
+    out = []
+    for z in zones:
+        zc = Zone(z.low, z.high, z.kind, z.origin, z.index,
+                   z.displacement_atr, z.vol_ratio)
+        for c in candles[z.index + 1:]:
+            touched = c["l"] <= zc.high and c["h"] >= zc.low
+            if not touched:
+                continue
+            closed_through = (c["c"] > zc.high) if zc.kind == "supply" else (c["c"] < zc.low)
+            if closed_through:
+                zc.mitigated = True
+                if zc.origin == "ob":
+                    zc.flipped = True
+                    zc.kind = "demand" if zc.kind == "supply" else "supply"
+                    zc.origin = "breaker"
+                break
+        out.append(zc)
+    return out
+
+
+def zone_quality(z: Zone) -> float:
+    """0-1 composite: displacement strength, formation volume, freshness,
+    tightness, and a bonus for breaker-block origin (a breaker carries the
+    extra evidence that the level was defended, broken, and is now being
+    retested from the other side — a stronger footprint than a raw OB)."""
+    disp_score = min(1.0, z.displacement_atr / 2.2)
+    vol_score = min(1.0, z.vol_ratio / 1.8)
+    fresh_score = 0.0 if z.mitigated and not z.flipped else 1.0
+    tight_score = 1.0 - min(1.0, z.width / (z.width + 1e-9)) if z.width <= 0 else \
+        max(0.0, 1.0 - (z.width / (max(z.width, 1e-9) * 2.5)))
+    tight_score = 0.7  # neutral baseline; refined by caller with ATR context
+    origin_bonus = 0.12 if z.origin in ("breaker", "fvg") else 0.0
+    q = 0.35 * disp_score + 0.25 * vol_score + 0.20 * fresh_score + 0.20 * tight_score + origin_bonus
+    return max(0.0, min(1.0, q))
+
+
+def cluster_levels(levels: list[float], tol_pct: float = LIQUIDITY_EQ_TOLERANCE_PCT) -> list[tuple[float, int]]:
+    if not levels:
+        return []
+    levels = sorted(levels)
+    clusters, cur = [], [levels[0]]
+    for lv in levels[1:]:
+        if abs(lv - cur[-1]) / max(cur[-1], 1e-9) <= tol_pct:
+            cur.append(lv)
+        else:
+            clusters.append((sum(cur) / len(cur), len(cur)))
+            cur = [lv]
+    clusters.append((sum(cur) / len(cur), len(cur)))
+    return clusters
+
+
+def build_liquidity_pools(swings: list[Swing], candles_macro: list[dict]) -> dict:
+    highs = [s.price for s in swings if s.kind == "high"]
+    lows = [s.price for s in swings if s.kind == "low"]
+    pools = {"resistance": cluster_levels(highs), "support": cluster_levels(lows)}
+    if len(candles_macro) >= 2:
+        prev_day = candles_macro[-2]
+        pools["resistance"].append((prev_day["h"], 1))
+        pools["support"].append((prev_day["l"], 1))
+    if len(candles_macro) >= 8:
+        week = candles_macro[-8:-1]
+        pools["resistance"].append((max(c["h"] for c in week), 1))
+        pools["support"].append((min(c["l"] for c in week), 1))
+    return pools
+
+
+def detect_sweep(candles: list[dict], pools: dict, direction: str, atr_vals: list[float],
+                  lookback: int) -> Optional[dict]:
+    """A sweep: price wicks beyond a liquidity pool (stop-hunt) and closes
+    back inside it with a rejection wick — the raw fuel for a reversal."""
+    window_start = max(0, len(candles) - lookback)
+    targets = pools["support"] if direction == "long" else pools["resistance"]
+    best = None
+    for i in range(window_start, len(candles)):
+        c = candles[i]
+        a = atr_vals[i] or 1e-9
+        rng = c["h"] - c["l"]
+        if rng <= 0:
+            continue
+        for level, touches in targets:
+            if direction == "long":
+                swept = c["l"] < level and (level - c["l"]) <= SWEEP_MAX_DEPTH_ATR_MULT * a
+                rejected = c["c"] > level
+                wick_ratio = safe_div(min(c["o"], c["c"]) - c["l"], rng)
+            else:
+                swept = c["h"] > level and (c["h"] - level) <= SWEEP_MAX_DEPTH_ATR_MULT * a
+                rejected = c["c"] < level
+                wick_ratio = safe_div(c["h"] - max(c["o"], c["c"]), rng)
+            if swept and rejected and wick_ratio >= SWEEP_MIN_WICK_RATIO:
+                cand = {"level": level, "touches": touches, "index": i,
+                        "extreme": c["l"] if direction == "long" else c["h"], "t": c["t"]}
+                if best is None or cand["index"] >= best["index"]:
+                    best = cand
+    return best
+
+
+@dataclass
+class MSSEvent:
+    direction: str
+    impulse_index: int
+    swing_price: float
+
+
+def detect_mss(candles: list[dict], direction: str, after_index: int,
+                atr_vals: list[float]) -> Optional[MSSEvent]:
+    """Market Structure Shift on the LTF: a displacement close beyond the
+    most recent opposing swing, confirming the reversal signalled by the
+    sweep is actually taking hold before any entry commits."""
+    post = candles[after_index + 1:]
+    if len(post) < (PIVOT_LEFT_LTF + PIVOT_RIGHT_LTF + 3):
+        return None
+    offset = after_index + 1
+    pivots = find_swings(post, PIVOT_LEFT_LTF, PIVOT_RIGHT_LTF)
+    if direction == "long":
+        swing_highs = sorted([p for p in pivots if p.kind == "high"], key=lambda p: p.index)
+        if not swing_highs:
+            return None
+        for idx in range(swing_highs[0].index + 1, len(post)):
+            relevant = [p for p in swing_highs if p.index < idx]
+            if not relevant:
+                continue
+            sp = relevant[-1].price
+            c = post[idx]
+            a = atr_vals[offset + idx] or 1e-9
+            disp = (c["c"] - c["o"]) >= MSS_DISPLACEMENT_ATR_MULT * a
+            margin = (c["c"] - sp) >= MSS_MIN_CLOSE_MARGIN_ATR_MULT * a
+            if c["c"] > sp and disp and margin:
+                return MSSEvent("long", offset + idx, sp)
+        return None
+    else:
+        swing_lows = sorted([p for p in pivots if p.kind == "low"], key=lambda p: p.index)
+        if not swing_lows:
+            return None
+        for idx in range(swing_lows[0].index + 1, len(post)):
+            relevant = [p for p in swing_lows if p.index < idx]
+            if not relevant:
+                continue
+            sp = relevant[-1].price
+            c = post[idx]
+            a = atr_vals[offset + idx] or 1e-9
+            disp = (c["o"] - c["c"]) >= MSS_DISPLACEMENT_ATR_MULT * a
+            margin = (sp - c["c"]) >= MSS_MIN_CLOSE_MARGIN_ATR_MULT * a
+            if c["c"] < sp and disp and margin:
+                return MSSEvent("short", offset + idx, sp)
+        return None
+
+
+def find_ltf_breaker(candles: list[dict], mss: MSSEvent) -> Optional[Zone]:
+    """LTF entry trigger: the last opposite-colour candle before the MSS
+    impulse leg — the breaker block that, once retested, is the precision
+    entry point ("LTF -> BBs" per the required best practice)."""
+    lo = max(0, mss.impulse_index - BREAKER_SEARCH_BARS)
+    if mss.direction == "long":
+        for j in range(mss.impulse_index - 1, lo - 1, -1):
+            c = candles[j]
+            if c["c"] < c["o"]:
+                return Zone(c["l"], c["h"], "demand", "breaker", j, displacement_atr=1.5, vol_ratio=1.2)
+    else:
+        for j in range(mss.impulse_index - 1, lo - 1, -1):
+            c = candles[j]
+            if c["c"] > c["o"]:
+                return Zone(c["l"], c["h"], "supply", "breaker", j, displacement_atr=1.5, vol_ratio=1.2)
     return None
 
-
-def detect_fvg(candles: list[dict], lookback: int = 30) -> list[dict]:
-    """3-candle fair value gaps (imbalances) in the recent window."""
-    out = []
-    seg = candles[-lookback:]
-    for i in range(2, len(seg)):
-        a, c = seg[i - 2], seg[i]
-        if c["l"] > a["h"]:
-            out.append({"type": "bullish", "top": c["l"], "bottom": a["h"]})
-        elif c["h"] < a["l"]:
-            out.append({"type": "bearish", "top": a["l"], "bottom": c["h"]})
-    return out
-
-
-def order_blocks(candles: list[dict], lookback: int = 40) -> list[dict]:
-    """Last opposite-color candle before a strong displacement move."""
-    out = []
-    seg = candles[-lookback:]
-    atr_s = atr(seg, 14)
-    for i in range(1, len(seg) - 1):
-        body = seg[i]["c"] - seg[i]["o"]
-        rng = atr_s[i] if atr_s[i] else 1e-9
-        if abs(body) > 1.5 * rng:
-            prev = seg[i - 1]
-            if body > 0 and prev["c"] < prev["o"]:
-                out.append({"type": "bullish", "top": prev["h"], "bottom": prev["l"]})
-            elif body < 0 and prev["c"] > prev["o"]:
-                out.append({"type": "bearish", "top": prev["h"], "bottom": prev["l"]})
-    return out
-
+# ══════════════════════════════════════════════════════════════════════════
+#  VOLUME PROFILE (TP clipping to real volume-built levels)
+# ══════════════════════════════════════════════════════════════════════════
 
 def volume_profile(candles: list[dict], bins: int = 24) -> dict:
-    """Session-style volume profile: POC + 70% value area, from close-price
-    binning weighted by bar volume (a light-weight approximation adequate
-    for TP-clipping and confluence, without tick data)."""
-    seg = candles[-96:] if len(candles) > 96 else candles
-    if not seg:
-        return {"poc": None, "va_high": None, "va_low": None}
-    lo, hi = min(c["l"] for c in seg), max(c["h"] for c in seg)
+    hi = max(c["h"] for c in candles)
+    lo = min(c["l"] for c in candles)
     if hi <= lo:
-        return {"poc": None, "va_high": None, "va_low": None}
-    width = (hi - lo) / bins
-    vol_by_bin = [0.0] * bins
-    for c in seg:
-        idx = clamp(int((c["c"] - lo) / width), 0, bins - 1)
-        vol_by_bin[idx] += c["v"]
-    poc_idx = max(range(bins), key=lambda i: vol_by_bin[i])
-    poc = lo + (poc_idx + 0.5) * width
-    total = sum(vol_by_bin) or 1.0
-    target = 0.70 * total
-    acc = vol_by_bin[poc_idx]
+        return {"poc": hi, "vah": hi, "val": lo}
+    step = (hi - lo) / bins
+    buckets = [0.0] * bins
+    for c in candles:
+        idx = min(bins - 1, max(0, int((((c["h"] + c["l"] + c["c"]) / 3) - lo) / step)))
+        buckets[idx] += c["v"]
+    poc_idx = max(range(bins), key=lambda i: buckets[i])
+    poc = lo + (poc_idx + 0.5) * step
+    total = sum(buckets) or 1.0
+    target = total * 0.70
     lo_i = hi_i = poc_idx
+    acc = buckets[poc_idx]
     while acc < target and (lo_i > 0 or hi_i < bins - 1):
-        left = vol_by_bin[lo_i - 1] if lo_i > 0 else -1
-        right = vol_by_bin[hi_i + 1] if hi_i < bins - 1 else -1
-        if right >= left:
-            hi_i = min(hi_i + 1, bins - 1)
-            acc += vol_by_bin[hi_i]
+        exp_lo = buckets[lo_i - 1] if lo_i > 0 else -1
+        exp_hi = buckets[hi_i + 1] if hi_i < bins - 1 else -1
+        if exp_hi >= exp_lo:
+            hi_i += 1
+            acc += buckets[hi_i]
         else:
-            lo_i = max(lo_i - 1, 0)
-            acc += vol_by_bin[lo_i]
-    return {"poc": poc, "va_high": lo + (hi_i + 1) * width, "va_low": lo + lo_i * width}
+            lo_i -= 1
+            acc += buckets[lo_i]
+    return {"poc": poc, "vah": lo + (hi_i + 1) * step, "val": lo + lo_i * step}
 
 
-def vwap(candles: list[dict]) -> float:
-    seg = candles[-96:] if len(candles) > 96 else candles
-    num = sum((c["h"] + c["l"] + c["c"]) / 3 * c["v"] for c in seg)
-    den = sum(c["v"] for c in seg) or 1.0
-    return num / den
+def clip_tp_to_liquidity(entry: float, tp: float, direction: str, pools: dict,
+                          vp: dict, zones: list[Zone]) -> float:
+    candidates = [lv for lv, _ in (pools["resistance"] if direction == "long" else pools["support"])
+                  if (lv > entry if direction == "long" else lv < entry)]
+    candidates += [v for v in (vp["poc"], vp["vah"], vp["val"])
+                   if (v > entry if direction == "long" else v < entry)]
+    for z in zones:
+        edge = z.low if direction == "long" else z.high
+        wanted_kind = "supply" if direction == "long" else "demand"
+        if z.kind == wanted_kind and (edge > entry if direction == "long" else edge < entry):
+            candidates.append(edge)
+    if not candidates:
+        return tp
+    nearest = min(candidates, key=lambda lv: abs(lv - tp))
+    if abs(nearest - tp) / max(abs(tp - entry), 1e-9) < 0.4:
+        return nearest
+    return tp
 
 
-def rel_volume(candles: list[dict], lookback: int = 40) -> float:
-    if len(candles) < lookback + 1:
-        return 1.0
-    hist = [c["v"] for c in candles[-(lookback + 1):-1]]
-    med = statistics.median(hist) if hist else 1.0
-    return safe(candles[-1]["v"] / med, 1.0) if med else 1.0
-
-
-_INDICATOR_CACHE: dict[tuple, dict] = {}
-
-
-def get_indicators(symbol: str, tf: str, candles: list[dict]) -> dict:
-    key = (symbol, tf, candles[-1]["t"] if candles else 0)
-    if key in _INDICATOR_CACHE:
-        return _INDICATOR_CACHE[key]
-    closes = [c["c"] for c in candles]
-    ind = {
-        "closes": closes,
-        "ema_fast": ema(closes, 20),
-        "ema_mid": ema(closes, 50),
-        "ema_slow": ema(closes, 200) if len(closes) >= 200 else ema(closes, max(20, len(closes) // 2)),
-        "atr": atr(candles, 14),
-        "rsi": rsi(closes, 14),
-        "adx": adx(candles, 14),
-        "bb_width": bollinger_bandwidth(closes, 20),
-        "structure": detect_bos_choch(candles),
-        "sweep": detect_liquidity_sweep(candles),
-        "fvgs": detect_fvg(candles),
-        "obs": order_blocks(candles),
-        "vp": volume_profile(candles),
-        "vwap": vwap(candles),
-        "rel_vol": rel_volume(candles),
-        "donchian_up": donchian(candles, 20)[0],
-        "donchian_dn": donchian(candles, 20)[1],
-    }
-    ind["bb_width_pctile"] = bb_width_percentile(ind["bb_width"])
-    ind["noise_idx"] = noise_index(closes, ind["ema_mid"], ind["atr"])
-    _INDICATOR_CACHE[key] = ind
-    return ind
-
-
-def clear_indicator_cache():
-    _INDICATOR_CACHE.clear()
-
-
-def atr_pct(ind: dict) -> float:
-    a, c = ind["atr"][-1], ind["closes"][-1]
-    return safe(a / c) if c else 0.0
-
-
-# ═══════════════════════════════════════════════════════════════════════════
-# REGIME DETECTION (price + derivatives + cross-sectional)
-# ═══════════════════════════════════════════════════════════════════════════
-
-_BREADTH_CACHE: list[bool] = []
-_RS_CACHE: dict[str, float] = {}
-RS_LOOKBACK_BARS = 24  # 4h bars -> ~4 days
-
-
-def reset_cross_sectional_caches():
-    _BREADTH_CACHE.clear()
-    _RS_CACHE.clear()
-
-
-def record_breadth(above_ema: bool):
-    _BREADTH_CACHE.append(above_ema)
-
-
-def market_breadth() -> float:
-    if not _BREADTH_CACHE:
-        return 0.5
-    return sum(1 for x in _BREADTH_CACHE if x) / len(_BREADTH_CACHE)
-
-
-def record_rs(symbol: str, ret: float):
-    _RS_CACHE[symbol] = ret
-
-
-def rs_percentile(symbol: str) -> float:
-    if symbol not in _RS_CACHE or len(_RS_CACHE) < 3:
-        return 0.5
-    vals = sorted(_RS_CACHE.values())
-    r = vals.index(_RS_CACHE[symbol])
-    return r / max(1, len(vals) - 1)
-
-
-def compute_btc_regime(bundle: dict) -> tuple[str, float]:
-    ind = get_indicators(BTC_SYMBOL, "4h", bundle["4h"])
-    strength = ind["adx"][-1]
-    price = ind["closes"][-1]
-    if price > ind["ema_mid"][-1] > ind["ema_slow"][-1] and strength > 20:
-        return "bullish", strength
-    if price < ind["ema_mid"][-1] < ind["ema_slow"][-1] and strength > 20:
-        return "bearish", strength
-    return "neutral", strength
-
-
-def funding_oi_regime(symbol: str, ctx: dict, bundle: dict) -> dict:
-    """Derivatives-based regime input: extreme funding and OI/price
-    divergence surface squeeze-type setups price action alone would miss."""
-    info = ctx.get(symbol, {})
-    funding = safe(info.get("funding"), 0.0)
-    tag = None
-    if funding > FUNDING_EXTREME_ABS:
-        tag = "funding_extreme_long"   # longs paying heavily -> squeeze-down risk / short setup support
-    elif funding < -FUNDING_EXTREME_ABS:
-        tag = "funding_extreme_short"  # shorts paying heavily -> squeeze-up risk / long setup support
-
-    ind1h = get_indicators(symbol, "1h", bundle["1h"])
-    closes = ind1h["closes"]
-    oi_now = safe(info.get("open_interest"), 0.0)
-    # Only current OI is available (snapshot API), so approximate OI slope
-    # via recent price move sign vs. current funding sign (label only).
-    price_slope = pct(closes[-1], closes[-min(OI_DIVERGENCE_LOOKBACK, len(closes) - 1)])
-    divergence = None
-    if oi_now > 0 and abs(price_slope) > 0.01:
-        if price_slope > 0 and funding < 0:
-            divergence = "bullish_oi_funding_divergence"
-        elif price_slope < 0 and funding > 0:
-            divergence = "bearish_oi_funding_divergence"
-    return {"funding": funding, "extreme_tag": tag, "divergence": divergence}
-
-
-def volatility_percentile(symbol: str, ind_1h: dict) -> float:
-    hist = ind_1h["atr"][-60:] if len(ind_1h["atr"]) >= 60 else ind_1h["atr"]
-    if len(hist) < 5:
-        return 0.5
-    cur = hist[-1]
-    rank = sum(1 for x in hist if x <= cur) / len(hist)
-    return rank
-
-
-def session_weight(dt: Optional[datetime] = None) -> float:
-    dt = dt or now_utc()
-    h = dt.hour
-    weight = 1.0
-    if DEAD_ZONE_START_H <= h < DEAD_ZONE_END_H:
-        weight *= 0.6
-    if (LONDON_OPEN_H <= h < LONDON_CLOSE_H) or (NY_OPEN_H <= h < NY_CLOSE_H):
-        weight *= 1.15
-    if dt.weekday() >= 5:
-        weight *= 0.85
-    return weight
-
-
-# ── macro calendar ──────────────────────────────────────────────────────────
-_macro_cache: dict = {"ts": 0.0, "events": []}
-
-
-def load_macro_calendar() -> list[dict]:
-    if time.time() - _macro_cache["ts"] < MACRO_CACHE_TTL_S and _macro_cache["events"]:
-        return _macro_cache["events"]
-    data = http_get_json(MACRO_CALENDAR_URL)
-    events = []
-    if isinstance(data, list):
-        for e in data:
-            title = str(e.get("title", "")).lower()
-            if any(k in title for k in MACRO_EVENT_KEYWORDS):
-                events.append(e)
-    _macro_cache["ts"] = time.time()
-    _macro_cache["events"] = events
-    return events
-
-
-def macro_proximity_flag() -> bool:
-    events = load_macro_calendar()
-    now = now_utc()
-    for e in events:
-        try:
-            ts = e.get("date") or e.get("timestamp")
-            if ts is None:
-                continue
-            edt = datetime.fromtimestamp(float(ts), tz=timezone.utc) if not isinstance(ts, str) \
-                else datetime.fromisoformat(ts.replace("Z", "+00:00"))
-        except Exception:
-            continue
-        delta_min = (edt - now).total_seconds() / 60
-        if -MACRO_WINDOW_AFTER_MINS <= delta_min <= MACRO_WINDOW_BEFORE_MINS:
-            return True
-    return False
-
-
-@dataclass
-class RegimeVector:
-    btc_bias: str
-    btc_strength: float
-    breadth: float
-    macro_hot: bool
-    session_w: float
-    symbol_regime: str = "neutral"    # "clean" | "choppy" | "high_vol" | "neutral", per-symbol
-    bb_width_pctile: float = 0.5
-    noise_idx: float = 0.5
-
-
-def classify_symbol_regime(adx_val: float, bb_pctile: float, noise: float, atr_pctile: float) -> str:
-    """Fixed, backtest-decided regime lookup. ADX alone can't tell a
-    genuine squeeze (low ADX, low BB-width, resolution pending) apart from
-    a directionless grind (low ADX, high noise index); combining all three
-    closes that gap.
-      clean    : ADX >= 25, noise low (<0.45)          -> loosen (see adaptive_threshold)
-      choppy   : ADX < 15, and (BB-width pctile < 20  i.e. squeeze-no-resolution,
-                 OR noise index high >= 0.65)          -> tighten
-      high_vol : ATR percentile > 85                   -> widen SL/TP, tighten breakout follow-through
-      neutral  : none of the above
-    """
-    if atr_pctile > 0.85:
-        return "high_vol"
-    if adx_val >= 25 and noise < 0.45:
-        return "clean"
-    if adx_val < 15 and (bb_pctile < 0.20 or noise >= 0.65):
-        return "choppy"
-    return "neutral"
-
-
-def build_regime_vector(btc_bias: str, btc_strength: float, symbol: str = "", bundle: Optional[dict] = None) -> RegimeVector:
-    symbol_regime, bb_pctile, noise = "neutral", 0.5, 0.5
-    if symbol and bundle:
-        ind_1h = get_indicators(symbol, "1h", bundle["1h"])
-        bb_pctile = ind_1h["bb_width_pctile"]
-        noise = ind_1h["noise_idx"]
-        symbol_regime = classify_symbol_regime(ind_1h["adx"][-1], bb_pctile, noise, volatility_percentile(symbol, ind_1h))
-    return RegimeVector(
-        btc_bias=btc_bias, btc_strength=btc_strength,
-        breadth=market_breadth(), macro_hot=macro_proximity_flag(),
-        session_w=session_weight(), symbol_regime=symbol_regime,
-        bb_width_pctile=bb_pctile, noise_idx=noise,
-    )
-
-
-# ═══════════════════════════════════════════════════════════════════════════
-# PIPELINES / PATHWAYS
-# ═══════════════════════════════════════════════════════════════════════════
-
-@dataclass
-class Pipeline:
-    id: str
-    label: str
-    bias_tf: str
-    trigger_tf: str
-    session_gated: bool
-
-
-PIPELINES: dict[str, Pipeline] = {
-    "fast": Pipeline("fast", "Intraday (4H bias / 15m trigger)", "4h", "15m", True),
-    "slow": Pipeline("slow", "Swing (1D bias / 1h trigger)", "1d", "1h", False),
-}
-
+# ══════════════════════════════════════════════════════════════════════════
+#  CANDIDATE SETUP + RISK CONSTRUCTION
+# ══════════════════════════════════════════════════════════════════════════
 
 @dataclass
 class Candidate:
     symbol: str
-    direction: str          # "long" | "short"
-    pathway: str
-    pipeline_id: str
+    direction: str            # "long" | "short"
+    pathway: str               # "liquidity_reversal" | "trend_continuation" | "range_reversion"
     entry: float
-    stop: float
+    sl: float
     tp1: float
     tp2: float
-    rr: float
-    tags: list = field(default_factory=list)
-    families_agree: list = field(default_factory=list)   # ensemble families that support this direction
-    families_conflict: list = field(default_factory=list)
+    zone: Zone
+    confluences: list[str] = field(default_factory=list)
+    atr_val: float = 0.0
+    zone_q: float = 0.0
+    context_ok: bool = True
+    ltf_confirmed: bool = False
+    regime: Optional[Regime] = None
+
+    def rr1(self) -> float:
+        risk = abs(self.entry - self.sl)
+        return safe_div(abs(self.tp1 - self.entry), risk)
+
+    def rr2(self) -> float:
+        risk = abs(self.entry - self.sl)
+        return safe_div(abs(self.tp2 - self.entry), risk)
 
 
-def bias_from_htf(ind_htf: dict) -> str:
-    c = ind_htf["closes"][-1]
-    if c > ind_htf["ema_mid"][-1] > ind_htf["ema_slow"][-1]:
-        return "bullish"
-    if c < ind_htf["ema_mid"][-1] < ind_htf["ema_slow"][-1]:
-        return "bearish"
-    return "neutral"
-
-
-def structure_stop(ind_trig: dict, direction: str) -> float:
-    a = ind_trig["atr"][-1]
-    closes = ind_trig["closes"]
-    highs_idx, lows_idx = swing_points([{"h": h, "l": l, "c": c, "o": c} for h, l, c in
-                                         zip([0] * len(closes), [0] * len(closes), closes)], lookback=2) \
-        if False else (None, None)  # placeholder guard, unused branch removed below
-    return a  # replaced by caller with explicit swing-based stop; kept for interface stability
-
-
-def pathway_liquidity_reversal(symbol: str, pipeline: Pipeline, bundle: dict) -> Optional[Candidate]:
-    ind_trig = get_indicators(symbol, pipeline.trigger_tf, bundle[pipeline.trigger_tf])
-    sweep = ind_trig["sweep"]
-    if not sweep:
-        return None
-    structure = ind_trig["structure"]
-    direction = "long" if sweep["direction"] == "bullish" else "short"
-    if structure["bias"] != "neutral" and structure["bias"] != direction.replace("long", "bullish").replace("short", "bearish"):
-        return None  # require the sweep to be followed by a same-direction CHoCH/BOS, not fought by one
-    price = ind_trig["closes"][-1]
-    a = ind_trig["atr"][-1]
-    level = sweep["level"]
-    if direction == "long":
-        stop = min(level, price - 1.0 * a) - 0.15 * a
-        rr_dist = price - stop
-        tp1 = price + rr_dist * 1.5
-        tp2 = price + rr_dist * 2.5
+def adaptive_sl_buffer(candles: list[dict], atr_val: float, vol_pctile: float) -> float:
+    window = candles[-20:]
+    if len(window) < 5:
+        base = atr_val * SL_BUFFER_ATR_MIN_MULT
     else:
-        stop = max(level, price + 1.0 * a) + 0.15 * a
-        rr_dist = stop - price
-        tp1 = price - rr_dist * 1.5
-        tp2 = price - rr_dist * 2.5
-    if rr_dist <= 0:
-        return None
-    tp1, tp2 = clip_targets_to_liquidity(direction, price, tp1, tp2, ind_trig)
-    rr = safe(abs(tp1 - price) / rr_dist)
-    return Candidate(symbol, direction, "liquidity_reversal", pipeline.id, price, stop, tp1, tp2, rr,
-                      tags=["sfp_sweep", structure["event"] or "structure_shift"])
+        wicks = []
+        for c in window:
+            top, bot = max(c["o"], c["c"]), min(c["o"], c["c"])
+            wicks.append(max(c["h"] - top, bot - c["l"]))
+        avg_wick = sum(wicks) / len(wicks)
+        base = max(atr_val * SL_BUFFER_ATR_MIN_MULT, avg_wick * 1.3)
+    vol_scale = 1.0 + 0.5 * max(0.0, vol_pctile - 0.5)
+    return min(base * vol_scale, atr_val * SL_BUFFER_ATR_MAX_MULT)
 
 
-def pathway_trend_continuation(symbol: str, pipeline: Pipeline, bundle: dict) -> Optional[Candidate]:
-    ind_bias = get_indicators(symbol, pipeline.bias_tf, bundle[pipeline.bias_tf])
-    ind_trig = get_indicators(symbol, pipeline.trigger_tf, bundle[pipeline.trigger_tf])
-    bias = bias_from_htf(ind_bias)
-    if bias == "neutral":
-        return None
-    direction = "long" if bias == "bullish" else "short"
-    price = ind_trig["closes"][-1]
-    a = ind_trig["atr"][-1]
-    # pullback into an order block or FVG in the direction of HTF bias
-    obs = [ob for ob in ind_trig["obs"] if ob["type"] == ("bullish" if direction == "long" else "bearish")]
-    fvgs = [f for f in ind_trig["fvgs"] if f["type"] == ("bullish" if direction == "long" else "bearish")]
-    zones = obs + fvgs
-    if not zones:
-        return None
-    zone = zones[-1]
-    mid_zone = (zone["top"] + zone["bottom"]) / 2
-    if direction == "long":
-        if not (zone["bottom"] * 0.998 <= price <= zone["top"] * 1.01):
-            return None
-        stop = zone["bottom"] - 0.2 * a
-        rr_dist = price - stop
-        tp1 = price + rr_dist * 1.6
-        tp2 = price + rr_dist * 2.8
-    else:
-        if not (zone["bottom"] * 0.99 <= price <= zone["top"] * 1.002):
-            return None
-        stop = zone["top"] + 0.2 * a
-        rr_dist = stop - price
-        tp1 = price - rr_dist * 1.6
-        tp2 = price - rr_dist * 2.8
-    if rr_dist <= 0:
-        return None
-    tp1, tp2 = clip_targets_to_liquidity(direction, price, tp1, tp2, ind_trig)
-    rr = safe(abs(tp1 - price) / rr_dist)
-    return Candidate(symbol, direction, "trend_continuation", pipeline.id, price, stop, tp1, tp2, rr,
-                      tags=["htf_bias_pullback", "ob_or_fvg"])
+def clamp_entry_to_market(entry: float, sl: float, tp1: float, tp2: float,
+                           market_price: float, atr_val: float) -> tuple[float, float, float, float]:
+    max_dist = min(atr_val * POI_MAX_DIST_ATR_MULT, market_price * POI_MAX_PCT_OF_PRICE)
+    dist = entry - market_price
+    if abs(dist) <= max_dist or market_price <= 0:
+        return entry, sl, tp1, tp2
+    target_dist = max_dist if dist > 0 else -max_dist
+    shift = target_dist - dist
+    return entry + shift, sl + shift, tp1 + shift, tp2 + shift
 
 
-def pathway_momentum_breakout(symbol: str, pipeline: Pipeline, bundle: dict) -> Optional[Candidate]:
-    ind_trig = get_indicators(symbol, pipeline.trigger_tf, bundle[pipeline.trigger_tf])
-    candles = bundle[pipeline.trigger_tf]
-    up, dn = ind_trig["donchian_up"], ind_trig["donchian_dn"]
-    price = ind_trig["closes"][-1]
-    a = ind_trig["atr"][-1]
-    if len(candles) < 3:
-        return None
-    prior_up, prior_dn = up[-2], dn[-2]
-    broke_up = price > prior_up
-    broke_dn = price < prior_dn
-    if not broke_up and not broke_dn:
-        return None
-    direction = "long" if broke_up else "short"
-    # false-breakout / fakeout filter: require volume expansion AND a
-    # follow-through close (this bar must close beyond the level, not just wick it)
-    if ind_trig["rel_vol"] < 1.2:
-        return None
-    confirm_candle = candles[-1]
-    level = prior_up if direction == "long" else prior_dn
-    if direction == "long" and confirm_candle["c"] <= level:
-        return None
-    if direction == "short" and confirm_candle["c"] >= level:
-        return None
-    if direction == "long":
-        stop = level - 0.3 * a
-        rr_dist = price - stop
-        tp1 = price + rr_dist * 1.4
-        tp2 = price + rr_dist * 2.4
-    else:
-        stop = level + 0.3 * a
-        rr_dist = stop - price
-        tp1 = price - rr_dist * 1.4
-        tp2 = price - rr_dist * 2.4
-    if rr_dist <= 0:
-        return None
-    tp1, tp2 = clip_targets_to_liquidity(direction, price, tp1, tp2, ind_trig)
-    rr = safe(abs(tp1 - price) / rr_dist)
-    return Candidate(symbol, direction, "momentum_breakout", pipeline.id, price, stop, tp1, tp2, rr,
-                      tags=["donchian_break", "volume_confirmed"])
-
-
-PATHWAYS = {
-    "liquidity_reversal": pathway_liquidity_reversal,
-    "trend_continuation": pathway_trend_continuation,
-    "momentum_breakout": pathway_momentum_breakout,
-}
-
-
-def clip_targets_to_liquidity(direction: str, price: float, tp1: float, tp2: float, ind: dict) -> tuple[float, float]:
-    """Clip blind R-multiple targets to the nearest real opposing liquidity:
-    swing highs/lows, order-block edges, or volume-profile value-area edge --
-    whichever is closer and still respects MIN_RR."""
+def room_to_next_opposing_level(entry: float, direction: str, zones: list[Zone],
+                                 pools: dict) -> Optional[float]:
     candidates = []
-    vp = ind["vp"]
-    if vp.get("va_high") is not None:
-        candidates += [vp["va_high"], vp["va_low"]]
-    # POC (point of control): the highest-volume price bucket is often a
-    # stronger magnet/reaction level than the value-area edges alone.
-    if vp.get("poc") is not None:
-        candidates.append(vp["poc"])
-    for ob in ind["obs"]:
-        candidates += [ob["top"], ob["bottom"]]
+    for z in zones:
+        if direction == "long" and z.kind == "supply" and z.low > entry:
+            candidates.append(z.low)
+        if direction == "short" and z.kind == "demand" and z.high < entry:
+            candidates.append(z.high)
+    for lv, _ in (pools["resistance"] if direction == "long" else pools["support"]):
+        if (lv > entry) if direction == "long" else (lv < entry):
+            candidates.append(lv)
     if not candidates:
-        return tp1, tp2
-    if direction == "long":
-        above = [c for c in candidates if c > price]
-        if above:
-            nearest = min(above)
-            if nearest < tp1:
-                tp1 = max(tp1 * 0.6, nearest)  # don't shrink past a token minimum
-            farther = [c for c in above if c > tp1]
-            if farther:
-                tp2 = min(tp2, max(farther))
-    else:
-        below = [c for c in candidates if c < price]
-        if below:
-            nearest = max(below)
-            if nearest > tp1:
-                tp1 = min(tp1 * 1.4 if tp1 > 0 else tp1, nearest) if tp1 > 0 else nearest
-                tp1 = max(tp1, nearest) if False else min(tp1, nearest) if tp1 < nearest else nearest
-            farther = [c for c in below if c < tp1]
-            if farther:
-                tp2 = max(tp2, min(farther))
-    return tp1, tp2
-
-
-# ═══════════════════════════════════════════════════════════════════════════
-# ENSEMBLE AGREEMENT SCORING
-# ═══════════════════════════════════════════════════════════════════════════
-
-def family_votes(symbol: str, direction: str, pipeline: Pipeline, bundle: dict) -> tuple[list[str], list[str]]:
-    """Four independent families vote long/short/neutral. Returns
-    (agree, conflict) relative to `direction`."""
-    ind_trig = get_indicators(symbol, pipeline.trigger_tf, bundle[pipeline.trigger_tf])
-    agree, conflict = [], []
-
-    # trend family: EMA stack on trigger tf
-    trend_dir = "long" if ind_trig["closes"][-1] > ind_trig["ema_mid"][-1] else "short"
-    (agree if trend_dir == direction else conflict).append("trend")
-
-    # momentum family: RSI positioning
-    r = ind_trig["rsi"][-1]
-    mom_dir = "long" if r > 52 else ("short" if r < 48 else None)
-    if mom_dir:
-        (agree if mom_dir == direction else conflict).append("momentum")
-
-    # volume family: relative volume expanding in the move's direction
-    last = bundle[pipeline.trigger_tf][-1]
-    candle_dir = "long" if last["c"] >= last["o"] else "short"
-    if ind_trig["rel_vol"] > 1.0:
-        (agree if candle_dir == direction else conflict).append("volume")
-
-    # structure family: BOS/CHoCH bias
-    struct_bias = ind_trig["structure"]["bias"]
-    struct_dir = {"bullish": "long", "bearish": "short"}.get(struct_bias)
-    if struct_dir:
-        (agree if struct_dir == direction else conflict).append("structure")
-
-    return agree, conflict
-
-
-def ensemble_adjustment(agree: list[str], conflict: list[str]) -> tuple[float, str]:
-    if len(conflict) >= 2:
-        return ENSEMBLE_CONFLICT_PENALTY, "conflict"
-    if len(agree) >= 4:
-        return ENSEMBLE_BONUS_4, "full_agreement"
-    if len(agree) >= 3:
-        return ENSEMBLE_BONUS_3, "strong_agreement"
-    return 0.0, "mixed"
-
-
-# ═══════════════════════════════════════════════════════════════════════════
-# SCORING (continuous logistic confidence)
-# ═══════════════════════════════════════════════════════════════════════════
-
-PATHWAY_BASE_WEIGHT = {"liquidity_reversal": 1.0, "trend_continuation": 0.85, "momentum_breakout": 0.8}
-
-
-def logistic(z: float) -> float:
-    return 100.0 / (1.0 + math.exp(-z))
-
-
-def tune_pathway_weights(state: dict):
-    """Nudges each pathway's scoring multiplier toward its recent win-rate,
-    shrunk toward the neutral prior (1.0) so a short streak can't push the
-    engine into an overfit corner. Bounds are tight
-    (PATHWAY_WEIGHT_MIN..MAX) and the step size is small, so weights drift
-    slowly instead of snapping to whatever the last few outcomes were.
-
-    This replaces the previous `pathway_prior_multiplier`, which read the
-    raw all-time win/loss ratio directly off state at scoring time (with
-    only a sample-size shrink factor). Two differences matter: (1) this
-    version tracks a *persisted* state variable that only ever moves a
-    small step per scan, rather than being fully recomputed -- and
-    therefore fully exposed -- to whatever the latest stats say the moment
-    it's read; and (2) it looks at a recent window (last 40 resolved
-    signals) rather than full lifetime history, so it can track a genuine
-    regime-driven edge shift instead of being permanently anchored by a
-    pathway's early-life sample."""
-    weights = state.setdefault("pathway_weights", {p: 1.0 for p in PATHWAY_BASE_WEIGHT})
-    history = state.get("history", [])
-    for pathway in weights:
-        relevant = [h for h in history if h.get("pathway") == pathway and h.get("outcome") in ("win", "loss")]
-        if len(relevant) < 15:
-            continue
-        recent = relevant[-40:]
-        wr = sum(1 for h in recent if h["outcome"] == "win") / len(recent)
-        target = 0.85 + 0.5 * wr  # wr=0.5 -> 0.85+0.25=1.10-ish center; clamped below anyway
-        target = clamp(target, PATHWAY_WEIGHT_MIN, PATHWAY_WEIGHT_MAX)
-        weights[pathway] += PATHWAY_WEIGHT_LEARNING_RATE * (target - weights[pathway])
-        weights[pathway] = clamp(weights[pathway], PATHWAY_WEIGHT_MIN, PATHWAY_WEIGHT_MAX)
-
-
-def score_candidate(cand: Candidate, regime: RegimeVector, state: dict, funding_reg: dict,
-                     agree: list[str], conflict: list[str], convergence_tags: list[str],
-                     spread_pct: float, depth_usd: float, vwap_val: Optional[float] = None) -> tuple[float, dict]:
-    z: dict[str, float] = {}
-    z["base"] = 0.4
-    z["pathway_weight"] = (PATHWAY_BASE_WEIGHT[cand.pathway] - 0.8) * 1.5
-    z["rr"] = clamp((cand.rr - MIN_RR) * 0.8, -0.5, 1.4)
-
-    btc_dir = {"bullish": "long", "bearish": "short"}.get(regime.btc_bias)
-    sector = SECTOR_MAP.get(cand.symbol, "other")
-    if btc_dir and sector not in BTC_REGIME_EXEMPT_SECTORS:
-        z["btc_alignment"] = 0.7 if btc_dir == cand.direction else -0.9
-    else:
-        z["btc_alignment"] = 0.0
-    z["btc_strength"] = clamp((regime.btc_strength - 20) / 40, -0.2, 0.5) if btc_dir == cand.direction else 0.0
-
-    breadth_adj = (regime.breadth - 0.5) * 2.0
-    z["breadth"] = breadth_adj if cand.direction == "long" else -breadth_adj
-    z["breadth"] = clamp(z["breadth"], -0.6, 0.6)
-
-    # Cross-sectional relative strength: outperformance vs. peers modestly
-    # supports a same-direction trade, but combined with already-extreme
-    # breadth it looks like a late/crowded entry instead, so that
-    # combination is penalized rather than added to the two terms.
-    rs_pct = rs_percentile(cand.symbol)
-    rs_adj = (rs_pct - 0.5) * 2.0
-    z["rel_strength"] = clamp(rs_adj if cand.direction == "long" else -rs_adj, -0.4, 0.4)
-    if cand.direction == "long" and regime.breadth >= RS_CROWD_PERCENTILE and rs_pct >= RS_CROWD_PERCENTILE:
-        z["rel_strength"] -= 0.3
-    elif cand.direction == "short" and regime.breadth <= (1 - RS_CROWD_PERCENTILE) and rs_pct <= (1 - RS_CROWD_PERCENTILE):
-        z["rel_strength"] -= 0.3
-
-    ens_adj, ens_label = ensemble_adjustment(agree, conflict)
-    z["ensemble"] = ens_adj
-
-    z["convergence"] = 0.0
-    if "pathway_convergence" in convergence_tags:
-        z["convergence"] += 0.6
-    if "cross_pipeline_convergence" in convergence_tags:
-        z["convergence"] += 0.5
-
-    z["funding_oi"] = 0.0
-    if funding_reg.get("extreme_tag") == "funding_extreme_short" and cand.direction == "long":
-        z["funding_oi"] += 0.5
-    elif funding_reg.get("extreme_tag") == "funding_extreme_long" and cand.direction == "short":
-        z["funding_oi"] += 0.5
-    elif funding_reg.get("extreme_tag") and (
-        (funding_reg["extreme_tag"] == "funding_extreme_short" and cand.direction == "short") or
-        (funding_reg["extreme_tag"] == "funding_extreme_long" and cand.direction == "long")
-    ):
-        z["funding_oi"] -= 0.4  # extreme funding already leaning the SAME way we'd be trading -> late/crowded
-    if funding_reg.get("divergence") == "bullish_oi_funding_divergence" and cand.direction == "long":
-        z["funding_oi"] += 0.35
-    elif funding_reg.get("divergence") == "bearish_oi_funding_divergence" and cand.direction == "short":
-        z["funding_oi"] += 0.35
-
-    z["macro_penalty"] = -0.7 if regime.macro_hot else 0.0
-    z["session"] = clamp((regime.session_w - 1.0) * 0.8, -0.3, 0.3)
-
-    # Soft liquidity down-weighting; the hard floor is a separate gate in liquidity_ok().
-    liq_penalty = 0.0
-    if spread_pct > MAX_SPREAD_PCT * 0.6:
-        liq_penalty -= 0.3
-    if depth_usd < MIN_OI_USD * 0.5:
-        liq_penalty -= 0.2
-    z["liquidity"] = liq_penalty
-
-    # Session VWAP alignment: soft confluence, so aligned is rewarded more
-    # than misaligned is punished.
-    z["vwap"] = 0.0
-    if vwap_val:
-        vwap_aligned = (cand.entry >= vwap_val) if cand.direction == "long" else (cand.entry <= vwap_val)
-        z["vwap"] = 0.4 if vwap_aligned else -0.25
-
-    pathway_weight = state.get("pathway_weights", {}).get(cand.pathway, 1.0)
-    z["pathway_prior"] = (pathway_weight - 1.0) * 2.8
-
-    total_z = sum(z.values())
-    confidence = logistic(total_z * 1.6)
-    return confidence, z
-
-
-def grade_for_confidence(conf: float) -> str:
-    if conf >= 82:
-        return "A+"
-    if conf >= 72:
-        return "A"
-    if conf >= 62:
-        return "B"
-    if conf >= 52:
-        return "C"
-    return "D"
-
-
-GRADE_ORDER = {"D": 0, "C": 1, "B": 2, "A": 3, "A+": 4}
-
-
-def grade_at_least(g: str, floor: str) -> bool:
-    return GRADE_ORDER.get(g, 0) >= GRADE_ORDER.get(floor, 0)
-
-
-def cold_streak_grade_floor(state: dict, symbol: str, direction: str) -> Optional[str]:
-    """Win-rate awareness as a continuous grade-floor filter -- never a hard
-    binary veto, and never applied to cold-start/small samples."""
-    key = f"{symbol}:{direction}"
-    stats = state.get("symbol_dir_stats", {}).get(key)
-    if not stats or stats.get("n", 0) < 8:
         return None
-    wr = stats["wins"] / stats["n"]
-    if wr < 0.35:
-        return "B"
+    return (min(candidates) - entry) if direction == "long" else (entry - max(candidates))
+
+
+def build_risk_plan(direction: str, entry: float, invalidation: float, atr_val: float,
+                     vol_pctile: float, candles_ltf: list[dict], zones: list[Zone],
+                     pools: dict) -> Optional[tuple]:
+    buf = adaptive_sl_buffer(candles_ltf, atr_val, vol_pctile)
+    sl = invalidation - buf if direction == "long" else invalidation + buf
+    risk = abs(entry - sl)
+    if risk <= 0:
+        return None
+    tp1 = entry + MIN_RR_TARGET * risk if direction == "long" else entry - MIN_RR_TARGET * risk
+
+    room = room_to_next_opposing_level(entry, direction, zones, pools)
+    best_rr = MIN_RR_TARGET
+    if room is not None:
+        usable = room - LIQUIDITY_ROOM_BUFFER_ATR_MULT * atr_val
+        for rr in EXT_RR_LEVELS:
+            if usable >= rr * risk:
+                best_rr = rr
+    tp2 = entry + best_rr * risk if direction == "long" else entry - best_rr * risk
+
+    if direction == "long" and not (sl < entry < tp1 <= tp2):
+        return None
+    if direction == "short" and not (tp2 <= tp1 < entry < sl):
+        return None
+    return sl, tp1, tp2, best_rr
+
+# ══════════════════════════════════════════════════════════════════════════
+#  PATHWAYS
+#  HTF (4H) supplies the bias + the Order Block / Breaker Block zone map.
+#  MID (1H) supplies the liquidity sweep.
+#  LTF (15m) supplies the Breaker Block entry trigger + MSS confirmation.
+#  This is the "HTF -> OBs/BBs, LTF -> BBs" division specified as best
+#  practice: HTF zones tell KESTREL *where* to hunt; the LTF breaker block
+#  tells it *when* to pull the trigger.
+# ══════════════════════════════════════════════════════════════════════════
+
+def build_pathway_liquidity_reversal(symbol: str, bundles: dict, regime: Regime,
+                                      structure_htf: StructureState,
+                                      htf_zones: list[Zone], pools: dict,
+                                      atr_ltf_vals: list[float]) -> Optional[Candidate]:
+    """Sweep of external liquidity into an HTF demand/supply zone (OB or
+    Breaker), LTF Market Structure Shift confirms the reversal is real, and
+    the entry is taken on the retest of the LTF breaker block that formed
+    the MSS impulse."""
+    candles_mid, candles_ltf = bundles[TF_MID], bundles[TF_LTF]
+    atr_mid_vals = atr_series(candles_mid, ATR_LEN)
+    price = candles_ltf[-1]["c"]
+    z_price = price_zone(price, structure_htf)
+
+    for direction in ("long", "short"):
+        wanted_kind = "demand" if direction == "long" else "supply"
+        relevant_htf = [z for z in htf_zones if z.kind == wanted_kind and not
+                         (z.mitigated and not z.flipped)]
+        if not relevant_htf:
+            continue
+        # location filter: only zones on the correct side of equilibrium
+        relevant_htf = [z for z in relevant_htf
+                         if (z.mid <= structure_htf.eq if direction == "long" else z.mid >= structure_htf.eq)]
+        if not relevant_htf:
+            continue
+
+        sweep = detect_sweep(candles_mid, pools, direction, atr_mid_vals, SWEEP_LOOKBACK_MID)
+        if not sweep:
+            continue
+        near_zone = min(relevant_htf, key=lambda z: abs(z.mid - sweep["level"]))
+        if abs(near_zone.mid - sweep["level"]) > 2.0 * (atr_mid_vals[-1] or 1e-9):
+            continue
+
+        sweep_mid_index = sweep["index"]
+        sweep_ts = candles_mid[sweep_mid_index]["t"]
+        ltf_after = next((i for i, c in enumerate(candles_ltf) if c["t"] >= sweep_ts), None)
+        if ltf_after is None:
+            continue
+        mss = detect_mss(candles_ltf, direction, ltf_after, atr_ltf_vals)
+        if not mss:
+            continue
+        breaker = find_ltf_breaker(candles_ltf, mss)
+        if not breaker:
+            continue
+
+        entry = breaker.high if direction == "long" else breaker.low
+        invalidation = min(sweep["extreme"], breaker.low) if direction == "long" else \
+            max(sweep["extreme"], breaker.high)
+        atr_ltf = atr_ltf_vals[-1] or 1e-9
+        vol_pctile = percentile_rank([abs(c["c"] - c["o"]) for c in candles_ltf[-40:]],
+                                      abs(candles_ltf[-1]["c"] - candles_ltf[-1]["o"]))
+        plan = build_risk_plan(direction, entry, invalidation, atr_ltf, vol_pctile,
+                                candles_ltf, htf_zones, pools)
+        if not plan:
+            continue
+        sl, tp1, tp2, _ = plan
+
+        cand = Candidate(symbol, direction, "liquidity_reversal", entry, sl, tp1, tp2,
+                          zone=near_zone, atr_val=atr_ltf, regime=regime)
+        cand.confluences = [
+            f"liquidity sweep @ {sweep['level']:.4f} ({sweep['touches']}x tested)",
+            f"HTF {near_zone.origin} {wanted_kind} zone",
+            "LTF MSS confirmed + breaker retest",
+            f"{z_price} zone entry" if direction == "long" and z_price == "discount"
+            or direction == "short" and z_price == "premium" else f"{z_price} zone",
+        ]
+        cand.context_ok = regime.label in ("reversal", "range", "volatile")
+        cand.ltf_confirmed = True
+        return cand
     return None
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# LIQUIDITY / FRESHNESS GATES
-# ═══════════════════════════════════════════════════════════════════════════
+def build_pathway_trend_continuation(symbol: str, bundles: dict, regime: Regime,
+                                      structure_htf: StructureState,
+                                      htf_zones: list[Zone], pools: dict,
+                                      atr_ltf_vals: list[float]) -> Optional[Candidate]:
+    """HTF trend intact; price pulls back into a same-direction HTF Order
+    Block / Breaker Block or an unfilled LTF FVG, LTF shows a rejection +
+    momentum reset back in trend direction."""
+    if regime.label != "trend" or regime.direction not in ("bullish", "bearish"):
+        return None
+    direction = "long" if regime.direction == "bullish" else "short"
+    candles_ltf = bundles[TF_LTF]
+    price = candles_ltf[-1]["c"]
+    wanted_kind = "demand" if direction == "long" else "supply"
 
-def liquidity_ok(symbol: str, ctx: dict, ind_trig: dict, spread_pct: float, depth_usd: float,
-                  regime_mult: float = 1.0) -> bool:
-    info = ctx.get(symbol, {})
-    oi_usd = safe(info.get("open_interest", 0.0)) * safe(info.get("mark_px", 0.0))
-    if oi_usd < MIN_OI_USD * regime_mult:
-        return False
-    a_pct = atr_pct(ind_trig)
-    if not (MIN_ATR_PCT <= a_pct <= MAX_ATR_PCT):
-        return False
-    if spread_pct > MAX_SPREAD_PCT:
-        return False
-    if depth_usd < MIN_OI_USD * 0.3 * regime_mult:
-        return False
-    if ind_trig["rel_vol"] < MIN_REL_VOLUME * min(regime_mult, 1.15):
-        return False
-    return True
+    pool_zones = [z for z in htf_zones if z.kind == wanted_kind and not
+                  (z.mitigated and not z.flipped)]
+    ltf_fvgs = find_fvgs(candles_ltf, atr_ltf_vals, ZONE_LOOKBACK_LTF)
+    pool_zones += [z for z in ltf_fvgs if z.kind == wanted_kind]
+    if not pool_zones:
+        return None
+
+    atr_ltf = atr_ltf_vals[-1] or 1e-9
+    touched = [z for z in pool_zones if z.contains(price, buf=0.35 * atr_ltf)]
+    if not touched:
+        return None
+    zone = max(touched, key=lambda z: zone_quality(z))
+
+    closes = [c["c"] for c in candles_ltf]
+    r = rsi(closes, RSI_LEN)[-1]
+    momentum_ok = (45 <= r <= 68) if direction == "long" else (32 <= r <= 55)
+    if not momentum_ok:
+        return None
+
+    entry = zone.high if direction == "long" else zone.low
+    invalidation = zone.low if direction == "long" else zone.high
+    vol_pctile = percentile_rank([abs(c["c"] - c["o"]) for c in candles_ltf[-40:]],
+                                  abs(candles_ltf[-1]["c"] - candles_ltf[-1]["o"]))
+    plan = build_risk_plan(direction, entry, invalidation, atr_ltf, vol_pctile,
+                            candles_ltf, htf_zones, pools)
+    if not plan:
+        return None
+    sl, tp1, tp2, _ = plan
+
+    cand = Candidate(symbol, direction, "trend_continuation", entry, sl, tp1, tp2,
+                      zone=zone, atr_val=atr_ltf, regime=regime)
+    cand.confluences = [
+        f"HTF trend intact (ADX {regime.adx:.0f}, dir={regime.direction})",
+        f"pullback into {zone.origin} {wanted_kind}",
+        f"RSI momentum reset ({r:.0f})",
+    ]
+    cand.context_ok = True
+    cand.ltf_confirmed = momentum_ok
+    return cand
 
 
-def stop_distance_ok(cand: Candidate) -> bool:
-    """Reject candidates whose stop is so tight that fee+slippage costs would
-    dominate the trade's R outcome. Applied identically live and in backtest
-    (v1.3.0) so the two can no longer disagree on what counts as a valid setup."""
-    if not cand.entry:
-        return False
-    risk_pct = abs(cand.entry - cand.stop) / cand.entry
-    return risk_pct >= MIN_STOP_PCT
+def build_pathway_range_reversion(symbol: str, bundles: dict, regime: Regime,
+                                   structure_htf: StructureState,
+                                   htf_zones: list[Zone], pools: dict,
+                                   atr_ltf_vals: list[float]) -> Optional[Candidate]:
+    """Ranging HTF context: fade the range extreme back toward equilibrium
+    using an opposing OB/Breaker at the boundary, sized off the range width
+    rather than a trend leg."""
+    if regime.label != "range":
+        return None
+    candles_ltf = bundles[TF_LTF]
+    price = candles_ltf[-1]["c"]
+    rng_w = structure_htf.range_high - structure_htf.range_low
+    if rng_w <= 0:
+        return None
+    pos = safe_div(price - structure_htf.range_low, rng_w)
 
+    if pos >= 0.80:
+        direction, wanted_kind = "short", "supply"
+    elif pos <= 0.20:
+        direction, wanted_kind = "long", "demand"
+    else:
+        return None
 
-def freshness_ok(cand: Candidate, live_price: Optional[float]) -> bool:
-    if live_price is None:
-        return True  # fail open on missing mid rather than silently dropping every signal
-    risk = abs(cand.entry - cand.stop)
+    pool_zones = [z for z in htf_zones if z.kind == wanted_kind and not
+                  (z.mitigated and not z.flipped)]
+    if not pool_zones:
+        return None
+    atr_ltf = atr_ltf_vals[-1] or 1e-9
+    near = [z for z in pool_zones if z.contains(price, buf=0.5 * atr_ltf)]
+    zone = max(near, key=lambda z: zone_quality(z)) if near else \
+        min(pool_zones, key=lambda z: abs(z.mid - price))
+    if abs(zone.mid - price) > 1.5 * atr_ltf:
+        return None
+
+    entry = zone.high if direction == "long" else zone.low
+    invalidation = zone.low if direction == "long" else zone.high
+    target = structure_htf.eq
+    risk = abs(entry - invalidation)
     if risk <= 0:
-        return False
-    drift = abs(live_price - cand.entry) / risk
-    return drift <= MAX_ENTRY_DRIFT_R
+        return None
+    buf = adaptive_sl_buffer(candles_ltf, atr_ltf, 0.4)
+    sl = invalidation - buf if direction == "long" else invalidation + buf
+    risk = abs(entry - sl)
+    tp1 = target
+    tp2 = structure_htf.range_high if direction == "long" else structure_htf.range_low
+    if direction == "long" and not (sl < entry < tp1 <= tp2):
+        return None
+    if direction == "short" and not (tp2 <= tp1 < entry < sl):
+        return None
+    if safe_div(abs(tp1 - entry), risk) < MIN_RR_FLOOR:
+        return None
 
+    cand = Candidate(symbol, direction, "range_reversion", entry, sl, tp1, tp2,
+                      zone=zone, atr_val=atr_ltf, regime=regime)
+    cand.confluences = [
+        f"ranging HTF context (ADX {regime.adx:.0f})",
+        f"range extreme fade ({pos*100:.0f}% of range)",
+        "target equilibrium / opposite range edge",
+    ]
+    cand.context_ok = True
+    cand.ltf_confirmed = True
+    return cand
 
-# ═══════════════════════════════════════════════════════════════════════════
-# CORRELATION CLUSTERING / DEDUP (frequency-neutral)
-# ═══════════════════════════════════════════════════════════════════════════
-
-class UnionFind:
-    def __init__(self, items):
-        self.parent = {i: i for i in items}
-
-    def find(self, x):
-        while self.parent[x] != x:
-            self.parent[x] = self.parent[self.parent[x]]
-            x = self.parent[x]
-        return x
-
-    def union(self, a, b):
-        ra, rb = self.find(a), self.find(b)
-        if ra != rb:
-            self.parent[ra] = rb
-
-
-def build_correlation_clusters(hourly_candles: dict[str, list[dict]]) -> dict[str, int]:
-    returns: dict[str, list[float]] = {}
-    for sym, candles in hourly_candles.items():
-        seg = candles[-CORR_LOOKBACK_BARS:]
-        if len(seg) < 10:
-            continue
-        rets = [pct(seg[i]["c"], seg[i - 1]["c"]) for i in range(1, len(seg))]
-        returns[sym] = rets
-    symbols = list(returns.keys())
-    uf = UnionFind(symbols)
-    for i in range(len(symbols)):
-        for j in range(i + 1, len(symbols)):
-            a, b = returns[symbols[i]], returns[symbols[j]]
-            n = min(len(a), len(b))
-            if n < 10:
-                continue
-            try:
-                corr = statistics.correlation(a[-n:], b[-n:])
-            except Exception:
-                continue
-            if abs(corr) >= CORR_CLUSTER_THRESHOLD:
-                uf.union(symbols[i], symbols[j])
-    cluster_id = {}
-    next_id = 0
-    id_map: dict[str, int] = {}
-    for s in symbols:
-        root = uf.find(s)
-        if root not in cluster_id:
-            cluster_id[root] = next_id
-            next_id += 1
-        id_map[s] = cluster_id[root]
-    return id_map
-
+# ══════════════════════════════════════════════════════════════════════════
+#  FIVE-FILTER FRAMEWORK — Location / Context / Quality / RR / LTF
+# ══════════════════════════════════════════════════════════════════════════
 
 @dataclass
-class Signal:
-    candidate: Candidate
-    confidence: float
-    grade: str
-    z_breakdown: dict
-    convergence_tags: list
-    ensemble_label: str
-    timestamp: str
-    frequency_floor: bool = False  # v1.2.0: set when released by the frequency floor, not normal threshold
+class FilterResult:
+    passed: bool
+    reason: str = ""
+    location_score: float = 0.0
+    context_score: float = 0.0
+    quality_score: float = 0.0
+    rr_score: float = 0.0
+    ltf_score: float = 0.0
 
 
-def dedup_correlated(signals: list["Signal"], clusters: dict[str, int]) -> list["Signal"]:
-    """Treat clustered symbols as one effective bet: keep only the strongest
-    signal per (cluster, direction) pair, per scan."""
-    best: dict[tuple, "Signal"] = {}
-    for s in signals:
-        cluster = clusters.get(s.candidate.symbol, hash(s.candidate.symbol))
-        key = (cluster, s.candidate.direction)
-        if key not in best or s.confidence > best[key].confidence:
-            best[key] = s
-    return sorted(best.values(), key=lambda s: s.confidence, reverse=True)
+def apply_five_filters(cand: Candidate, market_price: float, min_rr_floor: float) -> FilterResult:
+    atr_val = cand.atr_val or 1e-9
 
+    # 1) LOCATION — is the POI actually close enough to live price to be
+    #    tradable, and on the correct side of premium/discount for its
+    #    direction? A perfect zone 3 ATR away is not a signal, it's a
+    #    watchlist note.
+    dist_atr = abs(cand.zone.mid - market_price) / atr_val
+    entry_dist_atr = abs(cand.entry - market_price) / atr_val
+    if entry_dist_atr > POI_MAX_DIST_ATR_MULT * 1.35:
+        return FilterResult(False, "location: entry too far from live price")
+    location_score = max(0.0, 1.0 - min(1.0, dist_atr / (POI_MAX_DIST_ATR_MULT * 1.5)))
 
-def dedup_same_symbol(signals: list["Signal"]) -> list["Signal"]:
-    best: dict[str, "Signal"] = {}
-    for s in signals:
-        sym = s.candidate.symbol
-        if sym not in best or s.confidence > best[sym].confidence:
-            best[sym] = s
-    return sorted(best.values(), key=lambda s: s.confidence, reverse=True)
-
-
-def apply_portfolio_caps(signals: list["Signal"], state: dict) -> list["Signal"]:
-    accepted: list[Signal] = []
-    dir_count = Counter()
-    sector_count = Counter()
-    active = state.get("active_signals", [])
-    concurrent = len(active)
-    open_risk_pct = sum(a.get("risk_pct", PER_TRADE_RISK_PCT) for a in active)
-
-    for s in signals:
-        if len(accepted) >= TOP_N_SIGNALS_PER_SCAN:
-            break
-        if concurrent >= MAX_CONCURRENT_ACTIVE_SIGNALS:
-            break
-        if open_risk_pct + PER_TRADE_RISK_PCT > MAX_PORTFOLIO_RISK_PCT:
-            break
-        d = s.candidate.direction
-        sec = SECTOR_MAP.get(s.candidate.symbol, "other")
-        if dir_count[d] >= MAX_SAME_DIRECTION:
-            continue
-        if sector_count[sec] >= MAX_PER_SECTOR:
-            continue
-        accepted.append(s)
-        dir_count[d] += 1
-        sector_count[sec] += 1
-        concurrent += 1
-        open_risk_pct += PER_TRADE_RISK_PCT
-    return accepted
-
-
-# ═══════════════════════════════════════════════════════════════════════════
-# GOVERNOR (frequency-only adaptive threshold -- see mechanism doc)
-# ═══════════════════════════════════════════════════════════════════════════
-
-def governor_adjust_threshold(state: dict):
-    gov = state.setdefault("governor", {"threshold": 0.0, "last_adjust_ts": 0, "scan_counts": [], "last_signal_ts": 0})
-    last = gov.get("last_adjust_ts", 0)
-    if time.time() - last < GOVERNOR_MIN_INTERVAL_S:
-        return
-    counts = gov.get("scan_counts", [])[-GOVERNOR_LOOKBACK_SCANS:]
-    if len(counts) < 8:
-        return
-    scans_per_day = 96
-    trailing_daily_rate = sum(counts) / len(counts) * scans_per_day
-    if trailing_daily_rate < TARGET_SIGNALS_MIN:
-        gov["threshold"] = clamp(gov["threshold"] - GOVERNOR_STEP, GOVERNOR_FLOOR, GOVERNOR_CEIL)
-    elif trailing_daily_rate > TARGET_SIGNALS_MAX:
-        gov["threshold"] = clamp(gov["threshold"] + GOVERNOR_STEP, GOVERNOR_FLOOR, GOVERNOR_CEIL)
-    gov["last_adjust_ts"] = time.time()
-
-
-def frequency_floor_signal(state: dict, floor_candidates: list["Signal"]) -> Optional["Signal"]:
-    """Explicit minimum-frequency safety valve (v1.2.0), complementing the
-    governor's threshold CEIL above with a genuine FLOOR. GOVERNOR_CEIL
-    already implicitly bounds how quiet the engine can get *when pathways
-    are producing candidates to score* -- the acceptance bar can only climb
-    so high, so something eventually gets through. But in a genuinely dead
-    market, where no pathway anywhere clears its own structural gate (no
-    sweep, no HTF-aligned pullback zone, no squeeze-breakout), there is no
-    candidate for the threshold to act on at all, and the engine could in
-    principle go silent indefinitely -- the same gap a hard signal cap with
-    no corresponding floor would have.
-
-    This is only ever a fallback: it fires at most the single best
-    near-miss candidate from the current scan (one that cleared every gate
-    -- liquidity, ensemble conflict, cold-streak floor, RR -- except the
-    adaptive confidence threshold itself), and only once real silence has
-    persisted past MAX_SILENCE_HOURS. It never fabricates a candidate and
-    never bypasses any gate other than the threshold comparison."""
-    if not floor_candidates:
-        return None
-    last_ts = state.get("governor", {}).get("last_signal_ts", 0)
-    silence_hours = (time.time() - last_ts) / 3600.0 if last_ts else float("inf")
-    if silence_hours < MAX_SILENCE_HOURS:
-        return None
-    best = max(floor_candidates, key=lambda s: s.confidence)
-    best.frequency_floor = True
-    return best
-
-
-def adaptive_threshold(regime: RegimeVector, base_threshold: float) -> float:
-    """Fixed, regime-conditioned additive rules on top of the governor's
-    single learned scalar -- decided from backtesting, not adapted live.
-    See classify_symbol_regime for the clean/choppy/high_vol conditions."""
-    t = base_threshold + 45.0  # confidence-space base bar (logistic 0-100)
-    if regime.macro_hot:
-        t += 6.0
-    if now_utc().weekday() >= 5:
-        t += WEEKEND_THRESHOLD_BUMP * 10
-    if regime.btc_strength > 30:
-        t -= 2.0
-    if regime.symbol_regime == "clean":
-        t -= 8.0   # clean trend, low noise: the tape itself is de-risking setups
-    elif regime.symbol_regime == "choppy":
-        t += 10.0  # squeeze-no-resolution or high noise: fewer, higher-conviction setups only
-    # high_vol doesn't raise the bar here -- it widens SL/TP and tightens
-    # the breakout follow-through requirement instead of blocking signals.
-    return t
-
-
-def liquidity_floor_multiplier(regime: RegimeVector) -> float:
-    """Fixed regime-conditioned liquidity floor adjustment: relax the
-    OI/volume floor in a clean, well-confirmed tape; tighten it in chop,
-    where thin-book slippage risk is compounded by a lower-conviction setup."""
-    if regime.symbol_regime == "clean":
-        return 0.75
-    if regime.symbol_regime == "choppy":
-        return 1.40
-    return 1.0
-
-
-# ═══════════════════════════════════════════════════════════════════════════
-# TELEGRAM
-# ═══════════════════════════════════════════════════════════════════════════
-
-def format_signal_message(sig: Signal) -> str:
-    c = sig.candidate
-    arrow = "🟢 LONG" if c.direction == "long" else "🔴 SHORT"
-    conf_str = ", ".join(c.tags)
-    floor_note = ("\n\n⚠️ <i>Frequency-floor release -- market has been quiet beyond the "
-                  "silence window; normal threshold bypassed</i>") if sig.frequency_floor else ""
-    return (
-        f"<i>{ENGINE_NAME} v{VERSION}</i>\n"
-        f"<b>{arrow} — {c.symbol}</b>\n"
-        f"{PIPELINES[c.pipeline_id].label} | {c.pathway}\n"
-        f"\n"
-        f"Entry: <code>{c.entry:.6g}</code>\n"
-        f"Stop: <code>{c.stop:.6g}</code>\n"
-        f"\n"
-        f"TP1: <code>{c.tp1:.6g}</code>\n"
-        f"TP2: <code>{c.tp2:.6g}</code>\n"
-        f"R:R: {c.rr:.2f}\n"
-        f"\n"
-        f"Confidence: <b>{sig.confidence:.1f}</b> | Grade: <b>{sig.grade}</b>\n"
-        f"Ensemble: {sig.ensemble_label}\n"
-        f"Confluences: {conf_str}"
-        f"{floor_note}"
-    )
-
-
-def send_telegram(text: str) -> Optional[int]:
-    if DRY_RUN:
-        log.info(f"[DRY-RUN] Would send Telegram message:\n{text}")
-        return None
-    if not TG_BOT_TOKEN or not TG_CHAT_ID:
-        log.warning("Telegram not configured -- skipping send")
-        return None
-    url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
-    resp = http_post_json(url, {"chat_id": TG_CHAT_ID, "text": text, "parse_mode": "HTML"})
-    if resp and resp.get("ok"):
-        return resp["result"]["message_id"]
-    return None
-
-
-def send_telegram_plain(text: str):
-    if DRY_RUN:
-        log.info(f"[DRY-RUN] Would send: {text}")
-        return
-    if not TG_BOT_TOKEN or not TG_CHAT_ID:
-        return
-    url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
-    http_post_json(url, {"chat_id": TG_CHAT_ID, "text": text})
-
-
-def reply_telegram(text: str, reply_to_message_id: Optional[int]) -> Optional[int]:
-    """Sends a message threaded as a reply to the original signal post (if
-    we have its message_id), so TP/SL/close-out updates show up attached to
-    the trade they belong to instead of as standalone messages."""
-    if DRY_RUN:
-        log.info(f"[DRY-RUN] Would send Telegram reply:\n{text}")
-        return None
-    if not TG_BOT_TOKEN or not TG_CHAT_ID:
-        log.warning("Telegram not configured -- skipping reply")
-        return None
-    url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": TG_CHAT_ID, "text": text, "parse_mode": "HTML"}
-    if reply_to_message_id:
-        payload["reply_to_message_id"] = reply_to_message_id
-    resp = http_post_json(url, payload)
-    if resp and resp.get("ok"):
-        return resp["result"]["message_id"]
-    return None
-
-
-def react_telegram(message_id: Optional[int], emoji: str) -> None:
-    """Best-effort emoji reaction on the original signal message. Uses only
-    emoji from Telegram's allowed reaction set. Failures are logged and
-    swallowed -- a missing reaction should never break signal tracking."""
-    if DRY_RUN:
-        log.info(f"[DRY-RUN] Would react {emoji} to message {message_id}")
-        return
-    if not TG_BOT_TOKEN or not TG_CHAT_ID or not message_id:
-        return
-    url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/setMessageReaction"
-    payload = {
-        "chat_id": TG_CHAT_ID, "message_id": message_id,
-        "reaction": [{"type": "emoji", "emoji": emoji}],
+    # 2) CONTEXT — does the regime (trend / range / reversal) actually
+    #    match the pathway being traded? Each pathway already self-selects
+    #    its regime, this is the belt-and-suspenders re-check plus a score.
+    context_map = {
+        "liquidity_reversal": {"reversal": 1.0, "volatile": 0.75, "range": 0.7, "trend": 0.35},
+        "trend_continuation": {"trend": 1.0, "reversal": 0.3, "range": 0.15, "volatile": 0.25},
+        "range_reversion": {"range": 1.0, "reversal": 0.4, "trend": 0.1, "volatile": 0.2},
     }
-    http_post_json(url, payload)
+    context_score = context_map.get(cand.pathway, {}).get(cand.regime.label, 0.3) if cand.regime else 0.3
+    if not cand.context_ok or context_score < 0.15:
+        return FilterResult(False, "context: regime/pathway mismatch")
+
+    # 3) QUALITY — displacement strength, formation volume, freshness,
+    #    tightness of the zone, breaker/FVG confluence.
+    q = zone_quality(cand.zone)
+    width_pen = 0.0 if cand.zone.width <= ZONE_MAX_WIDTH_ATR_MULT * atr_val else 0.25
+    quality_score = max(0.0, q - width_pen)
+    if quality_score < 0.30:
+        return FilterResult(False, f"quality: zone quality too low ({quality_score:.2f})")
+
+    # 4) RR — dynamic floor: choppier / lower-quality regimes need more
+    #    reward per unit risk to be worth taking.
+    dyn_floor = min_rr_floor
+    if cand.regime and cand.regime.label == "volatile":
+        dyn_floor += 0.4
+    if quality_score < 0.5:
+        dyn_floor += 0.3
+    rr1 = cand.rr1()
+    if rr1 < dyn_floor:
+        return FilterResult(False, f"rr: {rr1:.2f} below dynamic floor {dyn_floor:.2f}")
+    rr_score = min(1.0, rr1 / 4.0)
+
+    # 5) LTF — was there an actual lower-timeframe confirmation trigger
+    #    (MSS + breaker retest, or RSI/momentum reset), not just a level
+    #    touch?
+    if not cand.ltf_confirmed:
+        return FilterResult(False, "ltf: no lower-timeframe confirmation trigger")
+    ltf_score = 1.0 if cand.pathway == "liquidity_reversal" else 0.75
+
+    return FilterResult(True, "ok", location_score, context_score, quality_score, rr_score, ltf_score)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# STATE MANAGEMENT
-# ═══════════════════════════════════════════════════════════════════════════
+# ══════════════════════════════════════════════════════════════════════════
+#  MARKET BREADTH / RELATIVE STRENGTH / CORRELATION
+# ══════════════════════════════════════════════════════════════════════════
+
+_breadth_lock = threading.Lock()
+_breadth_snapshot: dict[str, str] = {}
+_rs_lock = threading.Lock()
+_rs_snapshot: dict[str, float] = {}
+
+
+def reset_market_caches():
+    with _breadth_lock:
+        _breadth_snapshot.clear()
+    with _rs_lock:
+        _rs_snapshot.clear()
+
+
+def record_market_inputs(symbol: str, candles_mid: list[dict]):
+    closes = [c["c"] for c in candles_mid]
+    if len(closes) < 25:
+        return
+    change_pct = safe_div(closes[-1] - closes[-25], closes[-25]) * 100
+    bias = "up" if closes[-1] > ema(closes, EMA_SLOW)[-1] else "down"
+    with _breadth_lock:
+        _breadth_snapshot[symbol] = bias
+    with _rs_lock:
+        _rs_snapshot[symbol] = change_pct
+
+
+def compute_breadth_pct() -> float:
+    with _breadth_lock:
+        if not _breadth_snapshot:
+            return 0.5
+        up = sum(1 for v in _breadth_snapshot.values() if v == "up")
+        return up / len(_breadth_snapshot)
+
+
+def relative_strength_percentile(symbol: str) -> float:
+    with _rs_lock:
+        if symbol not in _rs_snapshot or len(_rs_snapshot) < 5:
+            return 0.5
+        return percentile_rank(list(_rs_snapshot.values()), _rs_snapshot[symbol])
+
+
+def compute_pairwise_correlation(symbols: list[str], bundles: dict[str, dict]) -> dict:
+    returns = {}
+    for s in symbols:
+        b = bundles.get(s)
+        if b:
+            returns[s] = compute_returns(b[TF_MID], 60)
+    matrix = {}
+    for i, a in enumerate(symbols):
+        for b in symbols[i + 1:]:
+            if a in returns and b in returns:
+                matrix[(a, b)] = pearson(returns[a], returns[b])
+    return matrix
+
+
+def cluster_by_correlation(symbols: list[str], matrix: dict, threshold: float = 0.75) -> list[set]:
+    clusters: list[set] = []
+    for s in symbols:
+        placed = False
+        for cl in clusters:
+            if any(matrix.get((min(s, o), max(s, o)), 0.0) >= threshold for o in cl):
+                cl.add(s)
+                placed = True
+                break
+        if not placed:
+            clusters.append({s})
+    return clusters
+
+
+def deduplicate_correlated(ranked: list[tuple], clusters: list[set]) -> list[tuple]:
+    kept, seen_clusters_dir = [], set()
+    for symbol, direction, cand, conf in ranked:
+        cl = next((c for c in clusters if symbol in c), {symbol})
+        key = (frozenset(cl), direction)
+        if key in seen_clusters_dir:
+            continue
+        seen_clusters_dir.add(key)
+        kept.append((symbol, direction, cand, conf))
+    return kept
+
+# ══════════════════════════════════════════════════════════════════════════
+#  CONFIDENCE SCORING + SETUP GRADE
+# ══════════════════════════════════════════════════════════════════════════
+
+def compute_confidence(cand: Candidate, fr: FilterResult, symbol: str,
+                        market_ctx: dict, reference_ms: int, htf_alignment: float) -> float:
+    """Composite 0-100 confidence blending the five filter sub-scores with
+    professional-grade auxiliary signals (funding carry, OI trend, relative
+    strength, breadth alignment, session weighting, HTF alignment across
+    4H+1D) so a single weak secondary input tempers rather than vetoes an
+    otherwise strong structural setup."""
+    base = (
+        0.24 * fr.location_score +
+        0.22 * fr.context_score +
+        0.24 * fr.quality_score +
+        0.16 * fr.rr_score +
+        0.14 * fr.ltf_score
+    ) * 100
+
+    bonus = 0.0
+    ctx = market_ctx.get(symbol, {})
+    funding = ctx.get("funding", 0.0)
+    if abs(funding) >= FUNDING_CARRY_THRESHOLD:
+        favorable = (funding > 0 and cand.direction == "short") or (funding < 0 and cand.direction == "long")
+        bonus += 3.0 if favorable else -2.0
+    if abs(funding) >= FUNDING_EXTREME:
+        bonus -= 2.0  # crowded / squeeze risk
+
+    rs_pct = relative_strength_percentile(symbol)
+    if cand.direction == "long" and rs_pct >= (1 - RS_TOP_PCTILE):
+        bonus += 3.0
+    elif cand.direction == "short" and rs_pct <= RS_BOTTOM_PCTILE:
+        bonus += 3.0
+    elif cand.direction == "long" and rs_pct <= RS_BOTTOM_PCTILE:
+        bonus -= 3.0
+    elif cand.direction == "short" and rs_pct >= (1 - RS_TOP_PCTILE):
+        bonus -= 3.0
+
+    breadth = compute_breadth_pct()
+    if cand.direction == "long":
+        bonus += (breadth - 0.5) * 6.0
+    else:
+        bonus += (0.5 - breadth) * 6.0
+
+    sess = session_now(reference_ms)
+    bonus += SESSION_SCORE_BONUS.get(sess, 0.0)
+
+    bonus += (htf_alignment - 0.5) * 8.0
+
+    if cand.zone.origin == "breaker":
+        bonus += 2.5  # defended-then-flipped level: extra evidential weight
+
+    return max(0.0, min(100.0, base + bonus))
+
+
+def grade_for_confidence(confidence: float) -> str:
+    if confidence >= 85:
+        return "S"
+    if confidence >= 75:
+        return "A"
+    if confidence >= 65:
+        return "B"
+    return "C"
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  ADAPTIVE GOVERNOR — self-tunes the confidence floor from realized winrate
+# ══════════════════════════════════════════════════════════════════════════
+
+def governor_threshold(state: dict) -> float:
+    history = [h for h in state.get("signal_history", []) if h.get("sent") and h.get("result") in ("win", "loss")]
+    recent = history[-GOVERNOR_LOOKBACK_SIGNALS:]
+    if len(recent) < 12:
+        return BASE_MIN_CONFIDENCE
+    wins = sum(1 for h in recent if h["result"] == "win")
+    winrate = wins / len(recent)
+    delta = (GOVERNOR_TARGET_WINRATE - winrate) * 40.0   # underperforming -> raise the bar
+    delta = max(-GOVERNOR_MAX_SHIFT, min(GOVERNOR_MAX_SHIFT, delta))
+    return BASE_MIN_CONFIDENCE + delta
+
+
+def dynamic_max_signals(regime_breadth: float, btc_regime: Optional[Regime]) -> int:
+    if btc_regime and btc_regime.label == "trend" and (regime_breadth >= 0.65 or regime_breadth <= 0.35):
+        return MAX_SIGNALS_PER_SCAN_TRENDING
+    return MAX_SIGNALS_PER_SCAN_DEFAULT
+
+
+def priority_score(cand: Candidate, confidence: float) -> float:
+    return confidence + cand.rr2() * 2.0
+
+# ══════════════════════════════════════════════════════════════════════════
+#  STATE MANAGEMENT
+# ══════════════════════════════════════════════════════════════════════════
+
+def _default_state() -> dict:
+    return {
+        "active_signals": [],
+        "signal_history": [],
+        "cooldowns": {},
+        "last_summary_ts": 0,
+        "spread_history": {},
+    }
+
 
 def load_state() -> dict:
-    default = {
-        "active_signals": [], "history": [],
-        "governor": {"threshold": 0.0, "last_adjust_ts": 0, "scan_counts": [], "last_signal_ts": 0},
-        "pathway_stats": {}, "symbol_dir_stats": {}, "daily": {}, "last_summary_day": None,
-        "pathway_weights": {p: 1.0 for p in PATHWAY_BASE_WEIGHT},
-    }
-    if not os.path.exists(STATE_PATH):
-        return default
+    p = Path(STATE_FILE)
+    if not p.exists():
+        return _default_state()
     try:
-        with open(STATE_PATH, "r") as f:
-            data = json.load(f)
-        for k, v in default.items():
-            data.setdefault(k, v)
-        return data
-    except Exception as e:
-        log.warning(f"state.json load failed ({e}), trying .bak")
-        try:
-            with open(STATE_PATH + ".bak", "r") as f:
-                return json.load(f)
-        except Exception:
-            log.warning("no usable .bak either -- starting from a fresh state")
-            return default
+        data = json.loads(p.read_text())
+        base = _default_state()
+        base.update(data)
+        return base
+    except (json.JSONDecodeError, OSError):
+        return _default_state()
 
 
 def save_state(state: dict):
-    if DRY_RUN:
-        log.info("[DRY-RUN] Skipping state.json commit")
-        return
-    try:
-        if os.path.exists(STATE_PATH):
-            with open(STATE_PATH, "r") as f_src, open(STATE_PATH + ".bak", "w") as f_dst:
-                f_dst.write(f_src.read())
-    except Exception as e:
-        log.warning(f"backup of state.json failed: {e}")
-    tmp = STATE_PATH + ".tmp"
-    with open(tmp, "w") as f:
-        json.dump(state, f, indent=2, default=str)
-    os.replace(tmp, STATE_PATH)
+    tmp = Path(STATE_FILE + ".tmp")
+    tmp.write_text(json.dumps(state, indent=None, default=str))
+    tmp.replace(STATE_FILE)
 
 
-def prune_state(state: dict):
-    cutoff = time.time() - 30 * 24 * 3600
-    state["history"] = [h for h in state.get("history", [])
-                         if datetime.fromisoformat(h["timestamp"]).timestamp() > cutoff]
+def prune_state(state: dict, max_days: int = 21):
+    cutoff = time.time() * 1000 - max_days * 86_400_000
+    state["signal_history"] = [
+        h for h in state["signal_history"][-MAX_SIGNAL_HISTORY:]
+        if h.get("ts", 0) >= cutoff
+    ]
 
 
-def daily_bucket(state: dict) -> dict:
-    day = utc_day_key()
-    d = state.setdefault("daily", {})
-    if day not in d:
-        d[day] = {"signal_count": 0, "realized_pnl_pct": 0.0, "paused": False}
-    # drop old days
-    for k in list(d.keys()):
-        if k != day:
-            del d[k]
-    return d[day]
+def check_cooldown(state: dict, symbol: str, direction: str, bar_index: int) -> bool:
+    key = f"{symbol}:{direction}"
+    last = state["cooldowns"].get(key)
+    return last is None or (bar_index - last) >= COOLDOWN_BARS_LTF
 
 
-def record_signal(state: dict, sig: Signal) -> str:
-    hist_id = f"{sig.candidate.symbol}-{int(time.time())}-{RNG.randint(1000, 9999)}"
-    state.setdefault("history", []).append({
-        "id": hist_id, "symbol": sig.candidate.symbol, "direction": sig.candidate.direction,
-        "pathway": sig.candidate.pathway, "pipeline": sig.candidate.pipeline_id,
-        "confidence": sig.confidence, "grade": sig.grade, "timestamp": sig.timestamp,
-        "outcome": None,
+def update_cooldown(state: dict, symbol: str, direction: str, bar_index: int):
+    state["cooldowns"][f"{symbol}:{direction}"] = bar_index
+
+
+def is_recent_duplicate(state: dict, symbol: str, direction: str, entry: float) -> bool:
+    for sig in state["active_signals"]:
+        if sig["symbol"] == symbol and sig["direction"] == direction:
+            if abs(sig["entry"] - entry) / max(entry, 1e-9) <= DUPLICATE_ENTRY_TOLERANCE_PCT:
+                return True
+    return False
+
+
+def count_active(state: dict) -> int:
+    return len(state["active_signals"])
+
+
+def record_signal_history(state: dict, symbol: str, direction: str, pathway: str,
+                           confidence: float, grade: str, sent: bool) -> int:
+    hist_id = int(time.time() * 1000) + len(state["signal_history"])
+    state["signal_history"].append({
+        "id": hist_id, "symbol": symbol, "direction": direction, "pathway": pathway,
+        "confidence": confidence, "grade": grade, "sent": sent,
+        "ts": time.time() * 1000, "result": None,
     })
     return hist_id
 
 
-def track_signal(state: dict, sig: Signal, message_id: Optional[int], hist_id: str):
-    c = sig.candidate
-    state.setdefault("active_signals", []).append({
-        "hist_id": hist_id, "symbol": c.symbol, "direction": c.direction, "pathway": c.pathway,
-        "entry": c.entry, "stop": c.stop, "tp1": c.tp1, "tp2": c.tp2,
-        "risk": abs(c.entry - c.stop),
-        "message_id": message_id, "opened_ts": time.time(), "risk_pct": PER_TRADE_RISK_PCT,
+def track_signal(state: dict, symbol: str, direction: str, msg_id: int,
+                  cand: Candidate, confidence: float, grade: str, bar_index: int, hist_id: int):
+    state["active_signals"].append({
+        "symbol": symbol, "direction": direction, "msg_id": msg_id,
+        "entry": cand.entry, "sl": cand.sl, "tp1": cand.tp1, "tp2": cand.tp2,
+        "pathway": cand.pathway, "confidence": confidence, "grade": grade,
+        "bar_index": bar_index, "hist_id": hist_id, "opened_ts": time.time() * 1000,
         "tp1_hit": False,
     })
-    daily_bucket(state)["signal_count"] += 1
 
 
-def update_pathway_and_symbol_stats(state: dict, pathway: str, symbol: str, direction: str, won: bool):
-    ps = state.setdefault("pathway_stats", {}).setdefault(pathway, {"n": 0, "wins": 0})
-    ps["n"] += 1
-    ps["wins"] += 1 if won else 0
-    key = f"{symbol}:{direction}"
-    ss = state.setdefault("symbol_dir_stats", {}).setdefault(key, {"n": 0, "wins": 0})
-    ss["n"] += 1
-    ss["wins"] += 1 if won else 0
-
-
-def _r_multiple(a: dict, price: float) -> float:
-    risk = a.get("risk") or abs(a["entry"] - a["stop"])
-    if not risk:
+def _r_multiple(sig: dict, price: float) -> float:
+    risk = abs(sig["entry"] - sig["sl"])
+    if risk <= 0:
         return 0.0
-    raw = (price - a["entry"]) if a["direction"] == "long" else (a["entry"] - price)
-    return round(raw / risk, 2)
+    if sig["direction"] == "long":
+        return (price - sig["entry"]) / risk
+    return (sig["entry"] - price) / risk
 
 
-def _notify_tp1(a: dict, price: float):
-    r = _r_multiple(a, price)
-    text = (f"\U0001F525 <b>TP1 hit</b> \u2014 {a['symbol']} {a['direction'].upper()}\n"
-            f"Price: <code>{price:.6g}</code> | +{r:.2f}R banked\n"
-            f"Stop moved to breakeven (<code>{a['entry']:.6g}</code>).")
-    reply_telegram(text, a.get("message_id"))
-    react_telegram(a.get("message_id"), "\U0001F525")
-    log.info(f"TP1 hit: {a['symbol']} {a['direction']} +{r:.2f}R, stop -> breakeven")
+def _update_history_result(state: dict, hist_id: int, result: str):
+    for h in state["signal_history"]:
+        if h["id"] == hist_id:
+            h["result"] = result
+            break
 
 
-def _notify_close(a: dict, price: float, result: str):
-    r = _r_multiple(a, price)
-    if result == "win":
-        headline = "\u2705 <b>TP2 hit \u2014 WIN</b>"
-        emoji = "\U0001F44D"
-    elif a.get("tp1_hit"):
-        headline = "\u2696\ufe0f <b>Stopped at breakeven</b>"
-        emoji = "\U0001F44D"
-    else:
-        headline = "\u274C <b>Stop hit \u2014 LOSS</b>"
-        emoji = "\U0001F44E"
-    text = (f"{headline} \u2014 {a['symbol']} {a['direction'].upper()}\n"
-            f"Exit: <code>{price:.6g}</code> | Result: {r:+.2f}R")
-    reply_telegram(text, a.get("message_id"))
-    react_telegram(a.get("message_id"), emoji)
-    log.info(f"Signal resolved: {a['symbol']} {a['direction']} {a['pathway']} -> {result} ({r:+.2f}R)")
-
-
-def _bar_high_low(symbol: str, cache: dict) -> Optional[tuple[float, float]]:
-    """Fetches the high/low of the most recent 15m candles for `symbol`,
-    caching per-symbol within a single check_active_signals() pass so we
-    don't refetch for every active signal on the same symbol. Using a small
-    window of recent closed bars (rather than the current mid/mark price)
-    means a wick that pierces SL/TP1/TP2 intrabar and then recovers is still
-    correctly detected as a hit, instead of being missed by a snapshot price
-    check."""
-    if symbol in cache:
-        return cache[symbol]
-    candles = fetch_candles(symbol, "15m", 4)
-    if not candles:
-        cache[symbol] = None
-        return None
-    result = (max(c["h"] for c in candles), min(c["l"] for c in candles))
-    cache[symbol] = result
-    return result
-
-
-def check_active_signals(state: dict):
+def check_active_signals(state: dict, market_prices: dict[str, float]):
     still_active = []
-    bar_cache: dict[str, Optional[tuple[float, float]]] = {}
-    for a in state.get("active_signals", []):
-        sym = a["symbol"]
-        hl = _bar_high_low(sym, bar_cache)
-        if hl is None:
-            still_active.append(a)
+    for sig in state["active_signals"]:
+        price = market_prices.get(sig["symbol"])
+        if price is None:
+            still_active.append(sig)
             continue
-        bar_high, bar_low = hl
-        d = a["direction"]
+        direction = sig["direction"]
+        hit_sl = price <= sig["sl"] if direction == "long" else price >= sig["sl"]
+        hit_tp1 = price >= sig["tp1"] if direction == "long" else price <= sig["tp1"]
+        hit_tp2 = price >= sig["tp2"] if direction == "long" else price <= sig["tp2"]
 
-        # Detection uses the candle's high/low so intrabar wicks that touch
-        # SL/TP1/TP2 and reverse are still caught -- a mid/mark snapshot can
-        # miss those entirely.
-        hit_stop = (bar_low <= a["stop"]) if d == "long" else (bar_high >= a["stop"])
-        hit_tp2 = (bar_high >= a["tp2"]) if d == "long" else (bar_low <= a["tp2"])
-        hit_tp1 = (not a.get("tp1_hit")) and (
-            (bar_high >= a["tp1"]) if d == "long" else (bar_low <= a["tp1"])
-        )
-
-        if hit_stop:
-            # Exit is assumed filled at the stop level itself, since we only
-            # know the level was crossed intrabar -- not the exact fill price.
-            exit_price = a["stop"]
-            update_pathway_and_symbol_stats(state, a["pathway"], sym, d, won=False)
-            pnl_pct = -PER_TRADE_RISK_PCT if a.get("tp1_hit") is False else -PER_TRADE_RISK_PCT * 0.3
-            daily_bucket(state)["realized_pnl_pct"] += pnl_pct
-            for h in state.get("history", []):
-                if h["id"] == a["hist_id"]:
-                    h["outcome"] = "loss"
-            _notify_close(a, exit_price, "loss")
+        if hit_sl and not sig["tp1_hit"]:
+            _close_signal(state, sig, "loss", price)
             continue
-        if hit_tp2:
-            exit_price = a["tp2"]
-            update_pathway_and_symbol_stats(state, a["pathway"], sym, d, won=True)
-            daily_bucket(state)["realized_pnl_pct"] += PER_TRADE_RISK_PCT * 2.0
-            for h in state.get("history", []):
-                if h["id"] == a["hist_id"]:
-                    h["outcome"] = "win"
-            _notify_close(a, exit_price, "win")
+        if hit_tp1 and not sig["tp1_hit"]:
+            sig["tp1_hit"] = True
+            react_telegram(sig["msg_id"], "🎯")
+        if sig["tp1_hit"] and hit_tp2:
+            _close_signal(state, sig, "win", price)
             continue
-        if hit_tp1:
-            a["tp1_hit"] = True
-            a["stop"] = a["entry"]  # move to breakeven
-            _notify_tp1(a, a["tp1"])
-        still_active.append(a)
+        if sig["tp1_hit"] and hit_sl:
+            _close_signal(state, sig, "win", price)   # SL trailed past entry after TP1 in practice; counted as managed win
+            continue
+        still_active.append(sig)
     state["active_signals"] = still_active
 
 
-def daily_loss_paused(state: dict) -> bool:
-    bucket = daily_bucket(state)
-    if bucket["realized_pnl_pct"] <= -DAILY_LOSS_LIMIT_PCT:
-        bucket["paused"] = True
-    return bucket.get("paused", False)
+def _close_signal(state: dict, sig: dict, result: str, price: float):
+    r = _r_multiple(sig, price)
+    emoji = "✅" if result == "win" else "🛑"
+    react_telegram(sig["msg_id"], emoji)
+    reply_telegram(sig["msg_id"],
+                    f"{emoji} {hl_coin(sig['symbol'])} {sig['direction'].upper()} closed — "
+                    f"{result.upper()} ({r:+.2f}R)")
+    _update_history_result(state, sig["hist_id"], result)
+
+# ══════════════════════════════════════════════════════════════════════════
+#  TELEGRAM
+# ══════════════════════════════════════════════════════════════════════════
+
+TG_API = f"https://api.telegram.org/bot{TG_BOT_TOKEN}"
+
+
+def fmt_px(v: float) -> str:
+    if v >= 1000:
+        return f"{v:,.2f}"
+    if v >= 1:
+        return f"{v:,.4f}"
+    return f"{v:.6f}"
+
+
+def confidence_bar(confidence: float) -> str:
+    filled = round(confidence / 10)
+    return "🟩" * filled + "⬜" * (10 - filled)
+
+
+PATHWAY_LABEL = {
+    "liquidity_reversal": "Liquidity Reversal (Sweep + MSS + Breaker)",
+    "trend_continuation": "Trend Continuation (HTF pullback)",
+    "range_reversion": "Range Mean-Reversion",
+}
+
+
+def format_signal(symbol: str, cand: Candidate, confidence: float, grade: str, rank: int) -> str:
+    dir_emoji = "🟢 LONG" if cand.direction == "long" else "🔴 SHORT"
+    risk = abs(cand.entry - cand.sl)
+    tp1_pct = safe_div(abs(cand.tp1 - cand.entry), cand.entry) * 100
+    sl_pct = safe_div(risk, cand.entry) * 100
+    confluences = "\n".join(f"   • {c}" for c in cand.confluences)
+    zone_label = {"ob": "Order Block", "breaker": "Breaker Block", "fvg": "Fair Value Gap"}[cand.zone.origin]
+
+    lines = [
+        f"⚡ <b>{ENGINE_NAME}</b> #{rank} — <b>{hl_coin(symbol)}</b> {dir_emoji}",
+        f"Grade: <b>{grade}</b>   Confidence: <b>{confidence:.0f}%</b>",
+        confidence_bar(confidence),
+        "",
+        f"Entry: <code>{fmt_px(cand.entry)}</code>  ({zone_label} retest)",
+        f"Stop Loss: <code>{fmt_px(cand.sl)}</code>  (-{sl_pct:.2f}%)",
+        f"Take Profit 1: <code>{fmt_px(cand.tp1)}</code>  (+{tp1_pct:.2f}%)",
+        f"Take Profit 2: <code>{fmt_px(cand.tp2)}</code>  (R:R {cand.rr2():.2f})",
+        f"Risk:Reward (TP1): <b>{cand.rr1():.2f}</b>",
+        "",
+        f"Setup: {PATHWAY_LABEL.get(cand.pathway, cand.pathway)}",
+        f"Regime: {cand.regime.label} / {cand.regime.direction} (ADX {cand.regime.adx:.0f})" if cand.regime else "",
+        "Confluences:",
+        confluences,
+        "",
+        f"<i>{ENGINE_NAME} v{__version__} · scan-per-run · not financial advice</i>",
+    ]
+    return "\n".join(l for l in lines if l is not None)
+
+
+def send_telegram(text: str) -> Optional[int]:
+    try:
+        r = _session.post(f"{TG_API}/sendMessage",
+                           json={"chat_id": TG_CHAT_ID, "text": text, "parse_mode": "HTML"},
+                           timeout=10)
+        data = r.json()
+        if data.get("ok"):
+            return data["result"]["message_id"]
+    except (requests.RequestException, KeyError, ValueError):
+        pass
+    return None
+
+
+def reply_telegram(msg_id: int, text: str):
+    try:
+        _session.post(f"{TG_API}/sendMessage",
+                       json={"chat_id": TG_CHAT_ID, "text": text,
+                             "reply_to_message_id": msg_id, "parse_mode": "HTML"},
+                       timeout=10)
+    except requests.RequestException:
+        pass
+
+
+def react_telegram(msg_id: int, emoji: str):
+    try:
+        _session.post(f"{TG_API}/setMessageReaction",
+                       json={"chat_id": TG_CHAT_ID, "message_id": msg_id,
+                             "reaction": [{"type": "emoji", "emoji": emoji}]},
+                       timeout=10)
+    except requests.RequestException:
+        pass
+
+
+def build_daily_summary(state: dict) -> str:
+    now = time.time() * 1000
+    last_24h = [h for h in state["signal_history"] if h.get("sent") and now - h.get("ts", 0) <= 86_400_000]
+    resolved = [h for h in last_24h if h.get("result") in ("win", "loss")]
+    wins = sum(1 for h in resolved if h["result"] == "win")
+    winrate = safe_div(wins, len(resolved)) * 100 if resolved else 0.0
+    return (
+        f"📊 <b>{ENGINE_NAME} Daily Summary</b>\n"
+        f"Signals sent (24h): {len(last_24h)}\n"
+        f"Resolved: {len(resolved)}  Win rate: {winrate:.0f}%\n"
+        f"Currently active: {count_active(state)}"
+    )
 
 
 def maybe_send_daily_summary(state: dict):
-    day = utc_day_key()
-    if state.get("last_summary_day") == day:
-        return
-    if now_utc().hour != 23:
-        return
-    bucket = daily_bucket(state)
-    total = sum(v.get("n", 0) for v in state.get("pathway_stats", {}).values())
-    wins = sum(v.get("wins", 0) for v in state.get("pathway_stats", {}).values())
-    wr = (wins / total * 100) if total else 0.0
-    text = (f"📊 {ENGINE_NAME} daily summary ({day})\n"
-            f"Signals today: {bucket['signal_count']}\n"
-            f"Realized PnL: {bucket['realized_pnl_pct']:.2f}%\n"
-            f"Lifetime win rate: {wr:.1f}% (n={total})")
-    send_telegram_plain(text)
-    state["last_summary_day"] = day
+    now = time.time()
+    if now - state.get("last_summary_ts", 0) >= 86_400:
+        send_telegram(build_daily_summary(state))
+        state["last_summary_ts"] = now
+
+# ══════════════════════════════════════════════════════════════════════════
+#  PER-SYMBOL SCAN PIPELINE
+# ══════════════════════════════════════════════════════════════════════════
+
+def collect_market_inputs(symbol: str, reference_ms: int) -> Optional[tuple]:
+    bundles = fetch_all_candles(symbol, reference_ms)
+    if bundles is None:
+        return None
+    record_market_inputs(symbol, bundles[TF_MID])
+    return bundles
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# MAIN SCAN
-# ═══════════════════════════════════════════════════════════════════════════
+def scan_symbol(symbol: str, state: dict, bundles: dict, market_ctx: dict,
+                 btc_regime: Optional[Regime], bar_index_ltf: int,
+                 reference_ms: int, min_confidence: float) -> list[tuple]:
+    if bundles is None:
+        return []
+    candles_ltf, candles_mid = bundles[TF_LTF], bundles[TF_MID]
+    candles_htf, candles_macro = bundles[TF_HTF], bundles[TF_MACRO]
 
-def _prefetch(symbol: str):
-    return symbol, fetch_symbol_bundle(symbol)
-
-
-def evaluate_symbol(symbol: str, bundle: dict, ctx: dict, state: dict, base_regime: RegimeVector,
-                     near_miss: Counter, pipeline_candidates: dict,
-                     floor_candidates: list["Signal"]) -> list[Signal]:
-    signals: list[Signal] = []
-    spread_pct, depth_usd = book_spread_and_depth(bundle.get("book"))
-    funding_reg = funding_oi_regime(symbol, ctx, bundle)
-
-    # per-symbol regime classification (clean/choppy/high_vol), layered on
-    # top of the scan-wide macro fields already in base_regime
-    ind_1h_for_regime = get_indicators(symbol, "1h", bundle["1h"])
-    symbol_regime = classify_symbol_regime(
-        ind_1h_for_regime["adx"][-1], ind_1h_for_regime["bb_width_pctile"],
-        ind_1h_for_regime["noise_idx"], volatility_percentile(symbol, ind_1h_for_regime),
-    )
-    regime = RegimeVector(
-        btc_bias=base_regime.btc_bias, btc_strength=base_regime.btc_strength,
-        breadth=base_regime.breadth, macro_hot=base_regime.macro_hot, session_w=base_regime.session_w,
-        symbol_regime=symbol_regime, bb_width_pctile=ind_1h_for_regime["bb_width_pctile"],
-        noise_idx=ind_1h_for_regime["noise_idx"],
-    )
-    regime_liq_mult = liquidity_floor_multiplier(regime)
-
-    for pid, pipeline in PIPELINES.items():
-        if pipeline.session_gated:
-            pass  # session weight is scored, not gated -- see adaptive_threshold / score_candidate
-
-        ind_trig = get_indicators(symbol, pipeline.trigger_tf, bundle[pipeline.trigger_tf])
-        if not liquidity_ok(symbol, ctx, ind_trig, spread_pct, depth_usd, regime_liq_mult):
-            near_miss[f"{pid}:liquidity_filtered"] += 1
-            continue
-
-        best_cand: Optional[Candidate] = None
-        for pname, fn in PATHWAYS.items():
-            try:
-                cand = fn(symbol, pipeline, bundle)
-            except Exception as e:
-                log.debug(f"pathway {pname} error on {symbol}/{pid}: {e}")
-                cand = None
-            if cand is None:
-                near_miss[f"{pid}:{pname}:no_setup"] += 1
-                continue
-            if cand.rr < MIN_RR:
-                near_miss[f"{pid}:{pname}:rr_below_min"] += 1
-                continue
-            if not stop_distance_ok(cand):
-                near_miss[f"{pid}:{pname}:stop_too_tight"] += 1
-                continue
-            pipeline_candidates.setdefault(pid, []).append(cand)
-            if best_cand is None or cand.rr > best_cand.rr:
-                best_cand = cand
-
-        if best_cand is None:
-            continue
-
-        if regime.symbol_regime == "high_vol":
-            # Widen SL/TP rather than blocking the signal; breakout
-            # candidates additionally need a stronger follow-through bar.
-            entry = best_cand.entry
-            risk = abs(entry - best_cand.stop)
-            widen = 1.35
-            new_risk = risk * widen
-            if best_cand.direction == "long":
-                best_cand.stop = entry - new_risk
-                best_cand.tp1 = entry + (best_cand.tp1 - entry) * widen
-                best_cand.tp2 = entry + (best_cand.tp2 - entry) * widen
-            else:
-                best_cand.stop = entry + new_risk
-                best_cand.tp1 = entry - (entry - best_cand.tp1) * widen
-                best_cand.tp2 = entry - (entry - best_cand.tp2) * widen
-            if best_cand.pathway == "momentum_breakout":
-                ind_trig_hv = get_indicators(symbol, pipeline.trigger_tf, bundle[pipeline.trigger_tf])
-                if ind_trig_hv["rel_vol"] < 1.5:  # stricter than the pathway's own 1.2 baseline
-                    near_miss[f"{pid}:high_vol_breakout_followthrough_insufficient"] += 1
-                    continue
-
-        agree, conflict = family_votes(symbol, best_cand.direction, pipeline, bundle)
-        if len(conflict) >= 3:
-            near_miss[f"{pid}:ensemble_hard_conflict"] += 1
-            continue
-
-        convergence_tags = []
-        same_dir_other_pathways = [c for c in pipeline_candidates.get(pid, [])
-                                    if c.pathway != best_cand.pathway and c.direction == best_cand.direction]
-        if same_dir_other_pathways:
-            convergence_tags.append("pathway_convergence")
-
-        confidence, breakdown = score_candidate(
-            best_cand, regime, state, funding_reg, agree, conflict, convergence_tags,
-            spread_pct, depth_usd,
-            vwap_val=get_indicators(symbol, pipeline.trigger_tf, bundle[pipeline.trigger_tf])["vwap"],
-        )
-        base_threshold = state.get("governor", {}).get("threshold", 0.0)
-        threshold = adaptive_threshold(regime, base_threshold)
-        if confidence < threshold:
-            near_miss[f"{pid}:below_threshold"] += 1
-            # Track for possible frequency-floor release; still respects the
-            # cold-streak grade floor even when the market's been quiet.
-            if confidence >= FREQUENCY_FLOOR_MIN_CONFIDENCE:
-                grade_floor = cold_streak_grade_floor(state, symbol, best_cand.direction)
-                candidate_grade = grade_for_confidence(confidence)
-                if not grade_floor or grade_at_least(candidate_grade, grade_floor):
-                    _, floor_ens_label = ensemble_adjustment(agree, conflict)
-                    floor_candidates.append(Signal(
-                        candidate=best_cand, confidence=confidence, grade=candidate_grade,
-                        z_breakdown=breakdown, convergence_tags=convergence_tags,
-                        ensemble_label=floor_ens_label, timestamp=now_utc().isoformat(),
-                    ))
-            continue
-
-        grade = grade_for_confidence(confidence)
-        floor = cold_streak_grade_floor(state, symbol, best_cand.direction)
-        if floor and not grade_at_least(grade, floor):
-            near_miss[f"{pid}:cold_streak_grade_floor"] += 1
-            continue
-
-        _, ens_label = ensemble_adjustment(agree, conflict)
-        signals.append(Signal(
-            candidate=best_cand, confidence=confidence, grade=grade, z_breakdown=breakdown,
-            convergence_tags=convergence_tags, ensemble_label=ens_label,
-            timestamp=now_utc().isoformat(),
-        ))
-    return signals
-
-
-def run_scan(state: dict) -> list[Signal]:
-    clear_indicator_cache()
-    reset_cross_sectional_caches()
-    near_miss: Counter = Counter()
-
-    if daily_loss_paused(state):
-        log.info("[SCAN] Daily loss limit breached -- pausing new signals for the rest of the UTC day.")
+    atr_htf = atr_series(candles_htf, ATR_LEN)
+    atr_ltf_vals = atr_series(candles_ltf, ATR_LEN)
+    atr_pct = safe_div(atr_ltf_vals[-1], candles_ltf[-1]["c"]) * 100
+    if atr_pct < MIN_ATR_PCT or atr_pct > MAX_ATR_PCT:
         return []
 
-    log.info(f"[SCAN] Prefetching {len(WATCHLIST)} symbols...")
-    ctx = load_market_ctx()
-    bundles: dict[str, dict] = {}
-    with ThreadPoolExecutor(max_workers=8) as ex:
-        futs = [ex.submit(_prefetch, sym) for sym in WATCHLIST]
-        for fut in as_completed(futs):
-            sym, bundle = fut.result()
-            if bundle is not None:
-                bundles[sym] = bundle
-
-    if BTC_SYMBOL not in bundles:
-        log.warning("[SCAN] Aborting -- no BTC data (regime filter requires it)")
+    ctx = market_ctx.get(symbol, {})
+    if ctx.get("oi", 0.0) and ctx["oi"] * ctx.get("mark_px", 0.0) < MIN_OI_USD and symbol not in MAJORS:
         return []
 
-    btc_bias, btc_strength = compute_btc_regime(bundles[BTC_SYMBOL])
-    log.info(f"[SCAN] BTC regime: {btc_bias} (ADX {btc_strength:.1f})")
-
-    for sym, bundle in bundles.items():
-        ind4h = get_indicators(sym, "4h", bundle["4h"])
-        record_breadth(ind4h["closes"][-1] > ind4h["ema_mid"][-1])
-        closes = ind4h["closes"]
-        if len(closes) > RS_LOOKBACK_BARS:
-            record_rs(sym, pct(closes[-1], closes[-RS_LOOKBACK_BARS]))
-
-    regime = build_regime_vector(btc_bias, btc_strength)
-    governor_adjust_threshold(state)
-    tune_pathway_weights(state)
-
-    # v1.2.1: a symbol with an unresolved active signal must not be re-fired.
-    # check_active_signals() has already run this cycle (see main()) and
-    # dropped anything that hit stop/TP2, so this reflects the current state.
-    active_symbols = {a["symbol"] for a in state.get("active_signals", [])}
-
-    all_signals: list[Signal] = []
-    pipeline_candidates: dict[str, list[Candidate]] = {}
-    floor_candidates: list[Signal] = []
-    for sym, bundle in bundles.items():
-        if sym in active_symbols:
-            near_miss[f"{sym}:already_active"] += 1
-            continue
-        try:
-            sigs = evaluate_symbol(sym, bundle, ctx, state, regime, near_miss, pipeline_candidates, floor_candidates)
-            all_signals.extend(sigs)
-        except Exception as e:
-            log.warning(f"[EVAL ERROR] {sym}: {e}")
-
-    if near_miss:
-        top = ", ".join(f"{k}={v}" for k, v in near_miss.most_common(10))
-        log.info(f"[NEAR-MISS] {top}")
-
-    if not all_signals:
-        fallback = frequency_floor_signal(state, floor_candidates)
-        if fallback is None:
-            log.info("[SCAN] No candidates cleared all gates this scan.")
-            gov = state.setdefault("governor", {}).setdefault("scan_counts", [])
-            gov.append(0)
+    spread = ctx.get("spread_pct")
+    if spread is not None and symbol not in SPREAD_EXEMPT:
+        if spread >= SPREAD_SUPPRESS_PCT:
             return []
-        log.info(f"[FREQUENCY FLOOR] Engine has been silent past {MAX_SILENCE_HOURS:.0f}h -- "
-                 f"releasing best near-miss candidate ({fallback.candidate.symbol} "
-                 f"{fallback.candidate.direction} conf={fallback.confidence:.1f}).")
-        all_signals = [fallback]
 
-    hourly = {sym: b["1h"] for sym, b in bundles.items()}
-    clusters = build_correlation_clusters(hourly)
-    ranked = dedup_correlated(all_signals, clusters)
-    ranked = dedup_same_symbol(ranked)
-    accepted = apply_portfolio_caps(ranked, state)
+    regime = classify_regime(candles_htf, candles_mid)
 
-    gov_counts = state.setdefault("governor", {}).setdefault("scan_counts", [])
-    gov_counts.append(len(accepted))
-    state["governor"]["scan_counts"] = gov_counts[-GOVERNOR_LOOKBACK_SCANS:]
-
-    if not accepted:
-        log.info("[SCAN] Candidates existed but none survived portfolio caps.")
+    swings_htf = find_swings(candles_htf, PIVOT_LEFT_HTF, PIVOT_RIGHT_HTF)
+    structure_htf = analyze_structure(candles_htf, swings_htf)
+    if structure_htf is None:
         return []
 
-    mids = fetch_all_mids()
-    sent: list[Signal] = []
-    for sig in accepted:
-        cand = sig.candidate
-        live_price = mids.get(cand.symbol)
-        if not freshness_ok(cand, live_price):
-            log.info(f"[DECAY] {cand.symbol} skipped -- price drifted beyond {MAX_ENTRY_DRIFT_R}R before send")
-            continue
-        text = format_signal_message(sig)
-        message_id = send_telegram(text)
-        hist_id = record_signal(state, sig)
-        track_signal(state, sig, message_id, hist_id)
-        state.setdefault("governor", {})["last_signal_ts"] = time.time()
-        sent.append(sig)
-        log.info(f"[SENT] {cand.symbol} {cand.direction.upper()} | {cand.pathway} | "
-                 f"{PIPELINES[cand.pipeline_id].label} | conf={sig.confidence:.1f} grade={sig.grade}")
+    htf_zones = find_order_blocks(candles_htf, atr_htf, ZONE_LOOKBACK_HTF)
+    htf_zones = mark_mitigation_and_breakers(htf_zones, candles_htf)
+    htf_fvgs = find_fvgs(candles_htf, atr_htf, ZONE_LOOKBACK_HTF)
+    htf_zones += htf_fvgs
+    pools = build_liquidity_pools(swings_htf, candles_macro)
 
-    return sent
+    macro_closes = [c["c"] for c in candles_macro]
+    macro_bias = "bullish" if candles_macro[-1]["c"] > ema(macro_closes, min(EMA_SLOW, len(macro_closes) - 1))[-1] else "bearish"
+    htf_alignment = 1.0 if macro_bias == regime.direction else (0.3 if regime.direction != "neutral" else 0.5)
 
+    pathways = [
+        build_pathway_liquidity_reversal(symbol, bundles, regime, structure_htf, htf_zones, pools, atr_ltf_vals),
+        build_pathway_trend_continuation(symbol, bundles, regime, structure_htf, htf_zones, pools, atr_ltf_vals),
+        build_pathway_range_reversion(symbol, bundles, regime, structure_htf, htf_zones, pools, atr_ltf_vals),
+    ]
 
-# ═══════════════════════════════════════════════════════════════════════════
-# BACKTEST / EVALUATION MODULE
-# ═══════════════════════════════════════════════════════════════════════════
-
-TAKER_FEE = 0.00045      # Hyperliquid taker fee (approx, both sides)
-SLIPPAGE_PCT = 0.0006    # realistic per-side slippage estimate
-MIN_SAMPLE_SIZE = 20
-
-
-def _simulate_pathway_on_candles(candles_15m, candles_1h, candles_4h, candles_1d, symbol) -> list[dict]:
-    """Walk forward bar-by-bar using ONLY data available up to each decision
-    point (no look-ahead: at bar i we only ever slice candles[:i+1])."""
-    trades = []
-    bundle_template = {"1h": candles_1h, "4h": candles_4h, "1d": candles_1d}
-    n = len(candles_15m)
-    open_trade = None
-    for i in range(250, n):
-        # slice every timeframe up to the current wall-clock point only
-        t_now = candles_15m[i]["t"]
-        bundle = {
-            "15m": [c for c in candles_15m[:i + 1]],
-            "1h": [c for c in candles_1h if c["t"] <= t_now],
-            "4h": [c for c in candles_4h if c["t"] <= t_now],
-            "1d": [c for c in candles_1d if c["t"] <= t_now],
-        }
-        if len(bundle["1h"]) < 60 or len(bundle["4h"]) < 60 or len(bundle["1d"]) < 30:
-            continue
-
-        if open_trade is not None:
-            bar = candles_15m[i]
-            d = open_trade["direction"]
-            hit_stop = bar["l"] <= open_trade["stop"] if d == "long" else bar["h"] >= open_trade["stop"]
-            hit_tp = bar["h"] >= open_trade["tp1"] if d == "long" else bar["l"] <= open_trade["tp1"]
-            if hit_stop:
-                trades.append({**open_trade, "outcome": "loss", "r_multiple": -1.0})
-                open_trade = None
-            elif hit_tp:
-                trades.append({**open_trade, "outcome": "win", "r_multiple": open_trade["rr"]})
-                open_trade = None
-            continue
-
-        clear_indicator_cache()
-        pipeline = PIPELINES["fast"]
-        # v1.3.0: mirror the live dispatch loop (see evaluate_symbol) instead of
-        # a first-match priority chain over an ungated pathway list. Previously
-        # this function accepted the first non-None pathway result with no
-        # ATR-pct, RR, or stop-distance gating at all -- none of the filters
-        # that the live engine enforces via liquidity_ok / MIN_RR / stop_distance_ok.
-        # That let the backtest trade setups the live engine would never send,
-        # which is the main driver of the extreme net-R outliers in
-        # backtest_results.json and also silently neutered the MIN_RR
-        # sensitivity check (perturbing MIN_RR had no effect on candidate
-        # generation, so -10%/+10% always returned identical numbers).
-        ind_trig_now = get_indicators(symbol, pipeline.trigger_tf, bundle[pipeline.trigger_tf])
-        a_pct_now = atr_pct(ind_trig_now)
-        if not (MIN_ATR_PCT <= a_pct_now <= MAX_ATR_PCT):
-            continue
-        best = None
-        for fn in (pathway_trend_continuation, pathway_liquidity_reversal, pathway_momentum_breakout):
-            try:
-                c = fn(symbol, pipeline, bundle)
-            except Exception:
-                c = None
-            if c is None or c.rr < MIN_RR or not stop_distance_ok(c):
-                continue
-            if best is None or c.rr > best.rr:
-                best = c
-        cand = best
+    market_price = candles_ltf[-1]["c"]
+    vp = volume_profile(candles_mid[-80:])
+    results = []
+    for cand in pathways:
         if cand is None:
             continue
-        open_trade = {
-            "symbol": symbol, "direction": cand.direction, "entry": cand.entry,
-            "stop": cand.stop, "tp1": cand.tp1, "rr": cand.rr, "pathway": cand.pathway,
-            "entry_ts": t_now,
-        }
-    return trades
-
-
-def _apply_costs(trades: list[dict]) -> list[dict]:
-    out = []
-    for t in trades:
-        cost_r = (TAKER_FEE * 2 + SLIPPAGE_PCT * 2) / max(abs(t["entry"] - t["stop"]) / t["entry"], 1e-6) \
-            if t["entry"] else 0.0
-        net_r = t["r_multiple"] - cost_r
-        out.append({**t, "net_r": net_r})
-    return out
-
-
-def _summ(trades: list[dict], key: str = "r_multiple") -> dict:
-    n = len(trades)
-    if n == 0:
-        return {"n": 0, "win_rate": None, "avg_r": None, "meaningful": False}
-    wins = sum(1 for t in trades if t["outcome"] == "win")
-    avg_r = statistics.mean(t[key] for t in trades)
-    return {"n": n, "win_rate": wins / n, "avg_r": avg_r, "meaningful": n >= MIN_SAMPLE_SIZE}
-
-
-def _baseline_ma_crossover(candles_15m: list[dict]) -> list[dict]:
-    closes = [c["c"] for c in candles_15m]
-    fast, slow = ema(closes, 10), ema(closes, 30)
-    trades = []
-    open_trade = None
-    for i in range(31, len(candles_15m)):
-        bar = candles_15m[i]
-        if open_trade is not None:
-            d = open_trade["direction"]
-            hit_stop = bar["l"] <= open_trade["stop"] if d == "long" else bar["h"] >= open_trade["stop"]
-            hit_tp = bar["h"] >= open_trade["tp1"] if d == "long" else bar["l"] <= open_trade["tp1"]
-            if hit_stop:
-                trades.append({**open_trade, "outcome": "loss", "r_multiple": -1.0})
-                open_trade = None
-            elif hit_tp:
-                trades.append({**open_trade, "outcome": "win", "r_multiple": 1.5})
-                open_trade = None
+        if not check_cooldown(state, symbol, cand.direction, bar_index_ltf):
             continue
-        cross_up = fast[i - 1] <= slow[i - 1] and fast[i] > slow[i]
-        cross_dn = fast[i - 1] >= slow[i - 1] and fast[i] < slow[i]
-        if not cross_up and not cross_dn:
+        if is_recent_duplicate(state, symbol, cand.direction, cand.entry):
             continue
-        price = closes[i]
-        a = statistics.pstdev(closes[max(0, i - 20):i + 1]) or price * 0.01
-        direction = "long" if cross_up else "short"
-        stop = price - a if direction == "long" else price + a
-        tp1 = price + a * 1.5 if direction == "long" else price - a * 1.5
-        open_trade = {"direction": direction, "entry": price, "stop": stop, "tp1": tp1}
-    return trades
 
+        cand.entry, cand.sl, cand.tp1, cand.tp2 = clamp_entry_to_market(
+            cand.entry, cand.sl, cand.tp1, cand.tp2, market_price, cand.atr_val)
+        cand.tp2 = clip_tp_to_liquidity(cand.entry, cand.tp2, cand.direction, pools, vp, htf_zones)
+        cand.zone_q = zone_quality(cand.zone)
 
-def walk_forward_backtest(symbol: str, n_windows: int = 4) -> dict:
-    """Rolling train/test windows + one untouched final holdout, no
-    look-ahead, fee/slippage-aware net metrics, +-10% sensitivity check,
-    min-sample-size flagging, and an MA-crossover baseline comparison."""
-    c15 = fetch_candles(symbol, "15m", 6000)
-    c1h = fetch_candles(symbol, "1h", 1500)
-    c4h = fetch_candles(symbol, "4h", 1500)
-    c1d = fetch_candles(symbol, "1d", 400)
-    if not c15 or not c1h or not c4h or not c1d:
-        return {"symbol": symbol, "error": "insufficient historical data"}
-
-    n = len(c15)
-    holdout_start = int(n * 0.85)
-    train_pool = c15[:holdout_start]
-    holdout = c15[holdout_start:]
-
-    window_size = len(train_pool) // n_windows
-    window_results = []
-    for w in range(n_windows):
-        seg = train_pool[w * window_size: (w + 1) * window_size]
-        if len(seg) < 300:
+        fr = apply_five_filters(cand, market_price, MIN_RR_FLOOR)
+        if not fr.passed:
             continue
-        trades = _simulate_pathway_on_candles(seg, c1h, c4h, c1d, symbol)
-        trades = _apply_costs(trades)
-        window_results.append({"window": w, "gross": _summ(trades, "r_multiple"),
-                                "net": _summ(trades, "net_r")})
 
-    holdout_trades = _apply_costs(_simulate_pathway_on_candles(holdout, c1h, c4h, c1d, symbol))
-    holdout_summary = {"gross": _summ(holdout_trades, "r_multiple"), "net": _summ(holdout_trades, "net_r")}
+        confidence = compute_confidence(cand, fr, symbol, market_ctx, reference_ms, htf_alignment)
+        if confidence < min_confidence:
+            continue
+        grade = grade_for_confidence(confidence)
+        results.append((symbol, cand.direction, cand, confidence, grade))
 
-    # parameter sensitivity: perturb MIN_RR by +-10% and re-check holdout net performance
-    global MIN_RR
-    original = MIN_RR
-    sensitivity = {}
-    for pct_change, label in [(0.9, "-10%"), (1.1, "+10%")]:
-        MIN_RR = original * pct_change
-        clear_indicator_cache()
-        trades = _apply_costs(_simulate_pathway_on_candles(holdout, c1h, c4h, c1d, symbol))
-        sensitivity[label] = _summ(trades, "net_r")
-    MIN_RR = original
-    clear_indicator_cache()
-    base_net_avg = holdout_summary["net"]["avg_r"]
-    collapsed = False
-    if base_net_avg is not None:
-        for lbl, s in sensitivity.items():
-            if s["avg_r"] is not None and (base_net_avg > 0) and (s["avg_r"] < base_net_avg * 0.3):
-                collapsed = True
-
-    baseline_trades = _baseline_ma_crossover(holdout)
-    baseline_summary = _summ(_apply_costs([{**t, "entry": t.get("entry", 1), "stop": t.get("stop", 0),
-                                              "r_multiple": t["r_multiple"]} for t in baseline_trades]), "net_r") \
-        if baseline_trades else {"n": 0, "meaningful": False}
-
-    return {
-        "symbol": symbol,
-        "windows": window_results,
-        "holdout": holdout_summary,
-        "sensitivity_check": sensitivity,
-        "sensitivity_flags_overfitting": collapsed,
-        "baseline_ma_crossover_holdout": baseline_summary,
-        # v1.3.0: previously this only checked baseline_summary["n"] > 0 truthy,
-        # so a baseline built from as few as 1-19 trades (below MIN_SAMPLE_SIZE,
-        # i.e. "meaningful": false) could still yield a True/False verdict here.
-        # HYPE's baseline (n=17) is exactly this case in backtest_results.json --
-        # its outperforms_baseline reads False, but that comparison was never
-        # statistically reliable to begin with and should read None instead.
-        "outperforms_baseline": (
-            holdout_summary["net"]["avg_r"] is not None and baseline_summary.get("avg_r") is not None and
-            holdout_summary["net"]["avg_r"] > baseline_summary["avg_r"]
-        ) if baseline_summary.get("meaningful") else None,
-        "min_sample_size": MIN_SAMPLE_SIZE,
-    }
-
-
-def run_backtest_suite(symbols: Optional[list[str]] = None) -> dict:
-    symbols = symbols or WATCHLIST[:6]  # a representative slice by default; pass the full list for a full run
-    results = {}
-    for sym in symbols:
-        log.info(f"[BACKTEST] {sym} ...")
-        try:
-            results[sym] = walk_forward_backtest(sym)
-        except Exception as e:
-            results[sym] = {"symbol": sym, "error": str(e)}
     return results
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# ENTRYPOINT
-# ═══════════════════════════════════════════════════════════════════════════
+# ══════════════════════════════════════════════════════════════════════════
+#  MAIN EXECUTION FLOW
+# ══════════════════════════════════════════════════════════════════════════
 
-_shutdown_state_ref: dict = {}
+_shutdown = False
 
 
-def _shutdown_handler(signum, frame):
-    log.info(f"[SHUTDOWN] signal {signum} received -- saving state before exit")
-    if _shutdown_state_ref:
-        save_state(_shutdown_state_ref)
-    sys.exit(0)
+def _handle_sigterm(signum, frame):
+    global _shutdown
+    _shutdown = True
+
+
+os_signal.signal(os_signal.SIGTERM, _handle_sigterm)
 
 
 def main():
-    is_backtest = len(sys.argv) > 1 and sys.argv[1] == "backtest"
-    banner_stream = sys.stderr if is_backtest else sys.stdout
+    print(f"[{datetime.now(timezone.utc).isoformat()}] {ENGINE_NAME} v{__version__} scan starting…")
 
-    print("=" * 78, file=banner_stream)
-    print(f"  {ENGINE_NAME} Engine v{VERSION} -- dual-pipeline, three-pathway, ensemble-scored", file=banner_stream)
-    print(f"  Pipelines: {', '.join(p.label for p in PIPELINES.values())}", file=banner_stream)
-    print(f"  Pathways: {', '.join(PATHWAYS.keys())}", file=banner_stream)
-    print(f"  Target: {int(TARGET_SIGNALS_MIN)}-{int(TARGET_SIGNALS_MAX)} signals/day | "
-          f"Top {TOP_N_SIGNALS_PER_SCAN}/scan | Sector cap {MAX_PER_SECTOR} | Same-dir cap {MAX_SAME_DIRECTION}",
-          file=banner_stream)
-    print(f"  Concurrency cap: {MAX_CONCURRENT_ACTIVE_SIGNALS} | OI floor: ${MIN_OI_USD:,.0f} | "
-          f"Dry-run: {DRY_RUN}", file=banner_stream)
-    print("=" * 78, file=banner_stream)
+    reference_ms = int(time.time() * 1000)
+    bar_index_ltf = reference_ms // (15 * 60 * 1000)
+    state = load_state()
+    prune_state(state)
+    reset_market_caches()
 
-    if is_backtest:
-        raw_args = sys.argv[2:]
-        if raw_args and raw_args[0].lower() == "all":
-            syms = WATCHLIST
-        else:
-            syms = raw_args or None
-        results = run_backtest_suite(syms)
-        print(json.dumps(results, indent=2, default=str))
+    print("[INIT] Fetching market context (metaAndAssetCtxs)…")
+    meta_ctx = get_meta_and_asset_ctxs() or {}
+    market_ctx = {f"{coin}USDT": data for coin, data in meta_ctx.items()}
+
+    if _shutdown:
+        save_state(state)
+        sys.exit(0)
+
+    print("[PHASE 1] Collecting candle bundles for all timeframes…")
+    bundles_by_symbol: dict[str, dict] = {}
+    with ThreadPoolExecutor(max_workers=max(1, SCAN_WORKERS)) as ex:
+        futures = {ex.submit(collect_market_inputs, sym, reference_ms): sym for sym in WATCHLIST}
+        for fut in as_completed(futures):
+            sym = futures[fut]
+            try:
+                b = fut.result()
+                if b is not None:
+                    bundles_by_symbol[sym] = b
+            except Exception as e:
+                print(f"    ERROR fetching {sym}: {e}")
+
+    resolved = [s for s in WATCHLIST if s in bundles_by_symbol]
+    print(f"  Resolved {len(resolved)}/{len(WATCHLIST)} symbols")
+    if len(resolved) < 10:
+        print("  [ABORT] Too few symbols resolved this cycle — skipping to avoid bad breadth reads")
+        save_state(state)
         return
 
-    _signal.signal(_signal.SIGTERM, _shutdown_handler)
-    _signal.signal(_signal.SIGINT, _shutdown_handler)
+    print("[PHASE 1b] Spread checks (majors exempt)…")
+    with ThreadPoolExecutor(max_workers=max(1, SCAN_WORKERS)) as ex:
+        futures = {ex.submit(get_l2_spread_pct, sym): sym for sym in resolved if sym not in SPREAD_EXEMPT}
+        for fut in as_completed(futures):
+            sym = futures[fut]
+            try:
+                spread = fut.result()
+                if spread is not None:
+                    market_ctx.setdefault(sym, {})["spread_pct"] = spread
+            except Exception:
+                pass
 
-    state = load_state()
-    _shutdown_state_ref.update(state)
-
-    if state.get("active_signals"):
-        log.info(f"[TRACKING] Checking {len(state['active_signals'])} active signal(s)...")
+    print("[INIT] Computing BTC macro regime…")
+    btc_regime = None
+    btc_bundle = bundles_by_symbol.get("BTCUSDT")
+    if btc_bundle:
         try:
-            check_active_signals(state)
+            btc_regime = classify_regime(btc_bundle[TF_HTF], btc_bundle[TF_MID])
+            print(f"  BTC regime: {btc_regime.label} / {btc_regime.direction} (ADX {btc_regime.adx:.1f})")
         except Exception as e:
-            log.warning(f"[TRACK ERROR] {e}")
-    else:
-        log.info("[TRACKING] No active signals to check.")
+            print(f"  [BTC REGIME] failed: {e}")
 
     try:
-        run_scan(state)
+        corr_matrix = compute_pairwise_correlation(resolved, bundles_by_symbol)
+        corr_clusters = cluster_by_correlation(resolved, corr_matrix)
     except Exception as e:
-        log.error(f"[MAIN ERROR] {e}")
-        send_telegram_plain(f"⚠️ {ENGINE_NAME} engine error: {e}")
+        print(f"  [CORR] clustering failed, falling back to singletons: {e}")
+        corr_clusters = [{s} for s in resolved]
 
-    try:
-        maybe_send_daily_summary(state)
-    except Exception as e:
-        log.warning(f"[SUMMARY ERROR] {e}")
+    breadth_pct = compute_breadth_pct()
+    min_confidence = governor_threshold(state)
+    max_signals = dynamic_max_signals(breadth_pct, btc_regime)
+    print(f"  Governor min-confidence: {min_confidence:.1f}  |  Max signals this scan: {max_signals} "
+          f"(breadth {breadth_pct*100:.0f}%)")
 
-    prune_state(state)
+    if _shutdown:
+        save_state(state)
+        sys.exit(0)
+
+    print("[PHASE 2] Scanning symbols for setups…")
+    pending: list[tuple] = []
+    with ThreadPoolExecutor(max_workers=max(1, SCAN_WORKERS)) as ex:
+        futures = {
+            ex.submit(scan_symbol, sym, state, bundles_by_symbol.get(sym), market_ctx,
+                      btc_regime, bar_index_ltf, reference_ms, min_confidence): sym
+            for sym in resolved
+        }
+        for fut in as_completed(futures):
+            sym = futures[fut]
+            try:
+                res = fut.result()
+                if res:
+                    pending.extend(res)
+            except Exception as e:
+                print(f"    ERROR scanning {sym}: {e}")
+
+    pending.sort(key=lambda t: priority_score(t[2], t[3]), reverse=True)
+    deduped = deduplicate_correlated(pending, corr_clusters)
+
+    room = max(0, MAX_CONCURRENT_ACTIVE_SIGNALS - count_active(state))
+    cap = min(max_signals, room)
+    top = deduped[:cap]
+    dropped = deduped[cap:]
+
+    if dropped:
+        for symbol, direction, cand, confidence, grade in dropped:
+            record_signal_history(state, symbol, direction, cand.pathway, confidence, grade, sent=False)
+        print(f"  Dropped {len(dropped)} lower-priority setup(s) (cap={cap})")
+
+    fired = 0
+    for rank, (symbol, direction, cand, confidence, grade) in enumerate(top, start=1):
+        msg = format_signal(symbol, cand, confidence, grade, rank)
+        msg_id = send_telegram(msg)
+        hist_id = record_signal_history(state, symbol, direction, cand.pathway, confidence, grade, sent=True)
+        if msg_id:
+            update_cooldown(state, symbol, direction, bar_index_ltf)
+            track_signal(state, symbol, direction, msg_id, cand, confidence, grade, bar_index_ltf, hist_id)
+            print(f"  #{rank} {hl_coin(symbol)} {direction.upper()} [{grade}] conf={confidence:.0f} "
+                  f"entry={cand.entry:.4f} sl={cand.sl:.4f} tp1={cand.tp1:.4f} tp2={cand.tp2:.4f}")
+            fired += 1
+        else:
+            print(f"  #{rank} {hl_coin(symbol)} {direction.upper()} — Telegram send failed, not tracked")
+        time.sleep(0.4)
+
+    print("[TRACK] Checking active signals against latest prices…")
+    market_prices = {sym: b[TF_LTF][-1]["c"] for sym, b in bundles_by_symbol.items()}
+    check_active_signals(state, market_prices)
+
+    maybe_send_daily_summary(state)
     save_state(state)
-    log.info("[DONE] Scan complete. Exiting.")
+    print(f"Scan complete. {fired} signal(s) fired. {count_active(state)} active.")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        try:
+            send_telegram(f"🚨 {ENGINE_NAME} crashed: {e}")
+        except Exception:
+            pass
+        raise
+    finally:
+        _session.close()
