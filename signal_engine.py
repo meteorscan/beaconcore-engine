@@ -35,6 +35,7 @@ import os
 import sys
 import json
 import math
+import re
 import time
 import signal as os_signal
 import threading
@@ -1528,7 +1529,11 @@ def check_active_signals(state: dict, market_prices: dict[str, float]):
             continue
         if hit_tp1 and not sig["tp1_hit"]:
             sig["tp1_hit"] = True
+            r1 = _r_multiple(sig, sig["tp1"])
             react_telegram(sig["msg_id"], "🔥")
+            reply_telegram(sig["msg_id"],
+                            f"🔥 {hl_coin(sig['symbol'])} {sig['direction'].upper()} — "
+                            f"TP1 hit ({r1:+.2f}R) — runner still active toward TP2")
         if sig["tp1_hit"] and hit_tp2:
             _close_signal(state, sig, "win", price)
             continue
@@ -1580,19 +1585,33 @@ def confidence_bar(confidence: float) -> str:
 
 
 PATHWAY_LABEL = {
-    "liquidity_reversal": "Liquidity Reversal (Sweep + MSS + Breaker)",
-    "trend_continuation": "Trend Continuation (HTF pullback)",
+    "liquidity_reversal": "Liquidity Reversal",
+    "trend_continuation": "Trend Continuation",
     "range_reversion": "Range Mean-Reversion",
 }
 
 
+_PAREN_RE = re.compile(r"\s*\([^)]*\)")
+
+_SHORTEN_MAP = {
+    "confirmed + breaker retest": "+ breaker retest",
+    "liquidity sweep @": "sweep @",
+}
+
+
+def _shorten_confluence(text: str) -> str:
+    text = _PAREN_RE.sub("", text).strip()
+    for long, short in _SHORTEN_MAP.items():
+        text = text.replace(long, short)
+    return text
+
+
 def format_signal(symbol: str, cand: Candidate, confidence: float, grade: str, rank: int) -> str:
     dir_emoji = "🟢 LONG" if cand.direction == "long" else "🔴 SHORT"
-    risk = abs(cand.entry - cand.sl)
-    tp1_pct = safe_div(abs(cand.tp1 - cand.entry), cand.entry) * 100
-    sl_pct = safe_div(risk, cand.entry) * 100
-    confluences = "\n".join(f"   • {c}" for c in cand.confluences)
-    zone_label = {"ob": "Order Block", "breaker": "Breaker Block", "fvg": "Fair Value Gap"}[cand.zone.origin]
+    confluences = "\n".join(f"• {_shorten_confluence(c)}" for c in cand.confluences)
+    setup_line = PATHWAY_LABEL.get(cand.pathway, cand.pathway)
+    if cand.regime:
+        setup_line += f" · {cand.regime.label}/{cand.regime.direction}"
 
     lines = [
         f"🦅 <b>{ENGINE_NAME}</b> — Adaptive Smart-Money Signal Engine",
@@ -1601,18 +1620,12 @@ def format_signal(symbol: str, cand: Candidate, confidence: float, grade: str, r
         f"Grade: <b>{grade}</b>   Confidence: <b>{confidence:.0f}%</b>",
         confidence_bar(confidence),
         "",
-        f"Entry ({zone_label} retest):",
-        f"<code>{fmt_px_copy(cand.entry)}</code>",
-        f"Stop Loss (-{sl_pct:.2f}%):",
-        f"<code>{fmt_px_copy(cand.sl)}</code>",
-        f"Take Profit 1 (+{tp1_pct:.2f}% · R:R {cand.rr1():.2f}):",
-        f"<code>{fmt_px_copy(cand.tp1)}</code>",
-        f"Take Profit 2 (R:R {cand.rr2():.2f}):",
-        f"<code>{fmt_px_copy(cand.tp2)}</code>",
+        f"Entry: <code>{fmt_px_copy(cand.entry)}</code>",
+        f"Stop Loss: <code>{fmt_px_copy(cand.sl)}</code>",
+        f"Take Profit 1: <code>{fmt_px_copy(cand.tp1)}</code>",
+        f"Take Profit 2: <code>{fmt_px_copy(cand.tp2)}</code>",
         "",
-        f"Setup: {PATHWAY_LABEL.get(cand.pathway, cand.pathway)}",
-        f"Regime: {cand.regime.label} / {cand.regime.direction} (ADX {cand.regime.adx:.0f})" if cand.regime else "",
-        "Confluences:",
+        setup_line,
         confluences,
         "",
         f"<i>{ENGINE_NAME} v{__version__} · scan-per-run · not financial advice</i>",
