@@ -14,21 +14,6 @@
       "opened_ts": 1783560665.309464,
       "risk_pct": 1.0,
       "tp1_hit": false
-    },
-    {
-      "hist_id": "BTC-1783561533-9737",
-      "symbol": "BTC",
-      "direction": "short",
-      "pathway": "trend_continuation",
-      "entry": 62078.0,
-      "stop": 62610.192633626626,
-      "tp1": 61226.491786197395,
-      "tp2": 60587.860625845446,
-      "risk": 532.192633626626,
-      "message_id": 1930,
-      "opened_ts": 1783561533.5160964,
-      "risk_pct": 1.0,
-      "tp1_hit": false
     }
   ],
   "history": [
@@ -129,7 +114,7 @@
       "confidence": 99.14286260726082,
       "grade": "A+",
       "timestamp": "2026-07-09T01:45:31.811728+00:00",
-      "outcome": null
+      "outcome": "loss"
     }
   ],
   "governor": {
@@ -179,7 +164,8 @@
       0,
       0,
       1,
-      1
+      1,
+      0
     ],
     "last_signal_ts": 1783561533.5163257
   },
@@ -189,7 +175,7 @@
       "wins": 0
     },
     "trend_continuation": {
-      "n": 5,
+      "n": 6,
       "wins": 0
     },
     "liquidity_reversal": {
@@ -215,14 +201,14 @@
       "wins": 0
     },
     "BTC:short": {
-      "n": 1,
+      "n": 2,
       "wins": 0
     }
   },
   "daily": {
     "2026-07-09": {
       "signal_count": 3,
-      "realized_pnl_pct": -3.0,
+      "realized_pnl_pct": -4.0,
       "paused": false
     }
   },
