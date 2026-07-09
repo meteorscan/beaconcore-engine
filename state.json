@@ -14,6 +14,21 @@
       "opened_ts": 1783560665.309464,
       "risk_pct": 1.0,
       "tp1_hit": false
+    },
+    {
+      "hist_id": "BTC-1783575369-9737",
+      "symbol": "BTC",
+      "direction": "short",
+      "pathway": "trend_continuation",
+      "entry": 62292.0,
+      "stop": 62620.11159695164,
+      "tp1": 61831.416666666664,
+      "tp2": 61761.5,
+      "risk": 328.1115969516395,
+      "message_id": 1935,
+      "opened_ts": 1783575369.8489478,
+      "risk_pct": 1.0,
+      "tp1_hit": false
     }
   ],
   "history": [
@@ -115,11 +130,22 @@
       "grade": "A+",
       "timestamp": "2026-07-09T01:45:31.811728+00:00",
       "outcome": "loss"
+    },
+    {
+      "id": "BTC-1783575369-9737",
+      "symbol": "BTC",
+      "direction": "short",
+      "pathway": "trend_continuation",
+      "pipeline": "slow",
+      "confidence": 95.5369565630613,
+      "grade": "A+",
+      "timestamp": "2026-07-09T05:36:08.442905+00:00",
+      "outcome": null
     }
   ],
   "governor": {
-    "threshold": 1.5200000000000002,
-    "last_adjust_ts": 1783573273.0034885,
+    "threshold": 1.6000000000000003,
+    "last_adjust_ts": 1783575368.2232983,
     "scan_counts": [
       0,
       1,
@@ -178,9 +204,10 @@
       0,
       0,
       0,
-      0
+      0,
+      1
     ],
-    "last_signal_ts": 1783561533.5163257
+    "last_signal_ts": 1783575369.8491702
   },
   "pathway_stats": {
     "momentum_breakout": {
@@ -220,7 +247,7 @@
   },
   "daily": {
     "2026-07-09": {
-      "signal_count": 3,
+      "signal_count": 4,
       "realized_pnl_pct": -4.0,
       "paused": false
     }
