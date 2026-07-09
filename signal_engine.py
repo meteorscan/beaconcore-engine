@@ -1311,13 +1311,13 @@ def cluster_by_correlation(symbols: list[str], matrix: dict, threshold: float = 
 
 def deduplicate_correlated(ranked: list[tuple], clusters: list[set]) -> list[tuple]:
     kept, seen_clusters_dir = [], set()
-    for symbol, direction, cand, conf in ranked:
+    for symbol, direction, cand, conf, grade in ranked:
         cl = next((c for c in clusters if symbol in c), {symbol})
         key = (frozenset(cl), direction)
         if key in seen_clusters_dir:
             continue
         seen_clusters_dir.add(key)
-        kept.append((symbol, direction, cand, conf))
+        kept.append((symbol, direction, cand, conf, grade))
     return kept
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -1419,7 +1419,7 @@ def _default_state() -> dict:
         "active_signals": [],
         "signal_history": [],
         "cooldowns": {},
-        "last_summary_ts": 0,
+        "last_summary_date": None,
         "spread_history": {},
     }
 
@@ -1528,7 +1528,7 @@ def check_active_signals(state: dict, market_prices: dict[str, float]):
             continue
         if hit_tp1 and not sig["tp1_hit"]:
             sig["tp1_hit"] = True
-            react_telegram(sig["msg_id"], "🎯")
+            react_telegram(sig["msg_id"], "🔥")
         if sig["tp1_hit"] and hit_tp2:
             _close_signal(state, sig, "win", price)
             continue
@@ -1541,7 +1541,7 @@ def check_active_signals(state: dict, market_prices: dict[str, float]):
 
 def _close_signal(state: dict, sig: dict, result: str, price: float):
     r = _r_multiple(sig, price)
-    emoji = "✅" if result == "win" else "🛑"
+    emoji = "🏆" if result == "win" else "😭"
     react_telegram(sig["msg_id"], emoji)
     reply_telegram(sig["msg_id"],
                     f"{emoji} {hl_coin(sig['symbol'])} {sig['direction'].upper()} closed — "
@@ -1560,6 +1560,17 @@ def fmt_px(v: float) -> str:
         return f"{v:,.2f}"
     if v >= 1:
         return f"{v:,.4f}"
+    return f"{v:.6f}"
+
+
+def fmt_px_copy(v: float) -> str:
+    """Plain numeric formatting with NO thousands separators, so tapping the
+    <code> block in Telegram copies a value that pastes straight into an
+    exchange order field without needing to strip commas first."""
+    if v >= 1000:
+        return f"{v:.2f}"
+    if v >= 1:
+        return f"{v:.4f}"
     return f"{v:.6f}"
 
 
@@ -1584,15 +1595,20 @@ def format_signal(symbol: str, cand: Candidate, confidence: float, grade: str, r
     zone_label = {"ob": "Order Block", "breaker": "Breaker Block", "fvg": "Fair Value Gap"}[cand.zone.origin]
 
     lines = [
-        f"⚡ <b>{ENGINE_NAME}</b> #{rank} — <b>{hl_coin(symbol)}</b> {dir_emoji}",
+        f"🦅 <b>{ENGINE_NAME}</b> — Adaptive Smart-Money Signal Engine",
+        "────────────────────",
+        f"#{rank} <b>{hl_coin(symbol)}</b> {dir_emoji}",
         f"Grade: <b>{grade}</b>   Confidence: <b>{confidence:.0f}%</b>",
         confidence_bar(confidence),
         "",
-        f"Entry: <code>{fmt_px(cand.entry)}</code>  ({zone_label} retest)",
-        f"Stop Loss: <code>{fmt_px(cand.sl)}</code>  (-{sl_pct:.2f}%)",
-        f"Take Profit 1: <code>{fmt_px(cand.tp1)}</code>  (+{tp1_pct:.2f}%)",
-        f"Take Profit 2: <code>{fmt_px(cand.tp2)}</code>  (R:R {cand.rr2():.2f})",
-        f"Risk:Reward (TP1): <b>{cand.rr1():.2f}</b>",
+        f"Entry ({zone_label} retest):",
+        f"<code>{fmt_px_copy(cand.entry)}</code>",
+        f"Stop Loss (-{sl_pct:.2f}%):",
+        f"<code>{fmt_px_copy(cand.sl)}</code>",
+        f"Take Profit 1 (+{tp1_pct:.2f}% · R:R {cand.rr1():.2f}):",
+        f"<code>{fmt_px_copy(cand.tp1)}</code>",
+        f"Take Profit 2 (R:R {cand.rr2():.2f}):",
+        f"<code>{fmt_px_copy(cand.tp2)}</code>",
         "",
         f"Setup: {PATHWAY_LABEL.get(cand.pathway, cand.pathway)}",
         f"Regime: {cand.regime.label} / {cand.regime.direction} (ADX {cand.regime.adx:.0f})" if cand.regime else "",
@@ -1637,6 +1653,9 @@ def react_telegram(msg_id: int, emoji: str):
         pass
 
 
+DAILY_SUMMARY_HOUR_UTC = 8   # send once per day, during the 8am UTC scan window
+
+
 def build_daily_summary(state: dict) -> str:
     now = time.time() * 1000
     last_24h = [h for h in state["signal_history"] if h.get("sent") and now - h.get("ts", 0) <= 86_400_000]
@@ -1644,7 +1663,9 @@ def build_daily_summary(state: dict) -> str:
     wins = sum(1 for h in resolved if h["result"] == "win")
     winrate = safe_div(wins, len(resolved)) * 100 if resolved else 0.0
     return (
-        f"📊 <b>{ENGINE_NAME} Daily Summary</b>\n"
+        f"🦅 <b>{ENGINE_NAME}</b> — Adaptive Smart-Money Signal Engine\n"
+        f"────────────────────\n"
+        f"📊 <b>24H Summary</b>\n"
         f"Signals sent (24h): {len(last_24h)}\n"
         f"Resolved: {len(resolved)}  Win rate: {winrate:.0f}%\n"
         f"Currently active: {count_active(state)}"
@@ -1652,10 +1673,11 @@ def build_daily_summary(state: dict) -> str:
 
 
 def maybe_send_daily_summary(state: dict):
-    now = time.time()
-    if now - state.get("last_summary_ts", 0) >= 86_400:
+    now_dt = datetime.now(timezone.utc)
+    today_str = now_dt.strftime("%Y-%m-%d")
+    if now_dt.hour == DAILY_SUMMARY_HOUR_UTC and state.get("last_summary_date") != today_str:
         send_telegram(build_daily_summary(state))
-        state["last_summary_ts"] = now
+        state["last_summary_date"] = today_str
 
 # ══════════════════════════════════════════════════════════════════════════
 #  PER-SYMBOL SCAN PIPELINE
