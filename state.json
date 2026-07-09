@@ -29,6 +29,21 @@
       "opened_ts": 1783546265.9837224,
       "risk_pct": 1.0,
       "tp1_hit": false
+    },
+    {
+      "hist_id": "HYPE-1783557934-9737",
+      "symbol": "HYPE",
+      "direction": "long",
+      "pathway": "trend_continuation",
+      "entry": 67.756,
+      "stop": 67.23311816130638,
+      "tp1": 68.5926109419098,
+      "tp2": 69.22006914834213,
+      "risk": 0.5228818386936211,
+      "message_id": 1923,
+      "opened_ts": 1783557934.4270954,
+      "risk_pct": 1.0,
+      "tp1_hit": false
     }
   ],
   "history": [
@@ -97,6 +112,17 @@
       "grade": "A+",
       "timestamp": "2026-07-08T21:31:04.924176+00:00",
       "outcome": null
+    },
+    {
+      "id": "HYPE-1783557934-9737",
+      "symbol": "HYPE",
+      "direction": "long",
+      "pathway": "trend_continuation",
+      "pipeline": "slow",
+      "confidence": 52.331640980385174,
+      "grade": "C",
+      "timestamp": "2026-07-09T00:45:33.083651+00:00",
+      "outcome": null
     }
   ],
   "governor": {
@@ -141,9 +167,10 @@
       0,
       0,
       0,
-      0
+      0,
+      1
     ],
-    "last_signal_ts": 1783546265.9839478
+    "last_signal_ts": 1783557934.4272864
   },
   "pathway_stats": {
     "momentum_breakout": {
@@ -171,7 +198,7 @@
   },
   "daily": {
     "2026-07-09": {
-      "signal_count": 0,
+      "signal_count": 1,
       "realized_pnl_pct": 0.0,
       "paused": false
     }
