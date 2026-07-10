@@ -1763,7 +1763,18 @@ def scan_symbol(symbol: str, state: dict, bundles: dict, market_ctx: dict,
 
         cand.entry, cand.sl, cand.tp1, cand.tp2 = clamp_entry_to_market(
             cand.entry, cand.sl, cand.tp1, cand.tp2, market_price, cand.atr_val)
-        cand.tp2 = clip_tp_to_liquidity(cand.entry, cand.tp2, cand.direction, pools, vp, htf_zones)
+        clipped_tp2 = clip_tp_to_liquidity(cand.entry, cand.tp2, cand.direction, pools, vp, htf_zones)
+        # Guard: clipping TP2 to a nearby liquidity/OB/VP level must never
+        # place it closer to entry than TP1 -- that would invert the
+        # tp1 <= tp2 (long) / tp2 <= tp1 (short) invariant build_risk_plan()
+        # already guaranteed. If the clip would violate it, keep the
+        # original (unclipped) TP2 instead of the closer level.
+        if cand.direction == "long":
+            if clipped_tp2 >= cand.tp1:
+                cand.tp2 = clipped_tp2
+        else:
+            if clipped_tp2 <= cand.tp1:
+                cand.tp2 = clipped_tp2
         cand.zone_q = zone_quality(cand.zone)
 
         fr = apply_five_filters(cand, market_price, MIN_RR_FLOOR)
