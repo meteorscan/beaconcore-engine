@@ -108,6 +108,8 @@ MAX_SIGNALS_PER_SCAN_TRENDING = 6
 MAX_CONCURRENT_ACTIVE_SIGNALS = 14
 MAX_SIGNAL_HISTORY = 1500
 COOLDOWN_BARS_LTF = 3                # bars (of TF_LTF) before same symbol/direction can re-fire
+PENDING_ENTRY_EXPIRY_BARS = 8         # bars (of TF_LTF) a signal can sit unfilled before it's cancelled --
+                                       # 8 * 15m = 2h; the POI is assumed stale/invalidated past this
 DUPLICATE_ENTRY_TOLERANCE_PCT = 0.0035
 
 # ── ADAPTIVE GOVERNOR ────────────────────────────────────────────────────
@@ -1452,6 +1454,11 @@ def track_signal(state: dict, symbol: str, direction: str, msg_id: int,
         "pathway": cand.pathway, "confidence": confidence, "grade": grade,
         "bar_index": bar_index, "hist_id": hist_id, "opened_ts": time.time() * 1000,
         "tp1_hit": False,
+        # Entry is a resting limit/stop order, not an instant fill. Nothing
+        # is "at risk" until price actually trades through cand.entry, so
+        # SL/TP checks must not begin until this flips true.
+        "entry_filled": False,
+        "bars_pending": 0,
         # Only candles CLOSING after this ts get scanned for SL/TP hits.
         # Seeded with the last already-closed LTF candle at entry time, so
         # the next NEW closed candle is the first one checked.
@@ -1480,6 +1487,18 @@ def check_active_signals(state: dict, bundles_by_symbol: dict[str, dict[str, lis
     that candle's high/low wick, not just the latest close -- so a SL/TP1/TP2
     level touched intra-candle is never missed between polling runs, however
     far apart those runs are.
+
+    ENTRY FILL: `entry` is a resting limit/stop order, not an instant fill.
+    Nothing is at risk until price actually trades through the entry level,
+    so SL/TP wicks are ignored for any signal whose entry hasn't printed
+    yet -- otherwise a signal whose SL sits closer to market than its entry
+    (a common shape for breakout/continuation setups) can be marked a loss
+    without ever having been filled. A candle's range is treated as having
+    touched entry if lo <= entry <= hi. If entry fills mid-candle and that
+    same candle's wick also reaches SL/TP1/TP2, the same conservative
+    same-candle-ambiguity handling below still applies. A signal that sits
+    unfilled for PENDING_ENTRY_EXPIRY_BARS is cancelled outright (see
+    _expire_signal) rather than left pending forever or misjudged as a loss.
 
     NOTE: SL is never moved/trailed to TP1. It stays at its original level
     for the life of the signal. A return to that original SL after TP1 has
@@ -1510,6 +1529,20 @@ def check_active_signals(state: dict, bundles_by_symbol: dict[str, dict[str, lis
         closed = False
         for c in new_candles:
             hi, lo = c["h"], c["l"]
+
+            if not sig.get("entry_filled", False):
+                if not (lo <= sig["entry"] <= hi):
+                    # Order still resting -- nothing to check this candle.
+                    sig["bars_pending"] = sig.get("bars_pending", 0) + 1
+                    if sig["bars_pending"] >= PENDING_ENTRY_EXPIRY_BARS:
+                        _expire_signal(state, sig)
+                        closed = True
+                        break
+                    continue
+                sig["entry_filled"] = True
+                # Fall through: the same candle that fills entry can also
+                # wick to SL/TP1/TP2, so it still gets evaluated below.
+
             hit_sl = lo <= sig["sl"] if direction == "long" else hi >= sig["sl"]
             hit_tp1 = hi >= sig["tp1"] if direction == "long" else lo <= sig["tp1"]
             hit_tp2 = hi >= sig["tp2"] if direction == "long" else lo <= sig["tp2"]
@@ -1565,6 +1598,18 @@ def _close_signal(state: dict, sig: dict, result: str, price: float):
                     f"{emoji} {hl_coin(sig['symbol'])} {sig['direction'].upper()} closed — "
                     f"{result.upper()} ({r:+.2f}R)")
     _update_history_result(state, sig["hist_id"], result)
+
+
+def _expire_signal(state: dict, sig: dict):
+    """Cancels a signal whose entry never filled within PENDING_ENTRY_EXPIRY_BARS.
+    No position was ever opened, so this is neither a win nor a loss -- it's
+    excluded from win-rate stats entirely (governor_threshold and
+    build_daily_summary already only count result in ('win', 'loss'))."""
+    react_telegram(sig["msg_id"], "⌛")
+    reply_telegram(sig["msg_id"],
+                    f"⌛ {hl_coin(sig['symbol'])} {sig['direction'].upper()} — entry never filled after "
+                    f"{PENDING_ENTRY_EXPIRY_BARS} bars, signal expired (not counted as win/loss)")
+    _update_history_result(state, sig["hist_id"], "expired")
 
 # TELEGRAM
 
