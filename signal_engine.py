@@ -1571,11 +1571,16 @@ def check_active_signals(state: dict, bundles_by_symbol: dict[str, dict[str, lis
                         closed = True
                         break
                     if hit_sl:
-                        # Wick touched both TP1 and original SL within the
-                        # same candle -- can't know which came first intra-bar,
-                        # so treat conservatively as SL first (loss) rather
-                        # than assuming the more favourable order.
-                        _close_signal(state, sig, "loss", sig["sl"], close_type="sl_only")
+                        # Wick touched both TP1 and original SL within the same
+                        # candle. TP1 was already marked hit and its R banked
+                        # above -- scoring this as a plain loss here would
+                        # silently erase that credit and contradict the
+                        # deferred-candle case below (which correctly scores
+                        # a later SL touch after TP1 as a win). Score it the
+                        # same way: TP1 secured -- WIN, with TP1's R credited,
+                        # not the SL exit's negative R.
+                        _close_signal(state, sig, "win", sig["sl"],
+                                      close_type="tp1_then_sl", r_override=r1)
                         closed = True
                         break
             else:
