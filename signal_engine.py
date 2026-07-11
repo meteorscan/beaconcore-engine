@@ -1444,13 +1444,18 @@ def record_signal_history(state: dict, symbol: str, direction: str, pathway: str
 
 
 def track_signal(state: dict, symbol: str, direction: str, msg_id: int,
-                  cand: Candidate, confidence: float, grade: str, bar_index: int, hist_id: int):
+                  cand: Candidate, confidence: float, grade: str, bar_index: int, hist_id: int,
+                  last_candle_ts: float = 0):
     state["active_signals"].append({
         "symbol": symbol, "direction": direction, "msg_id": msg_id,
         "entry": cand.entry, "sl": cand.sl, "tp1": cand.tp1, "tp2": cand.tp2,
         "pathway": cand.pathway, "confidence": confidence, "grade": grade,
         "bar_index": bar_index, "hist_id": hist_id, "opened_ts": time.time() * 1000,
         "tp1_hit": False,
+        # Only candles CLOSING after this ts get scanned for SL/TP hits.
+        # Seeded with the last already-closed LTF candle at entry time, so
+        # the next NEW closed candle is the first one checked.
+        "last_check_ts": last_candle_ts,
     })
 
 
@@ -1470,35 +1475,85 @@ def _update_history_result(state: dict, hist_id: int, result: str):
             break
 
 
-def check_active_signals(state: dict, market_prices: dict[str, float]):
+def check_active_signals(state: dict, bundles_by_symbol: dict[str, dict[str, list[dict]]]):
+    """Scans every LTF candle CLOSED since the signal's last check -- using
+    that candle's high/low wick, not just the latest close -- so a SL/TP1/TP2
+    level touched intra-candle is never missed between polling runs, however
+    far apart those runs are.
+
+    NOTE: SL is never moved/trailed to TP1. It stays at its original level
+    for the life of the signal. A return to that original SL after TP1 has
+    already been hit is still scored as a managed win (see _close_signal
+    call below) purely for bookkeeping purposes -- the stored sl value
+    itself is untouched, so there's no risk of a moved SL sitting right on
+    top of TP1 and self-triggering the moment TP1 prints.
+    """
     still_active = []
     for sig in state["active_signals"]:
-        price = market_prices.get(sig["symbol"])
-        if price is None:
+        bundle = bundles_by_symbol.get(sig["symbol"])
+        candles_ltf = bundle.get(TF_LTF) if bundle else None
+        if not candles_ltf:
             still_active.append(sig)
             continue
-        direction = sig["direction"]
-        hit_sl = price <= sig["sl"] if direction == "long" else price >= sig["sl"]
-        hit_tp1 = price >= sig["tp1"] if direction == "long" else price <= sig["tp1"]
-        hit_tp2 = price >= sig["tp2"] if direction == "long" else price <= sig["tp2"]
 
-        if hit_sl and not sig["tp1_hit"]:
-            _close_signal(state, sig, "loss", price)
+        direction = sig["direction"]
+        last_ts = sig.get("last_check_ts", 0)
+        # Only candles that closed strictly after the last check, oldest first.
+        new_candles = sorted(
+            (c for c in candles_ltf if c["t"] > last_ts),
+            key=lambda c: c["t"],
+        )
+        if not new_candles:
+            still_active.append(sig)
             continue
-        if hit_tp1 and not sig["tp1_hit"]:
-            sig["tp1_hit"] = True
-            r1 = _r_multiple(sig, sig["tp1"])
-            react_telegram(sig["msg_id"], "🔥")
-            reply_telegram(sig["msg_id"],
-                            f"🔥 {hl_coin(sig['symbol'])} {sig['direction'].upper()} — "
-                            f"TP1 hit ({r1:+.2f}R) — runner still active toward TP2")
-        if sig["tp1_hit"] and hit_tp2:
-            _close_signal(state, sig, "win", price)
-            continue
-        if sig["tp1_hit"] and hit_sl:
-            _close_signal(state, sig, "win", price)   # SL trailed past entry after TP1 in practice; counted as managed win
-            continue
-        still_active.append(sig)
+
+        closed = False
+        for c in new_candles:
+            hi, lo = c["h"], c["l"]
+            hit_sl = lo <= sig["sl"] if direction == "long" else hi >= sig["sl"]
+            hit_tp1 = hi >= sig["tp1"] if direction == "long" else lo <= sig["tp1"]
+            hit_tp2 = hi >= sig["tp2"] if direction == "long" else lo <= sig["tp2"]
+
+            if not sig["tp1_hit"]:
+                if hit_sl and not hit_tp1:
+                    _close_signal(state, sig, "loss", sig["sl"])
+                    closed = True
+                    break
+                if hit_tp1:
+                    sig["tp1_hit"] = True
+                    r1 = _r_multiple(sig, sig["tp1"])
+                    react_telegram(sig["msg_id"], "🔥")
+                    reply_telegram(sig["msg_id"],
+                                    f"🔥 {hl_coin(sig['symbol'])} {sig['direction'].upper()} — "
+                                    f"TP1 hit ({r1:+.2f}R) — runner still active toward TP2")
+                    # Same candle's wick can also clear TP2 (fast/volatile
+                    # move) -- check it immediately rather than waiting for
+                    # the next candle.
+                    if hit_tp2:
+                        _close_signal(state, sig, "win", sig["tp2"])
+                        closed = True
+                        break
+                    if hit_sl:
+                        # Wick touched both TP1 and original SL within the
+                        # same candle -- can't know which came first intra-bar,
+                        # so treat conservatively as SL first (loss) rather
+                        # than assuming the more favourable order.
+                        _close_signal(state, sig, "loss", sig["sl"])
+                        closed = True
+                        break
+            else:
+                if hit_tp2:
+                    _close_signal(state, sig, "win", sig["tp2"])
+                    closed = True
+                    break
+                if hit_sl:
+                    _close_signal(state, sig, "win", sig["sl"])  # managed win, see docstring
+                    closed = True
+                    break
+
+        sig["last_check_ts"] = new_candles[-1]["t"]
+        if not closed:
+            still_active.append(sig)
     state["active_signals"] = still_active
 
 
@@ -1877,7 +1932,8 @@ def main():
         hist_id = record_signal_history(state, symbol, direction, cand.pathway, confidence, grade, sent=True)
         if msg_id:
             update_cooldown(state, symbol, direction, bar_index_ltf)
-            track_signal(state, symbol, direction, msg_id, cand, confidence, grade, bar_index_ltf, hist_id)
+            track_signal(state, symbol, direction, msg_id, cand, confidence, grade, bar_index_ltf, hist_id,
+                         last_candle_ts=bundles_by_symbol[symbol][TF_LTF][-1]["t"])
             print(f"  #{rank} {hl_coin(symbol)} {direction.upper()} [{grade}] conf={confidence:.0f} "
                   f"entry={cand.entry:.4f} sl={cand.sl:.4f} tp1={cand.tp1:.4f} tp2={cand.tp2:.4f}")
             fired += 1
@@ -1885,9 +1941,8 @@ def main():
             print(f"  #{rank} {hl_coin(symbol)} {direction.upper()} — Telegram send failed, not tracked")
         time.sleep(0.4)
 
-    print("[TRACK] Checking active signals against latest prices…")
-    market_prices = {sym: b[TF_LTF][-1]["c"] for sym, b in bundles_by_symbol.items()}
-    check_active_signals(state, market_prices)
+    print("[TRACK] Checking active signals against candle wicks since last check…")
+    check_active_signals(state, bundles_by_symbol)
 
     maybe_send_daily_summary(state)
     save_state(state)
