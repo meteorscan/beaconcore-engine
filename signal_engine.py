@@ -1549,21 +1549,25 @@ def check_active_signals(state: dict, bundles_by_symbol: dict[str, dict[str, lis
 
             if not sig["tp1_hit"]:
                 if hit_sl and not hit_tp1:
-                    _close_signal(state, sig, "loss", sig["sl"])
+                    _close_signal(state, sig, "loss", sig["sl"], close_type="sl_only")
                     closed = True
                     break
                 if hit_tp1:
                     sig["tp1_hit"] = True
                     r1 = _r_multiple(sig, sig["tp1"])
+                    sig["tp1_r"] = r1
                     react_telegram(sig["msg_id"], "🔥")
                     reply_telegram(sig["msg_id"],
                                     f"🔥 {hl_coin(sig['symbol'])} {sig['direction'].upper()} — "
-                                    f"TP1 hit ({r1:+.2f}R) — runner still active toward TP2")
+                                    f"TP1 hit ({r1:+.2f}R) — runner still active toward TP2\n"
+                                    f"SL stays at <code>{fmt_px_copy(sig['sl'])}</code> — unchanged. "
+                                    f"Want to lock in breakeven on the runner? You can manually move "
+                                    f"your own SL to entry (<code>{fmt_px_copy(sig['entry'])}</code>).")
                     # Same candle's wick can also clear TP2 (fast/volatile
                     # move) -- check it immediately rather than waiting for
                     # the next candle.
                     if hit_tp2:
-                        _close_signal(state, sig, "win", sig["tp2"])
+                        _close_signal(state, sig, "win", sig["tp2"], close_type="tp2")
                         closed = True
                         break
                     if hit_sl:
@@ -1571,16 +1575,22 @@ def check_active_signals(state: dict, bundles_by_symbol: dict[str, dict[str, lis
                         # same candle -- can't know which came first intra-bar,
                         # so treat conservatively as SL first (loss) rather
                         # than assuming the more favourable order.
-                        _close_signal(state, sig, "loss", sig["sl"])
+                        _close_signal(state, sig, "loss", sig["sl"], close_type="sl_only")
                         closed = True
                         break
             else:
                 if hit_tp2:
-                    _close_signal(state, sig, "win", sig["tp2"])
+                    _close_signal(state, sig, "win", sig["tp2"], close_type="tp2")
                     closed = True
                     break
                 if hit_sl:
-                    _close_signal(state, sig, "win", sig["sl"])  # managed win, see docstring
+                    # TP1 already banked -- this is a managed win. Credit the
+                    # R actually banked at TP1, not the (negative) R implied
+                    # by the SL exit price, which stays untouched at its
+                    # original level for the life of the signal (see docstring
+                    # above). See _close_signal for the "tp1_then_sl" framing.
+                    _close_signal(state, sig, "win", sig["sl"],
+                                  close_type="tp1_then_sl", r_override=sig.get("tp1_r"))
                     closed = True
                     break
 
@@ -1590,13 +1600,40 @@ def check_active_signals(state: dict, bundles_by_symbol: dict[str, dict[str, lis
     state["active_signals"] = still_active
 
 
-def _close_signal(state: dict, sig: dict, result: str, price: float):
-    r = _r_multiple(sig, price)
+def _close_signal(state: dict, sig: dict, result: str, price: float,
+                   close_type: str = "sl_only", r_override: float | None = None):
+    """close_type picks the outcome headline:
+      "tp2"          -> "TP2 hit -- WIN"
+      "tp1_then_sl"  -> "TP1 secured -- WIN" (SL was hit afterward on the
+                         runner, but the trade is still scored a win)
+      "sl_only"      -> "SL hit -- LOSS" (TP1 was never hit)
+
+    r_override, when provided, is used as the realized R instead of deriving
+    it from `price`. This matters for "tp1_then_sl": the exit price passed in
+    is the original SL, but the realized result credited to the trade is the
+    R actually banked at TP1 -- not the (negative, ~-1R) figure the SL price
+    would otherwise imply.
+    """
+    r = r_override if r_override is not None else _r_multiple(sig, price)
     emoji = "🏆" if result == "win" else "😭"
     react_telegram(sig["msg_id"], emoji)
-    reply_telegram(sig["msg_id"],
-                    f"{emoji} {hl_coin(sig['symbol'])} {sig['direction'].upper()} closed — "
-                    f"{result.upper()} ({r:+.2f}R)")
+
+    if close_type == "tp2":
+        headline = "TP2 hit — WIN"
+        extra = None
+    elif close_type == "tp1_then_sl":
+        headline = "TP1 secured — WIN"
+        extra = ("(SL was hit afterward on the runner portion -- still scored "
+                 "a win, with the R banked at TP1.)")
+    else:
+        headline = "SL hit — LOSS"
+        extra = None
+
+    msg = (f"{emoji} {hl_coin(sig['symbol'])} {sig['direction'].upper()} closed — "
+           f"{headline} ({r:+.2f}R)")
+    if extra:
+        msg += f"\n{extra}"
+    reply_telegram(sig["msg_id"], msg)
     _update_history_result(state, sig["hist_id"], result)
 
 
