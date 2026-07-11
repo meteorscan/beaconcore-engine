@@ -1,33 +1,11 @@
-# ══════════════════════════════════════════════════════════════════════════
-#  KESTREL — Adaptive Smart-Money Signal Engine
-#  v1.0.0
+
+# KESTREL — Adaptive Smart-Money Signal Engine
+# v1.1.1
 #
-#  Philosophy: a kestrel hunts by hovering motionless until the moment of
-#  strike is unambiguous, then commits with precision. This engine applies
-#  the same discipline to crypto intraday/swing trading: it maps liquidity
-#  and institutional footprints (Order Blocks, Breaker Blocks, Fair Value
-#  Gaps) across a four-timeframe stack, waits for price to actually sweep
-#  liquidity and shift structure in confirmation, and only then commits —
-#  scored through five independent filters (Location, Context, Quality,
-#  RR, LTF-confirmation) rather than a single blended threshold.
-#
-#  Key innovations over the reference generation:
-#   - Breaker Blocks are treated as first-class citizens, not a footnote:
-#     every mitigated Order Block is tracked forward and reclassified as a
-#     breaker the moment price closes through it, on BOTH the HTF (bias/
-#     zone map) and the LTF (entry trigger) stacks — "HTF -> OB/BB,
-#     LTF -> BB" is enforced structurally, not just as a scoring bonus.
-#   - Three regime-matched pathways (Liquidity Reversal, Trend Continuation,
-#     Range Mean-Reversion) are auto-selected per symbol from a live regime
-#     classifier, instead of running every pathway against every symbol.
-#   - A self-tuning governor nudges quality thresholds from realized win
-#     rate stored in state.json, bounded to prevent runaway drift or
-#     overfitting to a short sample.
-#   - Correlation-cluster de-duplication, market breadth, relative
-#     strength percentile, funding/OI carry, and session weighting are
-#     folded into confidence scoring rather than being separate hard gates,
-#     so a single weak input can't veto an otherwise excellent setup.
-# ══════════════════════════════════════════════════════════════════════════
+# Maps liquidity and institutional footprints (Order Blocks, Breaker
+# Blocks, Fair Value Gaps) across a multi-timeframe stack, waits for a
+# liquidity sweep + structure shift, then scores the setup through five
+# independent filters (Location, Context, Quality, RR, LTF-confirmation).
 
 from __future__ import annotations
 
@@ -48,11 +26,9 @@ from typing import Optional
 import requests
 
 ENGINE_NAME = "KESTREL"
-__version__ = "1.0.0"
+__version__ = "1.1.1"
 
-# ══════════════════════════════════════════════════════════════════════════
-#  CONFIGURATION
-# ══════════════════════════════════════════════════════════════════════════
+# CONFIGURATION
 
 TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN")
 TG_CHAT_ID = os.getenv("TG_CHAT_ID")
@@ -77,11 +53,6 @@ WATCHLIST = [
 
 MAJORS = {"BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT", "ADAUSDT", "DOGEUSDT"}
 
-# ── TIMEFRAME STACK ───────────────────────────────────────────────────────
-# MACRO : 1D  -> long-range bias, premium/discount range, PDH/PDL/PWH/PWL
-# HTF   : 4H  -> primary structure, Order Blocks & Breaker Blocks (zone map)
-# MID   : 1H  -> liquidity sweep + intermediate structure shift
-# LTF   : 15m -> execution: Breaker Block trigger, entry timing, MSS confirm
 TF_MACRO, TF_HTF, TF_MID, TF_LTF = "1d", "4h", "1h", "15m"
 TF_BARS = {TF_MACRO: 120, TF_HTF: 260, TF_MID: 300, TF_LTF: 300}
 SCAN_INTERVAL_MIN = 15
@@ -115,6 +86,7 @@ BREAKER_SEARCH_BARS = 8
 MIN_RR_FLOOR = 1.5
 MIN_RR_TARGET = 2.0
 EXT_RR_LEVELS = [2.0, 2.5, 3.0, 4.0, 5.0]
+TP2_MIN_RR_DELTA = 0.3
 SL_BUFFER_ATR_MIN_MULT = 0.25
 SL_BUFFER_ATR_MAX_MULT = 0.85
 LIQUIDITY_ROOM_BUFFER_ATR_MULT = 0.25
@@ -159,9 +131,7 @@ SESSION_WINDOWS = {
 }
 SESSION_SCORE_BONUS = {"asia": 0.0, "london": 2.0, "ny": 2.5, "off": -1.5}
 
-# ══════════════════════════════════════════════════════════════════════════
-#  HYPERLIQUID API CLIENT
-# ══════════════════════════════════════════════════════════════════════════
+# HYPERLIQUID API CLIENT
 
 _session = requests.Session()
 _req_lock = threading.Lock()
@@ -282,9 +252,7 @@ def get_l2_spread_pct(symbol: str) -> float | None:
     except (KeyError, IndexError, ValueError, TypeError):
         return None
 
-# ══════════════════════════════════════════════════════════════════════════
-#  MATH / INDICATORS
-# ══════════════════════════════════════════════════════════════════════════
+# MATH / INDICATORS
 
 def safe(v, fb=0.0):
     try:
@@ -431,9 +399,7 @@ def pearson(a: list[float], b: list[float]) -> float:
     vb = math.sqrt(sum((x - mb) ** 2 for x in b))
     return safe_div(cov, va * vb)
 
-# ══════════════════════════════════════════════════════════════════════════
-#  MARKET STRUCTURE — SWINGS, BOS/CHoCH, BIAS
-# ══════════════════════════════════════════════════════════════════════════
+# MARKET STRUCTURE — SWINGS, BOS/CHoCH, BIAS
 
 @dataclass
 class Swing:
@@ -497,9 +463,7 @@ def price_zone(price: float, structure: StructureState) -> str:
     return "premium" if price >= structure.eq else "discount"
 
 
-# ══════════════════════════════════════════════════════════════════════════
-#  REGIME DETECTION
-# ══════════════════════════════════════════════════════════════════════════
+# REGIME DETECTION
 
 @dataclass
 class Regime:
@@ -553,9 +517,7 @@ def classify_regime(candles_htf: list[dict], candles_mid: list[dict]) -> Regime:
 
     return Regime(label, direction, adx_htf, bbw_pctile, atr_pct, strength)
 
-# ══════════════════════════════════════════════════════════════════════════
-#  SMC ZONE ENGINE — ORDER BLOCKS / BREAKER BLOCKS / FAIR VALUE GAPS
-# ══════════════════════════════════════════════════════════════════════════
+# SMC ZONE ENGINE — ORDER BLOCKS / BREAKER BLOCKS / FAIR VALUE GAPS
 
 @dataclass
 class Zone:
@@ -821,9 +783,7 @@ def find_ltf_breaker(candles: list[dict], mss: MSSEvent) -> Optional[Zone]:
                 return Zone(c["l"], c["h"], "supply", "breaker", j, displacement_atr=1.5, vol_ratio=1.2)
     return None
 
-# ══════════════════════════════════════════════════════════════════════════
-#  VOLUME PROFILE (TP clipping to real volume-built levels)
-# ══════════════════════════════════════════════════════════════════════════
+# VOLUME PROFILE (TP clipping to real volume-built levels)
 
 def volume_profile(candles: list[dict], bins: int = 24) -> dict:
     hi = max(c["h"] for c in candles)
@@ -872,9 +832,7 @@ def clip_tp_to_liquidity(entry: float, tp: float, direction: str, pools: dict,
     return tp
 
 
-# ══════════════════════════════════════════════════════════════════════════
-#  CANDIDATE SETUP + RISK CONSTRUCTION
-# ══════════════════════════════════════════════════════════════════════════
+# CANDIDATE SETUP + RISK CONSTRUCTION
 
 @dataclass
 class Candidate:
@@ -892,6 +850,7 @@ class Candidate:
     context_ok: bool = True
     ltf_confirmed: bool = False
     regime: Optional[Regime] = None
+    tp2_extended: bool = True   # False when tp2 couldn't clear tp1 by TP2_MIN_RR_DELTA (no room)
 
     def rr1(self) -> float:
         risk = abs(self.entry - self.sl)
@@ -952,32 +911,37 @@ def build_risk_plan(direction: str, entry: float, invalidation: float, atr_val: 
     risk = abs(entry - sl)
     if risk <= 0:
         return None
-    tp1 = entry + MIN_RR_TARGET * risk if direction == "long" else entry - MIN_RR_TARGET * risk
 
     room = room_to_next_opposing_level(entry, direction, zones, pools)
+
+    tp1_rr = MIN_RR_TARGET
+    if room is not None:
+        wall_room = room - LIQUIDITY_ROOM_BUFFER_ATR_MULT * atr_val
+        if wall_room > 0:
+            wall_rr = safe_div(wall_room, risk)
+            if wall_rr < MIN_RR_TARGET:
+                tp1_rr = max(MIN_RR_FLOOR, wall_rr)
+    tp1 = entry + tp1_rr * risk if direction == "long" else entry - tp1_rr * risk
+
     best_rr = MIN_RR_TARGET
     if room is not None:
         usable = room - LIQUIDITY_ROOM_BUFFER_ATR_MULT * atr_val
         for rr in EXT_RR_LEVELS:
             if usable >= rr * risk:
                 best_rr = rr
+        continuous_rr = safe_div(usable, risk)
+        if continuous_rr > best_rr:
+            best_rr = min(continuous_rr, EXT_RR_LEVELS[-1])
     tp2 = entry + best_rr * risk if direction == "long" else entry - best_rr * risk
+    tp2_extended = (best_rr - tp1_rr) >= TP2_MIN_RR_DELTA
 
     if direction == "long" and not (sl < entry < tp1 <= tp2):
         return None
     if direction == "short" and not (tp2 <= tp1 < entry < sl):
         return None
-    return sl, tp1, tp2, best_rr
+    return sl, tp1, tp2, best_rr, tp2_extended
 
-# ══════════════════════════════════════════════════════════════════════════
-#  PATHWAYS
-#  HTF (4H) supplies the bias + the Order Block / Breaker Block zone map.
-#  MID (1H) supplies the liquidity sweep.
-#  LTF (15m) supplies the Breaker Block entry trigger + MSS confirmation.
-#  This is the "HTF -> OBs/BBs, LTF -> BBs" division specified as best
-#  practice: HTF zones tell KESTREL *where* to hunt; the LTF breaker block
-#  tells it *when* to pull the trigger.
-# ══════════════════════════════════════════════════════════════════════════
+# PATHWAYS
 
 def build_pathway_liquidity_reversal(symbol: str, bundles: dict, regime: Regime,
                                       structure_htf: StructureState,
@@ -1033,10 +997,11 @@ def build_pathway_liquidity_reversal(symbol: str, bundles: dict, regime: Regime,
                                 candles_ltf, htf_zones, pools)
         if not plan:
             continue
-        sl, tp1, tp2, _ = plan
+        sl, tp1, tp2, _, tp2_extended = plan
 
         cand = Candidate(symbol, direction, "liquidity_reversal", entry, sl, tp1, tp2,
                           zone=near_zone, atr_val=atr_ltf, regime=regime)
+        cand.tp2_extended = tp2_extended
         cand.confluences = [
             f"liquidity sweep @ {sweep['level']:.4f} ({sweep['touches']}x tested)",
             f"HTF {near_zone.origin} {wanted_kind} zone",
@@ -1091,10 +1056,11 @@ def build_pathway_trend_continuation(symbol: str, bundles: dict, regime: Regime,
                             candles_ltf, htf_zones, pools)
     if not plan:
         return None
-    sl, tp1, tp2, _ = plan
+    sl, tp1, tp2, _, tp2_extended = plan
 
     cand = Candidate(symbol, direction, "trend_continuation", entry, sl, tp1, tp2,
                       zone=zone, atr_val=atr_ltf, regime=regime)
+    cand.tp2_extended = tp2_extended
     cand.confluences = [
         f"HTF trend intact (ADX {regime.adx:.0f}, dir={regime.direction})",
         f"pullback into {zone.origin} {wanted_kind}",
@@ -1157,8 +1123,12 @@ def build_pathway_range_reversion(symbol: str, bundles: dict, regime: Regime,
     if safe_div(abs(tp1 - entry), risk) < MIN_RR_FLOOR:
         return None
 
+    rr1_val = safe_div(abs(tp1 - entry), risk)
+    rr2_val = safe_div(abs(tp2 - entry), risk)
+
     cand = Candidate(symbol, direction, "range_reversion", entry, sl, tp1, tp2,
                       zone=zone, atr_val=atr_ltf, regime=regime)
+    cand.tp2_extended = (rr2_val - rr1_val) >= TP2_MIN_RR_DELTA
     cand.confluences = [
         f"ranging HTF context (ADX {regime.adx:.0f})",
         f"range extreme fade ({pos*100:.0f}% of range)",
@@ -1168,9 +1138,7 @@ def build_pathway_range_reversion(symbol: str, bundles: dict, regime: Regime,
     cand.ltf_confirmed = True
     return cand
 
-# ══════════════════════════════════════════════════════════════════════════
-#  FIVE-FILTER FRAMEWORK — Location / Context / Quality / RR / LTF
-# ══════════════════════════════════════════════════════════════════════════
+# FIVE-FILTER FRAMEWORK — Location / Context / Quality / RR / LTF
 
 @dataclass
 class FilterResult:
@@ -1186,19 +1154,12 @@ class FilterResult:
 def apply_five_filters(cand: Candidate, market_price: float, min_rr_floor: float) -> FilterResult:
     atr_val = cand.atr_val or 1e-9
 
-    # 1) LOCATION — is the POI actually close enough to live price to be
-    #    tradable, and on the correct side of premium/discount for its
-    #    direction? A perfect zone 3 ATR away is not a signal, it's a
-    #    watchlist note.
     dist_atr = abs(cand.zone.mid - market_price) / atr_val
     entry_dist_atr = abs(cand.entry - market_price) / atr_val
     if entry_dist_atr > POI_MAX_DIST_ATR_MULT * 1.35:
         return FilterResult(False, "location: entry too far from live price")
     location_score = max(0.0, 1.0 - min(1.0, dist_atr / (POI_MAX_DIST_ATR_MULT * 1.5)))
 
-    # 2) CONTEXT — does the regime (trend / range / reversal) actually
-    #    match the pathway being traded? Each pathway already self-selects
-    #    its regime, this is the belt-and-suspenders re-check plus a score.
     context_map = {
         "liquidity_reversal": {"reversal": 1.0, "volatile": 0.75, "range": 0.7, "trend": 0.35},
         "trend_continuation": {"trend": 1.0, "reversal": 0.3, "range": 0.15, "volatile": 0.25},
@@ -1228,9 +1189,6 @@ def apply_five_filters(cand: Candidate, market_price: float, min_rr_floor: float
         return FilterResult(False, f"rr: {rr1:.2f} below dynamic floor {dyn_floor:.2f}")
     rr_score = min(1.0, rr1 / 4.0)
 
-    # 5) LTF — was there an actual lower-timeframe confirmation trigger
-    #    (MSS + breaker retest, or RSI/momentum reset), not just a level
-    #    touch?
     if not cand.ltf_confirmed:
         return FilterResult(False, "ltf: no lower-timeframe confirmation trigger")
     ltf_score = 1.0 if cand.pathway == "liquidity_reversal" else 0.75
@@ -1238,9 +1196,7 @@ def apply_five_filters(cand: Candidate, market_price: float, min_rr_floor: float
     return FilterResult(True, "ok", location_score, context_score, quality_score, rr_score, ltf_score)
 
 
-# ══════════════════════════════════════════════════════════════════════════
-#  MARKET BREADTH / RELATIVE STRENGTH / CORRELATION
-# ══════════════════════════════════════════════════════════════════════════
+# MARKET BREADTH / RELATIVE STRENGTH / CORRELATION
 
 _breadth_lock = threading.Lock()
 _breadth_snapshot: dict[str, str] = {}
@@ -1321,9 +1277,7 @@ def deduplicate_correlated(ranked: list[tuple], clusters: list[set]) -> list[tup
         kept.append((symbol, direction, cand, conf, grade))
     return kept
 
-# ══════════════════════════════════════════════════════════════════════════
-#  CONFIDENCE SCORING + SETUP GRADE
-# ══════════════════════════════════════════════════════════════════════════
+# CONFIDENCE SCORING + SETUP GRADE
 
 def compute_confidence(cand: Candidate, fr: FilterResult, symbol: str,
                         market_ctx: dict, reference_ms: int, htf_alignment: float) -> float:
@@ -1386,9 +1340,7 @@ def grade_for_confidence(confidence: float) -> str:
     return "C"
 
 
-# ══════════════════════════════════════════════════════════════════════════
-#  ADAPTIVE GOVERNOR — self-tunes the confidence floor from realized winrate
-# ══════════════════════════════════════════════════════════════════════════
+# ADAPTIVE GOVERNOR — self-tunes the confidence floor from realized winrate
 
 def governor_threshold(state: dict) -> float:
     history = [h for h in state.get("signal_history", []) if h.get("sent") and h.get("result") in ("win", "loss")]
@@ -1411,9 +1363,7 @@ def dynamic_max_signals(regime_breadth: float, btc_regime: Optional[Regime]) -> 
 def priority_score(cand: Candidate, confidence: float) -> float:
     return confidence + cand.rr2() * 2.0
 
-# ══════════════════════════════════════════════════════════════════════════
-#  STATE MANAGEMENT
-# ══════════════════════════════════════════════════════════════════════════
+# STATE MANAGEMENT
 
 def _default_state() -> dict:
     return {
@@ -1561,9 +1511,7 @@ def _close_signal(state: dict, sig: dict, result: str, price: float):
                     f"{result.upper()} ({r:+.2f}R)")
     _update_history_result(state, sig["hist_id"], result)
 
-# ══════════════════════════════════════════════════════════════════════════
-#  TELEGRAM
-# ══════════════════════════════════════════════════════════════════════════
+# TELEGRAM
 
 TG_API = f"https://api.telegram.org/bot{TG_BOT_TOKEN}"
 
@@ -1621,6 +1569,9 @@ def format_signal(symbol: str, cand: Candidate, confidence: float, grade: str, r
     if cand.regime:
         setup_line += f" · {cand.regime.label}/{cand.regime.direction}"
 
+    tp2_line = (f"Take Profit 2: <code>{fmt_px_copy(cand.tp2)}</code>" if cand.tp2_extended
+                else "Take Profit 2: <i>no extension room — close full at TP1</i>")
+
     lines = [
         f"🦅 <b>{ENGINE_NAME}</b> — Adaptive Smart-Money Signal Engine",
         "────────────────────",
@@ -1631,7 +1582,7 @@ def format_signal(symbol: str, cand: Candidate, confidence: float, grade: str, r
         f"Entry: <code>{fmt_px_copy(cand.entry)}</code>",
         f"Stop Loss: <code>{fmt_px_copy(cand.sl)}</code>",
         f"Take Profit 1: <code>{fmt_px_copy(cand.tp1)}</code>",
-        f"Take Profit 2: <code>{fmt_px_copy(cand.tp2)}</code>",
+        tp2_line,
         "",
         setup_line,
         confluences,
@@ -1700,9 +1651,7 @@ def maybe_send_daily_summary(state: dict):
         send_telegram(build_daily_summary(state))
         state["last_summary_date"] = today_str
 
-# ══════════════════════════════════════════════════════════════════════════
-#  PER-SYMBOL SCAN PIPELINE
-# ══════════════════════════════════════════════════════════════════════════
+# PER-SYMBOL SCAN PIPELINE
 
 def collect_market_inputs(symbol: str, reference_ms: int) -> Optional[tuple]:
     bundles = fetch_all_candles(symbol, reference_ms)
@@ -1774,17 +1723,16 @@ def scan_symbol(symbol: str, state: dict, bundles: dict, market_ctx: dict,
         cand.entry, cand.sl, cand.tp1, cand.tp2 = clamp_entry_to_market(
             cand.entry, cand.sl, cand.tp1, cand.tp2, market_price, cand.atr_val)
         clipped_tp2 = clip_tp_to_liquidity(cand.entry, cand.tp2, cand.direction, pools, vp, htf_zones)
-        # Guard: clipping TP2 to a nearby liquidity/OB/VP level must never
-        # place it closer to entry than TP1 -- that would invert the
-        # tp1 <= tp2 (long) / tp2 <= tp1 (short) invariant build_risk_plan()
-        # already guaranteed. If the clip would violate it, keep the
-        # original (unclipped) TP2 instead of the closer level.
         if cand.direction == "long":
             if clipped_tp2 >= cand.tp1:
                 cand.tp2 = clipped_tp2
         else:
             if clipped_tp2 <= cand.tp1:
                 cand.tp2 = clipped_tp2
+        risk = abs(cand.entry - cand.sl)
+        rr1 = safe_div(abs(cand.tp1 - cand.entry), risk)
+        rr2 = safe_div(abs(cand.tp2 - cand.entry), risk)
+        cand.tp2_extended = (rr2 - rr1) >= TP2_MIN_RR_DELTA
         cand.zone_q = zone_quality(cand.zone)
 
         fr = apply_five_filters(cand, market_price, MIN_RR_FLOOR)
@@ -1799,20 +1747,11 @@ def scan_symbol(symbol: str, state: dict, bundles: dict, market_ctx: dict,
 
     if not results:
         return []
-    # Enforce one-signal-per-symbol even *within* a single scan: the three
-    # pathways (liquidity reversal / trend continuation / range reversion)
-    # are evaluated independently and can each independently pass filters,
-    # sometimes in opposite directions. deduplicate_correlated() keys on
-    # (cluster, direction), so it will NOT catch two opposite-direction
-    # candidates from the same symbol. Keep only the single best candidate
-    # (highest confidence) here instead.
     best = max(results, key=lambda t: t[3])
     return [best]
 
 
-# ══════════════════════════════════════════════════════════════════════════
-#  MAIN EXECUTION FLOW
-# ══════════════════════════════════════════════════════════════════════════
+# MAIN EXECUTION FLOW
 
 _shutdown = False
 
