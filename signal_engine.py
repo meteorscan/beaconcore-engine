@@ -1470,6 +1470,14 @@ def is_recent_duplicate(state: dict, symbol: str, direction: str, entry: float) 
     return False
 
 
+def has_active_signal(state: dict, symbol: str) -> bool:
+    """True if `symbol` already has ANY active signal (either direction).
+    This is the one-signal-per-symbol gate -- unlike is_recent_duplicate()
+    (which only catches same-direction/near-identical-entry re-fires), this
+    blocks opposite-direction signals too."""
+    return any(sig["symbol"] == symbol for sig in state["active_signals"])
+
+
 def count_active(state: dict) -> int:
     return len(state["active_signals"])
 
@@ -1709,6 +1717,8 @@ def scan_symbol(symbol: str, state: dict, bundles: dict, market_ctx: dict,
                  reference_ms: int, min_confidence: float) -> list[tuple]:
     if bundles is None:
         return []
+    if has_active_signal(state, symbol):
+        return []
     candles_ltf, candles_mid = bundles[TF_LTF], bundles[TF_MID]
     candles_htf, candles_macro = bundles[TF_HTF], bundles[TF_MACRO]
 
@@ -1787,7 +1797,17 @@ def scan_symbol(symbol: str, state: dict, bundles: dict, market_ctx: dict,
         grade = grade_for_confidence(confidence)
         results.append((symbol, cand.direction, cand, confidence, grade))
 
-    return results
+    if not results:
+        return []
+    # Enforce one-signal-per-symbol even *within* a single scan: the three
+    # pathways (liquidity reversal / trend continuation / range reversion)
+    # are evaluated independently and can each independently pass filters,
+    # sometimes in opposite directions. deduplicate_correlated() keys on
+    # (cluster, direction), so it will NOT catch two opposite-direction
+    # candidates from the same symbol. Keep only the single best candidate
+    # (highest confidence) here instead.
+    best = max(results, key=lambda t: t[3])
+    return [best]
 
 
 # ══════════════════════════════════════════════════════════════════════════
