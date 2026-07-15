@@ -31,7 +31,7 @@
       "tp1_hit": true,
       "entry_filled": true,
       "bars_pending": 0,
-      "last_check_ts": 1784134800000,
+      "last_check_ts": 1784135700000,
       "tp1_r": 2.0
     },
     {
@@ -65,7 +65,7 @@
       "tp1_hit": true,
       "entry_filled": true,
       "bars_pending": 4,
-      "last_check_ts": 1784134800000,
+      "last_check_ts": 1784135700000,
       "tp1_r": 1.5
     },
     {
@@ -99,7 +99,7 @@
       "tp1_hit": false,
       "entry_filled": true,
       "bars_pending": 1,
-      "last_check_ts": 1784134800000
+      "last_check_ts": 1784135700000
     },
     {
       "symbol": "BNBUSDT",
@@ -132,7 +132,7 @@
       "tp1_hit": false,
       "entry_filled": true,
       "bars_pending": 5,
-      "last_check_ts": 1784134800000
+      "last_check_ts": 1784135700000
     },
     {
       "symbol": "ONDOUSDT",
@@ -165,7 +165,7 @@
       "tp1_hit": false,
       "entry_filled": true,
       "bars_pending": 3,
-      "last_check_ts": 1784134800000
+      "last_check_ts": 1784135700000
     },
     {
       "symbol": "DOTUSDT",
@@ -198,7 +198,7 @@
       "tp1_hit": true,
       "entry_filled": true,
       "bars_pending": 0,
-      "last_check_ts": 1784134800000,
+      "last_check_ts": 1784135700000,
       "tp1_r": 1.5
     },
     {
@@ -232,7 +232,7 @@
       "tp1_hit": false,
       "entry_filled": true,
       "bars_pending": 7,
-      "last_check_ts": 1784134800000
+      "last_check_ts": 1784135700000
     },
     {
       "symbol": "SOLUSDT",
@@ -264,8 +264,8 @@
       },
       "tp1_hit": false,
       "entry_filled": false,
-      "bars_pending": 3,
-      "last_check_ts": 1784134800000
+      "bars_pending": 4,
+      "last_check_ts": 1784135700000
     },
     {
       "symbol": "NEARUSDT",
@@ -297,8 +297,8 @@
       },
       "tp1_hit": false,
       "entry_filled": false,
-      "bars_pending": 3,
-      "last_check_ts": 1784134800000
+      "bars_pending": 4,
+      "last_check_ts": 1784135700000
     },
     {
       "symbol": "ETHUSDT",
@@ -330,8 +330,8 @@
       },
       "tp1_hit": false,
       "entry_filled": false,
-      "bars_pending": 2,
-      "last_check_ts": 1784134800000
+      "bars_pending": 3,
+      "last_check_ts": 1784135700000
     },
     {
       "symbol": "DOGEUSDT",
@@ -363,8 +363,8 @@
       },
       "tp1_hit": false,
       "entry_filled": false,
-      "bars_pending": 2,
-      "last_check_ts": 1784134800000
+      "bars_pending": 3,
+      "last_check_ts": 1784135700000
     },
     {
       "symbol": "LINKUSDT",
@@ -396,8 +396,8 @@
       },
       "tp1_hit": false,
       "entry_filled": false,
-      "bars_pending": 1,
-      "last_check_ts": 1784134800000
+      "bars_pending": 2,
+      "last_check_ts": 1784135700000
     },
     {
       "symbol": "HYPEUSDT",
@@ -428,9 +428,9 @@
         "breaker": 0.0
       },
       "tp1_hit": false,
-      "entry_filled": false,
+      "entry_filled": true,
       "bars_pending": 0,
-      "last_check_ts": 1784134800000
+      "last_check_ts": 1784135700000
     }
   ],
   "signal_history": [
