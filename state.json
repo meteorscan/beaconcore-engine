@@ -28,23 +28,23 @@
     },
     "segment_stats": {
       "asset=ETH|engine=trend_continuation|regime=neutral|tf=intraday": {
-        "n": 1,
+        "n": 2,
         "wins": 0,
-        "losses": 1,
-        "sum_r": -1.0,
-        "sum_conf": 0.3120418063021777,
-        "sum_r_sq": 1.0
+        "losses": 2,
+        "sum_r": -2.0,
+        "sum_conf": 0.6048297493936644,
+        "sum_r_sq": 2.0
       },
       "category=regime_mismatch|engine=trend_continuation|regime=neutral": {
-        "n": 1
+        "n": 2
       }
     },
     "calibration_buckets": {
       "trend_continuation": {
         "B": {
-          "n": 1,
+          "n": 2,
           "wins": 0,
-          "sum_conf": 0.3120418063021777
+          "sum_conf": 0.6048297493936644
         }
       }
     },
@@ -62,14 +62,14 @@
     "fill_stats": {
       "trend_continuation::market": {
         "dispatched": 2,
-        "filled": 1,
+        "filled": 2,
         "expired": 0
       }
     },
     "filter_funnel": {
       "confluence_threshold": {
-        "evaluated": 66,
-        "rejected": 64
+        "evaluated": 74,
+        "rejected": 72
       },
       "rr_floor": {
         "evaluated": 2,
@@ -86,40 +86,7 @@
     }
   },
   "tier2": {
-    "active_signals": [
-      {
-        "id": "ETH-trend_continuation-1784143862",
-        "engine": "trend_continuation",
-        "coin": "ETH",
-        "combo": "intraday",
-        "direction": "long",
-        "entry": 1924.0,
-        "sl": 1916.1000000000001,
-        "tp1": 1936.922424348184,
-        "tp2": 1940.8724243481838,
-        "entry_kind": "market",
-        "entry_filled": true,
-        "pending_bars_elapsed": 0,
-        "pending_expiry_bars": 12,
-        "confidence": 0.2927879430914867,
-        "grade": "B",
-        "rr_tp1": 1.6357499174916732,
-        "confluences": [
-          "ema_pullback",
-          "htf_mtf_agree"
-        ],
-        "regime_at_entry": "neutral",
-        "session_anchored": false,
-        "dispatch_ts": "2026-07-15T19:31:02.400583+00:00",
-        "dispatch_ts_ms": 1784143862400,
-        "status": "active",
-        "resolution_logic_version": "1.0.0",
-        "mae_r": 0.0,
-        "mfe_r": 0.0,
-        "last_checked_candle_t": null,
-        "telegram_message_id": 3416
-      }
-    ],
+    "active_signals": [],
     "trade_log": [
       {
         "entry": 1924.4,
@@ -140,12 +107,32 @@
         "result": "loss",
         "resolution_logic_version": "1.0.0",
         "forensic_delta": "sample_too_small"
+      },
+      {
+        "entry": 1924.0,
+        "sl": 1916.1000000000001,
+        "tp1": 1936.922424348184,
+        "tp2": 1940.8724243481838,
+        "r_realized": -1.0,
+        "mae_r": 14.632911392405305,
+        "mfe_r": 0.0,
+        "forensic_category": "regime_mismatch",
+        "confidence": 0.2927879430914867,
+        "grade": "B",
+        "regime_at_entry": "neutral",
+        "resolved_ts": "2026-07-15T19:45:31.374157+00:00",
+        "resolved_ts_ms": 1784144735923,
+        "engine": "trend_continuation",
+        "coin": "ETH",
+        "result": "loss",
+        "resolution_logic_version": "1.0.0",
+        "forensic_delta": "sample_too_small"
       }
     ]
   },
   "meta": {
     "created": "2026-07-15T17:45:34.912293+00:00",
-    "last_run": "2026-07-15T19:31:08.272197+00:00",
-    "run_count": 8
+    "last_run": "2026-07-15T19:45:36.958565+00:00",
+    "run_count": 9
   }
 }
