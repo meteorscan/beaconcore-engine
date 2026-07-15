@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # =============================================================================
-# CUTWATER ADAPTIVE SIGNAL ENGINE  —  v1.0.0
+# VIRELLE ADAPTIVE SIGNAL ENGINE  —  v1.0.0
 # -----------------------------------------------------------------------------
 # An institutional-grade, self-learning, multi-engine crypto signal generator
 # for Hyperliquid perpetuals. Single self-contained file — no local imports.
@@ -51,7 +51,7 @@ from typing import Any, Optional
 # SECTION A — CONFIGURATION & CONSTANTS
 # =============================================================================
 
-ENGINE_NAME = "Cutwater"
+ENGINE_NAME = "Virelle"
 ENGINE_VERSION = "1.0.0"
 RESOLUTION_LOGIC_VERSION = "1.0.0"  # bumped whenever outcome-scoring logic changes (Section 11)
 
@@ -65,12 +65,12 @@ WATCHLIST: list[str] = [
 ]
 MACRO_ANCHOR = "BTC"  # dominant benchmark asset for macro bias (Section 6)
 
-STATE_PATH = os.environ.get("CUTWATER_STATE_PATH", "state.json")
-CANDLE_CACHE_PATH = os.environ.get("CUTWATER_CANDLE_CACHE_PATH", "candle_cache.json")
+STATE_PATH = os.environ.get("VIRELLE_STATE_PATH", "state.json")
+CANDLE_CACHE_PATH = os.environ.get("VIRELLE_CANDLE_CACHE_PATH", "candle_cache.json")
 
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
-REACTION_IMAGE_PATH = os.environ.get("CUTWATER_REACTION_IMAGE", "reaction.jpg")
+TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "")
+TG_CHAT_ID = os.environ.get("TG_CHAT_ID", "")
+REACTION_IMAGE_PATH = os.environ.get("VIRELLE_REACTION_IMAGE", "reaction.jpg")
 
 # --- Timeframes (Section 7) ---------------------------------------------------
 # Forbidden: 1m/2m/3m/5m. Minimum timeframe 15m. Two independent combos run
@@ -138,7 +138,7 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
     stream=sys.stdout,
 )
-log = logging.getLogger("cutwater")
+log = logging.getLogger("virelle")
 
 _shutdown_requested = False
 
@@ -2061,11 +2061,11 @@ def _title_case_token(token: str) -> str:
 
 
 def tg_send_message(text: str, reply_to: Optional[int] = None) -> Optional[int]:
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+    if not TG_BOT_TOKEN or not TG_CHAT_ID:
         log.info("[telegram-disabled]\n%s", text)
         return None
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": text, "parse_mode": "Markdown"}
+    url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
+    payload = {"chat_id": TG_CHAT_ID, "text": text, "parse_mode": "Markdown"}
     if reply_to:
         payload["reply_to_message_id"] = reply_to
     body = json.dumps(payload).encode()
@@ -2080,14 +2080,14 @@ def tg_send_message(text: str, reply_to: Optional[int] = None) -> Optional[int]:
 
 
 def tg_send_photo(path: str, caption: str = "") -> None:
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID or not os.path.exists(path):
+    if not TG_BOT_TOKEN or not TG_CHAT_ID or not os.path.exists(path):
         return
     # Minimal multipart upload without external deps.
-    boundary = "----cutwater-boundary"
+    boundary = "----virelle-boundary"
     with open(path, "rb") as f:
         img_bytes = f.read()
     parts = []
-    parts.append(f"--{boundary}\r\nContent-Disposition: form-data; name=\"chat_id\"\r\n\r\n{TELEGRAM_CHAT_ID}\r\n".encode())
+    parts.append(f"--{boundary}\r\nContent-Disposition: form-data; name=\"chat_id\"\r\n\r\n{TG_CHAT_ID}\r\n".encode())
     parts.append(f"--{boundary}\r\nContent-Disposition: form-data; name=\"caption\"\r\n\r\n{caption}\r\n".encode())
     parts.append(
         f"--{boundary}\r\nContent-Disposition: form-data; name=\"photo\"; filename=\"reaction.jpg\"\r\n"
@@ -2095,7 +2095,7 @@ def tg_send_photo(path: str, caption: str = "") -> None:
     parts.append(img_bytes)
     parts.append(f"\r\n--{boundary}--\r\n".encode())
     body = b"".join(parts)
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendPhoto"
+    url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendPhoto"
     req = urllib.request.Request(url, data=body,
                                   headers={"Content-Type": f"multipart/form-data; boundary={boundary}"})
     try:
