@@ -24,7 +24,9 @@
       "veto::regime_mismatch_discount::mean_reversion__neutral": 0.55,
       "engine_weight::trend_continuation": 1.0,
       "veto::regime_mismatch_discount::trend_continuation__neutral": 0.55,
-      "filter::liquidity_sanity_margin_atr": 0.35
+      "filter::liquidity_sanity_margin_atr": 0.35,
+      "engine_weight::reversal": 1.0,
+      "veto::regime_mismatch_discount::reversal__neutral": 0.55
     },
     "segment_stats": {
       "asset=ETH|engine=trend_continuation|regime=neutral|tf=intraday": {
@@ -68,8 +70,8 @@
     },
     "filter_funnel": {
       "confluence_threshold": {
-        "evaluated": 74,
-        "rejected": 72
+        "evaluated": 83,
+        "rejected": 81
       },
       "rr_floor": {
         "evaluated": 2,
@@ -132,7 +134,7 @@
   },
   "meta": {
     "created": "2026-07-15T17:45:34.912293+00:00",
-    "last_run": "2026-07-15T19:45:36.958565+00:00",
-    "run_count": 9
+    "last_run": "2026-07-15T20:01:25.123628+00:00",
+    "run_count": 10
   }
 }
