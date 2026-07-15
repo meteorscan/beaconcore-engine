@@ -70,8 +70,8 @@
     },
     "filter_funnel": {
       "confluence_threshold": {
-        "evaluated": 137,
-        "rejected": 135
+        "evaluated": 145,
+        "rejected": 143
       },
       "rr_floor": {
         "evaluated": 2,
@@ -134,7 +134,7 @@
   },
   "meta": {
     "created": "2026-07-15T17:45:34.912293+00:00",
-    "last_run": "2026-07-15T22:15:36.614710+00:00",
-    "run_count": 19
+    "last_run": "2026-07-15T22:31:09.651466+00:00",
+    "run_count": 20
   }
 }
