@@ -1629,7 +1629,7 @@ def load_state() -> dict:
 
 def save_state(state: dict):
     tmp = Path(STATE_FILE + ".tmp")
-    tmp.write_text(json.dumps(state, indent=None, default=str))
+    tmp.write_text(json.dumps(state, indent=2, default=str))
     tmp.replace(STATE_FILE)
 
 
