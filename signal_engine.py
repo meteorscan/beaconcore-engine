@@ -26,7 +26,12 @@ from typing import Optional
 import requests
 
 ENGINE_NAME = "KESTREL"
-__version__ = "1.1.1"
+__version__ = "1.2.0"
+# v1.2.0 — calibration upgrade: logs raw sub-scores/bonus components to
+# signal_history, adds a per-pathway adaptive weight/pause governor, cuts
+# the weight of unvalidated confidence bonus terms, and instruments
+# long/short + pathway breakdowns for ongoing recalibration. See
+# kestrel_upgrade_prompt.md for the analysis this responds to.
 
 # CONFIGURATION
 
@@ -116,6 +121,28 @@ DUPLICATE_ENTRY_TOLERANCE_PCT = 0.0035
 GOVERNOR_LOOKBACK_SIGNALS = 40
 GOVERNOR_MAX_SHIFT = 8.0             # max +/- confidence-threshold points the governor may apply
 GOVERNOR_TARGET_WINRATE = 0.50
+# NOTE: this global governor only shifts a single confidence floor. It
+# cannot fix a pathway whose scoring isn't monotonic with outcome, and it
+# doesn't discriminate by pathway at all — raising the bar globally when
+# the problem is concentrated in one or two pathways just cuts volume
+# without improving quality. See PATHWAY_* below for the per-pathway
+# governor that actually targets the problem.
+
+# ── PER-PATHWAY ADAPTIVE WEIGHT / PAUSE GOVERNOR ───────────────────────
+PATHWAYS = ("liquidity_reversal", "trend_continuation", "range_reversion")
+PATHWAY_LOOKBACK_SIGNALS = 40        # rolling window for the weight nudge, same cadence as the global governor
+PATHWAY_MIN_SAMPLE = 10              # min resolved signals in-window before a weight nudge is trusted
+PATHWAY_TARGET_WINRATE = 0.50
+PATHWAY_WEIGHT_MIN = 0.5
+PATHWAY_WEIGHT_MAX = 1.5
+PATHWAY_CONF_OVERRIDE_MAX = 12.0     # extra min-confidence points required of a fully-derated pathway
+
+# Hard-pause: a pathway this bad isn't a "needs a higher bar" problem, it's
+# a "stop trading it" problem. range_reversion (17.4% WR, n=23) is the
+# obvious current candidate.
+PATHWAY_PAUSE_LOOKBACK = 20
+PATHWAY_PAUSE_WINRATE_FLOOR = 0.20
+PATHWAY_REACTIVATE_WEIGHT = 0.5      # weight assigned on reactivation -- cautious re-entry, not a snap back to 1.0
 
 # ── FUNDING / OI / RELATIVE STRENGTH ────────────────────────────────────
 FUNDING_EXTREME = 0.0010
@@ -854,6 +881,18 @@ class Candidate:
     regime: Optional[Regime] = None
     tp2_extended: bool = True   # False when tp2 couldn't clear tp1 by TP2_MIN_RR_DELTA (no room)
 
+    # Calibration instrumentation (populated in scan_symbol from the
+    # FilterResult + compute_confidence, and from there persisted into
+    # signal_history so components can be correlated against realized
+    # win/loss instead of only the blended confidence surviving).
+    location_score: float = 0.0
+    context_score: float = 0.0
+    quality_score: float = 0.0
+    rr_score: float = 0.0
+    ltf_score: float = 0.0
+    bonus: float = 0.0
+    bonus_components: dict = field(default_factory=dict)
+
     def rr1(self) -> float:
         risk = abs(self.entry - self.sl)
         return safe_div(abs(self.tp1 - self.entry), risk)
@@ -1226,6 +1265,24 @@ def record_market_inputs(symbol: str, candles_mid: list[dict]):
 
 
 def compute_breadth_pct() -> float:
+    """Task 4 investigation note: this is computed from every symbol that
+    resolves in collect_market_inputs() each scan (the whole WATCHLIST,
+    not just symbols with signals), and the up/down split
+    (record_market_inputs: close vs EMA_SLOW) is symmetric by construction
+    -- there's no directional weighting in the formula itself. Same for
+    relative_strength_percentile() below (a plain percentile rank). The
+    26.8pp long/short gap (34.3% vs 25.0%) is more likely a base-rate
+    effect: WATCHLIST is a long-only-tradable perp universe sampled during
+    whatever regime the 186-signal window covered, so if that window was
+    net bullish, breadth/RS bonuses (which reward being on the stronger
+    side of an average that's itself skewed by the same regime) will have
+    fired favorably for longs more often than shorts *independent of setup
+    quality* -- consistent with these being flagged as suspect bonus terms
+    in compute_confidence and already having their weight cut there. This
+    isn't fully conclusive from a single static read of the code; use
+    direction_bias_report() below once fresh history accumulates to check
+    whether the gap persists after the bonus-weight cut, which is the real
+    test of this hypothesis."""
     with _breadth_lock:
         if not _breadth_snapshot:
             return 0.5
@@ -1238,6 +1295,35 @@ def relative_strength_percentile(symbol: str) -> float:
         if symbol not in _rs_snapshot or len(_rs_snapshot) < 5:
             return 0.5
         return percentile_rank(list(_rs_snapshot.values()), _rs_snapshot[symbol])
+
+
+def direction_bias_report(state: dict, min_samples: int = 20) -> dict:
+    """Task 4 tool: win rate by direction, plus the average logged breadth/
+    rs/funding bonus components by direction, from resolved+sent history.
+    Meant for manual/periodic inspection (not the hot scan path) to check
+    whether the long/short gap tracks the breadth/rs bonus components --
+    which would confirm the compute_breadth_pct()/relative_strength_percentile()
+    hypothesis above -- or persists independent of them, which would point
+    to a different cause (e.g. pathway mix or entry-side structure) and
+    need further investigation there instead."""
+    out = {}
+    for direction in ("long", "short"):
+        hist = [h for h in state.get("signal_history", [])
+                if h.get("sent") and h.get("direction") == direction
+                and h.get("result") in ("win", "loss")]
+        if len(hist) < min_samples:
+            out[direction] = {"n": len(hist), "note": "insufficient sample"}
+            continue
+        wins = sum(1 for h in hist if h["result"] == "win")
+        with_components = [h for h in hist if h.get("bonus_components")]
+        avg = {}
+        if with_components:
+            keys = {k for h in with_components for k in h["bonus_components"]}
+            for k in keys:
+                vals = [h["bonus_components"].get(k, 0.0) for h in with_components]
+                avg[k] = sum(vals) / len(vals)
+        out[direction] = {"n": len(hist), "winrate": wins / len(hist), "avg_bonus_components": avg}
+    return out
 
 
 def compute_pairwise_correlation(symbols: list[str], bundles: dict[str, dict]) -> dict:
@@ -1282,12 +1368,35 @@ def deduplicate_correlated(ranked: list[tuple], clusters: list[set]) -> list[tup
 # CONFIDENCE SCORING + SETUP GRADE
 
 def compute_confidence(cand: Candidate, fr: FilterResult, symbol: str,
-                        market_ctx: dict, reference_ms: int, htf_alignment: float) -> float:
+                        market_ctx: dict, reference_ms: int,
+                        htf_alignment: float) -> tuple[float, float, dict]:
     """Composite 0-100 confidence blending the five filter sub-scores with
-    professional-grade auxiliary signals (funding carry, OI trend, relative
-    strength, breadth alignment, session weighting, HTF alignment across
-    4H+1D) so a single weak secondary input tempers rather than vetoes an
-    otherwise strong structural setup."""
+    auxiliary bonus terms (funding carry, relative strength, breadth,
+    session timing, HTF alignment, breaker-zone bonus).
+
+    CALIBRATION STATUS (v1.2.0): a 186-signal review found realized outcome
+    is NOT monotonic with the blended confidence/grade this function
+    produces (grade A was the worst-performing bucket). The structural
+    sub-scores (location/context/quality/rr/ltf) are the validated part of
+    this function -- they come from apply_five_filters() and gate signals
+    outright. The bonus terms below are the unvalidated part: they were
+    added speculatively and, per that review, funding carry / relative
+    strength / breadth / session are the most likely to be adding noise
+    rather than signal (an extreme, bull-market-skewed watchlist means
+    breadth and RS in particular can systematically favor one direction
+    regardless of setup quality -- see the long/short gap note on
+    relative_strength_percentile/compute_breadth_pct below).
+
+    As an interim measure their weights are cut by roughly half here
+    (rather than removed outright, since some signal may remain) pending a
+    proper refit: every bonus component is now returned alongside the
+    total so it lands in signal_history (see record_signal_history) and
+    can be correlated against realized win/loss once enough logged history
+    accumulates -- use analyze_bonus_correlations() for that pass, per
+    task 3 of the upgrade prompt. HTF alignment and the breaker-zone bonus
+    are NOT flagged as suspects by the review and are left at their
+    original weights.
+    """
     base = (
         0.24 * fr.location_score +
         0.22 * fr.context_score +
@@ -1296,40 +1405,82 @@ def compute_confidence(cand: Candidate, fr: FilterResult, symbol: str,
         0.14 * fr.ltf_score
     ) * 100
 
-    bonus = 0.0
+    components = {
+        "funding": 0.0, "rs": 0.0, "breadth": 0.0,
+        "session": 0.0, "htf_alignment": 0.0, "breaker": 0.0,
+    }
+
     ctx = market_ctx.get(symbol, {})
     funding = ctx.get("funding", 0.0)
     if abs(funding) >= FUNDING_CARRY_THRESHOLD:
         favorable = (funding > 0 and cand.direction == "short") or (funding < 0 and cand.direction == "long")
-        bonus += 3.0 if favorable else -2.0
+        components["funding"] += 1.5 if favorable else -1.0   # was +3.0 / -2.0 -- suspect term, halved
     if abs(funding) >= FUNDING_EXTREME:
-        bonus -= 2.0  # crowded / squeeze risk
+        components["funding"] -= 1.0                          # was -2.0 -- suspect term, halved
 
     rs_pct = relative_strength_percentile(symbol)
     if cand.direction == "long" and rs_pct >= (1 - RS_TOP_PCTILE):
-        bonus += 3.0
+        components["rs"] += 1.5      # was 3.0 -- suspect term, halved
     elif cand.direction == "short" and rs_pct <= RS_BOTTOM_PCTILE:
-        bonus += 3.0
+        components["rs"] += 1.5
     elif cand.direction == "long" and rs_pct <= RS_BOTTOM_PCTILE:
-        bonus -= 3.0
+        components["rs"] -= 1.5
     elif cand.direction == "short" and rs_pct >= (1 - RS_TOP_PCTILE):
-        bonus -= 3.0
+        components["rs"] -= 1.5
 
     breadth = compute_breadth_pct()
     if cand.direction == "long":
-        bonus += (breadth - 0.5) * 6.0
+        components["breadth"] = (breadth - 0.5) * 3.0   # was * 6.0 -- suspect term, halved
     else:
-        bonus += (0.5 - breadth) * 6.0
+        components["breadth"] = (0.5 - breadth) * 3.0
 
     sess = session_now(reference_ms)
-    bonus += SESSION_SCORE_BONUS.get(sess, 0.0)
+    components["session"] = SESSION_SCORE_BONUS.get(sess, 0.0) * 0.5   # suspect term, halved
 
-    bonus += (htf_alignment - 0.5) * 8.0
+    components["htf_alignment"] = (htf_alignment - 0.5) * 8.0   # not a flagged suspect -- unchanged
 
     if cand.zone.origin == "breaker":
-        bonus += 2.5  # defended-then-flipped level: extra evidential weight
+        components["breaker"] = 2.5   # not a flagged suspect -- unchanged
 
-    return max(0.0, min(100.0, base + bonus))
+    bonus = sum(components.values())
+    confidence = max(0.0, min(100.0, base + bonus))
+    return confidence, bonus, components
+
+
+def analyze_bonus_correlations(state: dict, min_samples: int = 40) -> dict:
+    """Task 3 tool: once enough resolved, sent signals with logged
+    bonus_components exist in signal_history, this runs a simple
+    point-biserial correlation of each bonus component (plus each
+    structural sub-score) against realized outcome (win=1/loss=0). Meant
+    to be run manually/periodically -- not wired into the hot scan path --
+    to decide which bonus terms should be cut further or removed per the
+    upgrade prompt's "refit against realized win/loss" instruction.
+
+    Returns {} if there isn't yet enough logged history to trust a
+    correlation estimate.
+    """
+    resolved = [h for h in state.get("signal_history", [])
+                if h.get("sent") and h.get("result") in ("win", "loss")
+                and "bonus_components" in h]
+    if len(resolved) < min_samples:
+        return {}
+
+    outcomes = [1.0 if h["result"] == "win" else 0.0 for h in resolved]
+
+    fields = ["location_score", "context_score", "quality_score", "rr_score", "ltf_score"]
+    bonus_keys = sorted({k for h in resolved for k in h.get("bonus_components", {})})
+
+    def series_for(key: str, is_bonus: bool) -> list[float]:
+        if is_bonus:
+            return [h.get("bonus_components", {}).get(key, 0.0) for h in resolved]
+        return [h.get(key, 0.0) for h in resolved]
+
+    out = {}
+    for f in fields:
+        out[f] = pearson(series_for(f, False), outcomes)
+    for k in bonus_keys:
+        out[f"bonus.{k}"] = pearson(series_for(k, True), outcomes)
+    return out
 
 
 def grade_for_confidence(confidence: float) -> str:
@@ -1362,8 +1513,93 @@ def dynamic_max_signals(regime_breadth: float, btc_regime: Optional[Regime]) -> 
     return MAX_SIGNALS_PER_SCAN_DEFAULT
 
 
-def priority_score(cand: Candidate, confidence: float) -> float:
-    return confidence + cand.rr2() * 2.0
+def priority_score(cand: Candidate, confidence: float, pathway_w: float = 1.0) -> float:
+    return (confidence + cand.rr2() * 2.0) * pathway_w
+
+
+# PER-PATHWAY ADAPTIVE WEIGHT / PAUSE GOVERNOR
+#
+# Mirrors the pathway_weights mechanism already used in the Axis engine
+# (state-axis.json). The global governor_threshold() above only shifts one
+# confidence floor for every pathway alike; this discriminates by pathway,
+# which the win-rate breakdown (liquidity_reversal 40.7% vs
+# trend_continuation 26.8% vs range_reversion 17.4%) shows is necessary --
+# a single global floor can't suppress one bad pathway without also
+# suppressing the good ones.
+
+def _default_pathway_state() -> dict:
+    return {"weight": 1.0, "paused": False}
+
+
+def _pathway_history(state: dict, pathway: str, lookback: int) -> list[dict]:
+    hist = [h for h in state.get("signal_history", [])
+            if h.get("sent") and h.get("pathway") == pathway and h.get("result") in ("win", "loss")]
+    return hist[-lookback:]
+
+
+def pathway_winrate(state: dict, pathway: str, lookback: int, min_sample: int = PATHWAY_MIN_SAMPLE) -> Optional[float]:
+    hist = _pathway_history(state, pathway, lookback)
+    if len(hist) < min_sample:
+        return None
+    wins = sum(1 for h in hist if h["result"] == "win")
+    return wins / len(hist)
+
+
+def update_pathway_weights(state: dict):
+    """Call once per scan (see main()) to refresh per-pathway weight/pause
+    state from realized win/loss history. Bounded weight in
+    [PATHWAY_WEIGHT_MIN, PATHWAY_WEIGHT_MAX]; a pathway whose trailing
+    win rate over PATHWAY_PAUSE_LOOKBACK signals drops below
+    PATHWAY_PAUSE_WINRATE_FLOOR is hard-paused (excluded from scan_symbol
+    entirely) rather than just soft-weighted, until a fresh sample of the
+    same size looks better -- at which point it's reactivated at a
+    cautious reduced weight, not snapped back to 1.0."""
+    pw = state.setdefault("pathway_weights", {})
+    for pathway in PATHWAYS:
+        entry = pw.setdefault(pathway, _default_pathway_state())
+
+        if entry.get("paused"):
+            recheck = _pathway_history(state, pathway, PATHWAY_PAUSE_LOOKBACK)
+            if len(recheck) >= PATHWAY_PAUSE_LOOKBACK:
+                wr = sum(1 for h in recheck if h["result"] == "win") / len(recheck)
+                if wr >= PATHWAY_PAUSE_WINRATE_FLOOR:
+                    entry["paused"] = False
+                    entry["weight"] = PATHWAY_REACTIVATE_WEIGHT
+            continue  # still paused (or just reactivated cautiously) -- no further nudge this cycle
+
+        pause_wr = pathway_winrate(state, pathway, PATHWAY_PAUSE_LOOKBACK)
+        if pause_wr is not None and pause_wr < PATHWAY_PAUSE_WINRATE_FLOOR:
+            entry["paused"] = True
+            entry["weight"] = PATHWAY_WEIGHT_MIN
+            continue
+
+        wr = pathway_winrate(state, pathway, PATHWAY_LOOKBACK_SIGNALS)
+        if wr is None:
+            continue  # not enough resolved history yet -- leave weight as-is
+        delta = wr - PATHWAY_TARGET_WINRATE
+        entry["weight"] = max(PATHWAY_WEIGHT_MIN, min(PATHWAY_WEIGHT_MAX, 1.0 + delta))
+
+
+def pathway_weight(state: dict, pathway: str) -> float:
+    return state.get("pathway_weights", {}).get(pathway, {}).get("weight", 1.0)
+
+
+def pathway_is_paused(state: dict, pathway: str) -> bool:
+    return state.get("pathway_weights", {}).get(pathway, {}).get("paused", False)
+
+
+def pathway_confidence_override(state: dict, pathway: str) -> float:
+    """Extra min-confidence points required on top of the global governor
+    floor for a pathway whose adaptive weight is below 1.0 -- i.e.
+    range_reversion and trend_continuation need a materially higher bar to
+    fire than liquidity_reversal until their realized win rate improves.
+    weight==1.0 -> +0; weight==PATHWAY_WEIGHT_MIN -> +PATHWAY_CONF_OVERRIDE_MAX."""
+    w = pathway_weight(state, pathway)
+    if w >= 1.0:
+        return 0.0
+    span = 1.0 - PATHWAY_WEIGHT_MIN
+    frac = (1.0 - w) / span if span > 0 else 0.0
+    return frac * PATHWAY_CONF_OVERRIDE_MAX
 
 # STATE MANAGEMENT
 
@@ -1374,6 +1610,7 @@ def _default_state() -> dict:
         "cooldowns": {},
         "last_summary_date": None,
         "spread_history": {},
+        "pathway_weights": {},
     }
 
 
@@ -1435,13 +1672,29 @@ def count_active(state: dict) -> int:
 
 
 def record_signal_history(state: dict, symbol: str, direction: str, pathway: str,
-                           confidence: float, grade: str, sent: bool) -> int:
+                           confidence: float, grade: str, sent: bool,
+                           cand: Optional[Candidate] = None) -> int:
+    """Persists the five raw structural sub-scores and the bonus (total +
+    per-component breakdown) alongside the blended confidence/grade/result,
+    so which component is (mis)predicting outcome can be analyzed later
+    (see analyze_bonus_correlations) instead of only the final blended
+    number surviving to history. `cand` is optional so this still works for
+    callers that don't have sub-score data (there are none left in this
+    file, but keeps the signature backward-compatible)."""
     hist_id = int(time.time() * 1000) + len(state["signal_history"])
-    state["signal_history"].append({
+    entry = {
         "id": hist_id, "symbol": symbol, "direction": direction, "pathway": pathway,
         "confidence": confidence, "grade": grade, "sent": sent,
         "ts": time.time() * 1000, "result": None,
-    })
+        "location_score": cand.location_score if cand else 0.0,
+        "context_score": cand.context_score if cand else 0.0,
+        "quality_score": cand.quality_score if cand else 0.0,
+        "rr_score": cand.rr_score if cand else 0.0,
+        "ltf_score": cand.ltf_score if cand else 0.0,
+        "bonus": cand.bonus if cand else 0.0,
+        "bonus_components": dict(cand.bonus_components) if cand else {},
+    }
+    state["signal_history"].append(entry)
     return hist_id
 
 
@@ -1453,6 +1706,10 @@ def track_signal(state: dict, symbol: str, direction: str, msg_id: int,
         "entry": cand.entry, "sl": cand.sl, "tp1": cand.tp1, "tp2": cand.tp2,
         "pathway": cand.pathway, "confidence": confidence, "grade": grade,
         "bar_index": bar_index, "hist_id": hist_id, "opened_ts": time.time() * 1000,
+        "location_score": cand.location_score, "context_score": cand.context_score,
+        "quality_score": cand.quality_score, "rr_score": cand.rr_score,
+        "ltf_score": cand.ltf_score, "bonus": cand.bonus,
+        "bonus_components": dict(cand.bonus_components),
         "tp1_hit": False,
         # Entry is a resting limit/stop order, not an instant fill. Nothing
         # is "at risk" until price actually trades through cand.entry, so
@@ -1776,13 +2033,21 @@ def build_daily_summary(state: dict) -> str:
     resolved = [h for h in last_24h if h.get("result") in ("win", "loss")]
     wins = sum(1 for h in resolved if h["result"] == "win")
     winrate = safe_div(wins, len(resolved)) * 100 if resolved else 0.0
+
+    pathway_lines = []
+    for pw in PATHWAYS:
+        n = sum(1 for h in last_24h if h.get("pathway") == pw)
+        status = "paused" if pathway_is_paused(state, pw) else f"w={pathway_weight(state, pw):.2f}"
+        pathway_lines.append(f"  {pw}: {n} sent ({status})")
+
     return (
         f"🦅 <b>{ENGINE_NAME}</b> — Adaptive Smart-Money Signal Engine\n"
         f"────────────────────\n"
         f"📊 <b>24H Summary</b>\n"
         f"Signals sent (24h): {len(last_24h)}\n"
         f"Resolved: {len(resolved)}  Win rate: {winrate:.0f}%\n"
-        f"Currently active: {count_active(state)}"
+        f"Currently active: {count_active(state)}\n"
+        f"Pathway mix:\n" + "\n".join(pathway_lines)
     )
 
 
@@ -1881,8 +2146,26 @@ def scan_symbol(symbol: str, state: dict, bundles: dict, market_ctx: dict,
         if not fr.passed:
             continue
 
-        confidence = compute_confidence(cand, fr, symbol, market_ctx, reference_ms, htf_alignment)
-        if confidence < min_confidence:
+        if pathway_is_paused(state, cand.pathway):
+            continue
+
+        confidence, bonus, bonus_components = compute_confidence(
+            cand, fr, symbol, market_ctx, reference_ms, htf_alignment)
+
+        # Persist the raw sub-scores/bonus onto the candidate itself so they
+        # ride through to record_signal_history/track_signal below --
+        # this is the prerequisite for correlating components against
+        # realized outcome instead of only the blended number.
+        cand.location_score = fr.location_score
+        cand.context_score = fr.context_score
+        cand.quality_score = fr.quality_score
+        cand.rr_score = fr.rr_score
+        cand.ltf_score = fr.ltf_score
+        cand.bonus = bonus
+        cand.bonus_components = bonus_components
+
+        pathway_min = min_confidence + pathway_confidence_override(state, cand.pathway)
+        if confidence < pathway_min:
             continue
         grade = grade_for_confidence(confidence)
         results.append((symbol, cand.direction, cand, confidence, grade))
@@ -1978,6 +2261,13 @@ def main():
     print(f"  Governor min-confidence: {min_confidence:.1f}  |  Max signals this scan: {max_signals} "
           f"(breadth {breadth_pct*100:.0f}%)")
 
+    update_pathway_weights(state)
+    for pw in PATHWAYS:
+        status = "PAUSED" if pathway_is_paused(state, pw) else f"w={pathway_weight(state, pw):.2f}"
+        override = pathway_confidence_override(state, pw)
+        print(f"    pathway[{pw}]: {status}"
+              f"{f' (+{override:.1f} conf bar)' if override > 0 else ''}")
+
     if _shutdown:
         save_state(state)
         sys.exit(0)
@@ -1999,7 +2289,7 @@ def main():
             except Exception as e:
                 print(f"    ERROR scanning {sym}: {e}")
 
-    pending.sort(key=lambda t: priority_score(t[2], t[3]), reverse=True)
+    pending.sort(key=lambda t: priority_score(t[2], t[3], pathway_weight(state, t[2].pathway)), reverse=True)
     deduped = deduplicate_correlated(pending, corr_clusters)
 
     room = max(0, MAX_CONCURRENT_ACTIVE_SIGNALS - count_active(state))
@@ -2009,14 +2299,14 @@ def main():
 
     if dropped:
         for symbol, direction, cand, confidence, grade in dropped:
-            record_signal_history(state, symbol, direction, cand.pathway, confidence, grade, sent=False)
+            record_signal_history(state, symbol, direction, cand.pathway, confidence, grade, sent=False, cand=cand)
         print(f"  Dropped {len(dropped)} lower-priority setup(s) (cap={cap})")
 
     fired = 0
     for rank, (symbol, direction, cand, confidence, grade) in enumerate(top, start=1):
         msg = format_signal(symbol, cand, confidence, grade, rank)
         msg_id = send_telegram(msg)
-        hist_id = record_signal_history(state, symbol, direction, cand.pathway, confidence, grade, sent=True)
+        hist_id = record_signal_history(state, symbol, direction, cand.pathway, confidence, grade, sent=True, cand=cand)
         if msg_id:
             update_cooldown(state, symbol, direction, bar_index_ltf)
             track_signal(state, symbol, direction, msg_id, cand, confidence, grade, bar_index_ltf, hist_id,
