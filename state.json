@@ -21,7 +21,10 @@
       "engine_weight::volatility_expansion": 1.0,
       "veto::regime_mismatch_discount::volatility_expansion__neutral": 0.55,
       "engine_weight::mean_reversion": 1.0,
-      "veto::regime_mismatch_discount::mean_reversion__neutral": 0.55
+      "veto::regime_mismatch_discount::mean_reversion__neutral": 0.55,
+      "engine_weight::trend_continuation": 1.0,
+      "veto::regime_mismatch_discount::trend_continuation__neutral": 0.55,
+      "filter::liquidity_sanity_margin_atr": 0.35
     },
     "segment_stats": {},
     "calibration_buckets": {},
@@ -36,21 +39,72 @@
       "tripped_at": null,
       "reason": null
     },
-    "fill_stats": {},
+    "fill_stats": {
+      "trend_continuation::market": {
+        "dispatched": 1,
+        "filled": 0,
+        "expired": 0
+      }
+    },
     "filter_funnel": {
       "confluence_threshold": {
-        "evaluated": 39,
-        "rejected": 39
+        "evaluated": 49,
+        "rejected": 48
+      },
+      "rr_floor": {
+        "evaluated": 1,
+        "rejected": 0
+      },
+      "liquidity_sanity": {
+        "evaluated": 1,
+        "rejected": 0
+      },
+      "macro_blackout": {
+        "evaluated": 1,
+        "rejected": 0
       }
     }
   },
   "tier2": {
-    "active_signals": [],
+    "active_signals": [
+      {
+        "id": "ETH-trend_continuation-1784142070",
+        "engine": "trend_continuation",
+        "coin": "ETH",
+        "combo": "intraday",
+        "direction": "long",
+        "entry": 1924.4,
+        "sl": 1918.77,
+        "tp1": 1936.8986714694756,
+        "tp2": 1940.0233393368444,
+        "entry_kind": "market",
+        "entry_filled": true,
+        "pending_bars_elapsed": 0,
+        "pending_expiry_bars": 12,
+        "confidence": 0.3120418063021777,
+        "grade": "B",
+        "rr_tp1": 2.2200126944005856,
+        "confluences": [
+          "ema_pullback",
+          "htf_mtf_agree"
+        ],
+        "regime_at_entry": "neutral",
+        "session_anchored": false,
+        "dispatch_ts": "2026-07-15T19:01:10.167577+00:00",
+        "dispatch_ts_ms": 1784142070167,
+        "status": "active",
+        "resolution_logic_version": "1.0.0",
+        "mae_r": 0.0,
+        "mfe_r": 0.0,
+        "last_checked_candle_t": null,
+        "telegram_message_id": 3411
+      }
+    ],
     "trade_log": []
   },
   "meta": {
     "created": "2026-07-15T17:45:34.912293+00:00",
-    "last_run": "2026-07-15T18:45:34.474975+00:00",
-    "run_count": 5
+    "last_run": "2026-07-15T19:01:20.902894+00:00",
+    "run_count": 6
   }
 }
