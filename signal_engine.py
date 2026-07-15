@@ -1813,6 +1813,12 @@ def check_active_signals(state: dict, bundles_by_symbol: dict[str, dict[str, lis
                     sig["tp1_hit"] = True
                     r1 = _r_multiple(sig, sig["tp1"])
                     sig["tp1_r"] = r1
+                    # TP1 reaching price is now enough to bank the win for
+                    # win-rate purposes -- don't wait for the eventual TP2/SL
+                    # close. If the trade later closes via _close_signal
+                    # (tp2 or tp1_then_sl), that call just re-writes the same
+                    # "win" result, so this is safe to set early.
+                    _update_history_result(state, sig["hist_id"], "win")
                     react_telegram(sig["msg_id"], "🔥")
                     reply_telegram(sig["msg_id"],
                                     f"🔥 {hl_coin(sig['symbol'])} {sig['direction'].upper()} — "
