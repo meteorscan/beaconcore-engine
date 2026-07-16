@@ -1717,7 +1717,16 @@ def run_adaptive_filters(state: dict, cand: Candidate, ctx: dict, rv: RegimeVect
 # SECTION L — ENTRY-FILL VERIFICATION & SIGNAL LIFECYCLE (Section 12, mandatory)
 # =============================================================================
 
-def new_signal_record(cand: Candidate, scored: dict, dispatch_ts: datetime, combo: str) -> dict:
+def new_signal_record(cand: Candidate, scored: dict, dispatch_ts: datetime, combo: str,
+                       dispatch_watermark_t: Optional[int] = None) -> dict:
+    """`dispatch_watermark_t` must be the `t` of the most recent fully-closed
+    candle on this signal's low timeframe *as of dispatch*. Seeding the
+    resolution watermark here (rather than leaving it None) is what stops
+    resolve_active_signals() from treating the whole fetched candle history
+    as 'new' on the signal's first resolution pass — without it, up to
+    CANDLE_COUNT bars of pre-signal price action get replayed through
+    resolve_against_candle() on the next scan, which can manufacture an
+    SL/TP hit from a candle that closed before the signal ever existed."""
     grade = grade_for_confidence(scored["confidence"])
     pending_expiry_bars = PENDING_ENTRY_EXPIRY_BARS[combo]
     return {
@@ -1746,7 +1755,7 @@ def new_signal_record(cand: Candidate, scored: dict, dispatch_ts: datetime, comb
         "resolution_logic_version": RESOLUTION_LOGIC_VERSION,
         "mae_r": 0.0,
         "mfe_r": 0.0,
-        "last_checked_candle_t": None,
+        "last_checked_candle_t": dispatch_watermark_t,
     }
 
 
@@ -2106,11 +2115,11 @@ def tg_send_photo(path: str, caption: str = "") -> None:
 
 def format_signal_message(sig: dict) -> str:
     direction_word = "LONG" if sig["direction"] == "long" else "SHORT"
+    direction_dot = "🟢" if sig["direction"] == "long" else "🔴"
     lines = [
         f"*{ENGINE_NAME} {ENGINE_VERSION}* — New Signal",
+        f"*{sig['coin'].upper()} — {direction_word}* {direction_dot}",
         "",
-        f"Asset: {_title_case_token(sig['coin'])}",
-        f"Direction: {direction_word}",
         f"Engine: {_title_case_token(sig['engine'])}",
         f"Style: {_title_case_token(sig['combo'])}",
         f"Grade: {sig['grade']}   Confidence: {sig['confidence']*100:.1f}%",
@@ -2129,10 +2138,12 @@ def format_signal_message(sig: dict) -> str:
 
 
 def format_status_message(sig: dict, status: str) -> str:
+    direction_word = "LONG" if sig["direction"] == "long" else "SHORT"
+    direction_dot = "🟢" if sig["direction"] == "long" else "🔴"
     lines = [
         f"*{ENGINE_NAME}* — {status}",
+        f"*{sig['coin'].upper()} — {direction_word}* {direction_dot}",
         "",
-        f"Asset: {_title_case_token(sig['coin'])}",
         f"Engine: {_title_case_token(sig['engine'])}",
         f"Entry: `{sig['entry']:.6g}`",
         f"SL: `{sig['sl']:.6g}`",
@@ -2204,9 +2215,9 @@ def build_daily_summary(state: dict) -> str:
     for cat, count in by_category.items():
         lines.append(f"  {_title_case_token(cat)}: {count}")
     if best:
-        lines += ["", f"Best Setup: {_title_case_token(best['coin'])} ({best['r_realized']:.2f}R)"]
+        lines += ["", f"Best Setup: {best['coin'].upper()} ({best['r_realized']:.2f}R)"]
     if worst:
-        lines += [f"Worst Setup: {_title_case_token(worst['coin'])} ({worst['r_realized']:.2f}R)"]
+        lines += [f"Worst Setup: {worst['coin'].upper()} ({worst['r_realized']:.2f}R)"]
     return "\n".join(lines)
 
 
@@ -2302,7 +2313,13 @@ def run_scan(state: dict, start_time: float) -> None:
 
     log.info("Selected %d new signal(s) from %d filtered candidates.", len(selected), len(all_scored))
     for cand, scored in selected:
-        sig = new_signal_record(cand, scored, ts, cand.combo)
+        low_tf = COMBOS[cand.combo]["low"]
+        low_tf_candles = bundles.get(cand.coin, {}).get(low_tf, [])
+        # Seed the resolution watermark to the most recent CLOSED candle as of
+        # dispatch, so resolve_active_signals() only ever evaluates candles
+        # that close after this signal exists (see new_signal_record docstring).
+        dispatch_watermark_t = low_tf_candles[-1]["t"] if low_tf_candles else None
+        sig = new_signal_record(cand, scored, ts, cand.combo, dispatch_watermark_t)
         fs = state["tier1"]["fill_stats"].setdefault(f"{cand.engine}::{cand.entry_kind}",
                                                        {"dispatched": 0, "filled": 0, "expired": 0})
         fs["dispatched"] += 1
