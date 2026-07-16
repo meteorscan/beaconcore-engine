@@ -4,7 +4,20 @@
   "resolution_logic_version": "1.0.0",
   "tier1": {
     "adaptive_params": {
-      "risk::sl_buffer_percentile": 70.0
+      "risk::sl_buffer_percentile": 70.0,
+      "term_weight::regime_fit": 1.0,
+      "term_weight::mtf_alignment": 1.0,
+      "term_weight::confluence": 1.0,
+      "term_weight::segment_performance": 1.0,
+      "term_weight::ev_rr": 0.6,
+      "term_weight::liquidity_vol_context": 1.0,
+      "term_weight::session_open_proximity": 0.3,
+      "engine_weight::mean_reversion": 1.0,
+      "calib::global_offset": 0.0,
+      "veto::regime_mismatch_discount::mean_reversion__neutral": 0.55,
+      "filter::min_confluence_score": 0.42,
+      "engine_weight::range_trading": 1.0,
+      "veto::regime_mismatch_discount::range_trading__neutral": 0.55
     },
     "segment_stats": {},
     "calibration_buckets": {},
@@ -20,7 +33,12 @@
       "reason": null
     },
     "fill_stats": {},
-    "filter_funnel": {},
+    "filter_funnel": {
+      "confluence_threshold": {
+        "evaluated": 6,
+        "rejected": 6
+      }
+    },
     "engine_governor": {
       "smc": {
         "paused": false
@@ -69,7 +87,7 @@
   },
   "meta": {
     "created": "2026-07-16T07:31:03.697088+00:00",
-    "last_run": "2026-07-16T07:31:10.067913+00:00",
-    "run_count": 1
+    "last_run": "2026-07-16T07:45:36.299534+00:00",
+    "run_count": 2
   }
 }
