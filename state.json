@@ -32,7 +32,9 @@
       "veto::regime_mismatch_discount::range_trading__neutral": 0.55,
       "veto::regime_mismatch_discount::trend_continuation__ranging_choppy": 0.55,
       "veto::regime_mismatch_discount::mean_reversion__low_volatility": 0.55,
-      "veto::regime_mismatch_discount::range_trading__low_volatility": 0.55
+      "veto::regime_mismatch_discount::range_trading__low_volatility": 0.55,
+      "filter::sfp_purity_min": 0.45,
+      "veto::regime_mismatch_discount::reversal__consolidation": 0.55
     },
     "segment_stats": {
       "asset=ETH|engine=trend_continuation|regime=neutral|tf=intraday": {
@@ -44,23 +46,23 @@
         "sum_r_sq": 2.0
       },
       "category=regime_mismatch|engine=trend_continuation|regime=neutral": {
-        "n": 4
+        "n": 5
       },
       "asset=ONDO|engine=trend_continuation|regime=neutral|tf=intraday": {
-        "n": 2,
+        "n": 3,
         "wins": 0,
-        "losses": 2,
-        "sum_r": -2.0,
-        "sum_conf": 0.6435329653989597,
-        "sum_r_sq": 2.0
+        "losses": 3,
+        "sum_r": -3.0,
+        "sum_conf": 0.9535574058974632,
+        "sum_r_sq": 3.0
       }
     },
     "calibration_buckets": {
       "trend_continuation": {
         "B": {
-          "n": 4,
+          "n": 5,
           "wins": 0,
-          "sum_conf": 1.2483627147926242
+          "sum_conf": 1.5583871552911277
         }
       }
     },
@@ -78,64 +80,35 @@
     "fill_stats": {
       "trend_continuation::market": {
         "dispatched": 5,
-        "filled": 4,
+        "filled": 5,
         "expired": 0
       }
     },
     "filter_funnel": {
       "confluence_threshold": {
-        "evaluated": 226,
-        "rejected": 221
+        "evaluated": 237,
+        "rejected": 231
       },
       "rr_floor": {
-        "evaluated": 5,
+        "evaluated": 6,
         "rejected": 0
       },
       "liquidity_sanity": {
-        "evaluated": 5,
+        "evaluated": 6,
         "rejected": 0
       },
       "macro_blackout": {
-        "evaluated": 5,
+        "evaluated": 6,
         "rejected": 0
+      },
+      "sfp_purity": {
+        "evaluated": 1,
+        "rejected": 1
       }
     }
   },
   "tier2": {
-    "active_signals": [
-      {
-        "id": "ONDO-trend_continuation-1784164528",
-        "engine": "trend_continuation",
-        "coin": "ONDO",
-        "combo": "intraday",
-        "direction": "long",
-        "entry": 0.36148,
-        "sl": 0.35671699999999995,
-        "tp1": 0.3715835367290807,
-        "tp2": 0.37709455676312464,
-        "entry_kind": "market",
-        "entry_filled": true,
-        "pending_bars_elapsed": 0,
-        "pending_expiry_bars": 12,
-        "confidence": 0.3100244404985035,
-        "grade": "B",
-        "rr_tp1": 2.1212548244972704,
-        "confluences": [
-          "ema_pullback",
-          "htf_mtf_agree"
-        ],
-        "regime_at_entry": "neutral",
-        "session_anchored": false,
-        "dispatch_ts": "2026-07-16T01:15:28.215065+00:00",
-        "dispatch_ts_ms": 1784164528215,
-        "status": "active",
-        "resolution_logic_version": "1.0.0",
-        "mae_r": 0.0,
-        "mfe_r": 0.0,
-        "last_checked_candle_t": null,
-        "telegram_message_id": 3484
-      }
-    ],
+    "active_signals": [],
     "trade_log": [
       {
         "entry": 1924.4,
@@ -216,12 +189,32 @@
         "result": "loss",
         "resolution_logic_version": "1.0.0",
         "forensic_delta": "sample_too_small"
+      },
+      {
+        "entry": 0.36148,
+        "sl": 0.35671699999999995,
+        "tp1": 0.3715835367290807,
+        "tp2": 0.37709455676312464,
+        "r_realized": -1.0,
+        "mae_r": 6.088599622086832,
+        "mfe_r": 0.0,
+        "forensic_category": "regime_mismatch",
+        "confidence": 0.3100244404985035,
+        "grade": "B",
+        "regime_at_entry": "neutral",
+        "resolved_ts": "2026-07-16T01:31:01.591455+00:00",
+        "resolved_ts_ms": 1784165466106,
+        "engine": "trend_continuation",
+        "coin": "ONDO",
+        "result": "loss",
+        "resolution_logic_version": "1.0.0",
+        "forensic_delta": "sample_too_small"
       }
     ]
   },
   "meta": {
     "created": "2026-07-15T17:45:34.912293+00:00",
-    "last_run": "2026-07-16T01:15:36.851052+00:00",
-    "run_count": 31
+    "last_run": "2026-07-16T01:31:07.209409+00:00",
+    "run_count": 32
   }
 }
