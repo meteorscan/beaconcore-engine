@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # =============================================================================
-# VIRELLE ADAPTIVE SIGNAL ENGINE  —  v1.1.0
+# VIRELLE ADAPTIVE SIGNAL ENGINE  —  v1.1.1
 # -----------------------------------------------------------------------------
 # An institutional-grade, self-learning, multi-engine crypto signal generator
 # for Hyperliquid perpetuals. Single self-contained file — no local imports.
@@ -42,6 +42,21 @@
 #      weight on a win but never lower it on a loss) by replacing it with a
 #      single symmetric update in the new governor.
 #
+# v1.1.1 changelog — audited against Vantage Annex v2.0.0 (same two bug
+# classes checked first; neither present here, see above):
+#   1. SL liquidity-pool clearing: `_adaptive_sl_buffer` now also pushes the
+#      wick-buffered SL fully clear of any SSL/BSL equal-highs/equal-lows
+#      cluster it would otherwise rest at or inside, via the new
+#      `_clear_sl_of_liquidity_pool` (re-implemented independently from
+#      Vantage Annex's `_clear_sl_of_liquidity_pool`, adapted to this file's
+#      `equal_levels`/`Swing` structures rather than copied). Previously the
+#      wick buffer was the only adjustment made to a structural SL, so a stop
+#      could still land inside a known liquidity pool -- exactly the level a
+#      stop-hunt wick is drawn to sweep -- and get tagged by that sweep
+#      without the setup actually being invalidated. All thirteen engines now
+#      route through the pool-clearing step, since every one of them derives
+#      its SL from this single function.
+#
 # Run mode: single scan-per-invocation, intended to be triggered every 15
 # minutes by an external scheduler (GitHub Actions / cron-job.org). Each run:
 #   1. loads state.json (Tier 1 aggregates + Tier 2 bounded trade log)
@@ -78,7 +93,7 @@ from typing import Any, Optional
 # =============================================================================
 
 ENGINE_NAME = "Virelle"
-ENGINE_VERSION = "1.1.0"
+ENGINE_VERSION = "1.1.1"
 RESOLUTION_LOGIC_VERSION = "1.0.0"  # bumped whenever outcome-scoring logic changes (Section 11)
 
 # Same watchlist as every reference engine in this project (Section: "Use the
@@ -1025,15 +1040,44 @@ class Candidate:
     rr_floor_used: float = TP1_RR_FLOOR  # the dynamic RR floor actually enforced at TP finalization
 
 
-def _adaptive_sl_buffer(candles: list[dict], struct_level: float, direction: str, state: dict) -> float:
+def _clear_sl_of_liquidity_pool(direction: str, sl: float, equal_levels: dict) -> float:
+    """Push the SL fully clear of a known SSL/BSL liquidity-pool cluster
+    (Section 10 refinement, ported from Vantage Annex v2.0.0, re-implemented
+    against this file's own `equal_levels`/`Swing` structures rather than
+    copied). An EQL cluster below price (SSL, resting sell-side liquidity for
+    a long) or an EQH cluster above price (BSL, resting buy-side liquidity
+    for a short) is exactly what a stop-hunt wick is drawn to sweep before
+    reversing. If the SL still rests at or inside the cluster's own range
+    rather than fully clear of it, a sweep of the whole pool -- not just one
+    equal high/low -- could tag the stop without the setup actually being
+    invalidated, so the SL is pushed past the cluster's far edge plus the
+    cluster's own width as a margin."""
+    pools = equal_levels.get("eql_clusters", []) if direction == "long" else equal_levels.get("eqh_clusters", [])
+    for cluster in pools:
+        prices = [s.price for s in cluster]
+        lo, hi = min(prices), max(prices)
+        margin = max(hi - lo, 1e-9)
+        if direction == "long" and sl >= lo:
+            sl = lo - margin
+        elif direction == "short" and sl <= hi:
+            sl = hi + margin
+    return sl
+
+
+def _adaptive_sl_buffer(candles: list[dict], struct_level: float, direction: str, state: dict,
+                         equal_levels: dict) -> float:
     """Adaptive-percentile SL buffer (Section 10, mandatory): buffer sized
     from a live percentile of recent adverse-wick excursions, not a fixed
-    constant."""
+    constant. The buffered level is then pushed fully clear of any SSL/BSL
+    liquidity-pool cluster it would otherwise rest inside (Section 10
+    refinement, see `_clear_sl_of_liquidity_pool`) -- never resized to hit an
+    RR target, only to keep the SL a genuine invalidation level."""
     dist_dist = wick_noise_distribution(candles, 120)
     pctile = get_param(state, "risk::sl_buffer_percentile")
     buf = percentile(dist_dist, pctile) if dist_dist else atr(candles, 14) * 0.15
     buf = max(buf, atr(candles, 14) * 0.08)
-    return struct_level - buf if direction == "long" else struct_level + buf
+    sl = struct_level - buf if direction == "long" else struct_level + buf
+    return _clear_sl_of_liquidity_pool(direction, sl, equal_levels)
 
 
 def _quality_score_for(zone: Optional[Zone], sfp_purity: float, atr_val: float) -> float:
@@ -1263,7 +1307,7 @@ def engine_smc(coin: str, combo: str, ctx: dict, market_price: float, rv: Regime
         zone, sfp = sel["zone"], sel["sfp"]
         entry = sel["entry"]
         struct_level = zone.bottom if direction == "long" else zone.top
-        sl = _adaptive_sl_buffer(ctx["low"], struct_level, direction, _GLOBAL_STATE_REF[0])
+        sl = _adaptive_sl_buffer(ctx["low"], struct_level, direction, _GLOBAL_STATE_REF[0], ctx["equal_levels"])
         raw_span = abs(entry - sl) * 1.6
         tp1_raw = entry + raw_span if direction == "long" else entry - raw_span
         tp2_raw = entry + raw_span * 1.7 if direction == "long" else entry - raw_span * 1.7
@@ -1305,7 +1349,7 @@ def engine_trend_continuation(coin: str, combo: str, ctx: dict, market_price: fl
         return out
     entry = low[-1]["c"]
     struct_ref = min(c["l"] for c in low[-6:]) if direction == "long" else max(c["h"] for c in low[-6:])
-    sl = _adaptive_sl_buffer(low, struct_ref, direction, _GLOBAL_STATE_REF[0])
+    sl = _adaptive_sl_buffer(low, struct_ref, direction, _GLOBAL_STATE_REF[0], ctx["equal_levels"])
     a = ctx["atr_low"]
     tp1_raw = entry + a * 2.2 if direction == "long" else entry - a * 2.2
     tp2_raw = entry + a * 3.4 if direction == "long" else entry - a * 3.4
@@ -1335,7 +1379,7 @@ def engine_breakout(coin: str, combo: str, ctx: dict, market_price: float, rv: R
             continue
         entry = last["c"]
         sl_struct = lo if direction == "long" else hi
-        sl = _adaptive_sl_buffer(low, sl_struct, direction, _GLOBAL_STATE_REF[0])
+        sl = _adaptive_sl_buffer(low, sl_struct, direction, _GLOBAL_STATE_REF[0], ctx["equal_levels"])
         rng = hi - lo
         tp1_raw = entry + rng * 0.9 if direction == "long" else entry - rng * 0.9
         tp2_raw = entry + rng * 1.6 if direction == "long" else entry - rng * 1.6
@@ -1364,7 +1408,7 @@ def engine_pullback(coin: str, combo: str, ctx: dict, market_price: float, rv: R
         zone = sel["zone"]
         entry = (zone.top + zone.bottom) / 2
         struct_level = zone.bottom if direction == "long" else zone.top
-        sl = _adaptive_sl_buffer(ctx["low"], struct_level, direction, _GLOBAL_STATE_REF[0])
+        sl = _adaptive_sl_buffer(ctx["low"], struct_level, direction, _GLOBAL_STATE_REF[0], ctx["equal_levels"])
         span = abs(entry - sl) * 1.55
         tp1_raw = entry + span if direction == "long" else entry - span
         tp2_raw = entry + span * 1.6 if direction == "long" else entry - span * 1.6
@@ -1394,7 +1438,7 @@ def engine_liquidity_sweep(coin: str, combo: str, ctx: dict, market_price: float
     low = ctx["low"]
     entry = low[-1]["c"]
     struct_level = sfp["swept_level"]
-    sl = _adaptive_sl_buffer(low, struct_level, direction, _GLOBAL_STATE_REF[0])
+    sl = _adaptive_sl_buffer(low, struct_level, direction, _GLOBAL_STATE_REF[0], ctx["equal_levels"])
     span = abs(entry - sl) * 1.6
     tp1_raw = entry + span if direction == "long" else entry - span
     tp2_raw = entry + span * 1.8 if direction == "long" else entry - span * 1.8
@@ -1438,7 +1482,7 @@ def _poi_based_engine(engine_name: str, coin: str, combo: str, ctx: dict, market
         zone = sel["zone"]
         entry = sel["entry"]
         struct_level = zone.bottom if direction == "long" else zone.top
-        sl = _adaptive_sl_buffer(ctx["low"], struct_level, direction, _GLOBAL_STATE_REF[0])
+        sl = _adaptive_sl_buffer(ctx["low"], struct_level, direction, _GLOBAL_STATE_REF[0], ctx["equal_levels"])
         span = abs(entry - sl) * 1.55
         tp1_raw = entry + span if direction == "long" else entry - span
         tp2_raw = entry + span * 1.65 if direction == "long" else entry - span * 1.65
@@ -1471,7 +1515,7 @@ def engine_momentum(coin: str, combo: str, ctx: dict, market_price: float, rv: R
         return out
     entry = closes[-1]
     struct_ref = min(c["l"] for c in low[-10:]) if direction == "long" else max(c["h"] for c in low[-10:])
-    sl = _adaptive_sl_buffer(low, struct_ref, direction, _GLOBAL_STATE_REF[0])
+    sl = _adaptive_sl_buffer(low, struct_ref, direction, _GLOBAL_STATE_REF[0], ctx["equal_levels"])
     span = abs(entry - sl) * 1.6
     tp1_raw = entry + span if direction == "long" else entry - span
     tp2_raw = entry + span * 1.9 if direction == "long" else entry - span * 1.9
@@ -1499,7 +1543,7 @@ def engine_reversal(coin: str, combo: str, ctx: dict, market_price: float, rv: R
         return out  # only take counter-trend reversal with a documented strong reason: MTF already turning
     low = ctx["low"]
     entry = low[-1]["c"]
-    sl = _adaptive_sl_buffer(low, sfp["swept_level"], direction, _GLOBAL_STATE_REF[0])
+    sl = _adaptive_sl_buffer(low, sfp["swept_level"], direction, _GLOBAL_STATE_REF[0], ctx["equal_levels"])
     span = abs(entry - sl) * 1.7
     tp1_raw = entry + span if direction == "long" else entry - span
     tp2_raw = entry + span * 2.0 if direction == "long" else entry - span * 2.0
@@ -1532,7 +1576,7 @@ def engine_mean_reversion(coin: str, combo: str, ctx: dict, market_price: float,
     entry = closes[-1]
     sl_struct = min(low[-20:], key=lambda c: c["l"])["l"] if direction == "long" \
         else max(low[-20:], key=lambda c: c["h"])["h"]
-    sl = _adaptive_sl_buffer(low, sl_struct, direction, _GLOBAL_STATE_REF[0])
+    sl = _adaptive_sl_buffer(low, sl_struct, direction, _GLOBAL_STATE_REF[0], ctx["equal_levels"])
     target = mean
     tp1_raw = target
     tp2_raw = target + (target - entry) * 0.5
@@ -1565,7 +1609,7 @@ def engine_range_trading(coin: str, combo: str, ctx: dict, market_price: float, 
             continue
         entry = last["c"]
         sl_struct = lo if direction == "long" else hi
-        sl = _adaptive_sl_buffer(low, sl_struct, direction, _GLOBAL_STATE_REF[0])
+        sl = _adaptive_sl_buffer(low, sl_struct, direction, _GLOBAL_STATE_REF[0], ctx["equal_levels"])
         target = hi if direction == "long" else lo
         tp1_raw = target
         tp2_raw = target
@@ -1595,7 +1639,7 @@ def engine_volatility_expansion(coin: str, combo: str, ctx: dict, market_price: 
     direction = "long" if low[-1]["c"] > low[-2]["c"] else "short"
     entry = low[-1]["c"]
     sl_struct = low[-1]["l"] if direction == "long" else low[-1]["h"]
-    sl = _adaptive_sl_buffer(low, sl_struct, direction, _GLOBAL_STATE_REF[0])
+    sl = _adaptive_sl_buffer(low, sl_struct, direction, _GLOBAL_STATE_REF[0], ctx["equal_levels"])
     span = abs(entry - sl) * 1.7
     tp1_raw = entry + span if direction == "long" else entry - span
     tp2_raw = entry + span * 2.1 if direction == "long" else entry - span * 2.1
