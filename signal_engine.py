@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # =============================================================================
-# VIRELLE ADAPTIVE SIGNAL ENGINE  —  v1.0.0
+# VIRELLE ADAPTIVE SIGNAL ENGINE  —  v1.1.0
 # -----------------------------------------------------------------------------
 # An institutional-grade, self-learning, multi-engine crypto signal generator
 # for Hyperliquid perpetuals. Single self-contained file — no local imports.
@@ -15,6 +15,32 @@
 # Best-of-breed ideas adopted (weight-budgeted rate limiter, delta candle
 # cache, closed-candle-only structural reads) are re-implemented independently
 # below, never copy-pasted.
+#
+# v1.1.0 changelog — architecture ported from Kestrel v1.2.1 (audited
+# engine-by-engine, added only where missing):
+#   1. Mandatory LTF confirmation trigger: every Candidate now carries
+#      `ltf_confirmed`; engines already routed through
+#      `_zone_selection_sequence` (smc, pullback, order_block, breaker_block,
+#      fair_value_gap) satisfy it via the existing mss.confirmed gate, and
+#      the remaining engines are checked against the new `_ltf_confirmation`
+#      helper. Enforced as a hard gate in `run_adaptive_filters`.
+#   2. Regime/quality-adaptive RR floor: `_finalize_tp_pair` now derives a
+#      per-candidate `dyn_floor` (bumped for high noise/volatility and for
+#      low zone-quality, via the new `_quality_score_for`) instead of the
+#      flat TP1_RR_FLOOR constant; stored per-candidate as `rr_floor_used`
+#      and enforced in `run_adaptive_filters`.
+#   3. Room-to-next-opposing-level TP construction: `_finalize_tp_pair` now
+#      derives TP1/TP2 from `_room_to_next_opposing_level` (measured
+#      distance to the next real opposing swing/EQH/EQL) first, falling back
+#      to the fixed-RR ceiling only when nothing binding is in the way;
+#      liquidity-wall clipping is still applied as a final safety net.
+#   4. Per-engine adaptive weight + pause governor: `update_engine_governor`
+#      (called once per scan) hard-pauses/cautiously-reactivates individual
+#      engines off their own rolling win rate, independent of the global
+#      circuit breaker. This also fixes the prior one-way-only engine_weight
+#      nudge in `route_forensic_response` (which could raise an engine's
+#      weight on a win but never lower it on a loss) by replacing it with a
+#      single symmetric update in the new governor.
 #
 # Run mode: single scan-per-invocation, intended to be triggered every 15
 # minutes by an external scheduler (GitHub Actions / cron-job.org). Each run:
@@ -52,7 +78,7 @@ from typing import Any, Optional
 # =============================================================================
 
 ENGINE_NAME = "Virelle"
-ENGINE_VERSION = "1.0.0"
+ENGINE_VERSION = "1.1.0"
 RESOLUTION_LOGIC_VERSION = "1.0.0"  # bumped whenever outcome-scoring logic changes (Section 11)
 
 # Same watchlist as every reference engine in this project (Section: "Use the
@@ -108,6 +134,19 @@ EMA_LEARNING_ALPHA = 0.15             # exponential-smoothing weight for newly o
 CIRCUIT_BREAKER_WINDOW = 30           # rolling trades compared against baseline
 CIRCUIT_BREAKER_WIN_RATE_DROP = 0.12  # absolute win-rate drop vs baseline that trips the breaker
 CIRCUIT_BREAKER_PF_DROP_FRAC = 0.25   # fractional profit-factor drop vs baseline that trips it
+
+# --- Per-engine adaptive weight / pause governor (Section 13 refinement) -------
+# The global circuit breaker above only freezes/resumes adaptation for the
+# whole ensemble at once. This discriminates by engine, so one persistently
+# bad engine (e.g. mean_reversion misfiring in a trend regime) can be
+# hard-paused and later cautiously reactivated at reduced weight, without
+# needing the whole system's circuit breaker to trip.
+ENGINE_GOVERNOR_LOOKBACK = 40          # rolling resolved-trade window for the weight nudge
+ENGINE_GOVERNOR_MIN_SAMPLE = 10        # min resolved trades in-window before a weight nudge is trusted
+ENGINE_GOVERNOR_TARGET_WINRATE = 0.50
+ENGINE_PAUSE_LOOKBACK = 20             # trailing resolved trades checked for the hard-pause trigger
+ENGINE_PAUSE_WINRATE_FLOOR = 0.20      # win rate below this over the lookback -> hard pause
+ENGINE_REACTIVATE_WEIGHT = 0.5         # weight assigned on reactivation -- cautious re-entry, not a snap back to 1.0
 
 # --- State file tiering (Section 5) -------------------------------------------
 TIER2_RETENTION_DAYS = 15
@@ -853,6 +892,7 @@ def default_state() -> dict:
             "circuit_breaker": {"tripped": False, "tripped_at": None, "reason": None},
             "fill_stats": {},       # entry_kind/setup -> {dispatched, filled, expired}
             "filter_funnel": {},    # filter_name -> {evaluated, rejected}
+            "engine_governor": {},  # engine -> {paused} -- see update_engine_governor()
         },
         "tier2": {
             "active_signals": [],
@@ -981,6 +1021,8 @@ class Candidate:
     sfp_purity: float = 0.0
     session_anchored: bool = False
     mfe_proxy_atr: float = 0.0  # used only for entry-distance sanity, not persisted
+    ltf_confirmed: bool = False  # mandatory LTF confirmation trigger (Section 9)
+    rr_floor_used: float = TP1_RR_FLOOR  # the dynamic RR floor actually enforced at TP finalization
 
 
 def _adaptive_sl_buffer(candles: list[dict], struct_level: float, direction: str, state: dict) -> float:
@@ -992,6 +1034,42 @@ def _adaptive_sl_buffer(candles: list[dict], struct_level: float, direction: str
     buf = percentile(dist_dist, pctile) if dist_dist else atr(candles, 14) * 0.15
     buf = max(buf, atr(candles, 14) * 0.08)
     return struct_level - buf if direction == "long" else struct_level + buf
+
+
+def _quality_score_for(zone: Optional[Zone], sfp_purity: float, atr_val: float) -> float:
+    """Zone-quality proxy feeding the dynamic RR floor (Section 10): tighter
+    zones and higher SFP purity score higher. Engines without a discrete POI
+    (pure momentum/range/mean-reversion/breakout reads) get a neutral mid
+    score so this term neither penalizes nor favors them specifically."""
+    if zone is not None and atr_val > 0:
+        width_frac = abs(zone.top - zone.bottom) / atr_val
+        width_score = max(0.0, 1.0 - min(1.0, width_frac / 2.5))
+    else:
+        width_score = 0.5
+    purity_score = sfp_purity if sfp_purity else 0.5
+    return max(0.0, min(1.0, 0.5 * width_score + 0.5 * purity_score))
+
+
+def _room_to_next_opposing_level(entry: float, direction: str, ctx: dict) -> Optional[float]:
+    """Measured distance to the next real opposing swing high/low or EQH/EQL
+    liquidity cluster (Section 10 refinement). Used by `_finalize_tp_pair` to
+    derive TP1/TP2 from actual structural room first, falling back to the
+    fixed-RR ceiling only when nothing binding sits in the way -- more honest
+    than reaching for a flat RR target and clipping after the fact."""
+    candidates: list[float] = []
+    swings = ctx.get("swings_low", []) + ctx.get("swings_med", [])
+    eq = ctx.get("equal_levels", {})
+    if direction == "long":
+        candidates += [s.price for s in swings if s.kind == "high" and s.price > entry]
+        candidates += [statistics.mean(s.price for s in cl) for cl in eq.get("eqh_clusters", [])
+                       if statistics.mean(s.price for s in cl) > entry]
+    else:
+        candidates += [s.price for s in swings if s.kind == "low" and s.price < entry]
+        candidates += [statistics.mean(s.price for s in cl) for cl in eq.get("eql_clusters", [])
+                       if statistics.mean(s.price for s in cl) < entry]
+    if not candidates:
+        return None
+    return (min(candidates) - entry) if direction == "long" else (entry - max(candidates))
 
 
 def _clip_tp_to_liquidity_wall(entry: float, target: float, direction: str,
@@ -1022,17 +1100,56 @@ def _clip_tp_to_liquidity_wall(entry: float, target: float, direction: str,
 
 
 def _finalize_tp_pair(entry: float, sl: float, direction: str, tp1_raw: float, tp2_raw: float,
-                       candles: list[dict], equal_levels: dict) -> Optional[tuple[float, float, float]]:
-    """Applies liquidity-wall clipping, enforces the 1.5 RR floor on TP1, and
-    structurally guarantees TP2 sits strictly farther than TP1 (Section 10's
-    TP-ordering-integrity assertion). Returns None if the candidate cannot be
-    made to satisfy the RR floor honestly."""
+                       ctx: dict, rv: RegimeVector,
+                       quality_score: float = 0.5) -> Optional[tuple[float, float, float, float]]:
+    """Applies liquidity-wall clipping, enforces a regime/quality-adaptive RR
+    floor on TP1 (Section 10), derives TP1/TP2 from actual measured room to
+    the next opposing structural level where that room is binding (Section
+    10 refinement -- more honest than reach-for-a-fixed-RR-then-clip), and
+    structurally guarantees TP2 sits strictly farther than TP1 (TP-ordering-
+    integrity assertion). Returns None if the candidate cannot be made to
+    satisfy the dynamic RR floor honestly.
+
+    `quality_score` (0..1, see `_quality_score_for`) and the regime vector's
+    noise/volatility both raise the bar dynamically: choppy or low-quality
+    setups need more reward per unit risk to be worth taking than a uniform
+    flat floor would require."""
+    candles, equal_levels = ctx["low"], ctx["equal_levels"]
+    atr_val = ctx.get("atr_low") or atr(candles, 14) or 1e-9
     risk = abs(entry - sl)
     if risk <= 0:
         return None
+
+    dyn_floor = TP1_RR_FLOOR
+    if rv.noise > 0.6 or rv.volatility_pctile > 80:
+        dyn_floor += 0.4
+    if quality_score < 0.5:
+        dyn_floor += 0.3
+
+    # Room-to-next-opposing-level: derive tp1_rr/tp2_rr from the actual
+    # measured distance to the next real supply/demand structure or
+    # liquidity pool first, only falling back to the fixed-RR ceiling
+    # (tp1_raw/tp2_raw) when there's no binding wall in the way.
+    room = _room_to_next_opposing_level(entry, direction, ctx)
+    room_buffer = 0.15 * atr_val
+    tp1_rr_ceiling = abs(tp1_raw - entry) / risk
+    tp2_rr_ceiling = abs(tp2_raw - entry) / risk
+    tp1_rr, tp2_rr = tp1_rr_ceiling, tp2_rr_ceiling
+    if room is not None:
+        usable = room - room_buffer
+        if usable > 0:
+            wall_rr = usable / risk
+            if wall_rr < tp1_rr_ceiling:
+                tp1_rr = max(dyn_floor, min(wall_rr, tp1_rr_ceiling))
+            if wall_rr < tp2_rr_ceiling:
+                tp2_rr = max(tp1_rr, min(wall_rr, tp2_rr_ceiling))
+
+    tp1_raw = entry + tp1_rr * risk if direction == "long" else entry - tp1_rr * risk
+    tp2_raw = entry + tp2_rr * risk if direction == "long" else entry - tp2_rr * risk
+
     tp1 = _clip_tp_to_liquidity_wall(entry, tp1_raw, direction, candles, equal_levels)
     rr1 = abs(tp1 - entry) / risk
-    if rr1 < TP1_RR_FLOOR:
+    if rr1 < dyn_floor:
         return None  # reject rather than stretch TP1 artificially (Section 10)
     tp2 = _clip_tp_to_liquidity_wall(entry, tp2_raw, direction, candles, equal_levels)
     # TP ordering integrity — final assertion, independent of upstream derivation.
@@ -1045,7 +1162,7 @@ def _finalize_tp_pair(entry: float, sl: float, direction: str, tp1_raw: float, t
     dist_tp1 = abs(tp1 - entry)
     dist_tp2 = abs(tp2 - entry)
     assert dist_tp2 > dist_tp1, "TP ordering integrity violated"
-    return tp1, tp2, rr1
+    return tp1, tp2, rr1, dyn_floor
 
 
 def _entry_distance_ok(entry: float, sl: float, tp1: float, market_price: float,
@@ -1059,6 +1176,30 @@ def _entry_distance_ok(entry: float, sl: float, tp1: float, market_price: float,
     if entry_kind == "pending" and abs(entry - market_price) > MAX_PENDING_ENTRY_ATR_MULT * atr_val:
         return False
     return True
+
+
+def _ltf_confirmation(ctx: dict, direction: str) -> bool:
+    """Mandatory LTF confirmation trigger (Section 9): a candidate is never
+    allowed to fire on the strength of HTF/MTF structural alignment alone --
+    something must have actually happened on the combo's low timeframe
+    confirming the intended direction *after* the sweep/POI tap, e.g. a
+    confirmed market-structure shift (a close beyond the last counter-trend
+    swing) or, failing that, a plain rejection candle closing back through
+    the prior bar's opposite extreme. This is engine-agnostic and is checked
+    independently of whatever structural read produced the candidate, so an
+    HTF zone that is "right" but where price never actually turns there gets
+    filtered out here rather than passed through on structure alone."""
+    low = ctx["low"]
+    if len(low) < 3:
+        return False
+    mss = detect_mss(low, direction, lookback=20)
+    if mss and mss.get("confirmed"):
+        return True
+    last, prev = low[-1], low[-2]
+    body_dir = last["c"] - last["o"]
+    if direction == "long":
+        return body_dir > 0 and last["c"] > prev["h"]
+    return body_dir < 0 and last["c"] < prev["l"]
 
 
 def _structural_context(bundle: dict[str, list[dict]], combo_tfs: dict) -> dict:
@@ -1126,10 +1267,11 @@ def engine_smc(coin: str, combo: str, ctx: dict, market_price: float, rv: Regime
         raw_span = abs(entry - sl) * 1.6
         tp1_raw = entry + raw_span if direction == "long" else entry - raw_span
         tp2_raw = entry + raw_span * 1.7 if direction == "long" else entry - raw_span * 1.7
-        finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, ctx["low"], ctx["equal_levels"])
+        quality = _quality_score_for(zone, sfp["purity"], ctx["atr_low"])
+        finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, ctx, rv, quality)
         if not finalized:
             continue
-        tp1, tp2, rr1 = finalized
+        tp1, tp2, rr1, dyn_floor = finalized
         entry_kind = "market" if abs(entry - market_price) < ctx["atr_low"] * 0.15 else "pending"
         if not _entry_distance_ok(entry, sl, tp1, market_price, ctx["atr_low"], entry_kind):
             continue
@@ -1141,7 +1283,9 @@ def engine_smc(coin: str, combo: str, ctx: dict, market_price: float, rv: Regime
                               min(0.95, conf), rr1, confluences,
                               best_fit_regimes=["trending", "expansion"], zone=zone,
                               sfp_purity=sfp["purity"],
-                              session_anchored=rv.session_open_proximity > 0.5))
+                              session_anchored=rv.session_open_proximity > 0.5,
+                              # already required by _zone_selection_sequence's mss.confirmed gate
+                              ltf_confirmed=True, rr_floor_used=dyn_floor))
     return out
 
 
@@ -1165,17 +1309,18 @@ def engine_trend_continuation(coin: str, combo: str, ctx: dict, market_price: fl
     a = ctx["atr_low"]
     tp1_raw = entry + a * 2.2 if direction == "long" else entry - a * 2.2
     tp2_raw = entry + a * 3.4 if direction == "long" else entry - a * 3.4
-    finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, low, ctx["equal_levels"])
+    finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, ctx, rv, _quality_score_for(None, 0.0, a))
     if not finalized:
         return out
-    tp1, tp2, rr1 = finalized
+    tp1, tp2, rr1, dyn_floor = finalized
     entry_kind = "market"
     if not _entry_distance_ok(entry, sl, tp1, market_price, a, entry_kind):
         return out
     conf = 0.48 + 0.2 * min(1.0, rv.trend_strength / 35.0)
     out.append(Candidate("trend_continuation", coin, combo, direction, entry, sl, tp1, tp2, entry_kind,
                           min(0.9, conf), rr1, ["ema_pullback", "htf_mtf_agree"],
-                          best_fit_regimes=["trending"]))
+                          best_fit_regimes=["trending"],
+                          ltf_confirmed=_ltf_confirmation(ctx, direction), rr_floor_used=dyn_floor))
     return out
 
 
@@ -1194,16 +1339,18 @@ def engine_breakout(coin: str, combo: str, ctx: dict, market_price: float, rv: R
         rng = hi - lo
         tp1_raw = entry + rng * 0.9 if direction == "long" else entry - rng * 0.9
         tp2_raw = entry + rng * 1.6 if direction == "long" else entry - rng * 1.6
-        finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, low, ctx["equal_levels"])
+        quality = _quality_score_for(None, 0.0, ctx["atr_low"])
+        finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, ctx, rv, quality)
         if not finalized:
             continue
-        tp1, tp2, rr1 = finalized
+        tp1, tp2, rr1, dyn_floor = finalized
         if not _entry_distance_ok(entry, sl, tp1, market_price, ctx["atr_low"], "market"):
             continue
         conf = 0.45 + 0.2 * (1.0 - rv.noise)
         out.append(Candidate("breakout", coin, combo, direction, entry, sl, tp1, tp2, "market",
                               min(0.9, conf), rr1, ["range_breakout"],
-                              best_fit_regimes=["expansion", "trending"]))
+                              best_fit_regimes=["expansion", "trending"],
+                              ltf_confirmed=_ltf_confirmation(ctx, direction), rr_floor_used=dyn_floor))
     return out
 
 
@@ -1221,17 +1368,20 @@ def engine_pullback(coin: str, combo: str, ctx: dict, market_price: float, rv: R
         span = abs(entry - sl) * 1.55
         tp1_raw = entry + span if direction == "long" else entry - span
         tp2_raw = entry + span * 1.6 if direction == "long" else entry - span * 1.6
-        finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, ctx["low"], ctx["equal_levels"])
+        quality = _quality_score_for(zone, sel["sfp"]["purity"], ctx["atr_low"])
+        finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, ctx, rv, quality)
         if not finalized:
             continue
-        tp1, tp2, rr1 = finalized
+        tp1, tp2, rr1, dyn_floor = finalized
         entry_kind = "pending"
         if not _entry_distance_ok(entry, sl, tp1, market_price, ctx["atr_low"], entry_kind):
             continue
         out.append(Candidate("pullback", coin, combo, direction, entry, sl, tp1, tp2, entry_kind,
                               0.5 + 0.1 * sel["sfp"]["purity"], rr1, ["poi_pullback"],
                               best_fit_regimes=["trending", "consolidation"], zone=zone,
-                              sfp_purity=sel["sfp"]["purity"]))
+                              sfp_purity=sel["sfp"]["purity"],
+                              # already required by _zone_selection_sequence's mss.confirmed gate
+                              ltf_confirmed=True, rr_floor_used=dyn_floor))
     return out
 
 
@@ -1248,10 +1398,11 @@ def engine_liquidity_sweep(coin: str, combo: str, ctx: dict, market_price: float
     span = abs(entry - sl) * 1.6
     tp1_raw = entry + span if direction == "long" else entry - span
     tp2_raw = entry + span * 1.8 if direction == "long" else entry - span * 1.8
-    finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, low, ctx["equal_levels"])
+    quality = _quality_score_for(None, sfp["purity"], ctx["atr_low"])
+    finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, ctx, rv, quality)
     if not finalized:
         return out
-    tp1, tp2, rr1 = finalized
+    tp1, tp2, rr1, dyn_floor = finalized
     if not _entry_distance_ok(entry, sl, tp1, market_price, ctx["atr_low"], "market"):
         return out
     confl = ["liquidity_sweep"]
@@ -1260,7 +1411,8 @@ def engine_liquidity_sweep(coin: str, combo: str, ctx: dict, market_price: float
     out.append(Candidate("liquidity_sweep", coin, combo, direction, entry, sl, tp1, tp2, "market",
                           0.5 + 0.2 * sfp["purity"], rr1, confl,
                           best_fit_regimes=["ranging_choppy", "consolidation"],
-                          sfp_purity=sfp["purity"], session_anchored=rv.session_open_proximity > 0.5))
+                          sfp_purity=sfp["purity"], session_anchored=rv.session_open_proximity > 0.5,
+                          ltf_confirmed=_ltf_confirmation(ctx, direction), rr_floor_used=dyn_floor))
     return out
 
 
@@ -1290,17 +1442,20 @@ def _poi_based_engine(engine_name: str, coin: str, combo: str, ctx: dict, market
         span = abs(entry - sl) * 1.55
         tp1_raw = entry + span if direction == "long" else entry - span
         tp2_raw = entry + span * 1.65 if direction == "long" else entry - span * 1.65
-        finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, ctx["low"], ctx["equal_levels"])
+        quality = _quality_score_for(zone, sel["sfp"]["purity"], ctx["atr_low"])
+        finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, ctx, rv, quality)
         if not finalized:
             continue
-        tp1, tp2, rr1 = finalized
+        tp1, tp2, rr1, dyn_floor = finalized
         entry_kind = "market" if abs(entry - market_price) < ctx["atr_low"] * 0.15 else "pending"
         if not _entry_distance_ok(entry, sl, tp1, market_price, ctx["atr_low"], entry_kind):
             continue
         out.append(Candidate(engine_name, coin, combo, direction, entry, sl, tp1, tp2, entry_kind,
                               0.5 + 0.15 * sel["sfp"]["purity"], rr1, [want_kind],
                               best_fit_regimes=["trending", "consolidation"], zone=zone,
-                              sfp_purity=sel["sfp"]["purity"]))
+                              sfp_purity=sel["sfp"]["purity"],
+                              # already required by _zone_selection_sequence's mss.confirmed gate
+                              ltf_confirmed=True, rr_floor_used=dyn_floor))
     return out
 
 
@@ -1320,15 +1475,17 @@ def engine_momentum(coin: str, combo: str, ctx: dict, market_price: float, rv: R
     span = abs(entry - sl) * 1.6
     tp1_raw = entry + span if direction == "long" else entry - span
     tp2_raw = entry + span * 1.9 if direction == "long" else entry - span * 1.9
-    finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, low, ctx["equal_levels"])
+    finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, ctx, rv,
+                                   _quality_score_for(None, 0.0, ctx["atr_low"]))
     if not finalized:
         return out
-    tp1, tp2, rr1 = finalized
+    tp1, tp2, rr1, dyn_floor = finalized
     if not _entry_distance_ok(entry, sl, tp1, market_price, ctx["atr_low"], "market"):
         return out
     out.append(Candidate("momentum", coin, combo, direction, entry, sl, tp1, tp2, "market",
                           0.45 + min(0.25, abs(roc) * 6), rr1, ["rate_of_change"],
-                          best_fit_regimes=["trending", "expansion"]))
+                          best_fit_regimes=["trending", "expansion"],
+                          ltf_confirmed=_ltf_confirmation(ctx, direction), rr_floor_used=dyn_floor))
     return out
 
 
@@ -1346,15 +1503,17 @@ def engine_reversal(coin: str, combo: str, ctx: dict, market_price: float, rv: R
     span = abs(entry - sl) * 1.7
     tp1_raw = entry + span if direction == "long" else entry - span
     tp2_raw = entry + span * 2.0 if direction == "long" else entry - span * 2.0
-    finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, low, ctx["equal_levels"])
+    finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, ctx, rv,
+                                   _quality_score_for(None, sfp["purity"], ctx["atr_low"]))
     if not finalized:
         return out
-    tp1, tp2, rr1 = finalized
+    tp1, tp2, rr1, dyn_floor = finalized
     if not _entry_distance_ok(entry, sl, tp1, market_price, ctx["atr_low"], "market"):
         return out
     out.append(Candidate("reversal", coin, combo, direction, entry, sl, tp1, tp2, "market",
                           0.5 + 0.2 * sfp["purity"], rr1, ["eq_cluster_reversal"],
-                          best_fit_regimes=["reversal", "ranging_choppy"], sfp_purity=sfp["purity"]))
+                          best_fit_regimes=["reversal", "ranging_choppy"], sfp_purity=sfp["purity"],
+                          ltf_confirmed=_ltf_confirmation(ctx, direction), rr_floor_used=dyn_floor))
     return out
 
 
@@ -1377,15 +1536,17 @@ def engine_mean_reversion(coin: str, combo: str, ctx: dict, market_price: float,
     target = mean
     tp1_raw = target
     tp2_raw = target + (target - entry) * 0.5
-    finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, low, ctx["equal_levels"])
+    finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, ctx, rv,
+                                   _quality_score_for(None, 0.0, ctx["atr_low"]))
     if not finalized:
         return out
-    tp1, tp2, rr1 = finalized
+    tp1, tp2, rr1, dyn_floor = finalized
     if not _entry_distance_ok(entry, sl, tp1, market_price, ctx["atr_low"], "market"):
         return out
     out.append(Candidate("mean_reversion", coin, combo, direction, entry, sl, tp1, tp2, "market",
                           0.45 + min(0.25, (abs(z) - 1.6) * 0.15), rr1, ["z_score_extension"],
-                          best_fit_regimes=["ranging_choppy", "consolidation"]))
+                          best_fit_regimes=["ranging_choppy", "consolidation"],
+                          ltf_confirmed=_ltf_confirmation(ctx, direction), rr_floor_used=dyn_floor))
     return out
 
 
@@ -1408,15 +1569,17 @@ def engine_range_trading(coin: str, combo: str, ctx: dict, market_price: float, 
         target = hi if direction == "long" else lo
         tp1_raw = target
         tp2_raw = target
-        finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, low, ctx["equal_levels"])
+        finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, ctx, rv,
+                                       _quality_score_for(None, 0.0, ctx["atr_low"]))
         if not finalized:
             continue
-        tp1, tp2, rr1 = finalized
+        tp1, tp2, rr1, dyn_floor = finalized
         if not _entry_distance_ok(entry, sl, tp1, market_price, ctx["atr_low"], "market"):
             continue
         out.append(Candidate("range_trading", coin, combo, direction, entry, sl, tp1, tp2, "market",
                               0.42 + 0.2 * (1.0 - rv.noise), rr1, ["range_edge"],
-                              best_fit_regimes=["ranging_choppy", "consolidation"]))
+                              best_fit_regimes=["ranging_choppy", "consolidation"],
+                              ltf_confirmed=_ltf_confirmation(ctx, direction), rr_floor_used=dyn_floor))
     return out
 
 
@@ -1436,15 +1599,17 @@ def engine_volatility_expansion(coin: str, combo: str, ctx: dict, market_price: 
     span = abs(entry - sl) * 1.7
     tp1_raw = entry + span if direction == "long" else entry - span
     tp2_raw = entry + span * 2.1 if direction == "long" else entry - span * 2.1
-    finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, low, ctx["equal_levels"])
+    finalized = _finalize_tp_pair(entry, sl, direction, tp1_raw, tp2_raw, ctx, rv,
+                                   _quality_score_for(None, 0.0, ctx["atr_low"]))
     if not finalized:
         return out
-    tp1, tp2, rr1 = finalized
+    tp1, tp2, rr1, dyn_floor = finalized
     if not _entry_distance_ok(entry, sl, tp1, market_price, ctx["atr_low"], "market"):
         return out
     out.append(Candidate("volatility_expansion", coin, combo, direction, entry, sl, tp1, tp2, "market",
                           0.45 + min(0.25, rv.volatility_pctile / 400), rr1, ["atr_expansion"],
-                          best_fit_regimes=["expansion", "high_volatility"]))
+                          best_fit_regimes=["expansion", "high_volatility"],
+                          ltf_confirmed=_ltf_confirmation(ctx, direction), rr_floor_used=dyn_floor))
     return out
 
 
@@ -1688,10 +1853,27 @@ def run_adaptive_filters(state: dict, cand: Candidate, ctx: dict, rv: RegimeVect
     if not passed:
         return False, "confluence_below_adaptive_threshold"
 
-    passed = cand.rr_tp1 >= TP1_RR_FLOOR
+    passed = cand.rr_tp1 >= cand.rr_floor_used
     log_funnel(state, "rr_floor", passed)
     if not passed:
         return False, "rr_below_floor"
+
+    # Mandatory LTF confirmation trigger (Section 9): a candidate never fires
+    # on HTF/MTF structural alignment alone. Engines whose zone-selection
+    # sequence already requires a confirmed low-TF MSS (smc, pullback, and
+    # the POI-based engines) set this at construction; every other engine is
+    # checked here against the same generic low-TF-close-back-in-direction
+    # criteria, so an HTF zone that is "right" but never actually turns gets
+    # filtered out regardless of which engine proposed it.
+    passed = cand.ltf_confirmed
+    log_funnel(state, "ltf_confirmation", passed)
+    if not passed:
+        return False, "no_ltf_confirmation"
+
+    passed = not engine_is_paused(state, cand.engine)
+    log_funnel(state, "engine_paused", passed)
+    if not passed:
+        return False, "engine_paused"
 
     passed = liquidity_sanity_check(cand, ctx, state)
     log_funnel(state, "liquidity_sanity", passed)
@@ -1965,13 +2147,14 @@ def route_forensic_response(state: dict, sig: dict, category: str) -> str:
     elif category == "genuine_variance":
         delta_desc = "no_change_expected_variance"
 
-    # win reinforcement (Section 13, part 2) — only for genuinely predictive,
-    # causally-relevant factors, raising the specific engine weight modestly.
-    if won and category == "genuine_variance":
-        ew_key = f"engine_weight::{engine}"
-        cur = get_param(state, ew_key)
-        update_param(state, ew_key, min(1.8, cur + 0.015), base_key=ew_key)
-        delta_desc = f"{ew_key} nudged up (reinforced win)"
+    # NOTE: engine_weight::* used to be nudged *up* right here on a winning
+    # genuine_variance trade and nowhere else -- a one-way ratchet that could
+    # raise an engine's weight but never lower it on a loss. That asymmetry
+    # is fixed by removing the per-trade nudge entirely and instead letting
+    # `update_engine_governor()` (Section 13 refinement, called once per scan
+    # in run_scan) set engine_weight symmetrically off each engine's rolling
+    # win rate in both directions, plus hard-pause/cautious-reactivate a
+    # persistently bad engine independently of every other engine.
 
     counts = state["tier1"]["forensic_category_counts"].setdefault(category, {"count": 0, "trend": []})
     counts["count"] += 1
@@ -2059,6 +2242,85 @@ def check_circuit_breaker(state: dict) -> None:
         cb["tripped_at"] = None
         cb["reason"] = "recovered"
         log.info("Circuit breaker auto-resumed: live performance recovered to baseline.")
+
+
+# --- Per-engine adaptive weight / pause governor -------------------------------
+# The circuit breaker above is a single global switch: it freezes/resumes
+# adaptation for the whole ensemble at once and says nothing about *which*
+# engine is responsible. This section discriminates by engine, mirroring the
+# structure of check_circuit_breaker but scoped to one engine's own trade
+# history, so one persistently bad engine can be hard-paused and later
+# cautiously reactivated at reduced weight without needing every other
+# engine's signals to be suppressed too.
+
+def _engine_history(state: dict, engine: str, lookback: int) -> list[dict]:
+    hist = [t for t in state["tier2"]["trade_log"]
+            if t.get("engine") == engine and t.get("result") in ("win", "loss")]
+    return hist[-lookback:]
+
+
+def engine_winrate(state: dict, engine: str, lookback: int,
+                    min_sample: int = ENGINE_GOVERNOR_MIN_SAMPLE) -> Optional[float]:
+    hist = _engine_history(state, engine, lookback)
+    if len(hist) < min_sample:
+        return None
+    wins = sum(1 for t in hist if t["result"] == "win")
+    return wins / len(hist)
+
+
+def _default_engine_governor_entry() -> dict:
+    return {"paused": False}
+
+
+def update_engine_governor(state: dict) -> None:
+    """Call once per scan (see run_scan) to refresh per-engine pause state
+    and engine_weight from realized win/loss history in tier2.trade_log. An
+    engine whose trailing win rate over ENGINE_PAUSE_LOOKBACK resolved trades
+    drops below ENGINE_PAUSE_WINRATE_FLOOR is hard-paused (excluded from
+    candidate generation entirely via `engine_is_paused` in
+    run_adaptive_filters) rather than just soft-weighted, until a fresh
+    sample of the same size looks better -- at which point it's reactivated
+    at a cautious reduced weight, not snapped back to 1.0.
+
+    Engine_weight itself is nudged symmetrically (both up on outperformance
+    and down on underperformance) off the rolling ENGINE_GOVERNOR_LOOKBACK
+    win rate -- this replaces the previous one-way-only reinforcement in
+    route_forensic_response(), which could only ever raise engine_weight and
+    never lower it."""
+    gov = state["tier1"].setdefault("engine_governor", {})
+    for engine in ENGINE_FUNCS:
+        entry = gov.setdefault(engine, _default_engine_governor_entry())
+        ew_key = f"engine_weight::{engine}"
+
+        if entry.get("paused"):
+            recheck = _engine_history(state, engine, ENGINE_PAUSE_LOOKBACK)
+            if len(recheck) >= ENGINE_PAUSE_LOOKBACK:
+                wr = sum(1 for t in recheck if t["result"] == "win") / len(recheck)
+                if wr >= ENGINE_PAUSE_WINRATE_FLOOR:
+                    entry["paused"] = False
+                    update_param(state, ew_key, ENGINE_REACTIVATE_WEIGHT, base_key=ew_key)
+                    log.info("Engine governor: %s reactivated at cautious weight %.2f "
+                             "(recheck win rate %.2f).", engine, ENGINE_REACTIVATE_WEIGHT, wr)
+            continue  # still paused (or just reactivated) -- no further nudge this cycle
+
+        pause_wr = engine_winrate(state, engine, ENGINE_PAUSE_LOOKBACK)
+        if pause_wr is not None and pause_wr < ENGINE_PAUSE_WINRATE_FLOOR:
+            entry["paused"] = True
+            update_param(state, ew_key, PARAM_SPECS[ew_key].lo, base_key=ew_key)
+            log.warning("Engine governor: %s HARD-PAUSED (win rate %.2f over last %d trades).",
+                        engine, pause_wr, ENGINE_PAUSE_LOOKBACK)
+            continue
+
+        wr = engine_winrate(state, engine, ENGINE_GOVERNOR_LOOKBACK)
+        if wr is None:
+            continue  # not enough resolved history yet -- leave weight as-is
+        delta = (wr - ENGINE_GOVERNOR_TARGET_WINRATE) * 0.6
+        cur = get_param(state, ew_key)
+        update_param(state, ew_key, cur + delta, base_key=ew_key)
+
+
+def engine_is_paused(state: dict, engine: str) -> bool:
+    return state["tier1"].get("engine_governor", {}).get(engine, {}).get("paused", False)
 
 
 # =============================================================================
@@ -2285,6 +2547,14 @@ def run_scan(state: dict, start_time: float) -> None:
         log.warning("Approaching scan deadline after resolution pass — skipping new-signal discovery this run.")
         save_state(state)
         return
+
+    # Per-engine adaptive weight / pause governor -- refreshed once per scan
+    # from realized trade_log history, independent of the global circuit
+    # breaker (Section 13 refinement).
+    update_engine_governor(state)
+    paused = [e for e in ENGINE_FUNCS if engine_is_paused(state, e)]
+    if paused:
+        log.warning("Engine governor: %d engine(s) currently paused: %s", len(paused), ", ".join(paused))
 
     # --- Step 2: discover new candidates across the whole watchlist --------
     macro_events = fetch_macro_events()
