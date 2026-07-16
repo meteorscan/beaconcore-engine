@@ -16,28 +16,40 @@
     "confidence_calibration": {},
     "filter_funnel": {
       "01_direction_nonzero": {
-        "killed": 2,
-        "seen": 7
+        "killed": 5,
+        "seen": 14
       },
       "02_structural_level_found": {
         "killed": 0,
-        "seen": 5
+        "seen": 9
       },
       "03_order_book_confirmation": {
-        "killed": 2,
-        "seen": 5
+        "killed": 3,
+        "seen": 9
       },
       "04_positioning_confirmation": {
         "killed": 0,
-        "seen": 3
+        "seen": 6
       },
       "05_risk_plan_valid": {
         "killed": 0,
-        "seen": 3
+        "seen": 6
       },
       "06_rr_floor": {
-        "killed": 3,
-        "seen": 3
+        "killed": 4,
+        "seen": 6
+      },
+      "07_entry_placement_rules": {
+        "killed": 1,
+        "seen": 2
+      },
+      "08_news_blackout": {
+        "killed": 0,
+        "seen": 1
+      },
+      "09_regime_fit_veto": {
+        "killed": 0,
+        "seen": 1
       }
     },
     "forensic_categories": {
@@ -86,79 +98,104 @@
     "mtf_alignment_weight": 0.2,
     "oi_history": {
       "AAVEUSDT": [
-        877322.1799999999
+        877322.1799999999,
+        877256.6
       ],
       "ADAUSDT": [
-        144371902.0
+        144371902.0,
+        143617494.0
       ],
       "APTUSDT": [
-        6447568.86
+        6447568.86,
+        6453325.779999999
       ],
       "AVAXUSDT": [
-        2148404.82
+        2148404.82,
+        2150930.559999999
       ],
       "BCHUSDT": [
-        29526.46
+        29526.46,
+        29501.67
       ],
       "BNBUSDT": [
-        42081.104
+        42081.104,
+        42078.924
       ],
       "BTCUSDT": [
-        37276.2306
+        37276.2306,
+        37205.0464
       ],
       "DOGEUSDT": [
-        360628878.0
+        360628878.0,
+        360644866.0
       ],
       "DOTUSDT": [
-        5439030.8
+        5439030.8,
+        5439575.999999999
       ],
       "ETHUSDT": [
-        966718.6052
+        966718.6052,
+        964556.0950000001
       ],
       "HYPEUSDT": [
-        22093525.36
+        22093525.36,
+        22273618.360000003
       ],
       "LINKUSDT": [
-        5066280.2
+        5066280.2,
+        5067227.6
       ],
       "LTCUSDT": [
-        283236.44
+        283236.44,
+        283432.14
       ],
       "NEARUSDT": [
-        46767611.39999999
+        46767611.39999999,
+        46827716.199999996
       ],
       "ONDOUSDT": [
-        41472922.0
+        41472922.0,
+        41307554.0
       ],
       "PENDLEUSDT": [
-        4411766.0
+        4411766.0,
+        4414460.0
       ],
       "PENGUUSDT": [
-        664025464.0
+        664025464.0,
+        664543924.0
       ],
       "SOLUSDT": [
-        4521709.400000001
+        4521709.400000001,
+        4514052.380000001
       ],
       "SUIUSDT": [
-        41043111.6
+        41043111.6,
+        41129003.2
       ],
       "TAOUSDT": [
-        107958.264
+        107958.264,
+        108141.29
       ],
       "TRXUSDT": [
-        59377514.0
+        59377514.0,
+        59366044.0
       ],
       "UNIUSDT": [
-        4565554.6
+        4565554.6,
+        4565836.999999999
       ],
       "XLMUSDT": [
-        40330062.0
+        40330062.0,
+        40339332.0
       ],
       "XRPUSDT": [
-        94014880.0
+        94014880.0,
+        94036978.0
       ],
       "ZECUSDT": [
-        506762.86
+        506762.86,
+        506296.42
       ]
     },
     "positioning_extremity_threshold": 1.5,
@@ -250,7 +287,33 @@
     }
   },
   "tier2": {
-    "active_signals": [],
+    "active_signals": [
+      {
+        "combo": "intraday",
+        "confidence": 0.5764233971231497,
+        "created_at": "2026-07-16T17:17:32.419906+00:00",
+        "direction": "bullish",
+        "dominant_factor": "trend",
+        "entry": 2.0547723145719647,
+        "entry_filled": false,
+        "entry_kind": "pending",
+        "filter_margin_thin": true,
+        "id": "NEARUSDT-prism_quant-1784222252419",
+        "ltf_tf": "15m",
+        "mtf_aligned": true,
+        "posture": "continuation",
+        "regime_label": "trending_expansion",
+        "resolution_logic_version": 1,
+        "rr1": 1.5,
+        "rr2": 2.650000000000049,
+        "sl": 2.0502438434475883,
+        "symbol": "NEARUSDT",
+        "tg_message_id": 3626,
+        "tier": "B",
+        "tp1": 2.0615650212585295,
+        "tp2": 2.0667727630515627
+      }
+    ],
     "trade_log": []
   }
 }
