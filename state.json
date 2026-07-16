@@ -1,1 +1,256 @@
-{}
+{
+  "schema_version": 1,
+  "tier1": {
+    "baseline": {
+      "avg_rr": null,
+      "n": 0,
+      "profit_factor": null,
+      "win_rate": null
+    },
+    "circuit_breaker": {
+      "active": false,
+      "reason": null,
+      "since": null
+    },
+    "confidence_bucket_log": {},
+    "confidence_calibration": {},
+    "filter_funnel": {
+      "01_direction_nonzero": {
+        "killed": 2,
+        "seen": 7
+      },
+      "02_structural_level_found": {
+        "killed": 0,
+        "seen": 5
+      },
+      "03_order_book_confirmation": {
+        "killed": 2,
+        "seen": 5
+      },
+      "04_positioning_confirmation": {
+        "killed": 0,
+        "seen": 3
+      },
+      "05_risk_plan_valid": {
+        "killed": 0,
+        "seen": 3
+      },
+      "06_rr_floor": {
+        "killed": 3,
+        "seen": 3
+      }
+    },
+    "forensic_categories": {
+      "confidence_miscalibration": {
+        "count": 0,
+        "recent_trend": []
+      },
+      "correct_read_poor_rr": {
+        "count": 0,
+        "recent_trend": []
+      },
+      "filter_over_permissiveness": {
+        "count": 0,
+        "recent_trend": []
+      },
+      "genuine_variance": {
+        "count": 0,
+        "recent_trend": []
+      },
+      "mtf_conflict_ignored": {
+        "count": 0,
+        "recent_trend": []
+      },
+      "order_book_liquidity_trap": {
+        "count": 0,
+        "recent_trend": []
+      },
+      "positioning_misread": {
+        "count": 0,
+        "recent_trend": []
+      },
+      "regime_mismatch": {
+        "count": 0,
+        "recent_trend": []
+      },
+      "sequence_violated": {
+        "count": 0,
+        "recent_trend": []
+      },
+      "structural_invalidation_too_tight": {
+        "count": 0,
+        "recent_trend": []
+      }
+    },
+    "liquidity_sanity_threshold": 0.5,
+    "mtf_alignment_weight": 0.2,
+    "oi_history": {
+      "AAVEUSDT": [
+        877322.1799999999
+      ],
+      "ADAUSDT": [
+        144371902.0
+      ],
+      "APTUSDT": [
+        6447568.86
+      ],
+      "AVAXUSDT": [
+        2148404.82
+      ],
+      "BCHUSDT": [
+        29526.46
+      ],
+      "BNBUSDT": [
+        42081.104
+      ],
+      "BTCUSDT": [
+        37276.2306
+      ],
+      "DOGEUSDT": [
+        360628878.0
+      ],
+      "DOTUSDT": [
+        5439030.8
+      ],
+      "ETHUSDT": [
+        966718.6052
+      ],
+      "HYPEUSDT": [
+        22093525.36
+      ],
+      "LINKUSDT": [
+        5066280.2
+      ],
+      "LTCUSDT": [
+        283236.44
+      ],
+      "NEARUSDT": [
+        46767611.39999999
+      ],
+      "ONDOUSDT": [
+        41472922.0
+      ],
+      "PENDLEUSDT": [
+        4411766.0
+      ],
+      "PENGUUSDT": [
+        664025464.0
+      ],
+      "SOLUSDT": [
+        4521709.400000001
+      ],
+      "SUIUSDT": [
+        41043111.6
+      ],
+      "TAOUSDT": [
+        107958.264
+      ],
+      "TRXUSDT": [
+        59377514.0
+      ],
+      "UNIUSDT": [
+        4565554.6
+      ],
+      "XLMUSDT": [
+        40330062.0
+      ],
+      "XRPUSDT": [
+        94014880.0
+      ],
+      "ZECUSDT": [
+        506762.86
+      ]
+    },
+    "positioning_extremity_threshold": 1.5,
+    "rr_ev_term_weight": 0.15,
+    "segments": {
+      "asset": {},
+      "dominant_factor": {},
+      "posture": {},
+      "regime": {},
+      "timeframe": {}
+    },
+    "session_anchor_bucket": {
+      "anchored": {
+        "losses": 0,
+        "n": 0,
+        "sum_hold_min": 0.0,
+        "sum_r": 0.0,
+        "wins": 0
+      },
+      "non_anchored": {
+        "losses": 0,
+        "n": 0,
+        "sum_hold_min": 0.0,
+        "sum_r": 0.0,
+        "wins": 0
+      }
+    },
+    "session_weight": 0.05,
+    "sl_buffer_percentile": {},
+    "totals": {
+      "expired": 0,
+      "losses": 0,
+      "signals": 0,
+      "sum_hold_min": 0.0,
+      "sum_r": 0.0,
+      "wins": 0
+    },
+    "weight_matrix": {
+      "ranging_compression": {
+        "breadth": 0.2,
+        "liquidity_microstructure": 0.9,
+        "mean_reversion": 1.4,
+        "momentum": 0.2,
+        "positioning": 1.1,
+        "trend": 0.1,
+        "volatility_regime": 0.0,
+        "volume_profile": 1.1
+      },
+      "ranging_expansion": {
+        "breadth": 0.3,
+        "liquidity_microstructure": 0.8,
+        "mean_reversion": 1.3,
+        "momentum": 0.3,
+        "positioning": 1.0,
+        "trend": 0.2,
+        "volatility_regime": 0.0,
+        "volume_profile": 1.0
+      },
+      "transitional": {
+        "breadth": 0.4,
+        "liquidity_microstructure": 0.5,
+        "mean_reversion": 0.5,
+        "momentum": 0.5,
+        "positioning": 0.5,
+        "trend": 0.5,
+        "volatility_regime": 0.0,
+        "volume_profile": 0.5
+      },
+      "trending_compression": {
+        "breadth": 0.6,
+        "liquidity_microstructure": 0.6,
+        "mean_reversion": 0.0,
+        "momentum": 0.9,
+        "positioning": 0.6,
+        "trend": 1.2,
+        "volatility_regime": 0.0,
+        "volume_profile": 0.9
+      },
+      "trending_expansion": {
+        "breadth": 0.7,
+        "liquidity_microstructure": 0.6,
+        "mean_reversion": 0.0,
+        "momentum": 1.1,
+        "positioning": 0.7,
+        "trend": 1.4,
+        "volatility_regime": 0.0,
+        "volume_profile": 0.8
+      }
+    }
+  },
+  "tier2": {
+    "active_signals": [],
+    "trade_log": []
+  }
+}
