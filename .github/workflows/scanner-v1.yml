@@ -1,4 +1,4 @@
-name: Scalp Swing Scanner
+name: Scalp Swing Scanner v1
 
 on:
   workflow_dispatch:
