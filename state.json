@@ -20,7 +20,9 @@
       "veto::regime_mismatch_discount::range_trading__neutral": 0.55,
       "engine_weight::trend_continuation": 1.0,
       "veto::regime_mismatch_discount::trend_continuation__neutral": 0.55,
-      "engine_weight::liquidity_sweep": 1.0
+      "engine_weight::liquidity_sweep": 1.0,
+      "engine_weight::volatility_expansion": 1.0,
+      "veto::regime_mismatch_discount::volatility_expansion__neutral": 0.55
     },
     "segment_stats": {},
     "calibration_buckets": {},
@@ -38,8 +40,8 @@
     "fill_stats": {},
     "filter_funnel": {
       "confluence_threshold": {
-        "evaluated": 13,
-        "rejected": 12
+        "evaluated": 29,
+        "rejected": 28
       },
       "rr_floor": {
         "evaluated": 1,
@@ -98,8 +100,8 @@
   },
   "meta": {
     "created": "2026-07-16T07:31:03.697088+00:00",
-    "last_run": "2026-07-16T08:01:19.379105+00:00",
-    "run_count": 3,
+    "last_run": "2026-07-16T08:15:36.594470+00:00",
+    "run_count": 4,
     "last_daily_summary_date": "2026-07-16"
   }
 }
