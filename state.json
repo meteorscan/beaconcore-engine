@@ -43,8 +43,8 @@
     "fill_stats": {},
     "filter_funnel": {
       "confluence_threshold": {
-        "evaluated": 21,
-        "rejected": 21
+        "evaluated": 23,
+        "rejected": 23
       }
     },
     "engine_governor": {
@@ -95,7 +95,7 @@
   },
   "meta": {
     "created": "2026-07-16T10:15:30.243941+00:00",
-    "last_run": "2026-07-16T14:31:08.910889+00:00",
-    "run_count": 18
+    "last_run": "2026-07-16T14:45:39.847892+00:00",
+    "run_count": 19
   }
 }
