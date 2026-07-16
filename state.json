@@ -2,46 +2,52 @@
   "schema_version": 1,
   "tier1": {
     "baseline": {
-      "avg_rr": null,
-      "n": 0,
-      "profit_factor": null,
-      "win_rate": null
+      "_gross_loss": 1.0,
+      "_gross_win": 0.0,
+      "avg_rr": -1.0,
+      "n": 1,
+      "profit_factor": 0.0,
+      "win_rate": 0.0
     },
     "circuit_breaker": {
       "active": false,
       "reason": null,
       "since": null
     },
-    "confidence_bucket_log": {},
+    "confidence_bucket_log": {
+      "continuation:5": [
+        0
+      ]
+    },
     "confidence_calibration": {},
     "filter_funnel": {
       "01_direction_nonzero": {
-        "killed": 10,
-        "seen": 30
+        "killed": 15,
+        "seen": 41
       },
       "02_structural_level_found": {
         "killed": 0,
-        "seen": 20
+        "seen": 26
       },
       "03_order_book_confirmation": {
-        "killed": 6,
-        "seen": 20
+        "killed": 9,
+        "seen": 26
       },
       "04_positioning_confirmation": {
         "killed": 0,
-        "seen": 14
+        "seen": 17
       },
       "05_risk_plan_valid": {
         "killed": 0,
-        "seen": 14
+        "seen": 17
       },
       "06_rr_floor": {
-        "killed": 6,
-        "seen": 14
+        "killed": 7,
+        "seen": 17
       },
       "07_entry_placement_rules": {
-        "killed": 4,
-        "seen": 8
+        "killed": 6,
+        "seen": 10
       },
       "08_news_blackout": {
         "killed": 0,
@@ -58,8 +64,10 @@
         "recent_trend": []
       },
       "correct_read_poor_rr": {
-        "count": 0,
-        "recent_trend": []
+        "count": 1,
+        "recent_trend": [
+          1
+        ]
       },
       "filter_over_permissiveness": {
         "count": 0,
@@ -101,161 +109,226 @@
         877322.1799999999,
         877256.6,
         878012.48,
-        878253.8400000001
+        878253.8400000001,
+        879939.0599999998
       ],
       "ADAUSDT": [
         144371902.0,
         143617494.0,
         143574180.0,
-        143583918.0
+        143583918.0,
+        143454554.0
       ],
       "APTUSDT": [
         6447568.86,
         6453325.779999999,
         6477751.66,
-        6478252.86
+        6478252.86,
+        6454455.0
       ],
       "AVAXUSDT": [
         2148404.82,
         2150930.559999999,
         2149313.1799999997,
-        2149215.46
+        2149215.46,
+        2146427.68
       ],
       "BCHUSDT": [
         29526.46,
         29501.67,
         29515.286,
-        29339.77
+        29339.77,
+        29361.346
       ],
       "BNBUSDT": [
         42081.104,
         42078.924,
         42038.464,
-        42029.81
+        42029.81,
+        41840.856
       ],
       "BTCUSDT": [
         37276.2306,
         37205.0464,
         37308.93432,
-        37326.78158
+        37326.78158,
+        37459.52928
       ],
       "DOGEUSDT": [
         360628878.0,
         360644866.0,
         360679278.0,
-        360670746.0
+        360670746.0,
+        360115486.0
       ],
       "DOTUSDT": [
         5439030.8,
         5439575.999999999,
         5433014.4,
-        5431531.8
+        5431531.8,
+        5431961.4
       ],
       "ETHUSDT": [
         966718.6052,
         964556.0950000001,
         964007.948,
-        963871.2508000002
+        963871.2508000002,
+        955355.0668000004
       ],
       "HYPEUSDT": [
         22093525.36,
         22273618.360000003,
         22379822.639999982,
-        22479343.899999995
+        22479343.899999995,
+        22568866.760000005
       ],
       "LINKUSDT": [
         5066280.2,
         5067227.6,
         5066272.0,
-        5066220.2
+        5066220.2,
+        5040678.600000001
       ],
       "LTCUSDT": [
         283236.44,
         283432.14,
         283447.42,
-        283421.48
+        283421.48,
+        283387.5
       ],
       "NEARUSDT": [
         46767611.39999999,
         46827716.199999996,
         46900382.4,
-        46961969.4
+        46961969.4,
+        46128439.20000003
       ],
       "ONDOUSDT": [
         41472922.0,
         41307554.0,
         41367770.0,
-        41410484.0
+        41410484.0,
+        41644538.0
       ],
       "PENDLEUSDT": [
         4411766.0,
         4414460.0,
         4411550.0,
-        4408154.0
+        4408154.0,
+        4402922.0
       ],
       "PENGUUSDT": [
         664025464.0,
         664543924.0,
         673700232.0,
-        676382810.0
+        676382810.0,
+        675896602.0
       ],
       "SOLUSDT": [
         4521709.400000001,
         4514052.380000001,
         4477104.439999999,
-        4464437.139999999
+        4464437.139999999,
+        4431456.460000001
       ],
       "SUIUSDT": [
         41043111.6,
         41129003.2,
         41166633.4,
-        41188585.4
+        41188585.4,
+        41128049.0
       ],
       "TAOUSDT": [
         107958.264,
         108141.29,
         108183.872,
-        108289.194
+        108289.194,
+        108310.948
       ],
       "TRXUSDT": [
         59377514.0,
         59366044.0,
         59345976.0,
-        59333004.0
+        59333004.0,
+        59303260.0
       ],
       "UNIUSDT": [
         4565554.6,
         4565836.999999999,
         4537168.2,
-        4536052.0
+        4536052.0,
+        4522624.400000001
       ],
       "XLMUSDT": [
         40330062.0,
         40339332.0,
         40267134.0,
-        40277644.0
+        40277644.0,
+        39745250.0
       ],
       "XRPUSDT": [
         94014880.0,
         94036978.0,
         94566242.0,
-        94537032.0
+        94537032.0,
+        94265280.0
       ],
       "ZECUSDT": [
         506762.86,
         506296.42,
         506425.72,
-        506624.02
+        506624.02,
+        501287.7199999999
       ]
     },
     "positioning_extremity_threshold": 1.5,
     "rr_ev_term_weight": 0.15,
     "segments": {
-      "asset": {},
-      "dominant_factor": {},
-      "posture": {},
-      "regime": {},
-      "timeframe": {}
+      "asset": {
+        "NEARUSDT": {
+          "losses": 1,
+          "n": 1,
+          "sum_hold_min": 43.26979451666667,
+          "sum_r": -1.0,
+          "wins": 0
+        }
+      },
+      "dominant_factor": {
+        "trend": {
+          "losses": 1,
+          "n": 1,
+          "sum_hold_min": 43.26979451666667,
+          "sum_r": -1.0,
+          "wins": 0
+        }
+      },
+      "posture": {
+        "continuation": {
+          "losses": 1,
+          "n": 1,
+          "sum_hold_min": 43.26979451666667,
+          "sum_r": -1.0,
+          "wins": 0
+        }
+      },
+      "regime": {
+        "trending_expansion": {
+          "losses": 1,
+          "n": 1,
+          "sum_hold_min": 43.26979451666667,
+          "sum_r": -1.0,
+          "wins": 0
+        }
+      },
+      "timeframe": {
+        "intraday": {
+          "losses": 1,
+          "n": 1,
+          "sum_hold_min": 43.26979451666667,
+          "sum_r": -1.0,
+          "wins": 0
+        }
+      }
     },
     "session_anchor_bucket": {
       "anchored": {
@@ -266,10 +339,10 @@
         "wins": 0
       },
       "non_anchored": {
-        "losses": 0,
-        "n": 0,
+        "losses": 1,
+        "n": 1,
         "sum_hold_min": 0.0,
-        "sum_r": 0.0,
+        "sum_r": -1.0,
         "wins": 0
       }
     },
@@ -277,10 +350,10 @@
     "sl_buffer_percentile": {},
     "totals": {
       "expired": 0,
-      "losses": 0,
-      "signals": 0,
-      "sum_hold_min": 0.0,
-      "sum_r": 0.0,
+      "losses": 1,
+      "signals": 1,
+      "sum_hold_min": 43.26979451666667,
+      "sum_r": -1.0,
       "wins": 0
     },
     "weight_matrix": {
@@ -340,33 +413,6 @@
     "active_signals": [
       {
         "combo": "intraday",
-        "confidence": 0.5764233971231497,
-        "created_at": "2026-07-16T17:17:32.419906+00:00",
-        "direction": "bullish",
-        "dominant_factor": "trend",
-        "entry": 2.0547723145719647,
-        "entry_filled": false,
-        "entry_kind": "pending",
-        "filter_margin_thin": true,
-        "id": "NEARUSDT-prism_quant-1784222252419",
-        "ltf_tf": "15m",
-        "mtf_aligned": true,
-        "pending_bars": 1,
-        "posture": "continuation",
-        "regime_label": "trending_expansion",
-        "resolution_logic_version": 1,
-        "rr1": 1.5,
-        "rr2": 2.650000000000049,
-        "sl": 2.0502438434475883,
-        "symbol": "NEARUSDT",
-        "tg_message_id": 3626,
-        "tier": "B",
-        "tp1": 2.0615650212585295,
-        "tp2": 2.0667727630515627,
-        "watermark_ts": 1784223000000
-      },
-      {
-        "combo": "intraday",
         "confidence": 0.6421495386149083,
         "created_at": "2026-07-16T17:47:30.508039+00:00",
         "direction": "bullish",
@@ -391,6 +437,43 @@
         "tp2": 1.6073235439819369
       }
     ],
-    "trade_log": []
+    "trade_log": [
+      {
+        "adaptive_adjustment": "no_change_insufficient_sample",
+        "combo": "intraday",
+        "confidence": 0.5764233971231497,
+        "created_at": "2026-07-16T17:17:32.419906+00:00",
+        "direction": "bullish",
+        "dominant_factor": "trend",
+        "entry": 2.0547723145719647,
+        "entry_filled": true,
+        "entry_kind": "pending",
+        "filter_margin_thin": true,
+        "forensic_category": "correct_read_poor_rr",
+        "hold_min": 43.26979451666667,
+        "id": "NEARUSDT-prism_quant-1784222252419",
+        "ltf_tf": "15m",
+        "mtf_aligned": true,
+        "pending_bars": 1,
+        "posture": "continuation",
+        "r_multiple": -1.0,
+        "regime_at_entry": {
+          "label": "trending_expansion"
+        },
+        "regime_label": "trending_expansion",
+        "resolution_logic_version": 1,
+        "resolved_at": "2026-07-16T18:00:48.607577+00:00",
+        "result": "loss",
+        "rr1": 1.5,
+        "rr2": 2.650000000000049,
+        "sl": 2.0502438434475883,
+        "symbol": "NEARUSDT",
+        "tg_message_id": 3626,
+        "tier": "B",
+        "tp1": 2.0615650212585295,
+        "tp2": 2.0667727630515627,
+        "watermark_ts": 1784223900000
+      }
+    ]
   }
 }
