@@ -492,7 +492,7 @@ class HyperliquidClient:
         now_ms = int(time.time() * 1000)
         start_ms = now_ms - lookback_hours * 3_600_000
         raw = self._post({"type": "fundingHistory",
-                           "req": {"coin": self._coin(symbol), "startTime": start_ms, "endTime": now_ms}},
+                           "coin": self._coin(symbol), "startTime": start_ms, "endTime": now_ms},
                           weight=20)
         out = []
         if raw:
