@@ -1,29 +1,3 @@
-# PRISM QUANT — Unified Adaptive Statistical Factor Engine
-# v1.0.0
-#
-# This is a from-scratch rebuild of the signal-generation core described in
-# the Quant Regime Signal Engine Master Specification (V1). It deliberately
-# retires the SMC/ICT pattern-roster architecture (order blocks, breaker
-# blocks, FVGs, BOS/CHoCH, SFP, EQH/EQL, premium/discount OTE, kill zones)
-# used by every prior engine in this project (Virelle, Vantage Annex,
-# Odyssey, Oracle) and replaces it with ONE computation pipeline: eight
-# continuously-valued statistical/microstructure factors feeding a single
-# regime-conditioned composite score, producing exactly two directional
-# postures (Continuation, Reversion) that share every downstream function.
-#
-# What is kept from the prior project, because it was never SMC/ICT-specific
-# engineering in the first place: the no-auto-breakeven stop-loss-integrity
-# fix, entry-fill verification (phantom-fill prevention), closed-candle-only
-# anti-repainting discipline, the two-tier state.json design with bounded/
-# dampened adaptive parameters and a live-performance circuit breaker, the
-# closed-taxonomy loss-forensics feedback loop (re-keyed to this model's own
-# factors), and the Hyperliquid operating contract (same watchlist, same
-# 15-minute cadence, same state.json persistence).
-#
-# Single self-contained file, no local imports. Discretionary engineering
-# decisions the spec left open are marked `# DECISION:` inline, at the point
-# they matter, rather than in a separate document (Section 21 of the spec).
-
 from __future__ import annotations
 
 import os
@@ -45,7 +19,7 @@ import requests
 ENGINE_NAME = "PRISM QUANT"
 ENGINE_SLUG = "prism_quant"
 __version__ = "1.0.0"
-RESOLUTION_LOGIC_VERSION = 1  # bumped only if outcome-scoring logic ever changes (Sec 10)
+RESOLUTION_LOGIC_VERSION = 1
 
 logging.basicConfig(
     level=logging.INFO,
@@ -54,9 +28,6 @@ logging.basicConfig(
 )
 log = logging.getLogger(ENGINE_SLUG)
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 0 — CONFIGURATION
-# ═══════════════════════════════════════════════════════════════════════
 
 TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN")
 TG_CHAT_ID = os.getenv("TG_CHAT_ID")
@@ -66,14 +37,13 @@ if not TG_CHAT_ID:
     raise RuntimeError("TG_CHAT_ID environment variable is required")
 
 STATE_FILE = os.getenv("STATE_FILE", "state.json")
-# DECISION: candle cache is a rebuildable performance artifact, not learned
-# data, so it lives outside state.json exactly as in the prior infra — it
-# can be wiped independently without touching any adaptive parameter.
+
+
 CANDLE_CACHE_FILE = os.getenv("CANDLE_CACHE_FILE", "candle_cache.json")
 SCAN_WORKERS = int(os.getenv("SCAN_WORKERS", "4"))
 HL_BASE_URL = "https://api.hyperliquid.xyz/info"
 
-# Operational contract unchanged from the prior project (Sec 15).
+
 WATCHLIST = [
     "BTCUSDT", "ETHUSDT", "HYPEUSDT", "ZECUSDT", "NEARUSDT",
     "ONDOUSDT", "SUIUSDT", "PENGUUSDT", "BNBUSDT", "SOLUSDT",
@@ -84,8 +54,7 @@ WATCHLIST = [
 MACRO_ASSET = "BTCUSDT"
 MAJORS = {"BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT", "ADAUSDT", "DOGEUSDT"}
 
-# Sec 6: 1M/2M/3M/5M forbidden, 15M floor. Two mandatory combos, neither a
-# fallback for the other.
+
 TF_HTF_SWING, TF_MID_SWING, TF_LTF_SWING = "1d", "4h", "1h"
 TF_HTF_INTRADAY, TF_MID_INTRADAY, TF_LTF_INTRADAY = "4h", "1h", "15m"
 ALL_TFS = ["1d", "4h", "1h", "15m"]
@@ -94,15 +63,15 @@ SCAN_INTERVAL_MIN = 15
 
 EMA_FAST, EMA_SLOW = 21, 50
 RSI_LEN, ATR_LEN, ADX_LEN, BB_LEN = 14, 14, 14, 20
-LINREG_LEN = 40           # Factor 1: HTF/MTF slope lookback (bars)
-ZSCORE_LOOKBACK = 60      # generic z-score normalization window
-VWAP_LOOKBACK = 96        # Factor 3: rolling VWAP anchor window (bars)
-VOL_PROFILE_LOOKBACK = {"1d": 90, "4h": 120, "1h": 168, "15m": 192}  # Factor 7
+LINREG_LEN = 40
+ZSCORE_LOOKBACK = 60
+VWAP_LOOKBACK = 96
+VOL_PROFILE_LOOKBACK = {"1d": 90, "4h": 120, "1h": 168, "15m": 192}
 VOL_PROFILE_BINS = 40
-OI_HISTORY_MAXLEN = 96    # ~24h of 15-min scans, bounded rolling OI buffer
+OI_HISTORY_MAXLEN = 96
 
 MAX_CONCURRENT_ACTIVE_SIGNALS = int(os.getenv("MAX_CONCURRENT_ACTIVE_SIGNALS", "8"))
-MAX_CORRELATED_CONCURRENT = 1  # Sec 14 correlation cap
+MAX_CORRELATED_CONCURRENT = 1
 
 MIN_SAMPLE_SIZE = int(os.getenv("MIN_SAMPLE_SIZE", "20"))
 MIN_SAMPLE_SIZE_CATEGORY = int(os.getenv("MIN_SAMPLE_SIZE_CATEGORY", "12"))
@@ -112,16 +81,16 @@ CIRCUIT_BREAKER_WINDOW = 30
 CIRCUIT_BREAKER_WIN_RATE_DROP = 0.20
 CIRCUIT_BREAKER_PF_DROP_FRAC = 0.25
 
-RR_MIN_GATE = 1.5          # Sec 9 hard floor, reject-only, never used to construct a target
-RR_TP1_CEIL_SOFT = 2.0     # never stretched toward this artificially
-RR_TP2_MIN_EXCESS = 0.15   # TP2 RR must exceed TP1 RR by at least this fraction (TP ordering, Sec 9)
+RR_MIN_GATE = 1.5
+RR_TP1_CEIL_SOFT = 2.0
+RR_TP2_MIN_EXCESS = 0.15
 
-MIN_MOVE_PCT_SL = 0.004    # Sec 9 minimum entry-to-SL buffer, as a floor under the ATR-based rule
-MAX_ENTRY_DISTANCE_ATR = 1.2   # Sec 9: cap how far a pending entry may sit from market price
+MIN_MOVE_PCT_SL = 0.004
+MAX_ENTRY_DISTANCE_ATR = 1.2
 
-PENDING_ENTRY_EXPIRY_BARS = {  # Sec 11, sized per LTF
-    "15m": 8,   # ~2h on the intraday LTF
-    "1h": 12,   # ~12h on the swing LTF
+PENDING_ENTRY_EXPIRY_BARS = {
+    "15m": 8,
+    "1h": 12,
 }
 
 NEWS_BLACKOUT_MIN_BEFORE = 30
@@ -139,7 +108,7 @@ REGIME_BUCKETS = ["trending_expansion", "trending_compression",
 FACTOR_NAMES = ["trend", "momentum", "mean_reversion", "volatility_regime",
                 "positioning", "liquidity_microstructure", "volume_profile", "breadth"]
 
-# Sec 13: closed failure taxonomy re-keyed to this model's own factors/params.
+
 FAILURE_CATEGORIES = [
     "regime_mismatch", "structural_invalidation_too_tight", "order_book_liquidity_trap",
     "mtf_conflict_ignored", "sequence_violated", "positioning_misread",
@@ -147,17 +116,10 @@ FAILURE_CATEGORIES = [
     "genuine_variance",
 ]
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 1 — STATE & PERSISTENCE (two-tier, Sec 7)
-# ═══════════════════════════════════════════════════════════════════════
 
 def _default_weight_matrix() -> dict:
-    # DECISION: cold-start weights (Sec 2's "baseline quality comes first").
-    # Continuation-relevant factors (trend/momentum/positioning/volume_profile/
-    # breadth) get most weight in trending buckets; mean_reversion/positioning/
-    # volume_profile dominate ranging buckets. volatility_regime never scores
-    # direction (Sec 4.1 #4) so it carries zero weight here by construction —
-    # it only steers bucket membership itself, computed separately.
+
+
     base = {
         "trending_expansion":   {"trend": 1.4, "momentum": 1.1, "mean_reversion": 0.0,
                                   "volatility_regime": 0.0, "positioning": 0.7,
@@ -191,23 +153,23 @@ def default_state() -> dict:
     return {
         "schema_version": 1,
         "tier1": {
-            # Sec 4.4 mandatory regime x factor weight matrix — the sole
-            # mechanism that replaces "raise this named engine's weight".
+
+
             "weight_matrix": _default_weight_matrix(),
-            # RR/EV term weight in the composite blend, kept separate and
-            # clearly labeled so it never mixes into the probability term.
+
+
             "rr_ev_term_weight": 0.15,
             "mtf_alignment_weight": 0.20,
             "session_weight": 0.05,
-            # adaptive-percentile SL buffer, per "{asset}:{timeframe}"
+
             "sl_buffer_percentile": {},
-            # positioning-extremity threshold gating reversion eligibility (Sec 4.3)
-            "positioning_extremity_threshold": 1.5,   # in z-score units
-            # liquidity sanity-check tightness (Sec 13), continuous 0-1
+
+            "positioning_extremity_threshold": 1.5,
+
             "liquidity_sanity_threshold": 0.5,
-            # confidence calibration: per-decile-bucket additive offset
+
             "confidence_calibration": {},
-            # rolling OI history per asset, bounded, feeds Factor 5's OI-delta term
+
             "oi_history": {},
             "segments": {"asset": {}, "regime": {}, "timeframe": {}, "posture": {},
                          "dominant_factor": {}},
@@ -219,7 +181,7 @@ def default_state() -> dict:
             "totals": {"signals": 0, "wins": 0, "losses": 0, "expired": 0,
                        "sum_r": 0.0, "sum_hold_min": 0.0},
             "filter_funnel": {},
-            "confidence_bucket_log": {},  # bucket(str) -> [outcomes...] bounded, for calibration audit
+            "confidence_bucket_log": {},
         },
         "tier2": {
             "trade_log": [],
@@ -324,9 +286,6 @@ def bounded_update(current: float, target: float, lo: float, hi: float,
     delta = clamp(target - current, -max_step, max_step)
     return clamp(current + delta, lo, hi)
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 2 — HYPERLIQUID CLIENT
-# ═══════════════════════════════════════════════════════════════════════
 
 class _WeightedRateLimiter:
     def __init__(self, budget_per_min: int = 1150):
@@ -354,8 +313,8 @@ class HyperliquidClient:
         self._limiter = _WeightedRateLimiter()
         self._session = requests.Session()
         self.cache = cache if cache is not None else {}
-        # Sec 12 consistency addendum: one l2Book/funding/OI snapshot per
-        # asset per scan, captured once and reused everywhere downstream.
+
+
         self._book_snapshot_cache: dict[str, Optional[dict]] = {}
         self._ctx_snapshot_cache: Optional[dict] = None
 
@@ -510,9 +469,6 @@ def _interval_to_ms(interval: str) -> int:
     mult = {"m": 60_000, "h": 3_600_000, "d": 86_400_000}[unit]
     return n * mult
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 3 — SHARED STATISTICAL PRIMITIVES
-# ═══════════════════════════════════════════════════════════════════════
 
 def ema(values: list[float], length: int) -> list[float]:
     if not values:
@@ -623,7 +579,7 @@ def linreg_slope_z(closes: list[float], length: int = LINREG_LEN) -> float:
     den = sum((x - x_mean) ** 2 for x in xs)
     slope = num / den if den > 1e-12 else 0.0
     norm_slope = slope / y_mean if y_mean > 1e-12 else 0.0
-    # z-score the normalized slope against a trailing series of rolling slopes
+
     rolling = []
     for end in range(length, n + 1):
         w = window[end - length:end]
@@ -733,9 +689,6 @@ def depth_near_level(book: dict, level: float, side: str, band_pct: float = 0.00
     levels = book["bids"] if side == "bid" else book["asks"]
     return sum(l["sz"] for l in levels if lo <= l["px"] <= hi)
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 4 — TIMEFRAME VIEWS & SNAPSHOTS
-# ═══════════════════════════════════════════════════════════════════════
 
 @dataclass
 class TFView:
@@ -764,7 +717,7 @@ class SymbolSnapshot:
     mark: float
     views: dict[str, TFView]
     book: Optional[dict]
-    ctx: Optional[dict]              # funding/OI/mark/oracle from metaAndAssetCtxs
+    ctx: Optional[dict]
     funding_hist: list[float]
     vol_profiles: dict[str, Optional[VolumeProfile]] = field(default_factory=dict)
 
@@ -778,8 +731,8 @@ def collect_snapshot(hl: HyperliquidClient, symbol: str, mark: float) -> Optiona
             views[tf] = view
     if not views:
         return None
-    book = hl.l2_book(symbol)                 # Sec 12: snapshotted once, reused all scan
-    ctx_all = hl.meta_and_asset_ctxs()         # same
+    book = hl.l2_book(symbol)
+    ctx_all = hl.meta_and_asset_ctxs()
     ctx = ctx_all.get(symbol) if ctx_all else None
     funding_hist = hl.funding_history(symbol)
     vol_profiles = {tf: build_volume_profile(v.candles[-VOL_PROFILE_LOOKBACK.get(tf, 120):])
@@ -788,21 +741,18 @@ def collect_snapshot(hl: HyperliquidClient, symbol: str, mark: float) -> Optiona
                           views=views, book=book, ctx=ctx, funding_hist=funding_hist,
                           vol_profiles=vol_profiles)
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 5 — FACTOR COMPUTATION (Sec 4.1, closed set of eight)
-# ═══════════════════════════════════════════════════════════════════════
 
 @dataclass
 class FactorReading:
     trend: float
     momentum: float
     mean_reversion: float
-    volatility_regime: float          # unsigned 0-1 percentile, not directional
+    volatility_regime: float
     positioning: float
     liquidity_microstructure: float
     volume_profile: float
     breadth: float
-    # supporting context carried alongside for regime/risk/zone logic:
+
     vol_pctile: float
     bb_width_pctile: float
     adx_now: float
@@ -842,7 +792,7 @@ def compute_factor_1_trend(htf: TFView, mtf: TFView) -> float:
     HTF + MTF, blended with ADX-style directional strength (Sec 4.1 #1)."""
     slope_htf = linreg_slope_z(htf.closes)
     slope_mtf = linreg_slope_z(mtf.closes)
-    adx_norm = clamp((htf.adx[-1] - 20) / 30, -1, 1)  # ADX>20 building, >50 very strong
+    adx_norm = clamp((htf.adx[-1] - 20) / 30, -1, 1)
     raw = 0.5 * slope_htf + 0.3 * slope_mtf + 0.2 * adx_norm * (1 if slope_htf >= 0 else -1) * 3
     return clamp(raw / 3, -1, 1)
 
@@ -874,8 +824,8 @@ def compute_factor_3_mean_reversion(ltf: TFView, vwap_val: Optional[float]) -> t
     window = ltf.closes[-VWAP_LOOKBACK:]
     sd = statistics.pstdev(window) if len(window) > 1 else 0.0
     dist_sd = (ltf.closes[-1] - vwap_val) / sd if sd > 1e-9 else 0.0
-    # price above VWAP by N sd -> reversion factor is negative (fade down);
-    # price below VWAP by N sd -> reversion factor is positive (fade up).
+
+
     score = clamp(-dist_sd / 2.5, -1, 1)
     return score, dist_sd
 
@@ -908,15 +858,14 @@ def compute_factor_5_positioning(ctx: Optional[dict], funding_hist: list[float],
         oi_delta_z = zscore(deltas)
 
     extremity = math.sqrt(funding_z ** 2 + oi_delta_z ** 2)
-    # crowding direction: positive funding + rising OI => longs crowded (bullish
-    # extremity that is contrarian/bearish-leaning); negative funding + rising
-    # OI => shorts crowded (contrarian/bullish-leaning).
+
+
     crowd_sign = 1.0 if (funding_now > 0 and oi_delta_z > 0) else (-1.0 if (funding_now < 0 and oi_delta_z > 0) else 0.0)
     if extremity >= 1.5:
-        # crowded and squeeze-prone -> contrarian against the crowded side
+
         positioning = clamp(-crowd_sign * min(extremity / 3.0, 1.0), -1, 1)
     else:
-        # moderate/neutral -> mildly confirms the direction funding/OI already lean
+
         positioning = clamp(crowd_sign * 0.3, -1, 1)
     return positioning, oi_delta_z, funding_z
 
@@ -942,7 +891,7 @@ def compute_factor_7_volume_profile(vp: Optional[VolumeProfile], mid: float) -> 
         return clamp((vp.val - mid) / (vp.vah - vp.val + 1e-9), 0, 1)
     if mid > vp.vah:
         return -clamp((mid - vp.vah) / (vp.vah - vp.val + 1e-9), 0, 1)
-    # inside value area: mild pull toward POC
+
     span = max(vp.vah - vp.val, 1e-9)
     return clamp((vp.poc - mid) / span, -0.5, 0.5)
 
@@ -1004,21 +953,18 @@ def compute_all_factors(snap: SymbolSnapshot, htf_tf: str, mtf_tf: str, ltf_tf: 
         ob_imbalance=ob_imbalance,
     )
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 6 — REGIME CLASSIFICATION & REGIME VECTOR (Sec 4.2, Sec 5)
-# ═══════════════════════════════════════════════════════════════════════
 
 @dataclass
 class RegimeVector:
-    macro_bias: float          # signed, BTC HTF directional bias
-    vol_percentile: float      # 0-1
-    trend_strength: float      # 0-1 (ADX-normalized)
+    macro_bias: float
+    vol_percentile: float
+    trend_strength: float
     session_weight: float
     session_open_proximity: float
     ob_positioning_skew: float
     noise_index: float
     breadth: float
-    bucket_weights: dict       # continuous membership across REGIME_BUCKETS, sums to 1
+    bucket_weights: dict
 
     def dominant_bucket(self) -> str:
         return max(self.bucket_weights, key=self.bucket_weights.get)
@@ -1026,9 +972,8 @@ class RegimeVector:
 
 def _session_weight_now() -> float:
     hour = datetime.now(timezone.utc).hour
-    # DECISION: Asia 0-8, London 7-16, NY 12-21 UTC (overlaps intentional);
-    # weight is highest during London/NY overlap, the historically most
-    # liquid window, and lowest in the dead Asia/NY gap.
+
+
     if 12 <= hour < 16:
         return 1.0
     if 7 <= hour < 12 or 16 <= hour < 21:
@@ -1038,7 +983,7 @@ def _session_weight_now() -> float:
 
 def _session_open_proximity_now() -> float:
     minute_of_day = datetime.now(timezone.utc).hour * 60 + datetime.now(timezone.utc).minute
-    opens = [0, 7 * 60, 12 * 60]  # Asia/London/NY opens, UTC minutes
+    opens = [0, 7 * 60, 12 * 60]
     dist = min(abs(minute_of_day - o) for o in opens)
     return clamp(1.0 - dist / 90.0, 0.0, 1.0)
 
@@ -1073,8 +1018,8 @@ def classify_regime_bucket(trend_strength_norm: float, vol_regime: float) -> dic
         "ranging_expansion": w_ranging * w_expansion,
         "ranging_compression": w_ranging * w_compression,
     }
-    # transitional weight rises the closer trend_strength sits to the 0.5
-    # midline (genuinely ambiguous whether trending or ranging)
+
+
     ambiguity = 1 - abs(trend_strength_norm - 0.5) * 2
     transitional_w = clamp(ambiguity * 0.5, 0.0, 0.5)
     scale = 1 - transitional_w
@@ -1092,7 +1037,7 @@ def compute_regime_vector(symbol: str, factors: FactorReading, macro_view: Optio
     ob_skew = factors.ob_imbalance
     n_idx = noise_index(ltf_candles)
     breadth_coherence = statistics.fmean(
-        [f.breadth for s, f in [] ]) if False else factors.breadth  # breadth already per-asset; kept simple
+        [f.breadth for s, f in [] ]) if False else factors.breadth
     return RegimeVector(
         macro_bias=clamp(macro_bias, -1, 1), vol_percentile=factors.vol_pctile,
         trend_strength=trend_strength_norm, session_weight=_session_weight_now(),
@@ -1100,13 +1045,10 @@ def compute_regime_vector(symbol: str, factors: FactorReading, macro_view: Optio
         noise_index=n_idx, breadth=factors.breadth, bucket_weights=bucket_weights,
     )
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 7 — POSTURE SELECTION (Sec 4.3, two read-outs of one pipeline)
-# ═══════════════════════════════════════════════════════════════════════
 
 TRENDING_BUCKETS = {"trending_expansion", "trending_compression"}
 RANGING_BUCKETS = {"ranging_expansion", "ranging_compression"}
-BUCKET_ELIGIBILITY_THRESHOLD = 0.35  # combined bucket weight required for a posture to be eligible at all
+BUCKET_ELIGIBILITY_THRESHOLD = 0.35
 
 
 def eligible_postures(regime: RegimeVector, factors: FactorReading, state: dict) -> list[str]:
@@ -1120,9 +1062,8 @@ def eligible_postures(regime: RegimeVector, factors: FactorReading, state: dict)
     if ranging_w >= BUCKET_ELIGIBILITY_THRESHOLD:
         extremity_threshold = state["tier1"]["positioning_extremity_threshold"]
         extremity = math.sqrt(factors.funding_z ** 2 + factors.oi_delta_z ** 2)
-        # Sec 4.3: reversion's eligibility condition is genuine crowding/
-        # extremity in the direction being faded -- a small stretch is not
-        # enough, so this is a hard gate, not a soft confluence add-on.
+
+
         if extremity >= extremity_threshold:
             out.append("reversion")
     return out
@@ -1132,14 +1073,9 @@ def posture_direction(posture: str, factors: FactorReading) -> float:
     """Signed direction implied by this posture, in [-1, 1]."""
     if posture == "continuation":
         return clamp(0.6 * factors.trend + 0.4 * factors.momentum, -1, 1)
-    return clamp(factors.mean_reversion, -1, 1)  # reversion
+    return clamp(factors.mean_reversion, -1, 1)
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 8 — COMPOSITE SCORING (Sec 4.4, continuous blend, not point stack)
-# ═══════════════════════════════════════════════════════════════════════
 
-# Sec 4.4 mandatory per-term contribution cap so no single factor can
-# saturate the logistic transform, independent of the weight matrix value.
 PER_TERM_CAP = 0.9
 
 
@@ -1149,7 +1085,7 @@ def _term_contribution(weight: float, factor_value: float) -> float:
 
 @dataclass
 class ScoreResult:
-    probability: float          # calibrated confidence in [0,1], probability-of-success ONLY
+    probability: float
     raw_sum: float
     per_term: dict
     dominant_factor: str
@@ -1178,8 +1114,8 @@ def composite_score(posture: str, factors: FactorReading, regime: RegimeVector, 
         "positioning": factors.positioning, "liquidity_microstructure": factors.liquidity_microstructure,
         "volume_profile": factors.volume_profile, "breadth": factors.breadth,
     }
-    # Blend regime-conditioned weights across ALL bucket memberships
-    # (continuous, per Sec 4.2/4.4 -- never snapped to the single dominant bucket).
+
+
     blended_weights = {f: 0.0 for f in FACTOR_NAMES}
     for bucket, bw in regime.bucket_weights.items():
         bucket_wts = wm.get(bucket, {})
@@ -1189,8 +1125,8 @@ def composite_score(posture: str, factors: FactorReading, regime: RegimeVector, 
     per_term = {}
     raw_sum = 0.0
     for f in FACTOR_NAMES:
-        # signed toward the candidate `direction` so a factor that opposes
-        # the trade direction subtracts, one that agrees adds.
+
+
         signed_val = factor_values[f] * (1 if direction >= 0 else -1) if f != "volatility_regime" else 0.0
         contrib = _term_contribution(blended_weights[f], signed_val)
         per_term[f] = contrib
@@ -1205,9 +1141,7 @@ def composite_score(posture: str, factors: FactorReading, regime: RegimeVector, 
     per_term["session"] = session_term
     raw_sum += session_term
 
-    # RR/EV term: labeled and capped like everything else, but computed from
-    # RR magnitude only -- never blended into what drives `probability`
-    # beyond this single explicit, small-weight term (Sec 4.4).
+
     rr_term = _term_contribution(state["tier1"]["rr_ev_term_weight"], clamp((rr1 - RR_MIN_GATE) / 2.0, -1, 1))
     per_term["rr_ev"] = rr_term
     raw_sum += rr_term
@@ -1239,14 +1173,11 @@ def assign_tier(probability: float, rr1: float) -> str:
         return "A"
     return "B"
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 9 — ZONE / ENTRY SELECTION SEQUENCE (Sec 4.5)
-# ═══════════════════════════════════════════════════════════════════════
 
 @dataclass
 class ZoneSelection:
     level: float
-    kind: str            # "poc" | "vah" | "val" | "hvn" | "vwap_band"
+    kind: str
     depth_supporting: float
     direction: float
 
@@ -1271,7 +1202,7 @@ def select_structural_level(posture: str, direction: float, snap: SymbolSnapshot
         return None
 
     if direction >= 0:
-        # long: want a level at/below current price to buy a pullback into
+
         below = [c for c in candidates if c[0] <= mid]
         pool = below if below else candidates
         level, kind = max(pool, key=lambda c: c[0])
@@ -1287,8 +1218,8 @@ def confirm_order_book(zone: ZoneSelection, book: Optional[dict], liquidity_thre
     """Sec 4.5 step 5: real l2Book depth/imbalance check -- a structurally
     plausible node with no real depth behind it is discounted/rejected."""
     if not book:
-        return True  # DECISION: graceful degradation -- absent book data never
-                      # blocks an otherwise-valid signal, per Sec 15's failure handling.
+        return True
+
     side = "bid" if zone.direction >= 0 else "ask"
     depth = depth_near_level(book, zone.level, side)
     total_side_depth = sum(l["sz"] for l in (book["bids"] if side == "bid" else book["asks"]))
@@ -1315,12 +1246,9 @@ def precision_entry_refine(zone: ZoneSelection, ltf: TFView) -> float:
     Fibonacci OTE pocket, grounded in real local volatility instead of a
     fixed ratio). Never nominates a zone on its own."""
     recent_atr = ltf.atr[-1] if ltf.atr else 0.0
-    offset = 0.25 * recent_atr  # DECISION: quarter-ATR refinement offset
+    offset = 0.25 * recent_atr
     return zone.level - offset if zone.direction >= 0 else zone.level + offset
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 10 — RISK MANAGEMENT (Sec 9)
-# ═══════════════════════════════════════════════════════════════════════
 
 def adverse_wick_percentile_buffer(ltf: TFView, asset: str, tf: str, state: dict) -> float:
     """Sec 9 mandatory adaptive-percentile SL buffer: sized from a live
@@ -1403,19 +1331,16 @@ def build_risk_plan(direction: float, entry: float, structural_level: float, ltf
     if risk <= 1e-9:
         return None
 
-    # TP1 constructed to respect the mandatory RR floor first (Sec 9), then
-    # clipped backward only if a genuine closer wall sits inside that path --
-    # never used to shrink TP1 below the floor (a wall inside the floor
-    # distance instead makes the candidate ineligible, handled by the caller).
+
     tp1_floor_price = entry + risk * RR_MIN_GATE if direction >= 0 else entry - risk * RR_MIN_GATE
     tp1 = clip_target_to_liquidity_wall(direction, entry, tp1_floor_price, book)
     rr1 = abs(tp1 - entry) / risk
 
-    tp2_target = entry + risk * (RR_MIN_GATE + RR_TP2_MIN_EXCESS + 1.0) if direction >= 0 \
+    tp2_target = entry + risk * (RR_MIN_GATE + RR_TP2_MIN_EXCESS + 1.0) if direction >= 0\
         else entry - risk * (RR_MIN_GATE + RR_TP2_MIN_EXCESS + 1.0)
     tp2 = clip_target_to_liquidity_wall(direction, entry, tp2_target, book)
-    # Sec 9 mandatory TP ordering integrity, structurally enforced here and
-    # re-asserted immediately before dispatch (Section 12 of the caller chain).
+
+
     min_tp2 = entry + risk * rr1 * (1 + RR_TP2_MIN_EXCESS) if direction >= 0 else entry - risk * rr1 * (1 + RR_TP2_MIN_EXCESS)
     if direction >= 0 and tp2 <= min_tp2:
         tp2 = min_tp2
@@ -1439,9 +1364,6 @@ def passes_entry_placement_rules(entry: float, sl: float, tp1: float, atr_val: f
         return False
     return True
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 11 — CANDIDATE CONSTRUCTION & FILTER FUNNEL (Sec 4.5, Sec 13, 14)
-# ═══════════════════════════════════════════════════════════════════════
 
 @dataclass
 class Candidate:
@@ -1449,7 +1371,7 @@ class Candidate:
     symbol: str
     combo: str
     posture: str
-    direction: str          # "bullish" | "bearish"
+    direction: str
     entry: float
     sl: float
     tp1: float
@@ -1476,7 +1398,7 @@ def _new_id(symbol: str) -> str:
 
 
 def _combo_tfs(combo: str) -> tuple[str, str, str]:
-    return (TF_HTF_INTRADAY, TF_MID_INTRADAY, TF_LTF_INTRADAY) if combo == "intraday" \
+    return (TF_HTF_INTRADAY, TF_MID_INTRADAY, TF_LTF_INTRADAY) if combo == "intraday"\
         else (TF_HTF_SWING, TF_MID_SWING, TF_LTF_SWING)
 
 
@@ -1547,9 +1469,9 @@ def build_candidate(snap: SymbolSnapshot, combo: str, posture: str, regime: Regi
     if blackout:
         return None
 
-    assert plan.tp2 == plan.tp2  # nan guard, cheap
-    # Mandatory final TP-ordering assertion before this candidate can ever
-    # reach dispatch (Sec 9/19): TP2 strictly farther from entry than TP1.
+    assert plan.tp2 == plan.tp2
+
+
     if abs(plan.tp2 - plan.entry) <= abs(plan.tp1 - plan.entry):
         log.error("TP ordering violation for %s -- discarding candidate", snap.symbol)
         return None
@@ -1618,9 +1540,6 @@ def rank_and_gate_candidates(candidates: list[Candidate], active_signals: list[d
         accepted.append(c)
     return accepted
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 12 — ENTRY FILL VERIFICATION & OUTCOME RESOLUTION (Sec 10, 11, 12)
-# ═══════════════════════════════════════════════════════════════════════
 
 def check_fill_and_resolve(signal: dict, candles: list[dict]) -> dict:
     """Chronological, closed-candle, watermark-based scan. Enforces: no
@@ -1660,9 +1579,8 @@ def check_fill_and_resolve(signal: dict, candles: list[dict]) -> dict:
         hit_tp1 = (c["h"] >= tp1) if direction == "bullish" else (c["l"] <= tp1)
 
         if hit_sl:
-            # conservative same-candle-ambiguity handling: SL checked first
-            # (Sec 12), consistently applied both in backtest and live via
-            # this single shared function.
+
+
             return {"status": "closed", "result": "loss"}
         if hit_tp1:
             return {"status": "closed", "result": "win"}
@@ -1687,7 +1605,7 @@ def resolve_and_learn(signal: dict, resolution: dict, state: dict, regime_at_ent
 
     risk = abs(signal["entry"] - signal["sl"])
     r_multiple = signal["rr1"] if result == "win" else -1.0
-    # Sec 19 mandatory invariant: no "win" may carry non-positive realized R.
+
     if result == "win":
         assert r_multiple > 0, "bug: win with non-positive R"
 
@@ -1750,9 +1668,6 @@ def _accumulate_baseline(baseline: dict, result: str, r_multiple: float) -> None
     baseline["_gross_win"], baseline["_gross_loss"] = gross_win, gross_loss
     baseline["profit_factor"] = (gross_win / gross_loss) if gross_loss > 1e-9 else None
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 13 — LOSS FORENSICS & ADAPTIVE FEEDBACK LOOP (Sec 13, re-keyed)
-# ═══════════════════════════════════════════════════════════════════════
 
 def _confidence_bucket_realized_wr(posture: str, confidence: float, state: dict) -> Optional[float]:
     bucket = str(int(clamp(confidence, 0, 0.999) * 10))
@@ -1907,14 +1822,14 @@ def check_circuit_breaker(state: dict) -> None:
     t1 = state["tier1"]
     baseline = t1["baseline"]
     if baseline["n"] < MIN_SAMPLE_SIZE or baseline["win_rate"] is None:
-        return  # not enough baseline history to judge deviation yet
+        return
 
-    log_entries = [r for r in [] ] if False else None  # placeholder removed below
+    log_entries = [r for r in [] ] if False else None
     cb = t1["circuit_breaker"]
     recent = _recent_resolved_trades(state, CIRCUIT_BREAKER_WINDOW)
     if len(recent) < CIRCUIT_BREAKER_WINDOW:
         if cb["active"]:
-            pass  # keep frozen until a fresh full window is available to judge recovery
+            pass
         return
 
     wins = sum(1 for r in recent if r["result"] == "win")
@@ -1944,9 +1859,6 @@ def _recent_resolved_trades(state: dict, n: int) -> list[dict]:
                 and r.get("resolution_logic_version") == RESOLUTION_LOGIC_VERSION]
     return resolved[-n:]
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 14 — TELEGRAM
-# ═══════════════════════════════════════════════════════════════════════
 
 def _display_name(identifier: str) -> str:
     return str(identifier).replace("_", " ").replace("-", " ").title()
@@ -2121,9 +2033,6 @@ def send_daily_summary(state: dict) -> None:
 
     send_telegram("\n".join(lines))
 
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 15 — ORCHESTRATION
-# ═══════════════════════════════════════════════════════════════════════
 
 def _update_oi_history(state: dict, snaps: dict[str, SymbolSnapshot]) -> None:
     """Bounded, persisted rolling OI buffer per asset (Sec 4.1 Factor 5's
