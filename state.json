@@ -30,7 +30,9 @@
       "veto::regime_mismatch_discount::trend_continuation__consolidation": 0.55,
       "engine_weight::range_trading": 1.0,
       "veto::regime_mismatch_discount::range_trading__neutral": 0.55,
-      "veto::regime_mismatch_discount::trend_continuation__ranging_choppy": 0.55
+      "veto::regime_mismatch_discount::trend_continuation__ranging_choppy": 0.55,
+      "veto::regime_mismatch_discount::mean_reversion__low_volatility": 0.55,
+      "veto::regime_mismatch_discount::range_trading__low_volatility": 0.55
     },
     "segment_stats": {
       "asset=ETH|engine=trend_continuation|regime=neutral|tf=intraday": {
@@ -67,32 +69,65 @@
     },
     "fill_stats": {
       "trend_continuation::market": {
-        "dispatched": 2,
+        "dispatched": 3,
         "filled": 2,
         "expired": 0
       }
     },
     "filter_funnel": {
       "confluence_threshold": {
-        "evaluated": 197,
-        "rejected": 195
+        "evaluated": 207,
+        "rejected": 204
       },
       "rr_floor": {
-        "evaluated": 2,
+        "evaluated": 3,
         "rejected": 0
       },
       "liquidity_sanity": {
-        "evaluated": 2,
+        "evaluated": 3,
         "rejected": 0
       },
       "macro_blackout": {
-        "evaluated": 2,
+        "evaluated": 3,
         "rejected": 0
       }
     }
   },
   "tier2": {
-    "active_signals": [],
+    "active_signals": [
+      {
+        "id": "ONDO-trend_continuation-1784162727",
+        "engine": "trend_continuation",
+        "coin": "ONDO",
+        "combo": "intraday",
+        "direction": "long",
+        "entry": 0.35974,
+        "sl": 0.356744,
+        "tp1": 0.37062461398842095,
+        "tp2": 0.37656167616392333,
+        "entry_kind": "market",
+        "entry_filled": true,
+        "pending_bars_elapsed": 0,
+        "pending_expiry_bars": 12,
+        "confidence": 0.32187112665308476,
+        "grade": "B",
+        "rr_tp1": 3.6330487277773527,
+        "confluences": [
+          "ema_pullback",
+          "htf_mtf_agree"
+        ],
+        "regime_at_entry": "neutral",
+        "session_anchored": false,
+        "dispatch_ts": "2026-07-16T00:45:27.068451+00:00",
+        "dispatch_ts_ms": 1784162727068,
+        "status": "active",
+        "resolution_logic_version": "1.0.0",
+        "mae_r": 0.0,
+        "mfe_r": 0.0,
+        "last_checked_candle_t": null,
+        "telegram_message_id": 3479
+      }
+    ],
     "trade_log": [
       {
         "entry": 1924.4,
@@ -138,7 +173,7 @@
   },
   "meta": {
     "created": "2026-07-15T17:45:34.912293+00:00",
-    "last_run": "2026-07-16T00:31:07.107169+00:00",
-    "run_count": 28
+    "last_run": "2026-07-16T00:45:32.844023+00:00",
+    "run_count": 29
   }
 }
