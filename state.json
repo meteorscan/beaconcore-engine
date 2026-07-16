@@ -2,10 +2,10 @@
   "schema_version": 1,
   "tier1": {
     "baseline": {
-      "_gross_loss": 2.0,
+      "_gross_loss": 4.0,
       "_gross_win": 0.0,
       "avg_rr": -1.0,
-      "n": 2,
+      "n": 4,
       "profit_factor": 0.0,
       "win_rate": 0.0
     },
@@ -15,50 +15,56 @@
       "since": null
     },
     "confidence_bucket_log": {
+      "continuation:4": [
+        0
+      ],
       "continuation:5": [
         0
       ],
       "continuation:6": [
+        0
+      ],
+      "reversion:6": [
         0
       ]
     },
     "confidence_calibration": {},
     "filter_funnel": {
       "01_direction_nonzero": {
-        "killed": 50,
-        "seen": 168
+        "killed": 51,
+        "seen": 180
       },
       "02_structural_level_found": {
         "killed": 0,
-        "seen": 118
+        "seen": 129
       },
       "03_order_book_confirmation": {
-        "killed": 55,
-        "seen": 118
+        "killed": 60,
+        "seen": 129
       },
       "04_positioning_confirmation": {
         "killed": 1,
-        "seen": 63
+        "seen": 69
       },
       "05_risk_plan_valid": {
         "killed": 0,
-        "seen": 62
+        "seen": 68
       },
       "06_rr_floor": {
-        "killed": 36,
-        "seen": 62
+        "killed": 41,
+        "seen": 68
       },
       "07_entry_placement_rules": {
         "killed": 16,
-        "seen": 26
+        "seen": 27
       },
       "08_news_blackout": {
         "killed": 0,
-        "seen": 10
+        "seen": 11
       },
       "09_regime_fit_veto": {
         "killed": 0,
-        "seen": 10
+        "seen": 11
       }
     },
     "forensic_categories": {
@@ -82,8 +88,10 @@
         "recent_trend": []
       },
       "mtf_conflict_ignored": {
-        "count": 0,
-        "recent_trend": []
+        "count": 1,
+        "recent_trend": [
+          1
+        ]
       },
       "order_book_liquidity_trap": {
         "count": 0,
@@ -94,8 +102,10 @@
         "recent_trend": []
       },
       "regime_mismatch": {
-        "count": 0,
-        "recent_trend": []
+        "count": 1,
+        "recent_trend": [
+          1
+        ]
       },
       "sequence_violated": {
         "count": 0,
@@ -126,7 +136,8 @@
         881199.6799999999,
         881189.7,
         881612.9,
-        882061.1
+        882061.1,
+        882282.1
       ],
       "ADAUSDT": [
         144371902.0,
@@ -145,7 +156,8 @@
         143600256.0,
         143588684.0,
         143592120.0,
-        143536242.0
+        143536242.0,
+        143531270.0
       ],
       "APTUSDT": [
         6447568.86,
@@ -164,7 +176,8 @@
         6420414.5600000005,
         6418927.66,
         6418224.96,
-        6404287.8
+        6404287.8,
+        6399423.1
       ],
       "AVAXUSDT": [
         2148404.82,
@@ -183,7 +196,8 @@
         2147015.46,
         2146860.6600000006,
         2146829.72,
-        2145894.22
+        2145894.22,
+        2145642.14
       ],
       "BCHUSDT": [
         29526.46,
@@ -202,7 +216,8 @@
         29722.67,
         29704.548,
         29428.614,
-        29281.376
+        29281.376,
+        29281.0
       ],
       "BNBUSDT": [
         42081.104,
@@ -221,7 +236,8 @@
         41818.91,
         41805.46,
         41804.356,
-        41726.432
+        41726.432,
+        41723.29
       ],
       "BTCUSDT": [
         37276.2306,
@@ -240,7 +256,8 @@
         37838.21704,
         37891.03874,
         37829.56186,
-        37877.10672
+        37877.10672,
+        37951.6593
       ],
       "DOGEUSDT": [
         360628878.0,
@@ -259,7 +276,8 @@
         359948010.0,
         358109974.0,
         358082328.0,
-        357004636.0
+        357004636.0,
+        355681746.0
       ],
       "DOTUSDT": [
         5439030.8,
@@ -278,7 +296,8 @@
         5323781.399999999,
         5321969.800000001,
         5322156.0,
-        5318742.0
+        5318742.0,
+        5273887.2
       ],
       "ETHUSDT": [
         966718.6052,
@@ -297,7 +316,8 @@
         966056.1472000001,
         966142.8718000001,
         964258.6481999999,
-        968344.6585999997
+        968344.6585999997,
+        970498.6741999999
       ],
       "HYPEUSDT": [
         22093525.36,
@@ -316,7 +336,8 @@
         22571458.859999996,
         22575463.86,
         22557161.479999986,
-        22482126.199999988
+        22482126.199999988,
+        22468088.84000001
       ],
       "LINKUSDT": [
         5066280.2,
@@ -335,7 +356,8 @@
         5031977.8,
         5034326.2,
         5034452.0,
-        5033552.6
+        5033552.6,
+        5046312.4
       ],
       "LTCUSDT": [
         283236.44,
@@ -354,7 +376,8 @@
         283010.26,
         282997.76,
         282998.26,
-        283329.72
+        283329.72,
+        283348.18
       ],
       "NEARUSDT": [
         46767611.39999999,
@@ -373,7 +396,8 @@
         44403812.8,
         44413375.199999996,
         44406673.6,
-        44369207.4
+        44369207.4,
+        44360912.599999994
       ],
       "ONDOUSDT": [
         41472922.0,
@@ -392,7 +416,8 @@
         38804314.0,
         38878648.0,
         38164570.0,
-        38784790.0
+        38784790.0,
+        38043540.0
       ],
       "PENDLEUSDT": [
         4411766.0,
@@ -411,7 +436,8 @@
         4272640.0,
         4272332.0,
         4271978.0,
-        4275708.0
+        4275708.0,
+        4275666.0
       ],
       "PENGUUSDT": [
         664025464.0,
@@ -430,7 +456,8 @@
         668336922.0,
         668490796.0,
         667096630.0,
-        666596778.0
+        666596778.0,
+        667924440.0
       ],
       "SOLUSDT": [
         4521709.400000001,
@@ -449,7 +476,8 @@
         4400169.819999999,
         4389400.74,
         4388972.320000001,
-        4388042.960000001
+        4388042.960000001,
+        4389260.720000001
       ],
       "SUIUSDT": [
         41043111.6,
@@ -468,7 +496,8 @@
         41078035.0,
         41071543.6,
         41064282.8,
-        41046862.199999996
+        41046862.199999996,
+        41053526.0
       ],
       "TAOUSDT": [
         107958.264,
@@ -487,7 +516,8 @@
         108545.16,
         108444.818,
         108413.276,
-        108407.676
+        108407.676,
+        108548.082
       ],
       "TRXUSDT": [
         59377514.0,
@@ -506,7 +536,8 @@
         59483770.0,
         59457886.0,
         59451584.0,
-        59442066.0
+        59442066.0,
+        59453378.0
       ],
       "UNIUSDT": [
         4565554.6,
@@ -525,7 +556,8 @@
         4585418.8,
         4586614.2,
         4595015.8,
-        4594461.2
+        4594461.2,
+        4593154.0
       ],
       "XLMUSDT": [
         40330062.0,
@@ -544,7 +576,8 @@
         39705576.0,
         39712696.0,
         39712364.0,
-        39717784.0
+        39717784.0,
+        39687786.0
       ],
       "XRPUSDT": [
         94014880.0,
@@ -563,7 +596,8 @@
         94354678.0,
         94392196.0,
         94410078.0,
-        94364622.0
+        94364622.0,
+        94430826.0
       ],
       "ZECUSDT": [
         506762.86,
@@ -582,7 +616,8 @@
         503220.32,
         503349.9,
         505819.26,
-        505145.86
+        505145.86,
+        505079.3599999999
       ]
     },
     "positioning_extremity_threshold": 1.5,
@@ -590,16 +625,23 @@
     "segments": {
       "asset": {
         "NEARUSDT": {
-          "losses": 1,
-          "n": 1,
-          "sum_hold_min": 43.26979451666667,
-          "sum_r": -1.0,
+          "losses": 2,
+          "n": 2,
+          "sum_hold_min": 175.95025523333334,
+          "sum_r": -2.0,
           "wins": 0
         },
         "PENDLEUSDT": {
           "losses": 1,
           "n": 1,
           "sum_hold_min": 28.0115393,
+          "sum_r": -1.0,
+          "wins": 0
+        },
+        "PENGUUSDT": {
+          "losses": 1,
+          "n": 1,
+          "sum_hold_min": 118.00297834999999,
           "sum_r": -1.0,
           "wins": 0
         }
@@ -612,6 +654,13 @@
           "sum_r": -1.0,
           "wins": 0
         },
+        "momentum": {
+          "losses": 2,
+          "n": 2,
+          "sum_hold_min": 250.68343906666666,
+          "sum_r": -2.0,
+          "wins": 0
+        },
         "trend": {
           "losses": 1,
           "n": 1,
@@ -622,28 +671,42 @@
       },
       "posture": {
         "continuation": {
-          "losses": 2,
-          "n": 2,
-          "sum_hold_min": 71.28133381666667,
-          "sum_r": -2.0,
+          "losses": 3,
+          "n": 3,
+          "sum_hold_min": 203.96179453333332,
+          "sum_r": -3.0,
+          "wins": 0
+        },
+        "reversion": {
+          "losses": 1,
+          "n": 1,
+          "sum_hold_min": 118.00297834999999,
+          "sum_r": -1.0,
           "wins": 0
         }
       },
       "regime": {
+        "transitional": {
+          "losses": 1,
+          "n": 1,
+          "sum_hold_min": 118.00297834999999,
+          "sum_r": -1.0,
+          "wins": 0
+        },
         "trending_expansion": {
-          "losses": 2,
-          "n": 2,
-          "sum_hold_min": 71.28133381666667,
-          "sum_r": -2.0,
+          "losses": 3,
+          "n": 3,
+          "sum_hold_min": 203.96179453333332,
+          "sum_r": -3.0,
           "wins": 0
         }
       },
       "timeframe": {
         "intraday": {
-          "losses": 2,
-          "n": 2,
-          "sum_hold_min": 71.28133381666667,
-          "sum_r": -2.0,
+          "losses": 4,
+          "n": 4,
+          "sum_hold_min": 321.9647728833333,
+          "sum_r": -4.0,
           "wins": 0
         }
       }
@@ -657,10 +720,10 @@
         "wins": 0
       },
       "non_anchored": {
-        "losses": 2,
-        "n": 2,
+        "losses": 4,
+        "n": 4,
         "sum_hold_min": 0.0,
-        "sum_r": -2.0,
+        "sum_r": -4.0,
         "wins": 0
       }
     },
@@ -668,10 +731,10 @@
     "sl_buffer_percentile": {},
     "totals": {
       "expired": 0,
-      "losses": 2,
-      "signals": 2,
-      "sum_hold_min": 71.28133381666667,
-      "sum_r": -2.0,
+      "losses": 4,
+      "signals": 4,
+      "sum_hold_min": 321.9647728833333,
+      "sum_r": -4.0,
       "wins": 0
     },
     "weight_matrix": {
@@ -731,60 +794,6 @@
     "active_signals": [
       {
         "combo": "intraday",
-        "confidence": 0.44628283687101306,
-        "created_at": "2026-07-16T19:02:50.096968+00:00",
-        "direction": "bearish",
-        "dominant_factor": "momentum",
-        "entry": 2.040146435708273,
-        "entry_filled": false,
-        "entry_kind": "pending",
-        "filter_margin_thin": false,
-        "id": "NEARUSDT-prism_quant-1784228570096",
-        "ltf_tf": "15m",
-        "mtf_aligned": false,
-        "pending_bars": 7,
-        "posture": "continuation",
-        "regime_label": "trending_expansion",
-        "resolution_logic_version": 1,
-        "rr1": 1.5000000000000537,
-        "rr2": 2.5502942109260913,
-        "sl": 2.04427445,
-        "symbol": "NEARUSDT",
-        "tg_message_id": 3642,
-        "tier": "B",
-        "tp1": 2.0339544142706822,
-        "tp2": 2.0296187847574614,
-        "watermark_ts": 1784234700000
-      },
-      {
-        "combo": "intraday",
-        "confidence": 0.6873857038947756,
-        "created_at": "2026-07-16T19:17:31.724740+00:00",
-        "direction": "bearish",
-        "dominant_factor": "momentum",
-        "entry": 0.006242429639782134,
-        "entry_filled": false,
-        "entry_kind": "pending",
-        "filter_margin_thin": false,
-        "id": "PENGUUSDT-prism_quant-1784229451724",
-        "ltf_tf": "15m",
-        "mtf_aligned": true,
-        "pending_bars": 6,
-        "posture": "reversion",
-        "regime_label": "transitional",
-        "resolution_logic_version": 1,
-        "rr1": 1.5,
-        "rr2": 1.8236572304673555,
-        "sl": 0.006256513,
-        "symbol": "PENGUUSDT",
-        "tg_message_id": 3643,
-        "tier": "A",
-        "tp1": 0.006221304599455336,
-        "tp2": 0.006216746418091547,
-        "watermark_ts": 1784234700000
-      },
-      {
-        "combo": "intraday",
         "confidence": 0.6938241679456305,
         "created_at": "2026-07-16T20:32:45.270651+00:00",
         "direction": "bullish",
@@ -796,7 +805,7 @@
         "id": "PENDLEUSDT-prism_quant-1784233965270",
         "ltf_tf": "15m",
         "mtf_aligned": true,
-        "pending_bars": 1,
+        "pending_bars": 2,
         "posture": "continuation",
         "regime_label": "trending_expansion",
         "resolution_logic_version": 1,
@@ -808,7 +817,7 @@
         "tier": "A",
         "tp1": 1.5748016377810217,
         "tp2": 1.5790675111602914,
-        "watermark_ts": 1784234700000
+        "watermark_ts": 1784235600000
       }
     ],
     "trade_log": [
@@ -882,6 +891,78 @@
         "tp1": 1.6031416978571267,
         "tp2": 1.6073235439819369,
         "watermark_ts": 1784224800000
+      },
+      {
+        "adaptive_adjustment": "no_change_insufficient_sample",
+        "combo": "intraday",
+        "confidence": 0.44628283687101306,
+        "created_at": "2026-07-16T19:02:50.096968+00:00",
+        "direction": "bearish",
+        "dominant_factor": "momentum",
+        "entry": 2.040146435708273,
+        "entry_filled": true,
+        "entry_kind": "pending",
+        "filter_margin_thin": false,
+        "forensic_category": "mtf_conflict_ignored",
+        "hold_min": 132.68046071666666,
+        "id": "NEARUSDT-prism_quant-1784228570096",
+        "ltf_tf": "15m",
+        "mtf_aligned": false,
+        "pending_bars": 7,
+        "posture": "continuation",
+        "r_multiple": -1.0,
+        "regime_at_entry": {
+          "label": "trending_expansion"
+        },
+        "regime_label": "trending_expansion",
+        "resolution_logic_version": 1,
+        "resolved_at": "2026-07-16T21:15:30.924611+00:00",
+        "result": "loss",
+        "rr1": 1.5000000000000537,
+        "rr2": 2.5502942109260913,
+        "sl": 2.04427445,
+        "symbol": "NEARUSDT",
+        "tg_message_id": 3642,
+        "tier": "B",
+        "tp1": 2.0339544142706822,
+        "tp2": 2.0296187847574614,
+        "watermark_ts": 1784235600000
+      },
+      {
+        "adaptive_adjustment": "no_change_insufficient_sample",
+        "combo": "intraday",
+        "confidence": 0.6873857038947756,
+        "created_at": "2026-07-16T19:17:31.724740+00:00",
+        "direction": "bearish",
+        "dominant_factor": "momentum",
+        "entry": 0.006242429639782134,
+        "entry_filled": true,
+        "entry_kind": "pending",
+        "filter_margin_thin": false,
+        "forensic_category": "regime_mismatch",
+        "hold_min": 118.00297834999999,
+        "id": "PENGUUSDT-prism_quant-1784229451724",
+        "ltf_tf": "15m",
+        "mtf_aligned": true,
+        "pending_bars": 6,
+        "posture": "reversion",
+        "r_multiple": -1.0,
+        "regime_at_entry": {
+          "label": "transitional"
+        },
+        "regime_label": "transitional",
+        "resolution_logic_version": 1,
+        "resolved_at": "2026-07-16T21:15:31.903441+00:00",
+        "result": "loss",
+        "rr1": 1.5,
+        "rr2": 1.8236572304673555,
+        "sl": 0.006256513,
+        "symbol": "PENGUUSDT",
+        "tg_message_id": 3643,
+        "tier": "A",
+        "tp1": 0.006221304599455336,
+        "tp2": 0.006216746418091547,
+        "watermark_ts": 1784235600000
       }
     ]
   }
