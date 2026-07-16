@@ -27,7 +27,8 @@
       "engine_weight::trend_continuation": 1.0,
       "veto::regime_mismatch_discount::trend_continuation__neutral": 0.55,
       "engine_weight::volatility_expansion": 1.0,
-      "veto::regime_mismatch_discount::volatility_expansion__neutral": 0.55
+      "veto::regime_mismatch_discount::volatility_expansion__neutral": 0.55,
+      "filter::liquidity_sanity_margin_atr": 0.35
     },
     "segment_stats": {},
     "calibration_buckets": {},
@@ -42,11 +43,37 @@
       "tripped_at": null,
       "reason": null
     },
-    "fill_stats": {},
+    "fill_stats": {
+      "trend_continuation::market": {
+        "dispatched": 1,
+        "filled": 0,
+        "expired": 0
+      }
+    },
     "filter_funnel": {
       "confluence_threshold": {
-        "evaluated": 29,
-        "rejected": 29
+        "evaluated": 35,
+        "rejected": 34
+      },
+      "rr_floor": {
+        "evaluated": 1,
+        "rejected": 0
+      },
+      "ltf_confirmation": {
+        "evaluated": 1,
+        "rejected": 0
+      },
+      "engine_paused": {
+        "evaluated": 1,
+        "rejected": 0
+      },
+      "liquidity_sanity": {
+        "evaluated": 1,
+        "rejected": 0
+      },
+      "macro_blackout": {
+        "evaluated": 1,
+        "rejected": 0
       }
     },
     "engine_governor": {
@@ -92,12 +119,45 @@
     }
   },
   "tier2": {
-    "active_signals": [],
+    "active_signals": [
+      {
+        "id": "ONDO-trend_continuation-1784215844",
+        "engine": "trend_continuation",
+        "coin": "ONDO",
+        "combo": "intraday",
+        "direction": "long",
+        "entry": 0.39102,
+        "sl": 0.30599999999999994,
+        "tp1": 0.5525580000000001,
+        "tp2": 0.5950680000000002,
+        "entry_kind": "market",
+        "entry_filled": true,
+        "pending_bars_elapsed": 0,
+        "pending_expiry_bars": 12,
+        "confidence": 0.3020568479618359,
+        "grade": "B",
+        "rr_tp1": 1.9000000000000006,
+        "confluences": [
+          "ema_pullback",
+          "htf_mtf_agree"
+        ],
+        "regime_at_entry": "neutral",
+        "session_anchored": false,
+        "dispatch_ts": "2026-07-16T15:30:44.261794+00:00",
+        "dispatch_ts_ms": 1784215844261,
+        "status": "active",
+        "resolution_logic_version": "1.0.0",
+        "mae_r": 0.0,
+        "mfe_r": 0.0,
+        "last_checked_candle_t": 1784214900000,
+        "telegram_message_id": 3609
+      }
+    ],
     "trade_log": []
   },
   "meta": {
     "created": "2026-07-16T10:15:30.243941+00:00",
-    "last_run": "2026-07-16T15:15:38.424052+00:00",
-    "run_count": 21
+    "last_run": "2026-07-16T15:30:50.342819+00:00",
+    "run_count": 22
   }
 }
