@@ -2,10 +2,10 @@
   "schema_version": 1,
   "tier1": {
     "baseline": {
-      "_gross_loss": 7.0,
+      "_gross_loss": 8.0,
       "_gross_win": 0.0,
       "avg_rr": -1.0,
-      "n": 7,
+      "n": 8,
       "profit_factor": 0.0,
       "win_rate": 0.0
     },
@@ -26,6 +26,9 @@
         0,
         0
       ],
+      "reversion:3": [
+        0
+      ],
       "reversion:4": [
         0
       ],
@@ -36,16 +39,16 @@
     "confidence_calibration": {},
     "filter_funnel": {
       "01_direction_nonzero": {
-        "killed": 83,
-        "seen": 366
+        "killed": 86,
+        "seen": 374
       },
       "02_structural_level_found": {
         "killed": 0,
-        "seen": 283
+        "seen": 288
       },
       "03_order_book_confirmation": {
-        "killed": 166,
-        "seen": 283
+        "killed": 171,
+        "seen": 288
       },
       "04_positioning_confirmation": {
         "killed": 1,
@@ -78,8 +81,9 @@
         "recent_trend": []
       },
       "correct_read_poor_rr": {
-        "count": 3,
+        "count": 4,
         "recent_trend": [
+          1,
           1,
           1,
           1
@@ -159,7 +163,8 @@
         875148.0800000002,
         875186.62,
         875447.16,
-        875543.5400000002
+        875543.5400000002,
+        876526.8599999999
       ],
       "ADAUSDT": [
         144371902.0,
@@ -193,7 +198,8 @@
         144919988.0,
         144986386.0,
         144985326.0,
-        145024202.0
+        145024202.0,
+        145098344.0
       ],
       "APTUSDT": [
         6447568.86,
@@ -227,7 +233,8 @@
         6685859.76,
         6728618.24,
         6728536.5,
-        6730090.94
+        6730090.94,
+        6725258.7
       ],
       "AVAXUSDT": [
         2148404.82,
@@ -261,7 +268,8 @@
         2153896.7799999993,
         2154511.5,
         2158328.42,
-        2154419.5
+        2154419.5,
+        2157958.4399999995
       ],
       "BCHUSDT": [
         29526.46,
@@ -295,7 +303,8 @@
         29303.092,
         29317.76,
         29314.018,
-        29311.374
+        29311.374,
+        29313.796
       ],
       "BNBUSDT": [
         42081.104,
@@ -329,7 +338,8 @@
         41916.574,
         40460.236,
         40444.592,
-        40451.4
+        40451.4,
+        40476.414
       ],
       "BTCUSDT": [
         37276.2306,
@@ -363,7 +373,8 @@
         37632.28488,
         37675.61652,
         37782.69992,
-        37503.6529
+        37503.6529,
+        37523.11426
       ],
       "DOGEUSDT": [
         360628878.0,
@@ -397,7 +408,8 @@
         355668888.0,
         357106016.0,
         355695584.0,
-        355403058.0
+        355403058.0,
+        355117192.0
       ],
       "DOTUSDT": [
         5439030.8,
@@ -431,7 +443,8 @@
         5203302.6,
         5195868.6,
         5198692.2,
-        5199657.4
+        5199657.4,
+        5200941.0
       ],
       "ETHUSDT": [
         966718.6052,
@@ -465,7 +478,8 @@
         956680.5900000001,
         957135.1266,
         956539.2903999996,
-        943799.7344000002
+        943799.7344000002,
+        944779.1599999997
       ],
       "HYPEUSDT": [
         22093525.36,
@@ -499,7 +513,8 @@
         22441382.579999994,
         22416514.500000007,
         22439068.299999993,
-        22443422.23999999
+        22443422.23999999,
+        22465340.279999994
       ],
       "LINKUSDT": [
         5066280.2,
@@ -533,7 +548,8 @@
         5013081.400000001,
         5007886.6,
         5008524.399999999,
-        5026632.4
+        5026632.4,
+        5024584.8
       ],
       "LTCUSDT": [
         283236.44,
@@ -567,7 +583,8 @@
         273512.3199999999,
         273427.26,
         273536.1,
-        273369.34
+        273369.34,
+        273106.28
       ],
       "NEARUSDT": [
         46767611.39999999,
@@ -601,7 +618,8 @@
         42902579.2,
         42644678.400000006,
         42320311.2,
-        42348491.800000004
+        42348491.800000004,
+        42354617.59999999
       ],
       "ONDOUSDT": [
         41472922.0,
@@ -635,7 +653,8 @@
         39033026.0,
         39292504.0,
         39456562.0,
-        39783136.0
+        39783136.0,
+        40105336.0
       ],
       "PENDLEUSDT": [
         4411766.0,
@@ -669,7 +688,8 @@
         4231842.0,
         4235114.0,
         4231952.0,
-        4230294.0
+        4230294.0,
+        4228256.0
       ],
       "PENGUUSDT": [
         664025464.0,
@@ -703,7 +723,8 @@
         636588642.0,
         636854978.0,
         636580332.0,
-        636227632.0
+        636227632.0,
+        636543298.0
       ],
       "SOLUSDT": [
         4521709.400000001,
@@ -737,7 +758,8 @@
         4339780.440000001,
         4329629.7,
         4333224.56,
-        4310747.76
+        4310747.76,
+        4309061.08
       ],
       "SUIUSDT": [
         41043111.6,
@@ -771,7 +793,8 @@
         42262605.999999985,
         42352365.4,
         42478763.599999994,
-        42491870.400000006
+        42491870.400000006,
+        42509239.8
       ],
       "TAOUSDT": [
         107958.264,
@@ -805,7 +828,8 @@
         107615.15,
         107448.908,
         107546.558,
-        107606.722
+        107606.722,
+        107289.75
       ],
       "TRXUSDT": [
         59377514.0,
@@ -839,7 +863,8 @@
         59463572.0,
         59481166.0,
         59483820.0,
-        59503730.0
+        59503730.0,
+        59491788.0
       ],
       "UNIUSDT": [
         4565554.6,
@@ -873,7 +898,8 @@
         4500285.799999998,
         4496852.4,
         4494467.599999999,
-        4510113.199999999
+        4510113.199999999,
+        4536167.999999999
       ],
       "XLMUSDT": [
         40330062.0,
@@ -907,7 +933,8 @@
         39635094.0,
         39695398.0,
         39665980.0,
-        39608050.0
+        39608050.0,
+        39823868.0
       ],
       "XRPUSDT": [
         94014880.0,
@@ -941,7 +968,8 @@
         94145482.0,
         92884474.0,
         92779930.0,
-        92441916.0
+        92441916.0,
+        92295350.0
       ],
       "ZECUSDT": [
         506762.86,
@@ -975,13 +1003,21 @@
         492892.64,
         493255.26,
         494055.6199999999,
-        494188.9
+        494188.9,
+        495184.4999999998
       ]
     },
     "positioning_extremity_threshold": 1.5,
     "rr_ev_term_weight": 0.15,
     "segments": {
       "asset": {
+        "AVAXUSDT": {
+          "losses": 1,
+          "n": 1,
+          "sum_hold_min": 88.0970063,
+          "sum_r": -1.0,
+          "wins": 0
+        },
         "HYPEUSDT": {
           "losses": 1,
           "n": 1,
@@ -1027,10 +1063,10 @@
           "wins": 0
         },
         "positioning": {
-          "losses": 1,
-          "n": 1,
-          "sum_hold_min": 132.70487308333333,
-          "sum_r": -1.0,
+          "losses": 2,
+          "n": 2,
+          "sum_hold_min": 220.80187938333333,
+          "sum_r": -2.0,
           "wins": 0
         },
         "trend": {
@@ -1057,14 +1093,21 @@
           "wins": 0
         },
         "reversion": {
-          "losses": 2,
-          "n": 2,
-          "sum_hold_min": 175.9423550333333,
-          "sum_r": -2.0,
+          "losses": 3,
+          "n": 3,
+          "sum_hold_min": 264.0393613333333,
+          "sum_r": -3.0,
           "wins": 0
         }
       },
       "regime": {
+        "ranging_compression": {
+          "losses": 1,
+          "n": 1,
+          "sum_hold_min": 88.0970063,
+          "sum_r": -1.0,
+          "wins": 0
+        },
         "ranging_expansion": {
           "losses": 1,
           "n": 1,
@@ -1094,6 +1137,13 @@
           "sum_hold_min": 570.53430895,
           "sum_r": -7.0,
           "wins": 0
+        },
+        "swing": {
+          "losses": 1,
+          "n": 1,
+          "sum_hold_min": 88.0970063,
+          "sum_r": -1.0,
+          "wins": 0
         }
       }
     },
@@ -1106,21 +1156,21 @@
         "wins": 0
       },
       "non_anchored": {
-        "losses": 7,
-        "n": 7,
+        "losses": 8,
+        "n": 8,
         "sum_hold_min": 0.0,
-        "sum_r": -7.0,
+        "sum_r": -8.0,
         "wins": 0
       }
     },
     "session_weight": 0.05,
     "sl_buffer_percentile": {},
     "totals": {
-      "expired": 0,
-      "losses": 7,
-      "signals": 7,
-      "sum_hold_min": 570.53430895,
-      "sum_r": -7.0,
+      "expired": 1,
+      "losses": 8,
+      "signals": 8,
+      "sum_hold_min": 658.63131525,
+      "sum_r": -8.0,
       "wins": 0
     },
     "weight_matrix": {
@@ -1177,60 +1227,7 @@
     }
   },
   "tier2": {
-    "active_signals": [
-      {
-        "combo": "intraday",
-        "confidence": 0.39646768488973466,
-        "created_at": "2026-07-16T22:47:30.554094+00:00",
-        "direction": "bearish",
-        "dominant_factor": "volume_profile",
-        "entry": 1.56817852403116,
-        "entry_filled": false,
-        "entry_kind": "pending",
-        "filter_margin_thin": false,
-        "id": "PENDLEUSDT-prism_quant-1784242050554",
-        "ltf_tf": "15m",
-        "mtf_aligned": false,
-        "pending_bars": 7,
-        "posture": "continuation",
-        "regime_label": "trending_compression",
-        "resolution_logic_version": 1,
-        "rr1": 1.5,
-        "rr2": 1.7250000000000176,
-        "sl": 1.5719627,
-        "symbol": "PENDLEUSDT",
-        "tg_message_id": 3662,
-        "tier": "B",
-        "tp1": 1.5625022600779002,
-        "tp2": 1.561650820484911,
-        "watermark_ts": 1784248200000
-      },
-      {
-        "combo": "swing",
-        "confidence": 0.36154950085788856,
-        "created_at": "2026-07-16T23:32:42.900807+00:00",
-        "direction": "bullish",
-        "dominant_factor": "positioning",
-        "entry": 6.46975258592447,
-        "entry_filled": false,
-        "entry_kind": "pending",
-        "filter_margin_thin": false,
-        "id": "AVAXUSDT-prism_quant-1784244762900",
-        "ltf_tf": "1h",
-        "mtf_aligned": true,
-        "posture": "reversion",
-        "regime_label": "ranging_compression",
-        "resolution_logic_version": 1,
-        "rr1": 1.5000000000000333,
-        "rr2": 2.201680139220441,
-        "sl": 6.4564259,
-        "symbol": "AVAXUSDT",
-        "tg_message_id": 3680,
-        "tier": "B",
-        "tp1": 6.489742614811174,
-        "tp2": 6.499093685646002
-      }
-    ],
+    "active_signals": [],
     "trade_log": [
       {
         "adaptive_adjustment": "no_change_insufficient_sample",
@@ -1482,6 +1479,70 @@
         "tp1": 1.5748016377810217,
         "tp2": 1.5790675111602914,
         "watermark_ts": 1784241000000
+      },
+      {
+        "combo": "intraday",
+        "confidence": 0.39646768488973466,
+        "created_at": "2026-07-16T22:47:30.554094+00:00",
+        "direction": "bearish",
+        "dominant_factor": "volume_profile",
+        "entry": 1.56817852403116,
+        "entry_filled": false,
+        "entry_kind": "pending",
+        "filter_margin_thin": false,
+        "id": "PENDLEUSDT-prism_quant-1784242050554",
+        "ltf_tf": "15m",
+        "mtf_aligned": false,
+        "pending_bars": 8,
+        "posture": "continuation",
+        "regime_label": "trending_compression",
+        "resolution_logic_version": 1,
+        "resolved_at": "2026-07-17T01:00:47.819025+00:00",
+        "result": "expired",
+        "rr1": 1.5,
+        "rr2": 1.7250000000000176,
+        "sl": 1.5719627,
+        "symbol": "PENDLEUSDT",
+        "tg_message_id": 3662,
+        "tier": "B",
+        "tp1": 1.5625022600779002,
+        "tp2": 1.561650820484911,
+        "watermark_ts": 1784249100000
+      },
+      {
+        "adaptive_adjustment": "no_change_insufficient_sample",
+        "combo": "swing",
+        "confidence": 0.36154950085788856,
+        "created_at": "2026-07-16T23:32:42.900807+00:00",
+        "direction": "bullish",
+        "dominant_factor": "positioning",
+        "entry": 6.46975258592447,
+        "entry_filled": true,
+        "entry_kind": "pending",
+        "filter_margin_thin": false,
+        "forensic_category": "correct_read_poor_rr",
+        "hold_min": 88.0970063,
+        "id": "AVAXUSDT-prism_quant-1784244762900",
+        "ltf_tf": "1h",
+        "mtf_aligned": true,
+        "posture": "reversion",
+        "r_multiple": -1.0,
+        "regime_at_entry": {
+          "label": "ranging_compression"
+        },
+        "regime_label": "ranging_compression",
+        "resolution_logic_version": 1,
+        "resolved_at": "2026-07-17T01:00:48.721185+00:00",
+        "result": "loss",
+        "rr1": 1.5000000000000333,
+        "rr2": 2.201680139220441,
+        "sl": 6.4564259,
+        "symbol": "AVAXUSDT",
+        "tg_message_id": 3680,
+        "tier": "B",
+        "tp1": 6.489742614811174,
+        "tp2": 6.499093685646002,
+        "watermark_ts": 1784246400000
       }
     ]
   }
