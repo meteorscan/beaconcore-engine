@@ -1,1 +1,159 @@
-{}
+{
+  "schema_version": 1,
+  "resolution_logic_version": "1.0.1",
+  "tier1": {
+    "engine_weights": {},
+    "combo_weights": {},
+    "confidence_calibration": {},
+    "filter_thresholds": {},
+    "sl_buffer_percentile": {},
+    "tp1_rank_preference": {},
+    "regime_fit_discount": {},
+    "segment_stats": {},
+    "calibration_buckets": {},
+    "forensic_counts": {},
+    "fill_stats": {
+      "Mean Reversion|market": {
+        "dispatched": 1,
+        "filled": 0,
+        "expired": 0
+      },
+      "Liquidity Sweep|market": {
+        "dispatched": 2,
+        "filled": 0,
+        "expired": 0
+      }
+    },
+    "filter_funnel": {
+      "liquidity_sanity": {
+        "seen": 4,
+        "rejected": 0
+      }
+    },
+    "circuit_breaker": {
+      "tripped": false,
+      "tripped_ts": null,
+      "reason": null
+    },
+    "governor": {
+      "last_adjust_ts": 0
+    },
+    "daily_totals": {
+      "2026-07-18": "sent"
+    }
+  },
+  "tier2_trades": [],
+  "active_signals": [
+    {
+      "id": "BTC-Mean Reversion-1784393139733",
+      "symbol": "BTC",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "market",
+      "entry": 64131.0,
+      "sl": 64197.8,
+      "tp1": 64020.0,
+      "tp2": 63997.0,
+      "rr1": 1.6616766467065145,
+      "rr2": 2.0059880239520083,
+      "confidence": 0.743232224607688,
+      "grade": "A",
+      "confluences": [
+        "1H Bollinger extreme"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 10.56984694063911,
+        "volatility_pctl": 0.8333333333333334,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": true,
+      "pending_bars": 0,
+      "status": "active",
+      "created_ts": 1784393139733,
+      "filled_ts": 1784393139733,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.1",
+      "tg_message_id": 3886,
+      "_last_checked_t": 1784391300000
+    },
+    {
+      "id": "SOL-Liquidity Sweep-1784393139733",
+      "symbol": "SOL",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "market",
+      "entry": 75.02,
+      "sl": 75.31000000000002,
+      "tp1": 74.524,
+      "tp2": 74.517,
+      "rr1": 1.7103448275860693,
+      "rr2": 1.7344827586205676,
+      "confidence": 0.7617316344768721,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 23.131470755529968,
+        "volatility_pctl": 2.5,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "1h",
+      "entry_filled": true,
+      "pending_bars": 0,
+      "status": "active",
+      "created_ts": 1784393139733,
+      "filled_ts": 1784393139733,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.1",
+      "tg_message_id": 3887,
+      "_last_checked_t": 1784391300000
+    },
+    {
+      "id": "LTC-Liquidity Sweep-1784393139733",
+      "symbol": "LTC",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "market",
+      "entry": 46.65,
+      "sl": 46.7082,
+      "tp1": 45.632,
+      "tp2": 45.521,
+      "rr1": 2.0,
+      "rr2": 19.398625429553437,
+      "confidence": 0.7810696321927871,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 30.081435548595657,
+        "volatility_pctl": 57.5,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": true,
+      "pending_bars": 0,
+      "status": "active",
+      "created_ts": 1784393139733,
+      "filled_ts": 1784393139733,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.1",
+      "tg_message_id": 3888,
+      "_last_checked_t": 1784391300000
+    }
+  ],
+  "macro_events": [],
+  "last_run_ts": 1784393139733
+}
