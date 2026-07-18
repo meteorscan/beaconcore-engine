@@ -2110,16 +2110,28 @@ def _bump_funnel_rejected(state: dict, name: str) -> None:
 def correlation_dedup(ranked: list, active_signals: list) -> list:
     """Section 14 correlation cap: caps concurrent exposure per correlation
     cluster jointly across the base ensemble and the counter-trend engine
-    -- never a separate exempt pool."""
+    -- never a separate exempt pool.
+
+    Also enforces one active signal per symbol: a symbol that already has
+    an active/pending signal is skipped entirely, and if multiple new
+    candidates exist for the same symbol in this batch (e.g. Mean
+    Reversion and Liquidity Sweep both firing on the same asset), only the
+    single highest-scored one is accepted -- `ranked` is already sorted by
+    score descending, so the first candidate seen per symbol is the best."""
     cluster_counts = collections.Counter(correlation_cluster(s["symbol"]) for s in active_signals)
+    symbols_with_active = {s["symbol"] for s in active_signals}
+    symbols_accepted_this_batch = set()
     accepted = []
     for score, grade, c, result in ranked:
         if len(accepted) + len(active_signals) >= MAX_CONCURRENT_ACTIVE_SIGNALS:
             break
+        if c.symbol in symbols_with_active or c.symbol in symbols_accepted_this_batch:
+            continue  # one active signal per symbol -- best-scored candidate wins
         cluster = correlation_cluster(c.symbol)
         if cluster_counts[cluster] >= MAX_CORRELATED_CONCURRENT:
             continue
         cluster_counts[cluster] += 1
+        symbols_accepted_this_batch.add(c.symbol)
         accepted.append((score, grade, c, result))
     return accepted
 
@@ -2768,8 +2780,6 @@ def run_scan(state: dict, candle_cache: dict) -> None:
             fs["dispatched"] += 1
             msg_id = send_telegram(format_signal_message(sig))
             sig["tg_message_id"] = msg_id
-            if sig["entry_filled"]:
-                send_telegram(format_status_message(sig, "activated"), msg_id)
             all_new_signals.append(sig)
             log.info("Dispatched %s %s %s grade=%s score=%.2f", symbol, cand.engine, cand.direction, grade, score)
 
