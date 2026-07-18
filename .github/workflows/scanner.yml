@@ -8,7 +8,8 @@ env:
 
 concurrency:
   group: scalp-swing-scanner
-  cancel-in-progress: false 
+  cancel-in-progress: false   # queue new triggers instead of running in parallel;
+                              # cancelling mid-flight risks a half-written state.json
 
 jobs:
   scan:
@@ -29,18 +30,33 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Sync state files with latest on origin
+        # Must happen BEFORE the scanner runs and touches state.json /
+        # candle_cache.json, while the tree is still clean. Doing this
+        # after the run (as before) meant `git pull --rebase` was always
+        # run against a dirty tree and always failed -- silently, because
+        # of the old `|| true`. That failure meant the cache never
+        # reliably round-tripped, so every run was effectively a cold
+        # start (~20 min of rate-limit pacing alone for 25 symbols),
+        # which is why every run blew past any timeout.
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin ${{ github.ref_name }}
+
       - name: Run signal scanner
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID:   ${{ secrets.TG_CHAT_ID }}
         run: python signal_engine.py
-        
+
       - name: Persist cooldown state
         if: always()
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin ${{ github.ref_name }} || true
-          git add state.json candle_cache.json || true
-          git diff --staged --quiet || git commit -m "chore: update scanner state [skip ci]"
-          git push || true
+          git add state.json candle_cache.json
+          if git diff --staged --quiet; then
+            echo "No state changes to commit."
+          else
+            git commit -m "chore: update scanner state [skip ci]"
+            git push
+          fi
