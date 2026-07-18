@@ -94,8 +94,8 @@ CANDLE_CACHE_PATH = os.environ.get("SOVEREIGN_CANDLE_CACHE_PATH", "candle_cache.
 CANDLE_DELTA_OVERLAP_BARS = 3  # extra closed bars re-fetched past the cached watermark
 
 ENGINE_NAME = "SOVEREIGN"
-ENGINE_VERSION = "1.0.0"
-RESOLUTION_LOGIC_VERSION = "1.0.0"  # Section 11 legacy-data tag; bump on any resolution-logic change
+ENGINE_VERSION = "1.0.1"
+RESOLUTION_LOGIC_VERSION = "1.0.1"  # Section 11 legacy-data tag; bump on any resolution-logic change
 
 # Same watchlist as the reference engines in this project (Section: "use the
 # same watchlist ... unless the prompt's own rules require a change" -- no
@@ -2191,6 +2191,19 @@ def new_signal_record(candidate: Candidate, score: float, grade: str, symbol: st
         "mfe_r": 0.0,
         "resolution_logic_version": RESOLUTION_LOGIC_VERSION,
         "tg_message_id": None,
+        # Seeds the monitor_signal() watermark to the last CLOSED 15m candle
+        # at creation time, minus one extra step. Without this, sig.get(
+        # "_last_checked_t", -1) defaults to -1 and the first monitoring
+        # pass (get_candles returns up to 30 closed candles, ~7.5h of
+        # history) walks every candle in that window, including ones from
+        # BEFORE the signal existed -- any pre-creation wick that happened
+        # to cross the SL/TP level then falsely resolves the signal as an
+        # instant win/loss on the very next run. Subtracting one extra step
+        # (rather than just the last-closed candle's own open time) keeps
+        # that most-recent-closed candle eligible for the first pass, which
+        # is what "same-candle fill allowed" (Section 12) actually means --
+        # not "allow any candle from the signal's whole lookback window."
+        "_last_checked_t": current_bar_open_ms(now_ms, MONITOR_TF) - 2 * TF_MS[MONITOR_TF],
     }
 
 
