@@ -94,8 +94,8 @@ CANDLE_CACHE_PATH = os.environ.get("SOVEREIGN_CANDLE_CACHE_PATH", "candle_cache.
 CANDLE_DELTA_OVERLAP_BARS = 3  # extra closed bars re-fetched past the cached watermark
 
 ENGINE_NAME = "SOVEREIGN"
-ENGINE_VERSION = "1.0.1"
-RESOLUTION_LOGIC_VERSION = "1.0.1"  # Section 11 legacy-data tag; bump on any resolution-logic change
+ENGINE_VERSION = "1.0.3"
+RESOLUTION_LOGIC_VERSION = "1.0.3"  # Section 11 legacy-data tag; bump on any resolution-logic change
 
 # Same watchlist as the reference engines in this project (Section: "use the
 # same watchlist ... unless the prompt's own rules require a change" -- no
@@ -1222,9 +1222,50 @@ def stage4_entry(views: dict, bias: str, poi: Zone) -> StageResult:
 
 MAX_SL_DISTANCE_ATR = 3.0      # hard ceiling on SL distance -- a stop only clearing it by
                                 # escalating further is rejected outright, never accepted at worse RR
-MIN_ENTRY_SL_DISTANCE_ATR = 0.25
+MIN_ENTRY_SL_DISTANCE_ATR = 0.5   # was 0.25 -- too small a multiple of a 15m ATR let stops sit
+                                   # inside ordinary noise; this is a floor, raising it only makes
+                                   # trades harder to qualify, never widens a stop past structure
 MAX_ENTRY_FROM_MARKET_ATR = 1.2  # cap on how far a pending/zone entry may sit from current price
-NOISE_SURVIVAL_FLOOR_ATR = 0.35  # 15m-anchored SL must clear this vs recent adverse wicks
+NOISE_SURVIVAL_FLOOR_ATR = 0.5   # was 0.35 -- 15m-anchored SL must clear this vs recent adverse wicks
+MIN_SL_DISTANCE_PCT = 0.006     # hard floor: risk must be >= 0.6% of entry regardless of ATR.
+                                 # ATR-based floors above can still be tiny in $ terms during quiet
+                                 # periods; this is the belt-and-suspenders guarantee that no
+                                 # signal is ever scalp-tight just because volatility was low when
+                                 # it fired. Raise this further (e.g. 0.01-0.015) for a stricter,
+                                 # more swing-oriented floor -- it only rejects tighter candidates,
+                                 # never loosens a genuinely wider structural stop.
+
+
+def _valid_structural_anchor(direction: str, entry: float, pivots: list) -> Optional[float]:
+    """Most recent opposing pivot that price has NOT already traded
+    through -- the genuine invalidation level the trade thesis depends on.
+
+    Bug fix (v1.0.1 -> v1.0.2): the previous version took the most recent
+    CONFIRMED pivot unconditionally (opp_pivots_15m[-1]), with no check on
+    which side of entry it actually sat. A confirmed pivot lags price by
+    `lookback` bars by construction (Section 4), so on precisely the setups
+    where this matters most -- e.g. Mean Reversion shorting a fresh 1H
+    high -- the last confirmed 15m pivot high is almost always BELOW the
+    current price making that fresh high, because price has already broken
+    above it. Anchoring a short's stop there put the "stop" on the same
+    side of entry as the take-profit: a level that price moving in the
+    PROFITABLE direction would hit, not the adverse direction. That is
+    what produced SL levels below entry on shorts (and above entry on
+    longs) at nonsensically tight distances -- the anchor was already
+    invalidated before the trade was even placed.
+
+    A short's stop anchor must sit above entry; a long's must sit below.
+    We walk backward from most recent and take the first pivot that still
+    satisfies that -- i.e. still-standing structure, not broken structure.
+    """
+    opp_kind = "low" if direction == "bullish" else "high"
+    candidates = [p for p in pivots if p.kind == opp_kind]
+    for p in reversed(candidates):
+        if direction == "bullish" and p.price < entry:
+            return p.price
+        if direction == "bearish" and p.price > entry:
+            return p.price
+    return None
 
 
 def _adaptive_sl_buffer(symbol: str, tf: str, view: View, state: dict) -> float:
@@ -1316,39 +1357,52 @@ def build_risk_plan(direction: str, entry: float, view_15m: View, view_1h: View,
     multiple, RR formula, or percentage target anywhere else in the
     engine. Returns None (reject) on any hard gate failure."""
 
-    # --- SL anchor: 15M primary, escalate to H1/H4 only on noise-survival failure ---
+    # --- SL anchor: 15M primary, escalate to H1/H4 only on noise-survival
+    # failure OR when no still-valid (unbroken) 15m structure exists ---
     anchor_view = view_15m
     anchor_tf = TF_15M
-    opp_pivots_15m = [p for p in view_15m.pivots if p.kind == ("low" if direction == "bullish" else "high")]
-    if not opp_pivots_15m:
-        return None
-    structural_level = opp_pivots_15m[-1].price
-    buffer_15m = _adaptive_sl_buffer(symbol, TF_15M, view_15m, state)
-    sl_15m = structural_level - buffer_15m if direction == "bullish" else structural_level + buffer_15m
-    risk_15m = abs(entry - sl_15m)
+    structural_level = _valid_structural_anchor(direction, entry, view_15m.pivots)
 
-    if risk_15m < view_15m.atr * NOISE_SURVIVAL_FLOOR_ATR:
-        # escalate: 15m stop too tight to survive ordinary wick noise
+    if structural_level is None:
+        # No confirmed 15m pivot is still unbroken relative to entry --
+        # go straight to H1/H4 rather than anchor on a level price has
+        # already traded through (the root cause of backwards/too-tight SLs).
         for tf_view, tf_name in ((view_1h, TF_1H), (view_4h, TF_4H)):
-            opp = [p for p in tf_view.pivots if p.kind == ("low" if direction == "bullish" else "high")]
-            if not opp:
-                continue
-            candidate_struct = opp[-1].price
-            candidate_dist = abs(entry - candidate_struct)
-            if candidate_dist < abs(entry - structural_level) * 4:  # closer of H1/H4, sanity-bounded
+            candidate_struct = _valid_structural_anchor(direction, entry, tf_view.pivots)
+            if candidate_struct is not None:
                 anchor_view, anchor_tf, structural_level = tf_view, tf_name, candidate_struct
                 break
+        if structural_level is None:
+            return None  # no genuine invalidation level on any timeframe -- no real trade here
         buffer_final = _adaptive_sl_buffer(symbol, anchor_tf, anchor_view, state)
         sl = structural_level - buffer_final if direction == "bullish" else structural_level + buffer_final
     else:
-        sl = sl_15m
+        buffer_15m = _adaptive_sl_buffer(symbol, TF_15M, view_15m, state)
+        sl_15m = structural_level - buffer_15m if direction == "bullish" else structural_level + buffer_15m
+        risk_15m = abs(entry - sl_15m)
+
+        if risk_15m < view_15m.atr * NOISE_SURVIVAL_FLOOR_ATR:
+            # escalate: 15m stop too tight to survive ordinary wick noise
+            for tf_view, tf_name in ((view_1h, TF_1H), (view_4h, TF_4H)):
+                candidate_struct = _valid_structural_anchor(direction, entry, tf_view.pivots)
+                if candidate_struct is None:
+                    continue
+                candidate_dist = abs(entry - candidate_struct)
+                if candidate_dist < abs(entry - structural_level) * 4:  # closer of H1/H4, sanity-bounded
+                    anchor_view, anchor_tf, structural_level = tf_view, tf_name, candidate_struct
+                    break
+            buffer_final = _adaptive_sl_buffer(symbol, anchor_tf, anchor_view, state)
+            sl = structural_level - buffer_final if direction == "bullish" else structural_level + buffer_final
+        else:
+            sl = sl_15m
 
     risk = abs(entry - sl)
     if risk <= 0:
         return None
     if risk > view_15m.atr * MAX_SL_DISTANCE_ATR:
         return None  # hard ceiling; a stop only clearing it by escalating further is rejected, never accepted worse
-    if risk < view_15m.atr * MIN_ENTRY_SL_DISTANCE_ATR:
+    min_risk = max(view_15m.atr * MIN_ENTRY_SL_DISTANCE_ATR, entry * MIN_SL_DISTANCE_PCT)
+    if risk < min_risk:
         return None  # entry-placement rule: entry too close to invalidation is noise, not a real trade
 
     # --- entry-placement: prefer entry near current market, cap pending-entry distance ---
@@ -1370,7 +1424,14 @@ def build_risk_plan(direction: str, entry: float, view_15m: View, view_1h: View,
     rr1 = tp1_dist / risk
     if rr1 < rr_min_gate:
         return None  # reject-only gate, never rescued by widening SL/target
-    rr1 = min(rr1, RR_SOFT_TARGET) if rr1 > RR_SOFT_TARGET and rr_min_gate == RR_MIN_GATE else rr1
+    # NOTE (fix v1.0.2): previously clamped rr1 to RR_SOFT_TARGET here. That
+    # only mutated the reported number -- tp1 stayed at its real structural
+    # price -- so the RR shown on the signal card didn't match the RR you'd
+    # compute yourself from entry/SL/TP1. It also fed monitor_signal()'s
+    # r_realized on a win, so the engine's own stats undercounted real wins.
+    # _rr_context_term() already saturates its OWN contribution to the
+    # confidence score at RR_SOFT_TARGET independently, so nothing here
+    # needs a clamp -- rr1 is left as the true, price-consistent value.
 
     tp2 = band.get("tp2")
     # TP ordering integrity: TP2 must sit strictly farther than TP1, guaranteed by construction
@@ -1440,6 +1501,34 @@ def _base_confidence(confluence_count: int, rr1: float, regime: RegimeVector, be
     c += 0.05 if best_fit else -0.05
     c += 0.03 if regime.trend_strength >= 22 else 0.0
     return max(0.05, min(0.95, c))
+
+
+def _retracement_entry(direction: str, m15: View, since_idx: int, fallback: float) -> float:
+    """Shared 'perfect entry' helper (fix v1.0.2 -> v1.0.3): every engine
+    below used to set entry = m15.close, i.e. whatever the last candle
+    happened to print, then fire a market order on it -- no different from
+    the SL/TP anchor bug, just applied to entry instead of risk. This is
+    the same OTE-pocket principle Stage 4 already uses for the SMC engine
+    (fibonacci_ote_refine), generalized: find the impulse leg since the
+    event that triggered this setup (a sweep, a CHoCH, etc.) and place the
+    entry at the 61.8-79% retracement of it, not at whatever price already
+    reached. If the leg is too short/flat to produce a real pocket, falls
+    back to the given price rather than guessing."""
+    leg = m15.candles[max(0, since_idx):]
+    if len(leg) < 2:
+        return fallback
+    impulse_low = min(c["l"] for c in leg)
+    impulse_high = max(c["h"] for c in leg)
+    span = impulse_high - impulse_low
+    if span <= 0:
+        return fallback
+    if direction == "bullish":
+        ote_low = impulse_high - span * 0.79
+        ote_high = impulse_high - span * 0.618
+    else:
+        ote_low = impulse_low + span * 0.618
+        ote_high = impulse_low + span * 0.79
+    return (ote_low + ote_high) / 2.0
 
 
 def run_smc_engine(bias: str, views: dict, stage3: StageResult, stage4: StageResult,
@@ -1512,7 +1601,10 @@ def run_breakout_engine(bias: str, views: dict, regime: RegimeVector,
     vol_confirm = last["v"] > statistics.fmean(c["v"] for c in lookback[:-1]) * 1.15
     if not vol_confirm:
         return None
-    entry = m15.close
+    # Perfect entry: the broken level (old resistance/support) is exactly
+    # where a genuine breakout is expected to hold on a pullback -- enter
+    # there, not by chasing the breakout candle that already ran.
+    entry = range_high if bias == "bullish" else range_low
     plan = build_risk_plan(bias, entry, m15, h1, views[TF_4H], state, symbol)
     if plan is None:
         return None
@@ -1520,8 +1612,8 @@ def run_breakout_engine(bias: str, views: dict, regime: RegimeVector,
     conf = _base_confidence(2, plan["rr1"], regime, best_fit)
     return Candidate(engine="Breakout", direction=bias, entry=plan["entry"], sl=plan["sl"], tp1=plan["tp1"],
                       tp2=plan["tp2"], confidence=conf, rr1=plan["rr1"], rr2=plan["rr2"],
-                      confluences=["1H range breakout", "volume confirmation"],
-                      regime_fit=["expansion", "high_volatility"], style="intraday", entry_kind="market",
+                      confluences=["1H range breakout", "volume confirmation", "retest entry"],
+                      regime_fit=["expansion", "high_volatility"], style="intraday", entry_kind="pending",
                       symbol=symbol, sl_anchor_tf=plan["sl_anchor_tf"])
 
 
@@ -1556,15 +1648,22 @@ def run_liquidity_sweep_engine(bias: str, views: dict, regime: RegimeVector,
     if not pools:
         return None
     pool = sorted(pools, key=lambda p: p.swept_idx or 0)[-1]
-    entry = m15.close
+    # Perfect entry: retrace into the OTE pocket of the impulse leg that
+    # moved away from the sweep, instead of chasing wherever the 15m candle
+    # already closed. The sweep is on the 1H view; convert its timestamp to
+    # the matching 15m index so the impulse leg is measured on 15m detail.
+    sweep_t = h1.candles[pool.swept_idx]["t"] if pool.swept_idx is not None else m15.candles[0]["t"]
+    since_idx = next((i for i, c in enumerate(m15.candles) if c["t"] >= sweep_t), 0)
+    entry = _retracement_entry(bias, m15, since_idx, fallback=m15.close)
     plan = build_risk_plan(bias, entry, m15, h1, views[TF_4H], state, symbol)
     if plan is None:
         return None
     conf = _base_confidence(2 + int(pool.equal), plan["rr1"], regime, best_fit=True)
     return Candidate(engine="Liquidity Sweep", direction=bias, entry=plan["entry"], sl=plan["sl"],
                       tp1=plan["tp1"], tp2=plan["tp2"], confidence=conf, rr1=plan["rr1"], rr2=plan["rr2"],
-                      confluences=["EQH/EQL sweep"] + (["equal-cluster liquidity"] if pool.equal else []),
-                      regime_fit=["reversal", "high_volatility"], style="intraday", entry_kind="market",
+                      confluences=["EQH/EQL sweep"] + (["equal-cluster liquidity"] if pool.equal else [])
+                      + ["OTE retracement entry"],
+                      regime_fit=["reversal", "high_volatility"], style="intraday", entry_kind="pending",
                       symbol=symbol, sl_anchor_tf=plan["sl_anchor_tf"])
 
 
@@ -1643,15 +1742,17 @@ def run_momentum_engine(bias: str, views: dict, regime: RegimeVector,
                 (m15.ema_fast < m15.ema_slow < m15.ema_trend)
     if not (rsi_ok and ema_stack):
         return None
-    entry = m15.close
+    # Perfect entry: buy/sell the pullback to the fast EMA, the standard
+    # momentum-continuation entry -- not wherever price already ran to.
+    entry = m15.ema_fast
     plan = build_risk_plan(bias, entry, m15, h1, views[TF_4H], state, symbol)
     if plan is None:
         return None
     conf = _base_confidence(2, plan["rr1"], regime, best_fit=regime.is_trending())
     return Candidate(engine="Momentum", direction=bias, entry=plan["entry"], sl=plan["sl"], tp1=plan["tp1"],
                       tp2=plan["tp2"], confidence=conf, rr1=plan["rr1"], rr2=plan["rr2"],
-                      confluences=["1H RSI momentum", "15M EMA stack alignment"],
-                      regime_fit=["trending", "expansion"], style="intraday", entry_kind="market",
+                      confluences=["1H RSI momentum", "15M EMA stack alignment", "EMA pullback entry"],
+                      regime_fit=["trending", "expansion"], style="intraday", entry_kind="pending",
                       symbol=symbol, sl_anchor_tf=plan["sl_anchor_tf"])
 
 
@@ -1665,15 +1766,17 @@ def run_reversal_engine(bias: str, views: dict, regime: RegimeVector,
     pools = [p for p in h1.pools if p.kind == wanted_kind and p.swept and p.pure_sfp]
     if not pools:
         return None
-    entry = m15.close
+    # Perfect entry: retrace into the OTE pocket of the impulse leg since
+    # the CHoCH broke, instead of chasing wherever the 15m candle closed.
+    entry = _retracement_entry(bias, m15, choch.idx, fallback=m15.close)
     plan = build_risk_plan(bias, entry, m15, h1, views[TF_4H], state, symbol)
     if plan is None:
         return None
     conf = _base_confidence(2, plan["rr1"], regime, best_fit=True)
     return Candidate(engine="Reversal", direction=bias, entry=plan["entry"], sl=plan["sl"], tp1=plan["tp1"],
                       tp2=plan["tp2"], confidence=conf, rr1=plan["rr1"], rr2=plan["rr2"],
-                      confluences=["1H liquidity sweep", "15M CHoCH"],
-                      regime_fit=["reversal"], style="intraday", entry_kind="market",
+                      confluences=["1H liquidity sweep", "15M CHoCH", "OTE retracement entry"],
+                      regime_fit=["reversal"], style="intraday", entry_kind="pending",
                       symbol=symbol, sl_anchor_tf=plan["sl_anchor_tf"])
 
 
@@ -1688,15 +1791,17 @@ def run_mean_reversion_engine(bias: str, views: dict, regime: RegimeVector,
         return None
     if bias == "bearish" and not (price >= upper * 0.99):
         return None
-    entry = m15.close
+    # Perfect entry: the band extreme IS the setup's thesis -- enter there,
+    # not at whatever price the 15m candle already retraced to.
+    entry = lower if bias == "bullish" else upper
     plan = build_risk_plan(bias, entry, m15, h1, views[TF_4H], state, symbol)
     if plan is None:
         return None
     conf = _base_confidence(1, plan["rr1"], regime, best_fit=not regime.is_trending())
     return Candidate(engine="Mean Reversion", direction=bias, entry=plan["entry"], sl=plan["sl"],
                       tp1=plan["tp1"], tp2=plan["tp2"], confidence=conf, rr1=plan["rr1"], rr2=plan["rr2"],
-                      confluences=["1H Bollinger extreme"],
-                      regime_fit=["ranging", "low_volatility"], style="intraday", entry_kind="market",
+                      confluences=["1H Bollinger extreme", "band-level entry"],
+                      regime_fit=["ranging", "low_volatility"], style="intraday", entry_kind="pending",
                       symbol=symbol, sl_anchor_tf=plan["sl_anchor_tf"])
 
 
@@ -1718,15 +1823,17 @@ def run_range_trading_engine(bias: str, views: dict, regime: RegimeVector,
         return None
     if bias == "bearish" and not near_high:
         return None
-    entry = m15.close
+    # Perfect entry: the range boundary itself is the setup's thesis --
+    # enter there, not wherever price already drifted to within the 15% zone.
+    entry = range_low if bias == "bullish" else range_high
     plan = build_risk_plan(bias, entry, m15, h1, views[TF_4H], state, symbol)
     if plan is None:
         return None
     conf = _base_confidence(1, plan["rr1"], regime, best_fit=not regime.is_trending())
     return Candidate(engine="Range Trading", direction=bias, entry=plan["entry"], sl=plan["sl"],
                       tp1=plan["tp1"], tp2=plan["tp2"], confidence=conf, rr1=plan["rr1"], rr2=plan["rr2"],
-                      confluences=["range extreme rejection"],
-                      regime_fit=["ranging", "consolidation"], style="intraday", entry_kind="market",
+                      confluences=["range extreme rejection", "range-boundary entry"],
+                      regime_fit=["ranging", "consolidation"], style="intraday", entry_kind="pending",
                       symbol=symbol, sl_anchor_tf=plan["sl_anchor_tf"])
 
 
@@ -1746,15 +1853,18 @@ def run_volatility_expansion_engine(bias: str, views: dict, regime: RegimeVector
     breaking_out = (h1.close > upper) if bias == "bullish" else (h1.close < lower)
     if not (was_squeezed and breaking_out):
         return None
-    entry = m15.close
+    # Perfect entry: the band edge that was just broken out of is exactly
+    # where a genuine expansion is expected to hold on a retest -- enter
+    # there, not by chasing the candle that already broke out.
+    entry = upper if bias == "bullish" else lower
     plan = build_risk_plan(bias, entry, m15, h1, views[TF_4H], state, symbol)
     if plan is None:
         return None
     conf = _base_confidence(2, plan["rr1"], regime, best_fit=regime.is_high_vol())
     return Candidate(engine="Volatility Expansion", direction=bias, entry=plan["entry"], sl=plan["sl"],
                       tp1=plan["tp1"], tp2=plan["tp2"], confidence=conf, rr1=plan["rr1"], rr2=plan["rr2"],
-                      confluences=["Bollinger squeeze release"],
-                      regime_fit=["expansion", "high_volatility"], style="intraday", entry_kind="market",
+                      confluences=["Bollinger squeeze release", "band-retest entry"],
+                      regime_fit=["expansion", "high_volatility"], style="intraday", entry_kind="pending",
                       symbol=symbol, sl_anchor_tf=plan["sl_anchor_tf"])
 
 
