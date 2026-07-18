@@ -9,24 +9,61 @@
     "sl_buffer_percentile": {},
     "tp1_rank_preference": {},
     "regime_fit_discount": {},
-    "segment_stats": {},
-    "calibration_buckets": {},
-    "forensic_counts": {},
+    "segment_stats": {
+      "BTC|range|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 1.7184154175588597
+      },
+      "SOL|trend|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 2.0
+      },
+      "TAO|range|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
+      }
+    },
+    "calibration_buckets": {
+      "Mean Reversion|A": {
+        "n": 1,
+        "wins": 1,
+        "sum_conf": 0.751798511953035
+      },
+      "Liquidity Sweep|A+": {
+        "n": 1,
+        "wins": 1,
+        "sum_conf": 0.8012174422064466
+      },
+      "Mean Reversion|A+": {
+        "n": 1,
+        "wins": 0,
+        "sum_conf": 0.8628585480082248
+      }
+    },
+    "forensic_counts": {
+      "genuine_variance": 1
+    },
     "fill_stats": {
       "Mean Reversion|market": {
-        "dispatched": 2,
-        "filled": 0,
+        "dispatched": 3,
+        "filled": 2,
         "expired": 0
       },
       "Liquidity Sweep|market": {
         "dispatched": 1,
-        "filled": 0,
+        "filled": 1,
         "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 5,
+        "seen": 7,
         "rejected": 0
       }
     },
@@ -42,23 +79,105 @@
       "2026-07-18": "sent"
     }
   },
-  "tier2_trades": [],
-  "active_signals": [
+  "tier2_trades": [
     {
       "id": "BTC-Mean Reversion-1784390831881",
       "symbol": "BTC",
       "engine": "Mean Reversion",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "market",
       "entry": 64104.0,
       "sl": 64197.4,
       "tp1": 63943.5,
       "tp2": 63943.0,
-      "rr1": 1.7184154175588597,
-      "rr2": 1.7237687366166754,
+      "r_realized": 1.7184154175588597,
+      "mae_r": 0.0,
+      "mfe_r": 1.9271948608136744,
+      "forensic_category": "genuine_variance",
       "confidence": 0.751798511953035,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 10.56984694063911,
+        "volatility_pctl": 0.8333333333333334,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1784366100000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "market",
+      "resolution_logic_version": "1.0.0"
+    },
+    {
+      "id": "SOL-Liquidity Sweep-1784390831881",
+      "symbol": "SOL",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 74.934,
+      "sl": 75.00079999999998,
+      "tp1": 74.726,
+      "tp2": 74.717,
+      "r_realized": 2.0,
+      "mae_r": 0.4491017964072939,
+      "mfe_r": 4.2814371257493935,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8012174422064466,
+      "grade": "A+",
+      "regime_at_entry": {
+        "trend_strength": 23.131470755529968,
+        "volatility_pctl": 2.5,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1784366100000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "market",
+      "resolution_logic_version": "1.0.0"
+    },
+    {
+      "id": "TAO-Mean Reversion-1784390831881",
+      "symbol": "TAO",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 193.5,
+      "sl": 193.697,
+      "tp1": 192.75,
+      "tp2": 192.72,
+      "r_realized": -1.0,
+      "mae_r": 1.8274111675127342,
+      "mfe_r": 0.5076142131979337,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8628585480082248,
+      "grade": "A+",
+      "regime_at_entry": {
+        "trend_strength": 17.87914913391041,
+        "volatility_pctl": 2.5,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1784365200000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "market",
+      "resolution_logic_version": "1.0.0"
+    }
+  ],
+  "active_signals": [
+    {
+      "id": "BTC-Mean Reversion-1784392301267",
+      "symbol": "BTC",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "market",
+      "entry": 64122.0,
+      "sl": 64198.0,
+      "tp1": 63943.5,
+      "tp2": 63943.0,
+      "rr1": 2.0,
+      "rr2": 2.3552631578947367,
+      "confidence": 0.7914181857609954,
       "grade": "A",
       "confluences": [
         "1H Bollinger extreme"
@@ -72,84 +191,14 @@
       "entry_filled": true,
       "pending_bars": 0,
       "status": "active",
-      "created_ts": 1784390831881,
-      "filled_ts": 1784390831881,
+      "created_ts": 1784392301267,
+      "filled_ts": 1784392301267,
       "mae_r": 0.0,
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.0",
-      "tg_message_id": 3877
-    },
-    {
-      "id": "SOL-Liquidity Sweep-1784390831881",
-      "symbol": "SOL",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "market",
-      "entry": 74.934,
-      "sl": 75.00079999999998,
-      "tp1": 74.726,
-      "tp2": 74.717,
-      "rr1": 2.0,
-      "rr2": 3.2485029940126173,
-      "confidence": 0.8012174422064466,
-      "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 23.131470755529968,
-        "volatility_pctl": 2.5,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1784390831881,
-      "filled_ts": 1784390831881,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.0",
-      "tg_message_id": 3878
-    },
-    {
-      "id": "TAO-Mean Reversion-1784390831881",
-      "symbol": "TAO",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "market",
-      "entry": 193.5,
-      "sl": 193.697,
-      "tp1": 192.75,
-      "tp2": 192.72,
-      "rr1": 2.0,
-      "rr2": 3.9593908629441135,
-      "confidence": 0.8628585480082248,
-      "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 17.87914913391041,
-        "volatility_pctl": 2.5,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1784390831881,
-      "filled_ts": 1784390831881,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.0",
-      "tg_message_id": 3879
+      "tg_message_id": 3884
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784390831881
+  "last_run_ts": 1784392301267
 }
