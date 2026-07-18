@@ -94,8 +94,8 @@ CANDLE_CACHE_PATH = os.environ.get("SOVEREIGN_CANDLE_CACHE_PATH", "candle_cache.
 CANDLE_DELTA_OVERLAP_BARS = 3  # extra closed bars re-fetched past the cached watermark
 
 ENGINE_NAME = "SOVEREIGN"
-ENGINE_VERSION = "1.0.3"
-RESOLUTION_LOGIC_VERSION = "1.0.3"  # Section 11 legacy-data tag; bump on any resolution-logic change
+ENGINE_VERSION = "1.0.4"
+RESOLUTION_LOGIC_VERSION = "1.0.4"  # Section 11 legacy-data tag; bump on any resolution-logic change
 
 # Same watchlist as the reference engines in this project (Section: "use the
 # same watchlist ... unless the prompt's own rules require a change" -- no
@@ -1277,6 +1277,42 @@ def _valid_structural_anchor(direction: str, entry: float, pivots: list) -> Opti
     return None
 
 
+def _liquidity_extension_buffer(direction: str, sl: float, view: View) -> float:
+    """Second, distinct layer of SL safety on top of _adaptive_sl_buffer's
+    generic noise cushion. A deliberate liquidity-grab wick isn't ordinary
+    noise -- it's aimed at a specific, known cluster of resting stops (an
+    EQH/EQL pool the engine already detects via liquidity_pools/mark_sweeps).
+    If an unswept opposing pool sits between the raw SL and where a hunt
+    would actually reach, the SL is parked in FRONT of the real target: the
+    hunt tags it on the way to the pool, before the reversal that was the
+    whole thesis. This pushes the SL just past the farthest such pool
+    within a bounded window instead, so the stop only triggers on a
+    genuine break of the level smart money was actually going for -- not
+    the hunt that precedes the reversal. Bounded by `view.atr * 1.5` so a
+    distant pool doesn't quietly balloon the stop; if extending past a pool
+    would blow the MAX_SL_DISTANCE ceilings, build_risk_plan's existing
+    ceiling checks reject the trade rather than accept a stop that's still
+    sitting in the hunt's way."""
+    wanted_kind = "SSL" if direction == "bullish" else "BSL"
+    window = view.atr * 1.5
+    if direction == "bullish":
+        nearby = [p for p in view.pools if p.kind == wanted_kind and not p.swept
+                  and sl - window <= p.price <= sl]
+        if not nearby:
+            return sl
+        target = min(nearby, key=lambda p: p.price)
+        cushion = max(view.atr * 0.08, target.price * 0.001)
+        return target.price - cushion
+    else:
+        nearby = [p for p in view.pools if p.kind == wanted_kind and not p.swept
+                  and sl <= p.price <= sl + window]
+        if not nearby:
+            return sl
+        target = max(nearby, key=lambda p: p.price)
+        cushion = max(view.atr * 0.08, target.price * 0.001)
+        return target.price + cushion
+
+
 def _adaptive_sl_buffer(symbol: str, tf: str, view: View, state: dict) -> float:
     """Nth percentile of recent adverse-wick excursions beyond structure,
     where N is itself a bounded, dampened adaptive parameter (Section 5),
@@ -1360,11 +1396,12 @@ def _tp_selection_band(direction: str, entry: float, sl: float, view: View,
 def build_risk_plan(direction: str, entry: float, view_15m: View, view_1h: View, view_4h: View,
                      state: dict, symbol: str, rr_min_gate: float = RR_MIN_GATE) -> Optional[dict]:
     """The single mandatory risk-plan construction (Section 10 Reference
-    Implementation) -- SL-anchor hierarchy, adaptive-percentile buffer,
-    confluence-ranked/liquidity-wall-clipped TP, RR floor, TP-ordering
-    integrity, entry-placement rules. Fully replaces any fixed ATR
-    multiple, RR formula, or percentage target anywhere else in the
-    engine. Returns None (reject) on any hard gate failure."""
+    Implementation) -- SL-anchor hierarchy, adaptive-percentile noise
+    buffer, liquidity-grab extension buffer, confluence-ranked/liquidity-
+    wall-clipped TP, RR floor+ceiling, TP-ordering integrity, entry-
+    placement rules. Fully replaces any fixed ATR multiple, RR formula, or
+    percentage target anywhere else in the engine. Returns None (reject) on
+    any hard gate failure."""
 
     # --- SL anchor: 15M primary, escalate to H1/H4 only on noise-survival
     # failure OR when no still-valid (unbroken) 15m structure exists ---
@@ -1404,6 +1441,11 @@ def build_risk_plan(direction: str, entry: float, view_15m: View, view_1h: View,
             sl = structural_level - buffer_final if direction == "bullish" else structural_level + buffer_final
         else:
             sl = sl_15m
+
+    # Liquidity-grab layer, distinct from the generic noise buffer above:
+    # push SL past any known unswept opposing pool a hunt would actually
+    # target, not just past raw structure (see _liquidity_extension_buffer).
+    sl = _liquidity_extension_buffer(direction, sl, anchor_view)
 
     risk = abs(entry - sl)
     if risk <= 0:
