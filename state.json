@@ -1,1 +1,33 @@
-{}
+{
+  "schema_version": 1,
+  "resolution_logic_version": "1.0.4",
+  "tier1": {
+    "engine_weights": {},
+    "combo_weights": {},
+    "confidence_calibration": {},
+    "filter_thresholds": {},
+    "sl_buffer_percentile": {},
+    "tp1_rank_preference": {},
+    "regime_fit_discount": {},
+    "segment_stats": {},
+    "calibration_buckets": {},
+    "forensic_counts": {},
+    "fill_stats": {},
+    "filter_funnel": {},
+    "circuit_breaker": {
+      "tripped": false,
+      "tripped_ts": null,
+      "reason": null
+    },
+    "governor": {
+      "last_adjust_ts": 0
+    },
+    "daily_totals": {
+      "2026-07-18": "sent"
+    }
+  },
+  "tier2_trades": [],
+  "active_signals": [],
+  "macro_events": [],
+  "last_run_ts": 1784395915480
+}
