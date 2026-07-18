@@ -77,10 +77,10 @@
       "created_ts": 1784400328218,
       "filled_ts": 1784405700000,
       "mae_r": 0.01864734025239122,
-      "mfe_r": 2.0349239662565,
+      "mfe_r": 2.3179066115276465,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 3921,
-      "_last_checked_t": 1784414700000
+      "_last_checked_t": 1784415600000
     },
     {
       "id": "ADA-Liquidity Sweep-1784408524246",
@@ -113,13 +113,13 @@
       "status": "active",
       "created_ts": 1784408524246,
       "filled_ts": 1784408400000,
-      "mae_r": 0.5935179246948792,
+      "mae_r": 0.7515266430582885,
       "mfe_r": 0.5032484733569862,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 3925,
-      "_last_checked_t": 1784414700000
+      "_last_checked_t": 1784415600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784415726111
+  "last_run_ts": 1784416568722
 }
