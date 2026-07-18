@@ -1517,6 +1517,159 @@ def _base_candidate_from_gate(engine_name: str, gate: GatedSetup, views: Dict[st
 
 
 # =============================================================================
+# SECTION 10B -- COUNTER-TREND REVERSAL SEQUENCE
+# =============================================================================
+# A deliberate, documented exception to Stage 1's "nothing downstream is
+# evaluated against a level that fights the bias" rule (spec doc,
+# Zone-Selection Sequence step 1). This is a genuinely separate top-down
+# path from run_mandatory_topdown, not a variant of it:
+#   Stage 1 (HTF location)      -> _htf_opposing_location
+#   Stage 2 (momentum exhaustion) -> _momentum_exhaustion_score
+#   Stage 3-4 (MSS + retest)    -> the *same* zone_selection_sequence /
+#                                   stage4_entry_trigger machinery the
+#                                   trend-aligned path uses, since that
+#                                   logic is direction-agnostic
+# Every candidate this path produces is tagged meta["counter_trend"]=True
+# so Section 13 scoring and Section 15 forensics can treat it as its own
+# population -- confidence is capped below every trend-aligned engine, and
+# it must never be blended into trend-aligned segment_stats.
+
+COUNTER_TREND_LOCATION_TOL_ATR = 0.75   # how close to an HTF POI counts as "at" it
+MOMENTUM_EXHAUSTION_MIN_SCORE = 0.5     # continuous gate threshold, not a point stack
+
+
+@dataclass
+class CounterTrendSetup(GatedSetup):
+    htf_location: Dict[str, Any] = field(default_factory=dict)
+    momentum_score: float = 0.0
+
+
+def _htf_opposing_location(direction: str, weekly: TFView, daily: TFView) -> Optional[Dict[str, Any]]:
+    """Step 1: is price actually sitting at a higher-timeframe location that
+    opposes the prevailing bias -- an unmitigated weekly/daily OB/breaker/
+    FVG in `direction`, a swept weekly/daily EQH/EQL pool in `direction`, or
+    a major weekly/daily swing pivot -- rather than "in the middle of a
+    selloff" with no HTF reason to expect a reaction."""
+    price = daily.candles[-1].c
+    atr_val = daily.atr[-1] if daily.atr else 0.0
+    tol = atr_val * COUNTER_TREND_LOCATION_TOL_ATR if atr_val else price * 0.01
+
+    for tf_name, view in (("Weekly", weekly), ("Daily", daily)):
+        for z in (view.order_blocks + view.breaker_blocks + view.fvgs):
+            if z.direction != direction or z.mitigated:
+                continue
+            lo, hi = min(z.top, z.bottom) - tol, max(z.top, z.bottom) + tol
+            if lo <= price <= hi:
+                return {"kind": f"{tf_name} {z.kind}", "level": (z.top + z.bottom) / 2.0, "zone": z}
+
+        pools = view.eq_lows if direction == "bullish" else view.eq_highs
+        for p in pools:
+            if not p.swept:
+                continue
+            if abs(price - p.level) <= tol:
+                return {"kind": f"{tf_name} swept {'EQL' if direction == 'bullish' else 'EQH'}",
+                        "level": p.level, "pool": p}
+
+    # fall back to the single nearest major weekly/daily swing pivot
+    kind = "low" if direction == "bullish" else "high"
+    candidates = [p for p in (weekly.pivots + daily.pivots) if p.kind == kind and abs(price - p.price) <= tol]
+    if candidates:
+        best = min(candidates, key=lambda p: abs(price - p.price))
+        return {"kind": f"Major swing {kind}", "level": best.price, "pivot": best}
+
+    return None  # not at a qualifying location -- "don't buy mid-selloff"
+
+
+def _momentum_exhaustion_score(direction: str, h4: TFView) -> float:
+    """Step 2: continuous 0..1 read of whether the prevailing pressure is
+    fading -- shrinking opposing-candle bodies, lengthening rejection wicks,
+    failure to extend the prior significant swing, and (lightly-weighted,
+    "optional confirmation" per the walkthrough) RSI divergence. Weighted
+    blend, never a discrete checklist."""
+    candles = h4.candles[-8:]
+    if len(candles) < 4:
+        return 0.0
+
+    def body(c): return abs(c.c - c.o)
+    def is_opposing(c): return (c.c < c.o) if direction == "bullish" else (c.c > c.o)
+    def rejection_wick(c):
+        return (min(c.o, c.c) - c.l) if direction == "bullish" else (c.h - max(c.o, c.c))
+
+    opposing = [c for c in candles if is_opposing(c)] or candles
+    bodies = [body(c) for c in opposing]
+    body_shrink = 0.0
+    if len(bodies) >= 3:
+        mid = len(bodies) // 2
+        first_avg = sum(bodies[:mid]) / mid
+        second_avg = sum(bodies[mid:]) / (len(bodies) - mid)
+        if first_avg > 1e-12:
+            body_shrink = clamp(1.0 - second_avg / first_avg, 0.0, 1.0)
+
+    wick_scores = [clamp(rejection_wick(c) / max(body(c), 1e-9), 0.0, 2.0) / 2.0 for c in candles[-3:]]
+    wick_rejection = sum(wick_scores) / len(wick_scores) if wick_scores else 0.0
+
+    pivot_kind = "low" if direction == "bullish" else "high"
+    pivots = [p for p in h4.pivots if p.kind == pivot_kind]
+    no_new_extreme = 0.0
+    if len(pivots) >= 2:
+        last, prior = pivots[-1], pivots[-2]
+        held = (last.price >= prior.price) if direction == "bullish" else (last.price <= prior.price)
+        no_new_extreme = 1.0 if held else 0.0
+
+    divergence = 0.0
+    if len(pivots) >= 2 and h4.rsi:
+        last, prior = pivots[-1], pivots[-2]
+        if 0 <= last.idx < len(h4.rsi) and 0 <= prior.idx < len(h4.rsi):
+            r_last, r_prior = h4.rsi[last.idx], h4.rsi[prior.idx]
+            price_extended = (last.price < prior.price) if direction == "bullish" else (last.price > prior.price)
+            rsi_reversed = (r_last > r_prior) if direction == "bullish" else (r_last < r_prior)
+            divergence = 1.0 if (price_extended and rsi_reversed) else 0.0
+
+    return clamp(0.30 * body_shrink + 0.30 * wick_rejection + 0.30 * no_new_extreme + 0.10 * divergence, 0.0, 1.0)
+
+
+def run_counter_trend_topdown(symbol: str, views: Dict[str, TFView], regime: RegimeVector,
+                               state: dict) -> Optional[CounterTrendSetup]:
+    """Independent counter-trend gate. Never contingent on
+    run_mandatory_topdown succeeding or failing -- it has its own Stage 1/2
+    and reuses the trend-aligned path's Stage 3/4 machinery directly."""
+    weekly, daily, h4, h1, m15 = (views.get(TF_WEEKLY), views.get(TF_DAILY),
+                                    views.get(TF_H4), views.get(TF_H1), views.get(TF_M15))
+    if not all([weekly, daily, h4, h1, m15]):
+        return None
+
+    bias = stage1_market_bias(weekly, daily)
+    if bias == "Neutral":
+        return None  # no established trend to fade
+
+    direction = "bearish" if bias == "Bullish" else "bullish"  # always OPPOSITE the bias
+
+    location = _htf_opposing_location(direction, weekly, daily)
+    if location is None:
+        return None
+
+    momentum = _momentum_exhaustion_score(direction, h4)
+    if momentum < MOMENTUM_EXHAUSTION_MIN_SCORE:
+        return None
+
+    # Stages 3-4: same Zone-Selection Sequence + entry trigger the
+    # trend-aligned path uses -- MSS/retest logic doesn't know or care
+    # which side is "the trend".
+    seq = zone_selection_sequence(direction, h1, h1)
+    if seq is None:
+        return None
+    pseudo_bias = "Bullish" if direction == "bullish" else "Bearish"
+    entry_info = stage4_entry_trigger(pseudo_bias, seq, m15)
+    if entry_info is None:
+        return None
+
+    return CounterTrendSetup(symbol=symbol, bias=bias, direction=direction, seq=seq,
+                              entry_info=entry_info, regime=regime,
+                              htf_location=location, momentum_score=momentum)
+
+
+
+# =============================================================================
 # SECTION 11 -- SPECIALIZED ENGINE ENSEMBLE (Section 4)
 # =============================================================================
 # Every engine shares the mandatory top-down gate (Section 7/10 above) and
@@ -1704,20 +1857,64 @@ SPECIALIZED_ENGINES = [
 ]
 
 
+def engine_counter_trend_reversal(gate: CounterTrendSetup, views: Dict[str, TFView],
+                                   state: dict) -> Optional[Candidate]:
+    """Only reachable via run_counter_trend_topdown -- direction here is
+    always opposite the prevailing Weekly/Daily bias. Confidence starts
+    capped well below every trend-aligned engine (0.30-0.45 vs 0.5-0.55+)
+    and scales with how strong the exhaustion read was, never a flat
+    constant, since "some boxes checked" isn't "strong exhaustion"."""
+    base_conf = 0.30 + 0.15 * gate.momentum_score
+
+    cand = _base_candidate_from_gate(
+        "Counter-Trend Reversal", gate, views, state,
+        extra_confluences=[f"HTF location: {gate.htf_location['kind']}",
+                            f"Momentum exhaustion {gate.momentum_score:.2f}"],
+        base_conf=base_conf,
+        best_fit_regimes=["Reversal"],
+    )
+    if cand is None:
+        return None
+    # tagged so Section 13 scoring and Section 15 forensics treat this as
+    # its own population -- never blended into trend-aligned segment stats
+    cand.meta["counter_trend"] = True
+    cand.meta["htf_bias"] = gate.bias
+    cand.meta["momentum_exhaustion_score"] = gate.momentum_score
+    return cand
+
+
+COUNTER_TREND_ENGINES = [engine_counter_trend_reversal]
+
+
 def run_specialized_engines(symbol: str, views: Dict[str, TFView], regime: RegimeVector,
                              state: dict) -> List[Candidate]:
-    gate = run_mandatory_topdown(symbol, views, regime)
-    if gate is None:
-        return []
     out: List[Candidate] = []
-    for engine_fn in SPECIALIZED_ENGINES:
-        try:
-            cand = engine_fn(gate, views, state)
-        except Exception:
-            log.exception("Engine %s raised on %s", engine_fn.__name__, symbol)
-            cand = None
-        if cand is not None:
-            out.append(cand)
+
+    gate = run_mandatory_topdown(symbol, views, regime)
+    if gate is not None:
+        for engine_fn in SPECIALIZED_ENGINES:
+            try:
+                cand = engine_fn(gate, views, state)
+            except Exception:
+                log.exception("Engine %s raised on %s", engine_fn.__name__, symbol)
+                cand = None
+            if cand is not None:
+                out.append(cand)
+
+    # Counter-trend path runs independently of the block above -- it has its
+    # own top-down gate (opposing HTF location + momentum exhaustion) and is
+    # never contingent on the trend-aligned gate succeeding or failing.
+    ct_gate = run_counter_trend_topdown(symbol, views, regime, state)
+    if ct_gate is not None:
+        for engine_fn in COUNTER_TREND_ENGINES:
+            try:
+                cand = engine_fn(ct_gate, views, state)
+            except Exception:
+                log.exception("Engine %s raised on %s", engine_fn.__name__, symbol)
+                cand = None
+            if cand is not None:
+                out.append(cand)
+
     return out
 
 
@@ -1731,7 +1928,11 @@ def default_state() -> dict:
         "resolution_logic_version": RESOLUTION_LOGIC_VERSION,
         "tier1": {
             # adaptive parameters -- every one bounded + dampened, none hardcoded elsewhere
-            "engine_weights": {e.__name__: 1.0 for e in SPECIALIZED_ENGINES},
+            "engine_weights": {e.__name__: 1.0 for e in SPECIALIZED_ENGINES + COUNTER_TREND_ENGINES},
+            "counter_trend_penalty_weight": 0.5,  # bounded [0.2, 0.8]; Section 15 should
+                                                    # adapt this once counter-trend has its
+                                                    # own live sample, same as every other
+                                                    # adaptive parameter -- starts fixed
             "confidence_calibration": {},       # key: "{engine}:{bucket}" -> multiplicative adj, default 1.0
             "regime_fit_discount": {},          # key: "{engine}:{regime_label}" -> 0..1 multiplier, default 1.0
             "sl_buffer_percentile": {},         # key: "{asset}:{tf}" -> float, default 65.0
@@ -1962,17 +2163,28 @@ def score_candidate(candidate: Candidate, regime: RegimeVector, state: dict,
     ev_input = clamp((candidate.plan.rr1 - RR_MIN_GATE) / (RR_TP1_SOFT_CEIL - RR_MIN_GATE + 1e-9), 0.0, 1.5)
     confluence_input = clamp(len(candidate.confluences) / 6.0, 0.0, 1.0)
 
+    # Counter-trend candidates did NOT pass Stage1/2 MTF agreement -- by
+    # construction their LTF direction opposes HTF bias, so they must not
+    # be credited with the flat mtf_alignment bonus every trend-aligned
+    # candidate earns, and instead take an explicit, separately-tracked
+    # discount so Section 15 can measure whether the discount is calibrated
+    # correctly against this engine's own live win rate.
+    is_counter_trend = bool(candidate.meta.get("counter_trend"))
+    mtf_alignment_input = 0.0 if is_counter_trend else 1.0
+    ct_penalty_w = state["tier1"].get("counter_trend_penalty_weight", 0.5)
+
     CAP = 1.2  # per-term hard cap on weight*value contribution (Section 4 mandatory)
     terms = {
         "confidence": _term(conf_input, 1.0, CAP),
         "regime_fit": _term(regime_fit * regime_discount, 0.9, CAP),
-        "mtf_alignment": _term(1.0, mtf_w, CAP),   # candidate already passed Stage1/2 MTF agreement
+        "mtf_alignment": _term(mtf_alignment_input, mtf_w, CAP),
         "confluence": _term(confluence_input, 0.6, CAP),
         "segment_perf": _term(seg_perf, 0.5, CAP),
         "ev_rr": _term(ev_input, 0.35, CAP),       # RR informs, never dominates win-probability
         "session_open": _term(candidate.session_anchored and gate_session_bonus(regime) or 0.0,
                                session_w, CAP),
         "engine_weight": _term(engine_weight - 1.0, 0.4, CAP),
+        "counter_trend_discount": _term(1.0 if is_counter_trend else 0.0, -ct_penalty_w, CAP),
     }
     z = sum(terms.values())
     score = _logistic(z)
