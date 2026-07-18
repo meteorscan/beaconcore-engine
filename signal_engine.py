@@ -2546,14 +2546,15 @@ def format_signal_message(sig: dict) -> str:
     """Section 17: clean, deliberately laid-out card. Entry/SL/TP1/TP2 each
     individually copy-paste-friendly monospace, no underscores anywhere,
     TP2 clearly labeled as suggestion-only."""
-    direction_label = "LONG" if sig["direction"] == "bullish" else "SHORT"
+    is_long = sig["direction"] == "bullish"
+    direction_label = f"{'🟢' if is_long else '🔴'} {'LONG' if is_long else 'SHORT'}"
     engine_label = human_label(sig["engine"])
     style_label = human_label(sig["style"])
     ct_badge = "\n⚠️ *COUNTER-TREND* — against the Weekly/Daily bias" if sig["counter_trend"] else ""
     confluences = ", ".join(human_label(x) for x in sig["confluences"])
     lines = [
         f"*{ENGINE_NAME} v{ENGINE_VERSION}*",
-        f"*{engine_label}* — {direction_label} {sig['symbol']}{ct_badge}",
+        f"{direction_label} {sig['symbol']} — *{engine_label}*{ct_badge}",
         "",
         f"Style: {style_label}   Grade: {sig['grade']}   Confidence: {sig['confidence']*100:.0f}%",
         f"Entry type: {human_label(sig['entry_kind'])}",
@@ -2565,9 +2566,6 @@ def format_signal_message(sig: dict) -> str:
         "",
         f"RR to TP1: {sig['rr1']:.2f}   RR to TP2 (suggested): {sig['rr2']:.2f}",
         f"Confluences: {confluences}",
-        "",
-        "TP1 is this signal's sole resolving target. The original SL is never",
-        "auto-moved after TP1 -- it stays exactly as shown for the internal record.",
     ]
     return "\n".join(lines)
 
