@@ -97,16 +97,6 @@ ENGINE_NAME = "SOVEREIGN"
 ENGINE_VERSION = "1.0.0"
 RESOLUTION_LOGIC_VERSION = "1.0.0"  # Section 11 legacy-data tag; bump on any resolution-logic change
 
-# Soft internal wall-clock budget for a single run, checked at every
-# checkpoint in run_scan(). Must stay comfortably below the GitHub Actions
-# job's `timeout-minutes` -- if the scan is still running past this, it
-# stops taking on new work and returns immediately so save_state()/
-# save_candle_cache() and the git-persist step still get to run before the
-# job is killed. A run that gets hard-killed by the CI timeout never
-# reaches the `finally` block in main(), so anything dispatched via
-# Telegram during that run would otherwise never make it into state.json.
-SOFT_RUN_DEADLINE_S = float(os.environ.get("SOVEREIGN_SOFT_DEADLINE_S", "420"))  # 7 min
-
 # Same watchlist as the reference engines in this project (Section: "use the
 # same watchlist ... unless the prompt's own rules require a change" -- no
 # rule here requires a change).
@@ -2705,10 +2695,9 @@ def scan_symbol(symbol: str, candle_cache: dict, state: dict, now_ms: int) -> li
     return {"symbol": symbol, "views": views, "stage1": stage1, "stage3": stage3, "stage4": stage4}
 
 
-def run_scan(state: dict, candle_cache: dict, deadline: Optional[float] = None) -> None:
+def run_scan(state: dict, candle_cache: dict) -> None:
     now_ms = utcnow_ms()
     active = state["active_signals"]
-    deadline = deadline if deadline is not None else (time.monotonic() + SOFT_RUN_DEADLINE_S)
     t_start = time.monotonic()
 
     n_cached_symbols = len(candle_cache)
@@ -2720,12 +2709,7 @@ def run_scan(state: dict, candle_cache: dict, deadline: Optional[float] = None) 
 
     # --- 1. monitor every currently active/pending signal first -----------
     still_active = []
-    for i, sig in enumerate(active):
-        if time.monotonic() > deadline:
-            log.warning("Soft deadline hit while monitoring active signals (%d/%d done); "
-                        "deferring the rest to next run.", i, len(active))
-            still_active.extend(active[i:])
-            break
+    for sig in active:
         symbol = sig["symbol"]
         m_candles = get_candles(symbol, MONITOR_TF, 30, now_ms,
                                  candle_cache.get(symbol, {}).get(MONITOR_TF))
@@ -2765,35 +2749,25 @@ def run_scan(state: dict, candle_cache: dict, deadline: Optional[float] = None) 
     # --- 2. scan every watchlist asset (bounded thread pool) --------------
     views_by_symbol_1h = {}
     scan_results = {}
-    if time.monotonic() > deadline:
-        log.warning("Soft deadline already hit after monitoring active signals; "
-                    "skipping new-signal scan this run, will pick up next cycle.")
-    else:
-        log.info("Scan phase starting: %d symbols, 6 worker threads.", len(WATCHLIST))
-        n_done = 0
-        with ThreadPoolExecutor(max_workers=6) as pool:
-            futures = {pool.submit(scan_symbol, sym, candle_cache, state, now_ms): sym for sym in WATCHLIST}
-            for fut in as_completed(futures):
-                if time.monotonic() > deadline:
-                    log.warning("Soft deadline hit mid-scan (%d/%d symbols done); "
-                                "cancelling remaining symbol scans.", n_done, len(WATCHLIST))
-                    for f in futures:
-                        f.cancel()
-                    break
-                sym = futures[fut]
-                try:
-                    result = fut.result()
-                except Exception as e:  # noqa: BLE001 -- never let one symbol's failure kill the run
-                    log.error("scan_symbol failed for %s: %s", sym, e)
-                    result = []
-                n_done += 1
-                log.info("  [%d/%d] %s scanned (%.1fs elapsed)", n_done, len(WATCHLIST), sym,
-                          time.monotonic() - t_start)
-                if result:
-                    scan_results[sym] = result
-                    views_by_symbol_1h[sym] = result["views"][TF_1H]
-        log.info("Scan phase done (%.1fs elapsed): %d/%d symbols produced usable data.",
-                  time.monotonic() - t_start, len(scan_results), len(WATCHLIST))
+    log.info("Scan phase starting: %d symbols, 6 worker threads.", len(WATCHLIST))
+    n_done = 0
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        futures = {pool.submit(scan_symbol, sym, candle_cache, state, now_ms): sym for sym in WATCHLIST}
+        for fut in as_completed(futures):
+            sym = futures[fut]
+            try:
+                result = fut.result()
+            except Exception as e:  # noqa: BLE001 -- never let one symbol's failure kill the run
+                log.error("scan_symbol failed for %s: %s", sym, e)
+                result = []
+            n_done += 1
+            log.info("  [%d/%d] %s scanned (%.1fs elapsed)", n_done, len(WATCHLIST), sym,
+                      time.monotonic() - t_start)
+            if result:
+                scan_results[sym] = result
+                views_by_symbol_1h[sym] = result["views"][TF_1H]
+    log.info("Scan phase done (%.1fs elapsed): %d/%d symbols produced usable data.",
+              time.monotonic() - t_start, len(scan_results), len(WATCHLIST))
 
     macro_view = views_by_symbol_1h.get(MACRO_ASSET)
     macro_bias = "neutral"
@@ -2802,10 +2776,6 @@ def run_scan(state: dict, candle_cache: dict, deadline: Optional[float] = None) 
 
     all_new_signals = []
     for symbol, result in scan_results.items():
-        if time.monotonic() > deadline:
-            log.warning("Soft deadline hit during ranking/dispatch; stopping here, "
-                        "remaining candidates picked up next run.")
-            break
         views, stage1, stage3, stage4 = result["views"], result["stage1"], result["stage3"], result["stage4"]
         try:
             regime = build_regime_vector(views, macro_bias, views_by_symbol_1h, now_ms)
@@ -2860,7 +2830,7 @@ def main() -> None:
         log.info("Loaded state.json (%d active signal(s)) and candle_cache.json (%d symbol(s) cached).",
                   len(state.get("active_signals", [])), len(candle_cache))
         try:
-            run_scan(state, candle_cache, deadline=run_started + SOFT_RUN_DEADLINE_S)
+            run_scan(state, candle_cache)
         except Exception as e:  # noqa: BLE001 -- top-level safety net; the run must never crash unlogged
             log.exception("run_scan failed: %s", e)
         finally:
