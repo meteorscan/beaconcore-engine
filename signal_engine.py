@@ -141,6 +141,10 @@ EQ_CLUSTER_TOLERANCE_ATR = 0.12  # swing points within this * ATR are "equal"
 RR_MIN_GATE = 1.5              # Section 10 hard floor -- shared by every core engine
 RR_MIN_GATE_COUNTERTREND = 2.0  # Section 4A stricter floor -- own call site only, never mutates RR_MIN_GATE
 RR_SOFT_TARGET = 2.0            # natural upper end of TP1's honest 1.5-2.0 range
+RR_MAX_GATE = 3.5               # hard ceiling: TP1 landing this far past the soft target means the
+                                 # nearest "strong" structural level was actually just a distant,
+                                 # low-conviction one -- reject rather than accept a TP1 that's honest
+                                 # by price but too far to be a realistic intraday/swing target
 
 MAX_CONCURRENT_ACTIVE_SIGNALS = 8
 MAX_CORRELATED_CONCURRENT = 2  # per correlation cluster (Section 14)
@@ -1234,6 +1238,11 @@ MIN_SL_DISTANCE_PCT = 0.006     # hard floor: risk must be >= 0.6% of entry rega
                                  # it fired. Raise this further (e.g. 0.01-0.015) for a stricter,
                                  # more swing-oriented floor -- it only rejects tighter candidates,
                                  # never loosens a genuinely wider structural stop.
+MAX_SL_DISTANCE_PCT = 0.025     # hard ceiling: risk must be <= 2.5% of entry regardless of ATR.
+                                 # MAX_SL_DISTANCE_ATR above is ATR-relative, so on a volatility
+                                 # spike day 3x ATR can itself become a wide, uncomfortable % move --
+                                 # this is the absolute sanity cap independent of what ATR is doing.
+                                 # Lower this (e.g. 0.015) for a tighter, more scalp-resistant ceiling.
 
 
 def _valid_structural_anchor(direction: str, entry: float, pivots: list) -> Optional[float]:
@@ -1401,6 +1410,8 @@ def build_risk_plan(direction: str, entry: float, view_15m: View, view_1h: View,
         return None
     if risk > view_15m.atr * MAX_SL_DISTANCE_ATR:
         return None  # hard ceiling; a stop only clearing it by escalating further is rejected, never accepted worse
+    if risk > entry * MAX_SL_DISTANCE_PCT:
+        return None  # absolute sanity ceiling, independent of an ATR spike -- SL too far in real terms
     min_risk = max(view_15m.atr * MIN_ENTRY_SL_DISTANCE_ATR, entry * MIN_SL_DISTANCE_PCT)
     if risk < min_risk:
         return None  # entry-placement rule: entry too close to invalidation is noise, not a real trade
@@ -1424,6 +1435,10 @@ def build_risk_plan(direction: str, entry: float, view_15m: View, view_1h: View,
     rr1 = tp1_dist / risk
     if rr1 < rr_min_gate:
         return None  # reject-only gate, never rescued by widening SL/target
+    if rr1 > RR_MAX_GATE:
+        return None  # TP1 too far to be a realistic target -- reject, don't relabel (fix v1.0.2:
+                      # a prior version clamped this number instead of the price, which is exactly
+                      # the kind of mismatch we don't want to reintroduce on the far side either)
     # NOTE (fix v1.0.2): previously clamped rr1 to RR_SOFT_TARGET here. That
     # only mutated the reported number -- tp1 stayed at its real structural
     # price -- so the RR shown on the signal card didn't match the RR you'd
