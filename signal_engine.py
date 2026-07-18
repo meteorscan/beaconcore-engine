@@ -299,21 +299,29 @@ def load_state() -> dict:
 
 
 def save_state(state: dict) -> None:
-    """Atomic write (tmp + os.replace) under an exclusive file lock so a
-    crash mid-write can never corrupt state.json, and two overlapping runs
-    can never interleave writes."""
+    """Atomic write (tmp + os.replace) so a crash mid-write can never
+    corrupt state.json.
+
+    NOTE: this does NOT take its own flock on LOCK_PATH. main() already
+    holds an exclusive LOCK_EX on LOCK_PATH for the full lifetime of the
+    process (see main()'s lock_f), which already guarantees only one run
+    is ever active and therefore already prevents interleaved writes.
+    Re-opening LOCK_PATH here and blocking on fcntl.flock(..., LOCK_EX)
+    self-deadlocks: flock() locks are per open-file-description, not
+    per-process, so a second fd on the same file blocks on the first fd's
+    lock even within the same process -- and that first fd is never
+    released until this call returns. That deadlock is why previous runs
+    hung indefinitely after logging "run_scan finished" and never wrote
+    state.json/candle_cache.json. Do not add locking back here; if a
+    standalone caller of save_state() ever needs mutual exclusion outside
+    of main(), use a distinct lock file (not LOCK_PATH) with LOCK_NB."""
     tmp_path = f"{STATE_PATH}.tmp"
-    lock_f = open(LOCK_PATH, "w")
     try:
-        fcntl.flock(lock_f.fileno(), fcntl.LOCK_EX)
         with open(tmp_path, "w") as f:
             json.dump(state, f, indent=2, default=str)
         os.replace(tmp_path, STATE_PATH)
     except OSError as e:
         log.error("save_state failed: %s", e)
-    finally:
-        fcntl.flock(lock_f.fileno(), fcntl.LOCK_UN)
-        lock_f.close()
 
 
 def prune_tier2(state: dict) -> None:
