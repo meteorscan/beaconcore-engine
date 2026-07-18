@@ -12,8 +12,19 @@
     "segment_stats": {},
     "calibration_buckets": {},
     "forensic_counts": {},
-    "fill_stats": {},
-    "filter_funnel": {},
+    "fill_stats": {
+      "Momentum|pending": {
+        "dispatched": 1,
+        "filled": 0,
+        "expired": 0
+      }
+    },
+    "filter_funnel": {
+      "liquidity_sanity": {
+        "seen": 1,
+        "rejected": 0
+      }
+    },
     "circuit_breaker": {
       "tripped": false,
       "tripped_ts": null,
@@ -27,7 +38,46 @@
     }
   },
   "tier2_trades": [],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "ZEC-Momentum-1784400328218",
+      "symbol": "ZEC",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 554.7218263159058,
+      "sl": 550.87,
+      "tp1": 563.95,
+      "tp2": 570.78,
+      "rr1": 2.3957917432536657,
+      "rr2": 4.168976575548942,
+      "confidence": 0.8622810892503988,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 20.36122029152188,
+        "volatility_pctl": 19.166666666666668,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784400328218,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 3921,
+      "_last_checked_t": 1784398500000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1784399521690
+  "last_run_ts": 1784400328218
 }
