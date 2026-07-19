@@ -167,7 +167,7 @@
       "mfe_r": 1.0725688848819532,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 3965,
-      "_last_checked_t": 1784493900000
+      "_last_checked_t": 1784494800000
     },
     {
       "id": "TAO-Reversal-1784482240168",
@@ -201,13 +201,13 @@
       "status": "active",
       "created_ts": 1784482240168,
       "filled_ts": 1784482200000,
-      "mae_r": 0.48259589606480746,
+      "mae_r": 0.5994755027649328,
       "mfe_r": 1.4824424915810894,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 3976,
-      "_last_checked_t": 1784493900000
+      "_last_checked_t": 1784494800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784494924607
+  "last_run_ts": 1784495728605
 }
