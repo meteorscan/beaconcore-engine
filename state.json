@@ -7,7 +7,9 @@
     "confidence_calibration": {},
     "filter_thresholds": {},
     "sl_buffer_percentile": {},
-    "tp1_rank_preference": {},
+    "tp1_rank_preference": {
+      "TAO": 4
+    },
     "regime_fit_discount": {},
     "segment_stats": {
       "ADA|range|intraday|Liquidity Sweep": {
@@ -21,6 +23,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 2.3957917432536657
+      },
+      "TAO|range|intraday|Reversal": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -33,10 +41,16 @@
         "n": 1,
         "wins": 1,
         "sum_conf": 0.8622810892503988
+      },
+      "Reversal|A+": {
+        "n": 1,
+        "wins": 0,
+        "sum_conf": 0.816481730014443
       }
     },
     "forensic_counts": {
-      "genuine_variance": 1
+      "genuine_variance": 1,
+      "correct_read_poor_rr": 1
     },
     "fill_stats": {
       "Momentum|pending": {
@@ -51,13 +65,13 @@
       },
       "Reversal|pending": {
         "dispatched": 1,
-        "filled": 0,
+        "filled": 1,
         "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 23,
+        "seen": 24,
         "rejected": 0
       }
     },
@@ -128,6 +142,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "TAO-Reversal-1784482240168",
+      "symbol": "TAO",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 197.11936000000003,
+      "sl": 198.48828999999998,
+      "tp1": 192.99333333333334,
+      "tp2": 192.96,
+      "r_realized": -1.0,
+      "mae_r": 1.3738028971532812,
+      "mfe_r": 1.4824424915810894,
+      "forensic_category": "correct_read_poor_rr",
+      "confidence": 0.816481730014443,
+      "grade": "A+",
+      "regime_at_entry": {
+        "trend_strength": 18.234188602056992,
+        "volatility_pctl": 10.833333333333334,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1784499300000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -167,45 +208,7 @@
       "mfe_r": 1.0725688848819532,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 3965,
-      "_last_checked_t": 1784498400000
-    },
-    {
-      "id": "TAO-Reversal-1784482240168",
-      "symbol": "TAO",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 197.11936000000003,
-      "sl": 198.48828999999998,
-      "tp1": 192.99333333333334,
-      "tp2": 192.96,
-      "rr1": 3.0140523377140123,
-      "rr2": 3.0384022557765373,
-      "confidence": 0.816481730014443,
-      "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 22.785115657186513,
-        "volatility_pctl": 7.5,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1784482240168,
-      "filled_ts": 1784482200000,
-      "mae_r": 0.5994755027649328,
-      "mfe_r": 1.4824424915810894,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 3976,
-      "_last_checked_t": 1784498400000
+      "_last_checked_t": 1784499300000
     },
     {
       "id": "PENGU-Liquidity Sweep-1784499325729",
@@ -234,7 +237,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1784499325729,
       "filled_ts": null,
@@ -242,9 +245,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 3987,
-      "_last_checked_t": 1784497500000
+      "_last_checked_t": 1784499300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784499325729
+  "last_run_ts": 1784500297127
 }
