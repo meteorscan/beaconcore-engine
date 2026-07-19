@@ -57,7 +57,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 20,
+        "seen": 21,
         "rejected": 0
       }
     },
@@ -163,11 +163,11 @@
       "status": "active",
       "created_ts": 1784467835721,
       "filled_ts": 1784467800000,
-      "mae_r": 0.48262354200710617,
+      "mae_r": 0.48713134614300846,
       "mfe_r": 1.0725688848819532,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 3965,
-      "_last_checked_t": 1784495700000
+      "_last_checked_t": 1784496600000
     },
     {
       "id": "TAO-Reversal-1784482240168",
@@ -205,9 +205,9 @@
       "mfe_r": 1.4824424915810894,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 3976,
-      "_last_checked_t": 1784495700000
+      "_last_checked_t": 1784496600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784496716839
+  "last_run_ts": 1784497527878
 }
