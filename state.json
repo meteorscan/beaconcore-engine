@@ -120,7 +120,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 55,
+        "seen": 58,
         "rejected": 0
       }
     },
@@ -392,7 +392,7 @@
       "mfe_r": 1.0241906974395225,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4007,
-      "_last_checked_t": 1784521800000
+      "_last_checked_t": 1784522700000
     },
     {
       "id": "ZEC-Mean Reversion-1784515599363",
@@ -421,7 +421,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 9,
+      "pending_bars": 10,
       "status": "pending",
       "created_ts": 1784515599363,
       "filled_ts": null,
@@ -429,7 +429,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4010,
-      "_last_checked_t": 1784521800000
+      "_last_checked_t": 1784522700000
     },
     {
       "id": "AVAX-Liquidity Sweep-1784517327550",
@@ -467,7 +467,7 @@
       "mfe_r": 0.7209045899725545,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4012,
-      "_last_checked_t": 1784521800000
+      "_last_checked_t": 1784522700000
     },
     {
       "id": "TAO-Reversal-1784522004310",
@@ -497,7 +497,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 2,
+      "pending_bars": 3,
       "status": "pending",
       "created_ts": 1784522004310,
       "filled_ts": null,
@@ -505,9 +505,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4014,
-      "_last_checked_t": 1784521800000
+      "_last_checked_t": 1784522700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784522726463
+  "last_run_ts": 1784523722091
 }
