@@ -156,7 +156,7 @@
       }
     },
     "forensic_counts": {
-      "genuine_variance": 5,
+      "genuine_variance": 6,
       "correct_read_poor_rr": 9,
       "structural_invalidation_too_tight": 2
     },
@@ -818,7 +818,7 @@
       "mfe_r": 0.8844074978920458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4060,
-      "_last_checked_t": 1784566800000
+      "_last_checked_t": 1784567700000
     },
     {
       "id": "BTC-Mean Reversion-1784562330548",
@@ -855,7 +855,7 @@
       "mfe_r": 0.350637042551372,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4066,
-      "_last_checked_t": 1784566800000
+      "_last_checked_t": 1784567700000
     },
     {
       "id": "XRP-Mean Reversion-1784563245711",
@@ -892,7 +892,7 @@
       "mfe_r": 0.10773446556645458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4074,
-      "_last_checked_t": 1784566800000
+      "_last_checked_t": 1784567700000
     },
     {
       "id": "ADA-Mean Reversion-1784563245711",
@@ -921,7 +921,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 6,
+      "pending_bars": 7,
       "status": "pending",
       "created_ts": 1784563245711,
       "filled_ts": null,
@@ -929,7 +929,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4075,
-      "_last_checked_t": 1784566800000
+      "_last_checked_t": 1784567700000
     },
     {
       "id": "XLM-Mean Reversion-1784566844349",
@@ -958,7 +958,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 2,
+      "pending_bars": 3,
       "status": "pending",
       "created_ts": 1784566844349,
       "filled_ts": null,
@@ -966,7 +966,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4088,
-      "_last_checked_t": 1784566800000
+      "_last_checked_t": 1784567700000
     },
     {
       "id": "PENGU-Liquidity Sweep-1784567729068",
@@ -995,16 +995,20 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "1h",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 0,
-      "status": "pending",
+      "status": "resolved",
       "created_ts": 1784567729068,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1784566800000,
+      "mae_r": 1.4930966469427778,
+      "mfe_r": 0.5039447731755403,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4091,
-      "_last_checked_t": 1784565900000
+      "_last_checked_t": 1784566800000,
+      "result": "loss",
+      "r_realized": -1.0,
+      "resolved_ts": 1784566800000,
+      "forensic_category": "genuine_variance"
     }
   ],
   "macro_events": [],
