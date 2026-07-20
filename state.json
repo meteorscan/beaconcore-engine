@@ -156,7 +156,7 @@
       }
     },
     "forensic_counts": {
-      "genuine_variance": 10,
+      "genuine_variance": 11,
       "correct_read_poor_rr": 9,
       "structural_invalidation_too_tight": 2
     },
@@ -818,7 +818,7 @@
       "mfe_r": 0.8844074978920458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4060,
-      "_last_checked_t": 1784573100000
+      "_last_checked_t": 1784574000000
     },
     {
       "id": "BTC-Mean Reversion-1784562330548",
@@ -855,7 +855,7 @@
       "mfe_r": 0.350637042551372,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4066,
-      "_last_checked_t": 1784573100000,
+      "_last_checked_t": 1784574000000,
       "result": "loss",
       "r_realized": -1.0,
       "resolved_ts": 1784571300000,
@@ -896,7 +896,7 @@
       "mfe_r": 0.10773446556645458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4074,
-      "_last_checked_t": 1784571300000,
+      "_last_checked_t": 1784574000000,
       "result": "loss",
       "r_realized": -1.0,
       "resolved_ts": 1784571300000,
@@ -923,21 +923,25 @@
         "band-level entry"
       ],
       "regime_at_entry": {
-        "trend_strength": 15.307066318048003,
+        "trend_strength": 18.181261752953578,
         "volatility_pctl": 100.0,
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 9,
-      "status": "pending",
+      "status": "resolved",
       "created_ts": 1784563245711,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1784570400000,
+      "mae_r": 1.302031097247549,
+      "mfe_r": 0.13925618496161923,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4075,
-      "_last_checked_t": 1784569500000
+      "_last_checked_t": 1784570400000,
+      "result": "loss",
+      "r_realized": -1.0,
+      "resolved_ts": 1784570400000,
+      "forensic_category": "genuine_variance"
     },
     {
       "id": "XLM-Mean Reversion-1784566844349",
