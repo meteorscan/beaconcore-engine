@@ -149,6 +149,16 @@ RR_MAX_GATE = 3.5               # hard ceiling: TP1 landing this far past the so
 MAX_CONCURRENT_ACTIVE_SIGNALS = 8
 MAX_CORRELATED_CONCURRENT = 2  # per correlation cluster (Section 14)
 
+# fix v1.0.5 (root cause: correlation_dedup only checks state["active_signals"],
+# and a resolved signal is dropped from active_signals in the SAME run_scan()
+# cycle, before the scan phase runs in that same cycle -- section 12/14 gap).
+# An SL hit on a liquidity-sweep setup doesn't invalidate the EQH/EQL pool it
+# was built on, so stage1-4 can regenerate a near-identical same-symbol/
+# same-direction candidate one cycle later with nothing left to block it.
+# SAME_SETUP_COOLDOWN_MS blocks same symbol+direction re-entry for a window
+# after a loss, independent of active_signals membership.
+SAME_SETUP_COOLDOWN_MS = 60 * 60 * 1000  # 1h
+
 ENABLE_COUNTERTREND_ENGINE = os.environ.get("ENABLE_COUNTERTREND_ENGINE", "false").lower() == "true"
 
 # --- Section 5: adaptive-parameter bounds & dampening -----------------------
@@ -272,6 +282,7 @@ def _default_state() -> dict:
             "circuit_breaker": {"tripped": False, "tripped_ts": None, "reason": None},
             "governor": {"last_adjust_ts": 0},
             "daily_totals": {},         # "YYYY-MM-DD" -> summary dict
+            "symbol_cooldown": {},      # fix v1.0.5: symbol -> {"direction","until_ts"} post-loss re-fire block
         },
         "tier2_trades": [],          # bounded raw trade log
         "active_signals": [],        # currently open/pending signals
@@ -2286,7 +2297,7 @@ def _bump_funnel_rejected(state: dict, name: str) -> None:
     state["tier1"]["filter_funnel"].setdefault(name, {"seen": 0, "rejected": 0})["rejected"] += 1
 
 
-def correlation_dedup(ranked: list, active_signals: list) -> list:
+def correlation_dedup(ranked: list, active_signals: list, state: dict, now_ms: int) -> list:
     """Section 14 correlation cap: caps concurrent exposure per correlation
     cluster jointly across the base ensemble and the counter-trend engine
     -- never a separate exempt pool.
@@ -2296,16 +2307,26 @@ def correlation_dedup(ranked: list, active_signals: list) -> list:
     candidates exist for the same symbol in this batch (e.g. Mean
     Reversion and Liquidity Sweep both firing on the same asset), only the
     single highest-scored one is accepted -- `ranked` is already sorted by
-    score descending, so the first candidate seen per symbol is the best."""
+    score descending, so the first candidate seen per symbol is the best.
+
+    fix v1.0.5: also rejects a same-symbol/same-direction candidate while
+    that symbol is inside its post-loss SAME_SETUP_COOLDOWN_MS window (see
+    process_resolution) -- this is the actual gap that let a swept-but-
+    unresolved liquidity pool re-dispatch an almost-identical signal one
+    scan cycle after the prior one resolved as a loss."""
     cluster_counts = collections.Counter(correlation_cluster(s["symbol"]) for s in active_signals)
     symbols_with_active = {s["symbol"] for s in active_signals}
     symbols_accepted_this_batch = set()
+    cooldowns = state["tier1"].get("symbol_cooldown", {})
     accepted = []
     for score, grade, c, result in ranked:
         if len(accepted) + len(active_signals) >= MAX_CONCURRENT_ACTIVE_SIGNALS:
             break
         if c.symbol in symbols_with_active or c.symbol in symbols_accepted_this_batch:
             continue  # one active signal per symbol -- best-scored candidate wins
+        cd = cooldowns.get(c.symbol)
+        if cd and cd["direction"] == c.direction and now_ms < cd["until_ts"]:
+            continue  # same symbol+direction re-fire blocked post-loss
         cluster = correlation_cluster(c.symbol)
         if cluster_counts[cluster] >= MAX_CORRELATED_CONCURRENT:
             continue
@@ -2674,6 +2695,15 @@ def process_resolution(sig: dict, views: dict, regime: RegimeVector, state: dict
             else:
                 reinforce_win(sig, state)
 
+    if sig["result"] == "loss":
+        # fix v1.0.5: block same symbol+direction from re-firing until the
+        # swept level has had time to actually invalidate, instead of only
+        # relying on active_signals membership (see SAME_SETUP_COOLDOWN_MS).
+        state["tier1"]["symbol_cooldown"][sig["symbol"]] = {
+            "direction": sig["direction"],
+            "until_ts": sig["resolved_ts"] + SAME_SETUP_COOLDOWN_MS,
+        }
+
     update_segment_stats(sig, state)
     state["tier2_trades"].append({
         "id": sig["id"], "symbol": sig["symbol"], "engine": sig["engine"],
@@ -2975,7 +3005,7 @@ def run_scan(state: dict, candle_cache: dict) -> None:
         if not candidates:
             continue
         ranked = rank_and_select(candidates, views, regime, state, symbol, now_ms)
-        accepted = correlation_dedup(ranked, state["active_signals"] + all_new_signals)
+        accepted = correlation_dedup(ranked, state["active_signals"] + all_new_signals, state, now_ms)
         for score, grade, cand, res in accepted:
             sig = new_signal_record(cand, score, grade, symbol, now_ms)
             sig["regime_at_entry"] = {"trend_strength": regime.trend_strength,
