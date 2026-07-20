@@ -87,14 +87,14 @@
         "expired": 0
       },
       "Mean Reversion|pending": {
-        "dispatched": 1,
+        "dispatched": 2,
         "filled": 0,
         "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 29,
+        "seen": 32,
         "rejected": 0
       }
     },
@@ -285,7 +285,7 @@
       "mfe_r": 1.7667707218121338,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 3965,
-      "_last_checked_t": 1784511900000
+      "_last_checked_t": 1784512800000
     },
     {
       "id": "ZEC-Mean Reversion-1784511930213",
@@ -322,7 +322,7 @@
       "mfe_r": 0.8329697919732358,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4006,
-      "_last_checked_t": 1784511900000
+      "_last_checked_t": 1784512800000
     },
     {
       "id": "PENGU-Liquidity Sweep-1784512841003",
@@ -351,18 +351,55 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
+      "entry_filled": true,
+      "pending_bars": 1,
+      "status": "active",
+      "created_ts": 1784512841003,
+      "filled_ts": 1784512800000,
+      "mae_r": 0.3225426325269718,
+      "mfe_r": 0.46866319882834434,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4007,
+      "_last_checked_t": 1784512800000
+    },
+    {
+      "id": "AVAX-Mean Reversion-1784513726864",
+      "symbol": "AVAX",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 6.5669206661997865,
+      "sl": 6.6418352,
+      "tp1": 6.4358,
+      "tp2": 6.4208,
+      "rr1": 1.7502700684151147,
+      "rr2": 1.9504982382920502,
+      "confidence": 0.8545019067425488,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 18.994681999378884,
+        "volatility_pctl": 56.666666666666664,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
       "entry_filled": false,
       "pending_bars": 0,
       "status": "pending",
-      "created_ts": 1784512841003,
+      "created_ts": 1784513726864,
       "filled_ts": null,
       "mae_r": 0.0,
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4007,
-      "_last_checked_t": 1784511000000
+      "tg_message_id": 4008,
+      "_last_checked_t": 1784511900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784512841003
+  "last_run_ts": 1784513726864
 }
