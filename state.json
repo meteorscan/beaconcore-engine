@@ -103,13 +103,19 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "XLM|range|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
       "Liquidity Sweep|A": {
-        "n": 5,
+        "n": 6,
         "wins": 0,
-        "sum_conf": 3.813758723866404
+        "sum_conf": 4.6073705263123665
       },
       "Momentum|A+": {
         "n": 1,
@@ -133,7 +139,7 @@
       }
     },
     "forensic_counts": {
-      "genuine_variance": 3,
+      "genuine_variance": 4,
       "correct_read_poor_rr": 8,
       "structural_invalidation_too_tight": 2
     },
@@ -145,7 +151,7 @@
       },
       "Liquidity Sweep|pending": {
         "dispatched": 15,
-        "filled": 11,
+        "filled": 12,
         "expired": 2
       },
       "Reversal|pending": {
@@ -171,7 +177,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 155,
+        "seen": 160,
         "rejected": 0
       }
     },
@@ -648,6 +654,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "XLM-Liquidity Sweep-1784563245711",
+      "symbol": "XLM",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.18886024,
+      "sl": 0.19012994,
+      "tp1": 0.18502,
+      "tp2": 0.18491,
+      "r_realized": -1.0,
+      "mae_r": 1.1418130266992297,
+      "mfe_r": 0.04744427817596099,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7936118024459623,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 19.426808801516916,
+        "volatility_pctl": 55.0,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1784563200000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -684,10 +717,10 @@
       "created_ts": 1784547932160,
       "filled_ts": 1784547000000,
       "mae_r": 0.7283870912205517,
-      "mfe_r": 1.7367714278335964,
+      "mfe_r": 2.1445824617583202,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4044,
-      "_last_checked_t": 1784562300000
+      "_last_checked_t": 1784563200000
     },
     {
       "id": "PENGU-Range Trading-1784554249258",
@@ -720,11 +753,11 @@
       "status": "active",
       "created_ts": 1784554249258,
       "filled_ts": 1784553300000,
-      "mae_r": 0.4785408674391212,
+      "mae_r": 0.5415067710495405,
       "mfe_r": 1.3726566987069553,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4054,
-      "_last_checked_t": 1784562300000
+      "_last_checked_t": 1784563200000
     },
     {
       "id": "AVAX-Liquidity Sweep-1784560528609",
@@ -762,7 +795,7 @@
       "mfe_r": 0.8844074978920458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4060,
-      "_last_checked_t": 1784562300000
+      "_last_checked_t": 1784563200000
     },
     {
       "id": "BTC-Mean Reversion-1784562330548",
@@ -799,7 +832,7 @@
       "mfe_r": 0.350637042551372,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4066,
-      "_last_checked_t": 1784562300000
+      "_last_checked_t": 1784563200000
     },
     {
       "id": "XRP-Mean Reversion-1784563245711",
@@ -827,16 +860,16 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "1h",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 0,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1784563245711,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1784562300000,
+      "mae_r": 0.6092995386918868,
+      "mfe_r": 0.10773446556645458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4074,
-      "_last_checked_t": 1784561400000
+      "_last_checked_t": 1784563200000
     },
     {
       "id": "ADA-Mean Reversion-1784563245711",
@@ -865,7 +898,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1784563245711,
       "filled_ts": null,
@@ -873,47 +906,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4075,
-      "_last_checked_t": 1784561400000
-    },
-    {
-      "id": "XLM-Liquidity Sweep-1784563245711",
-      "symbol": "XLM",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.18886024,
-      "sl": 0.19012994,
-      "tp1": 0.18502,
-      "tp2": 0.18491,
-      "rr1": 3.0245254784595326,
-      "rr2": 3.111160116563022,
-      "confidence": 0.7936118024459623,
-      "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 19.426808801516916,
-        "volatility_pctl": 55.0,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
-      "created_ts": 1784563245711,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4076,
-      "_last_checked_t": 1784561400000
+      "_last_checked_t": 1784563200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784563245711
+  "last_run_ts": 1784564128633
 }
