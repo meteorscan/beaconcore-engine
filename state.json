@@ -149,7 +149,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 126,
+        "seen": 130,
         "rejected": 0
       }
     },
@@ -557,7 +557,7 @@
       "mfe_r": 1.680198174473837,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4041,
-      "_last_checked_t": 1784556900000
+      "_last_checked_t": 1784557800000
     },
     {
       "id": "ZEC-Reversal-1784547932160",
@@ -595,7 +595,7 @@
       "mfe_r": 0.7769628730556422,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4044,
-      "_last_checked_t": 1784556900000
+      "_last_checked_t": 1784557800000
     },
     {
       "id": "BTC-Liquidity Sweep-1784547932160",
@@ -632,7 +632,7 @@
       "mfe_r": 1.398762879507576,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4045,
-      "_last_checked_t": 1784556900000
+      "_last_checked_t": 1784557800000
     },
     {
       "id": "XRP-Mean Reversion-1784547932160",
@@ -669,7 +669,7 @@
       "mfe_r": 2.100663421078254,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4047,
-      "_last_checked_t": 1784556900000
+      "_last_checked_t": 1784557800000
     },
     {
       "id": "PENGU-Range Trading-1784554249258",
@@ -706,7 +706,7 @@
       "mfe_r": 1.3726566987069553,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4054,
-      "_last_checked_t": 1784556900000
+      "_last_checked_t": 1784557800000
     },
     {
       "id": "SUI-Liquidity Sweep-1784557840468",
@@ -735,7 +735,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1784557840468,
       "filled_ts": null,
@@ -743,9 +743,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4057,
-      "_last_checked_t": 1784556000000
+      "_last_checked_t": 1784557800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784557840468
+  "last_run_ts": 1784558732091
 }
