@@ -115,12 +115,17 @@
       "Mean Reversion|pending": {
         "dispatched": 3,
         "filled": 2,
+        "expired": 1
+      },
+      "Breaker Block|pending": {
+        "dispatched": 1,
+        "filled": 0,
         "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 60,
+        "seen": 61,
         "rejected": 0
       }
     },
@@ -392,44 +397,7 @@
       "mfe_r": 1.8153965287948386,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4007,
-      "_last_checked_t": 1784523600000
-    },
-    {
-      "id": "ZEC-Mean Reversion-1784515599363",
-      "symbol": "ZEC",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 541.3077851947799,
-      "sl": 534.37509,
-      "tp1": 555.4449999999999,
-      "tp2": 555.5,
-      "rr1": 2.0392090533368687,
-      "rr2": 2.0471424758305443,
-      "confidence": 0.8394525780620601,
-      "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 14.93536099139645,
-        "volatility_pctl": 32.5,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1784515599363,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4010,
-      "_last_checked_t": 1784523600000
+      "_last_checked_t": 1784524500000
     },
     {
       "id": "AVAX-Liquidity Sweep-1784517327550",
@@ -467,7 +435,7 @@
       "mfe_r": 1.724893520420322,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4012,
-      "_last_checked_t": 1784523600000
+      "_last_checked_t": 1784524500000
     },
     {
       "id": "TAO-Reversal-1784522004310",
@@ -497,7 +465,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 4,
+      "pending_bars": 5,
       "status": "pending",
       "created_ts": 1784522004310,
       "filled_ts": null,
@@ -505,9 +473,45 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4014,
+      "_last_checked_t": 1784524500000
+    },
+    {
+      "id": "XLM-Breaker Block-1784525607860",
+      "symbol": "XLM",
+      "engine": "Breaker Block",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.186925,
+      "sl": 0.18840799999999996,
+      "tp1": 0.18398,
+      "tp2": 0.18331,
+      "rr1": 1.9858395144977001,
+      "rr2": 2.437626432906347,
+      "confidence": 0.7701789508062481,
+      "grade": "A",
+      "confluences": [
+        "confirmed breaker block retest"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 26.82071344977555,
+        "volatility_pctl": 48.333333333333336,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784525607860,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4020,
       "_last_checked_t": 1784523600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784524647663
+  "last_run_ts": 1784525607860
 }
