@@ -114,7 +114,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 43,
+        "seen": 44,
         "rejected": 0
       }
     },
@@ -359,7 +359,7 @@
       "mfe_r": 1.8479111962585253,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 3965,
-      "_last_checked_t": 1784517300000
+      "_last_checked_t": 1784518200000
     },
     {
       "id": "PENGU-Liquidity Sweep-1784512841003",
@@ -397,7 +397,7 @@
       "mfe_r": 0.5191656987020798,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4007,
-      "_last_checked_t": 1784517300000
+      "_last_checked_t": 1784518200000
     },
     {
       "id": "ZEC-Mean Reversion-1784515599363",
@@ -426,7 +426,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 4,
+      "pending_bars": 5,
       "status": "pending",
       "created_ts": 1784515599363,
       "filled_ts": null,
@@ -434,7 +434,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4010,
-      "_last_checked_t": 1784517300000
+      "_last_checked_t": 1784518200000
     },
     {
       "id": "AVAX-Liquidity Sweep-1784517327550",
@@ -472,9 +472,9 @@
       "mfe_r": 0.2857976779884675,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4012,
-      "_last_checked_t": 1784517300000
+      "_last_checked_t": 1784518200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784518235917
+  "last_run_ts": 1784519130623
 }
