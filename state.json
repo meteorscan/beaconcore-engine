@@ -77,7 +77,7 @@
         "expired": 0
       },
       "Liquidity Sweep|pending": {
-        "dispatched": 5,
+        "dispatched": 6,
         "filled": 3,
         "expired": 1
       },
@@ -94,7 +94,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 27,
+        "seen": 29,
         "rejected": 0
       }
     },
@@ -285,7 +285,7 @@
       "mfe_r": 1.7667707218121338,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 3965,
-      "_last_checked_t": 1784511000000
+      "_last_checked_t": 1784511900000
     },
     {
       "id": "ZEC-Mean Reversion-1784511930213",
@@ -313,18 +313,56 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
+      "entry_filled": true,
+      "pending_bars": 0,
+      "status": "active",
+      "created_ts": 1784511930213,
+      "filled_ts": 1784511000000,
+      "mae_r": 0.7503534838286765,
+      "mfe_r": 0.8329697919732358,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4006,
+      "_last_checked_t": 1784511900000
+    },
+    {
+      "id": "PENGU-Liquidity Sweep-1784512841003",
+      "symbol": "PENGU",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.00618984,
+      "sl": 0.006249243000000001,
+      "tp1": 0.006062333333333334,
+      "tp2": 0.00606,
+      "rr1": 2.146468472411591,
+      "rr2": 2.1857481945356145,
+      "confidence": 0.8149764241736063,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 11.767894603347228,
+        "volatility_pctl": 18.333333333333332,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
       "entry_filled": false,
       "pending_bars": 0,
       "status": "pending",
-      "created_ts": 1784511930213,
+      "created_ts": 1784512841003,
       "filled_ts": null,
       "mae_r": 0.0,
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4006,
-      "_last_checked_t": 1784510100000
+      "tg_message_id": 4007,
+      "_last_checked_t": 1784511000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784511930213
+  "last_run_ts": 1784512841003
 }
