@@ -116,7 +116,7 @@
       "Reversal|pending": {
         "dispatched": 2,
         "filled": 1,
-        "expired": 0
+        "expired": 1
       },
       "Mean Reversion|pending": {
         "dispatched": 3,
@@ -422,44 +422,6 @@
   ],
   "active_signals": [
     {
-      "id": "TAO-Reversal-1784522004310",
-      "symbol": "TAO",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 197.4276,
-      "sl": 198.639,
-      "tp1": 195.10500000000002,
-      "tp2": 195.09,
-      "rr1": 1.917285785042099,
-      "rr2": 1.929668152550779,
-      "confidence": 0.8187118354042612,
-      "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 19.13041513216179,
-        "volatility_pctl": 40.833333333333336,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1784522004310,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4014,
-      "_last_checked_t": 1784529900000
-    },
-    {
       "id": "XLM-Breaker Block-1784525607860",
       "symbol": "XLM",
       "engine": "Breaker Block",
@@ -485,7 +447,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 7,
+      "pending_bars": 8,
       "status": "pending",
       "created_ts": 1784525607860,
       "filled_ts": null,
@@ -493,9 +455,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4020,
-      "_last_checked_t": 1784529900000
+      "_last_checked_t": 1784530800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784530845704
+  "last_run_ts": 1784531729990
 }
