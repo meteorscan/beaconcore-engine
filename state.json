@@ -117,7 +117,7 @@
       "Liquidity Sweep|pending": {
         "dispatched": 10,
         "filled": 6,
-        "expired": 1
+        "expired": 2
       },
       "Reversal|pending": {
         "dispatched": 2,
@@ -456,44 +456,6 @@
   ],
   "active_signals": [
     {
-      "id": "AVAX-Liquidity Sweep-1784535327641",
-      "symbol": "AVAX",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 6.5885312,
-      "sl": 6.659960000000001,
-      "tp1": 6.444,
-      "tp2": 6.4368,
-      "rr1": 2.0234303250229497,
-      "rr2": 2.124230002463982,
-      "confidence": 0.8776040695478708,
-      "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 20.11861887606637,
-        "volatility_pctl": 100.0,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1784535327641,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4036,
-      "_last_checked_t": 1784543400000
-    },
-    {
       "id": "PENGU-Liquidity Sweep-1784539836953",
       "symbol": "PENGU",
       "engine": "Liquidity Sweep",
@@ -529,7 +491,7 @@
       "mfe_r": 0.9173937517590883,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4040,
-      "_last_checked_t": 1784543400000
+      "_last_checked_t": 1784544300000
     },
     {
       "id": "SOL-Liquidity Sweep-1784539836953",
@@ -559,7 +521,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 6,
+      "pending_bars": 7,
       "status": "pending",
       "created_ts": 1784539836953,
       "filled_ts": null,
@@ -567,9 +529,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4041,
-      "_last_checked_t": 1784543400000
+      "_last_checked_t": 1784544300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784544325285
+  "last_run_ts": 1784545246968
 }
