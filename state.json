@@ -449,7 +449,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 10,
+      "pending_bars": 11,
       "status": "pending",
       "created_ts": 1784522004310,
       "filled_ts": null,
@@ -457,7 +457,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4014,
-      "_last_checked_t": 1784529000000
+      "_last_checked_t": 1784529900000
     },
     {
       "id": "XLM-Breaker Block-1784525607860",
@@ -485,7 +485,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 6,
+      "pending_bars": 7,
       "status": "pending",
       "created_ts": 1784525607860,
       "filled_ts": null,
@@ -493,9 +493,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4020,
-      "_last_checked_t": 1784529000000
+      "_last_checked_t": 1784529900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784529925241
+  "last_run_ts": 1784530845704
 }
