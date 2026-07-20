@@ -149,7 +149,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 121,
+        "seen": 122,
         "rejected": 0
       }
     },
@@ -554,10 +554,10 @@
       "created_ts": 1784539836953,
       "filled_ts": 1784547000000,
       "mae_r": 0.6072887143207666,
-      "mfe_r": 1.146185555835381,
+      "mfe_r": 1.2912457000028355,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4041,
-      "_last_checked_t": 1784555100000
+      "_last_checked_t": 1784556000000
     },
     {
       "id": "ZEC-Reversal-1784547932160",
@@ -595,7 +595,7 @@
       "mfe_r": 0.7769628730556422,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4044,
-      "_last_checked_t": 1784555100000
+      "_last_checked_t": 1784556000000
     },
     {
       "id": "BTC-Liquidity Sweep-1784547932160",
@@ -632,7 +632,7 @@
       "mfe_r": 1.0376853209076953,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4045,
-      "_last_checked_t": 1784555100000
+      "_last_checked_t": 1784556000000
     },
     {
       "id": "XRP-Mean Reversion-1784547932160",
@@ -669,7 +669,7 @@
       "mfe_r": 1.709847842167929,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4047,
-      "_last_checked_t": 1784555100000
+      "_last_checked_t": 1784556000000
     },
     {
       "id": "PENGU-Range Trading-1784554249258",
@@ -703,12 +703,12 @@
       "created_ts": 1784554249258,
       "filled_ts": 1784553300000,
       "mae_r": 0.4785408674391212,
-      "mfe_r": 1.0326408192107346,
+      "mfe_r": 1.183758987875719,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4054,
-      "_last_checked_t": 1784555100000
+      "_last_checked_t": 1784556000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784556046737
+  "last_run_ts": 1784556926703
 }
