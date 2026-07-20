@@ -150,7 +150,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 140,
+        "seen": 145,
         "rejected": 0
       }
     },
@@ -585,7 +585,7 @@
       "mfe_r": 1.680198174473837,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4041,
-      "_last_checked_t": 1784559600000
+      "_last_checked_t": 1784560500000
     },
     {
       "id": "ZEC-Reversal-1784547932160",
@@ -623,7 +623,7 @@
       "mfe_r": 0.7791149101739765,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4044,
-      "_last_checked_t": 1784559600000
+      "_last_checked_t": 1784560500000
     },
     {
       "id": "BTC-Liquidity Sweep-1784547932160",
@@ -660,7 +660,7 @@
       "mfe_r": 1.398762879507576,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4045,
-      "_last_checked_t": 1784559600000
+      "_last_checked_t": 1784560500000
     },
     {
       "id": "XRP-Mean Reversion-1784547932160",
@@ -697,7 +697,7 @@
       "mfe_r": 2.100663421078254,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4047,
-      "_last_checked_t": 1784559600000
+      "_last_checked_t": 1784560500000
     },
     {
       "id": "PENGU-Range Trading-1784554249258",
@@ -734,7 +734,7 @@
       "mfe_r": 1.3726566987069553,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4054,
-      "_last_checked_t": 1784559600000
+      "_last_checked_t": 1784560500000
     },
     {
       "id": "AVAX-Liquidity Sweep-1784560528609",
@@ -763,18 +763,18 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 0,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1784560528609,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1784559600000,
+      "mae_r": 0.11687890515208814,
+      "mfe_r": 0.8844074978920458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4060,
-      "_last_checked_t": 1784558700000
+      "_last_checked_t": 1784560500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784560528609
+  "last_run_ts": 1784561463755
 }
