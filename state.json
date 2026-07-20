@@ -40,10 +40,10 @@
         "sum_r": -1.0
       },
       "PENGU|range|intraday|Liquidity Sweep": {
-        "n": 1,
-        "wins": 0,
+        "n": 2,
+        "wins": 1,
         "losses": 1,
-        "sum_r": -1.0
+        "sum_r": 1.1464684724115912
       },
       "ZEC|range|intraday|Mean Reversion": {
         "n": 1,
@@ -81,9 +81,9 @@
         "sum_conf": 0.816481730014443
       },
       "Liquidity Sweep|A+": {
-        "n": 2,
-        "wins": 1,
-        "sum_conf": 1.614013206362586
+        "n": 3,
+        "wins": 2,
+        "sum_conf": 2.428989630536192
       },
       "Mean Reversion|A+": {
         "n": 2,
@@ -104,7 +104,7 @@
       },
       "Liquidity Sweep|pending": {
         "dispatched": 7,
-        "filled": 4,
+        "filled": 5,
         "expired": 1
       },
       "Reversal|pending": {
@@ -358,47 +358,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "PENGU-Liquidity Sweep-1784512841003",
       "symbol": "PENGU",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.00618984,
       "sl": 0.006249243000000001,
       "tp1": 0.006062333333333334,
       "tp2": 0.00606,
-      "rr1": 2.146468472411591,
-      "rr2": 2.1857481945356145,
+      "r_realized": 2.146468472411591,
+      "mae_r": 0.5750551318956931,
+      "mfe_r": 2.3540898607814333,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8149764241736063,
       "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 11.767894603347228,
-        "volatility_pctl": 18.333333333333332,
+        "trend_strength": 13.110413443288488,
+        "volatility_pctl": 20.0,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1784512841003,
-      "filled_ts": 1784512800000,
-      "mae_r": 0.5750551318956931,
-      "mfe_r": 1.832230695419422,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4007,
-      "_last_checked_t": 1784525400000
-    },
+      "resolved_ts": 1784526300000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "AVAX-Liquidity Sweep-1784517327550",
       "symbol": "AVAX",
@@ -435,7 +424,7 @@
       "mfe_r": 1.724893520420322,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4012,
-      "_last_checked_t": 1784525400000
+      "_last_checked_t": 1784526300000
     },
     {
       "id": "TAO-Reversal-1784522004310",
@@ -465,7 +454,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 6,
+      "pending_bars": 7,
       "status": "pending",
       "created_ts": 1784522004310,
       "filled_ts": null,
@@ -473,7 +462,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4014,
-      "_last_checked_t": 1784525400000
+      "_last_checked_t": 1784526300000
     },
     {
       "id": "XLM-Breaker Block-1784525607860",
@@ -501,7 +490,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 2,
+      "pending_bars": 3,
       "status": "pending",
       "created_ts": 1784525607860,
       "filled_ts": null,
@@ -509,9 +498,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4020,
-      "_last_checked_t": 1784525400000
+      "_last_checked_t": 1784526300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784526491652
+  "last_run_ts": 1784527307258
 }
