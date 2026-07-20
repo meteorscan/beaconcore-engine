@@ -115,7 +115,7 @@
         "expired": 0
       },
       "Liquidity Sweep|pending": {
-        "dispatched": 8,
+        "dispatched": 10,
         "filled": 6,
         "expired": 1
       },
@@ -137,7 +137,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 66,
+        "seen": 69,
         "rejected": 0
       }
     },
@@ -483,7 +483,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 5,
+      "pending_bars": 6,
       "status": "pending",
       "created_ts": 1784535327641,
       "filled_ts": null,
@@ -491,9 +491,85 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4036,
+      "_last_checked_t": 1784538900000
+    },
+    {
+      "id": "PENGU-Liquidity Sweep-1784539836953",
+      "symbol": "PENGU",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.006261152000000001,
+      "sl": 0.006318000000000001,
+      "tp1": 0.006102,
+      "tp2": 0.0061,
+      "rr1": 2.7996059667886475,
+      "rr2": 2.8347875035181613,
+      "confidence": 0.837082818490803,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 13.767708578670563,
+        "volatility_pctl": 54.166666666666664,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784539836953,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4040,
+      "_last_checked_t": 1784538000000
+    },
+    {
+      "id": "SOL-Liquidity Sweep-1784539836953",
+      "symbol": "SOL",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 76.808032,
+      "sl": 77.43535800000001,
+      "tp1": 75.5,
+      "tp2": 75.43,
+      "rr1": 2.0850913241280846,
+      "rr2": 2.1966760504107383,
+      "confidence": 0.8537272298996836,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 21.920711548341757,
+        "volatility_pctl": 75.83333333333333,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784539836953,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4041,
       "_last_checked_t": 1784538000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784538928847
+  "last_run_ts": 1784539836953
 }
