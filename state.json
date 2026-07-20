@@ -483,7 +483,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 7,
+      "pending_bars": 8,
       "status": "pending",
       "created_ts": 1784535327641,
       "filled_ts": null,
@@ -491,7 +491,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4036,
-      "_last_checked_t": 1784539800000
+      "_last_checked_t": 1784540700000
     },
     {
       "id": "PENGU-Liquidity Sweep-1784539836953",
@@ -529,7 +529,7 @@
       "mfe_r": 0.7063045313819446,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4040,
-      "_last_checked_t": 1784539800000
+      "_last_checked_t": 1784540700000
     },
     {
       "id": "SOL-Liquidity Sweep-1784539836953",
@@ -559,7 +559,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 2,
+      "pending_bars": 3,
       "status": "pending",
       "created_ts": 1784539836953,
       "filled_ts": null,
@@ -567,9 +567,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4041,
-      "_last_checked_t": 1784539800000
+      "_last_checked_t": 1784540700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784540729089
+  "last_run_ts": 1784541647777
 }
