@@ -156,7 +156,7 @@
       }
     },
     "forensic_counts": {
-      "genuine_variance": 18,
+      "genuine_variance": 19,
       "correct_read_poor_rr": 9,
       "structural_invalidation_too_tight": 2
     },
@@ -818,7 +818,7 @@
       "mfe_r": 0.8844074978920458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4060,
-      "_last_checked_t": 1784583000000
+      "_last_checked_t": 1784583900000
     },
     {
       "id": "BTC-Mean Reversion-1784562330548",
@@ -855,7 +855,7 @@
       "mfe_r": 0.350637042551372,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4066,
-      "_last_checked_t": 1784583000000,
+      "_last_checked_t": 1784583900000,
       "result": "loss",
       "r_realized": -1.0,
       "resolved_ts": 1784571300000,
@@ -896,7 +896,7 @@
       "mfe_r": 0.10773446556645458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4074,
-      "_last_checked_t": 1784583000000,
+      "_last_checked_t": 1784583900000,
       "result": "loss",
       "r_realized": -1.0,
       "resolved_ts": 1784579400000,
@@ -923,8 +923,8 @@
         "band-level entry"
       ],
       "regime_at_entry": {
-        "trend_strength": 21.413340093276265,
-        "volatility_pctl": 99.16666666666667,
+        "trend_strength": 23.575377144426238,
+        "volatility_pctl": 100.0,
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
@@ -933,14 +933,14 @@
       "status": "resolved",
       "created_ts": 1784563245711,
       "filled_ts": 1784570400000,
-      "mae_r": 1.7844703548907819,
+      "mae_r": 2.502098750635093,
       "mfe_r": 0.30810992513675317,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4075,
-      "_last_checked_t": 1784582100000,
+      "_last_checked_t": 1784583000000,
       "result": "loss",
       "r_realized": -1.0,
-      "resolved_ts": 1784582100000,
+      "resolved_ts": 1784583000000,
       "forensic_category": "genuine_variance"
     },
     {
