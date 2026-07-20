@@ -50,6 +50,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "AVAX|range|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -74,13 +80,13 @@
         "sum_conf": 0.8023468114487138
       },
       "Mean Reversion|A+": {
-        "n": 1,
+        "n": 2,
         "wins": 0,
-        "sum_conf": 0.8464190959585315
+        "sum_conf": 1.7009210027010804
       }
     },
     "forensic_counts": {
-      "genuine_variance": 2,
+      "genuine_variance": 3,
       "correct_read_poor_rr": 2,
       "structural_invalidation_too_tight": 1
     },
@@ -91,7 +97,7 @@
         "expired": 0
       },
       "Liquidity Sweep|pending": {
-        "dispatched": 6,
+        "dispatched": 7,
         "filled": 3,
         "expired": 1
       },
@@ -102,13 +108,13 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 3,
-        "filled": 1,
+        "filled": 2,
         "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 41,
+        "seen": 42,
         "rejected": 0
       }
     },
@@ -287,6 +293,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "AVAX-Mean Reversion-1784513726864",
+      "symbol": "AVAX",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 6.5669206661997865,
+      "sl": 6.6418352,
+      "tp1": 6.4358,
+      "tp2": 6.4208,
+      "r_realized": -1.0,
+      "mae_r": 1.099644216166488,
+      "mfe_r": 0.7905097074717155,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8545019067425488,
+      "grade": "A+",
+      "regime_at_entry": {
+        "trend_strength": 20.64782952418704,
+        "volatility_pctl": 86.66666666666667,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1784516400000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -326,7 +359,7 @@
       "mfe_r": 1.7667707218121338,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 3965,
-      "_last_checked_t": 1784515500000
+      "_last_checked_t": 1784516400000
     },
     {
       "id": "PENGU-Liquidity Sweep-1784512841003",
@@ -360,48 +393,11 @@
       "status": "active",
       "created_ts": 1784512841003,
       "filled_ts": 1784512800000,
-      "mae_r": 0.4403817988990408,
+      "mae_r": 0.5750551318956931,
       "mfe_r": 0.46866319882834434,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4007,
-      "_last_checked_t": 1784515500000
-    },
-    {
-      "id": "AVAX-Mean Reversion-1784513726864",
-      "symbol": "AVAX",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 6.5669206661997865,
-      "sl": 6.6418352,
-      "tp1": 6.4358,
-      "tp2": 6.4208,
-      "rr1": 1.7502700684151147,
-      "rr2": 1.9504982382920502,
-      "confidence": 0.8545019067425488,
-      "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 18.994681999378884,
-        "volatility_pctl": 56.666666666666664,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1784513726864,
-      "filled_ts": 1784512800000,
-      "mae_r": 0.8473567221215543,
-      "mfe_r": 0.7905097074717155,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4008,
-      "_last_checked_t": 1784515500000
+      "_last_checked_t": 1784516400000
     },
     {
       "id": "ZEC-Mean Reversion-1784515599363",
@@ -430,7 +426,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 2,
+      "pending_bars": 3,
       "status": "pending",
       "created_ts": 1784515599363,
       "filled_ts": null,
@@ -438,9 +434,47 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4010,
+      "_last_checked_t": 1784516400000
+    },
+    {
+      "id": "AVAX-Liquidity Sweep-1784517327550",
+      "symbol": "AVAX",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 6.587850400000001,
+      "sl": 6.6618552,
+      "tp1": 6.4446,
+      "tp2": 6.4405,
+      "rr1": 1.9356906579032993,
+      "rr2": 1.9910924696776744,
+      "confidence": 0.8764705732153008,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 20.64782952418704,
+        "volatility_pctl": 86.66666666666667,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784517327550,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4012,
       "_last_checked_t": 1784515500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784516442512
+  "last_run_ts": 1784517327550
 }
