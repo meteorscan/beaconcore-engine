@@ -818,7 +818,7 @@
       "mfe_r": 0.8844074978920458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4060,
-      "_last_checked_t": 1784586600000
+      "_last_checked_t": 1784587500000
     },
     {
       "id": "BTC-Mean Reversion-1784562330548",
@@ -855,7 +855,7 @@
       "mfe_r": 0.350637042551372,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4066,
-      "_last_checked_t": 1784586600000,
+      "_last_checked_t": 1784587500000,
       "result": "loss",
       "r_realized": -1.0,
       "resolved_ts": 1784571300000,
@@ -896,7 +896,7 @@
       "mfe_r": 0.10773446556645458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4074,
-      "_last_checked_t": 1784586600000,
+      "_last_checked_t": 1784587500000,
       "result": "loss",
       "r_realized": -1.0,
       "resolved_ts": 1784579400000,
@@ -937,7 +937,7 @@
       "mfe_r": 0.30810992513675317,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4075,
-      "_last_checked_t": 1784585700000,
+      "_last_checked_t": 1784587500000,
       "result": "loss",
       "r_realized": -1.0,
       "resolved_ts": 1784585700000,
@@ -978,7 +978,7 @@
       "mfe_r": 1.238129897643555,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4088,
-      "_last_checked_t": 1784578500000
+      "_last_checked_t": 1784587500000
     },
     {
       "id": "PENGU-Liquidity Sweep-1784567729068",
@@ -1016,7 +1016,7 @@
       "mfe_r": 2.2790927021696126,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4091,
-      "_last_checked_t": 1784578500000,
+      "_last_checked_t": 1784587500000,
       "result": "loss",
       "r_realized": -1.0,
       "resolved_ts": 1784566800000,
@@ -1024,5 +1024,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784579434717
+  "last_run_ts": 1784588444888
 }
