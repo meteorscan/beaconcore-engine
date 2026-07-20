@@ -13,7 +13,8 @@
     "tp1_rank_preference": {
       "TAO": 4,
       "PENGU": 6,
-      "SUI": 4
+      "SUI": 4,
+      "BTC": 4
     },
     "regime_fit_discount": {},
     "segment_stats": {
@@ -82,13 +83,19 @@
         "wins": 0,
         "losses": 2,
         "sum_r": -2.0
+      },
+      "BTC|range|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
       "Liquidity Sweep|A": {
-        "n": 4,
+        "n": 5,
         "wins": 0,
-        "sum_conf": 3.064717954129665
+        "sum_conf": 3.813758723866404
       },
       "Momentum|A+": {
         "n": 1,
@@ -113,7 +120,7 @@
     },
     "forensic_counts": {
       "genuine_variance": 3,
-      "correct_read_poor_rr": 5,
+      "correct_read_poor_rr": 6,
       "structural_invalidation_too_tight": 2
     },
     "fill_stats": {
@@ -124,7 +131,7 @@
       },
       "Liquidity Sweep|pending": {
         "dispatched": 14,
-        "filled": 9,
+        "filled": 10,
         "expired": 2
       },
       "Reversal|pending": {
@@ -133,7 +140,7 @@
         "expired": 1
       },
       "Mean Reversion|pending": {
-        "dispatched": 5,
+        "dispatched": 6,
         "filled": 3,
         "expired": 1
       },
@@ -150,7 +157,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 145,
+        "seen": 149,
         "rejected": 0
       }
     },
@@ -546,6 +553,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "BTC-Liquidity Sweep-1784547932160",
+      "symbol": "BTC",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 64681.808000000005,
+      "sl": 65147.082,
+      "tp1": 63808.0,
+      "tp2": 63730.0,
+      "r_realized": -1.0,
+      "mae_r": 1.3286622506308081,
+      "mfe_r": 1.398762879507576,
+      "forensic_category": "correct_read_poor_rr",
+      "confidence": 0.7490407697367389,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 21.747639134637044,
+        "volatility_pctl": 96.66666666666667,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1784561400000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -581,11 +615,11 @@
       "status": "active",
       "created_ts": 1784539836953,
       "filled_ts": 1784547000000,
-      "mae_r": 0.6072887143207666,
+      "mae_r": 0.7842302088547128,
       "mfe_r": 1.680198174473837,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4041,
-      "_last_checked_t": 1784560500000
+      "_last_checked_t": 1784561400000
     },
     {
       "id": "ZEC-Reversal-1784547932160",
@@ -620,47 +654,10 @@
       "created_ts": 1784547932160,
       "filled_ts": 1784547000000,
       "mae_r": 0.7283870912205517,
-      "mfe_r": 0.7791149101739765,
+      "mfe_r": 0.9222253785433402,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4044,
-      "_last_checked_t": 1784560500000
-    },
-    {
-      "id": "BTC-Liquidity Sweep-1784547932160",
-      "symbol": "BTC",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 64681.808000000005,
-      "sl": 65147.082,
-      "tp1": 63808.0,
-      "tp2": 63730.0,
-      "rr1": 1.8780503531252746,
-      "rr2": 2.045693505332362,
-      "confidence": 0.7490407697367389,
-      "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 23.929209658628775,
-        "volatility_pctl": 52.5,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1784547932160,
-      "filled_ts": 1784547000000,
-      "mae_r": 0.8063893533702665,
-      "mfe_r": 1.398762879507576,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4045,
-      "_last_checked_t": 1784560500000
+      "_last_checked_t": 1784561400000
     },
     {
       "id": "XRP-Mean Reversion-1784547932160",
@@ -693,11 +690,11 @@
       "status": "active",
       "created_ts": 1784547932160,
       "filled_ts": 1784547000000,
-      "mae_r": 0.6215692320213406,
+      "mae_r": 0.8910972174767463,
       "mfe_r": 2.100663421078254,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4047,
-      "_last_checked_t": 1784560500000
+      "_last_checked_t": 1784561400000
     },
     {
       "id": "PENGU-Range Trading-1784554249258",
@@ -734,7 +731,7 @@
       "mfe_r": 1.3726566987069553,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4054,
-      "_last_checked_t": 1784560500000
+      "_last_checked_t": 1784561400000
     },
     {
       "id": "AVAX-Liquidity Sweep-1784560528609",
@@ -768,13 +765,50 @@
       "status": "active",
       "created_ts": 1784560528609,
       "filled_ts": 1784559600000,
-      "mae_r": 0.11687890515208814,
+      "mae_r": 0.20335978206818361,
       "mfe_r": 0.8844074978920458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4060,
+      "_last_checked_t": 1784561400000
+    },
+    {
+      "id": "BTC-Mean Reversion-1784562330548",
+      "symbol": "BTC",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 65011.336353445935,
+      "sl": 65642.577,
+      "tp1": 63721.5,
+      "tp2": 63713.0,
+      "rr1": 2.0433353911652015,
+      "rr2": 2.0568009372234304,
+      "confidence": 0.7771232147288959,
+      "grade": "A",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 21.747639134637044,
+        "volatility_pctl": 96.66666666666667,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "1h",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784562330548,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4066,
       "_last_checked_t": 1784560500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784561463755
+  "last_run_ts": 1784562330548
 }
