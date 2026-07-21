@@ -63,7 +63,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 33,
+        "seen": 35,
         "rejected": 0
       }
     },
@@ -213,7 +213,7 @@
       "mfe_r": 1.6700458503344016,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4260,
-      "_last_checked_t": 1784649600000
+      "_last_checked_t": 1784650500000
     },
     {
       "id": "TAO-Liquidity Sweep-1784634332528",
@@ -250,7 +250,7 @@
       "mfe_r": 1.6398739164696674,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4279,
-      "_last_checked_t": 1784649600000
+      "_last_checked_t": 1784650500000
     },
     {
       "id": "XLM-Liquidity Sweep-1784643331167",
@@ -279,7 +279,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 9,
+      "pending_bars": 10,
       "status": "pending",
       "created_ts": 1784643331167,
       "filled_ts": null,
@@ -287,7 +287,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4291,
-      "_last_checked_t": 1784649600000
+      "_last_checked_t": 1784650500000
     },
     {
       "id": "PENGU-Reversal-1784645129252",
@@ -316,16 +316,16 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 7,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1784645129252,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1784650500000,
+      "mae_r": 0.04125892621000228,
+      "mfe_r": 0.223221370007939,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4297,
-      "_last_checked_t": 1784649600000
+      "_last_checked_t": 1784650500000
     },
     {
       "id": "APT-Reversal-1784647839031",
@@ -360,12 +360,12 @@
       "created_ts": 1784647839031,
       "filled_ts": 1784646900000,
       "mae_r": 0.39659784621715904,
-      "mfe_r": 0.37506001783385806,
+      "mfe_r": 0.5293915906440653,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4309,
-      "_last_checked_t": 1784649600000
+      "_last_checked_t": 1784650500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784650529409
+  "last_run_ts": 1784651437022
 }
