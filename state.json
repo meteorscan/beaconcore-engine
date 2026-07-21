@@ -33,6 +33,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 2.0273180982400953
+      },
+      "PENGU|range|intraday|Reversal": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 1.8762232213700363
       }
     },
     "calibration_buckets": {
@@ -45,6 +51,11 @@
         "n": 1,
         "wins": 0,
         "sum_conf": 0.7835711403484492
+      },
+      "Reversal|A": {
+        "n": 1,
+        "wins": 1,
+        "sum_conf": 0.7556285341428068
       }
     },
     "forensic_counts": {
@@ -53,7 +64,7 @@
     "fill_stats": {
       "Reversal|pending": {
         "dispatched": 3,
-        "filled": 0,
+        "filled": 1,
         "expired": 1
       },
       "Liquidity Sweep|pending": {
@@ -207,6 +218,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "PENGU-Reversal-1784645129252",
+      "symbol": "PENGU",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.006416504,
+      "sl": 0.006476999999999999,
+      "tp1": 0.006303,
+      "tp2": 0.006275,
+      "r_realized": 1.8762232213700363,
+      "mae_r": 0.40491933350965365,
+      "mfe_r": 2.339063739751412,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7556285341428068,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 18.00135705461246,
+        "volatility_pctl": 2.5,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1784674800000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -246,45 +284,7 @@
       "mfe_r": 1.6700458503344016,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4260,
-      "_last_checked_t": 1784673900000
-    },
-    {
-      "id": "PENGU-Reversal-1784645129252",
-      "symbol": "PENGU",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.006416504,
-      "sl": 0.006476999999999999,
-      "tp1": 0.006303,
-      "tp2": 0.006275,
-      "rr1": 1.8762232213700363,
-      "rr2": 2.339063739751412,
-      "confidence": 0.7556285341428068,
-      "grade": "A",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 26.169519090289405,
-        "volatility_pctl": 14.166666666666666,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 7,
-      "status": "active",
-      "created_ts": 1784645129252,
-      "filled_ts": 1784650500000,
-      "mae_r": 0.40491933350965365,
-      "mfe_r": 1.6943930177201962,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4297,
-      "_last_checked_t": 1784673900000
+      "_last_checked_t": 1784674800000
     },
     {
       "id": "APT-Reversal-1784647839031",
@@ -322,9 +322,9 @@
       "mfe_r": 1.421085122436378,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4309,
-      "_last_checked_t": 1784673900000
+      "_last_checked_t": 1784674800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784674841927
+  "last_run_ts": 1784675731311
 }
