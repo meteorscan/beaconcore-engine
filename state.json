@@ -17,7 +17,8 @@
       "BTC": 4,
       "SOL": 4,
       "XRP": 4,
-      "AVAX": 6
+      "AVAX": 6,
+      "XLM": 4
     },
     "regime_fit_discount": {},
     "segment_stats": {
@@ -122,13 +123,43 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 2.41412511082992
+      },
+      "BTC|trend|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
+      },
+      "XRP|trend|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
+      },
+      "ADA|trend|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
+      },
+      "XLM|range|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
+      },
+      "PENGU|trend|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
       "Liquidity Sweep|A": {
-        "n": 7,
+        "n": 8,
         "wins": 0,
-        "sum_conf": 5.402417248968922
+        "sum_conf": 6.197463971625477
       },
       "Momentum|A+": {
         "n": 1,
@@ -146,19 +177,24 @@
         "sum_conf": 4.996270252141979
       },
       "Mean Reversion|A+": {
-        "n": 4,
+        "n": 5,
         "wins": 0,
-        "sum_conf": 3.4109449922994246
+        "sum_conf": 4.213615968792921
       },
       "Range Trading|A+": {
         "n": 1,
         "wins": 0,
         "sum_conf": 0.834329249487603
+      },
+      "Mean Reversion|A": {
+        "n": 3,
+        "wins": 0,
+        "sum_conf": 2.330702593132517
       }
     },
     "forensic_counts": {
-      "genuine_variance": 51,
-      "correct_read_poor_rr": 19,
+      "genuine_variance": 54,
+      "correct_read_poor_rr": 21,
       "structural_invalidation_too_tight": 2
     },
     "fill_stats": {
@@ -169,7 +205,7 @@
       },
       "Liquidity Sweep|pending": {
         "dispatched": 17,
-        "filled": 13,
+        "filled": 14,
         "expired": 2
       },
       "Reversal|pending": {
@@ -179,7 +215,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 9,
-        "filled": 4,
+        "filled": 8,
         "expired": 1
       },
       "Breaker Block|pending": {
@@ -210,7 +246,30 @@
     "daily_totals": {
       "2026-07-18": "sent",
       "2026-07-19": "sent",
-      "2026-07-20": "sent"
+      "2026-07-20": "sent",
+      "2026-07-21": "sent"
+    },
+    "symbol_cooldown": {
+      "BTC": {
+        "direction": "bearish",
+        "until_ts": 1784618100000
+      },
+      "XRP": {
+        "direction": "bearish",
+        "until_ts": 1784613600000
+      },
+      "ADA": {
+        "direction": "bearish",
+        "until_ts": 1784604600000
+      },
+      "XLM": {
+        "direction": "bearish",
+        "until_ts": 1784624400000
+      },
+      "PENGU": {
+        "direction": "bearish",
+        "until_ts": 1784600100000
+      }
     }
   },
   "tier2_trades": [
@@ -780,6 +839,141 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "BTC-Mean Reversion-1784562330548",
+      "symbol": "BTC",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 65011.336353445935,
+      "sl": 65642.577,
+      "tp1": 63721.5,
+      "tp2": 63713.0,
+      "r_realized": -1.0,
+      "mae_r": 1.3444375788962626,
+      "mfe_r": 0.350637042551372,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7771232147288959,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 32.59127729665697,
+        "volatility_pctl": 78.33333333333333,
+        "macro_bias": "neutral"
+      },
+      "resolved_ts": 1784614500000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "XRP-Mean Reversion-1784563245711",
+      "symbol": "XRP",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 1.107732051217095,
+      "sl": 1.11916805,
+      "tp1": 1.082675,
+      "tp2": 1.0826,
+      "r_realized": -1.0,
+      "mae_r": 2.6467254288405813,
+      "mfe_r": 0.10773446556645458,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7824852311294783,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 30.682505634648574,
+        "volatility_pctl": 80.83333333333333,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1784610000000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "ADA-Mean Reversion-1784563245711",
+      "symbol": "ADA",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.1676709201546191,
+      "sl": 0.16932916,
+      "tp1": 0.16499,
+      "tp2": 0.16494,
+      "r_realized": -1.0,
+      "mae_r": 2.9785075175577957,
+      "mfe_r": 0.30810992513675317,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7710941472741427,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 40.25796846775847,
+        "volatility_pctl": 98.33333333333333,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1784601000000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "XLM-Mean Reversion-1784566844349",
+      "symbol": "XLM",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.18993067037497155,
+      "sl": 0.19211192000000002,
+      "tp1": 0.18502,
+      "tp2": 0.18491,
+      "r_realized": -1.0,
+      "mae_r": 1.2145925870331657,
+      "mfe_r": 1.5361242182117605,
+      "forensic_category": "correct_read_poor_rr",
+      "confidence": 0.8026709764934966,
+      "grade": "A+",
+      "regime_at_entry": {
+        "trend_strength": 19.209086053523567,
+        "volatility_pctl": 26.666666666666668,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1784620800000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "PENGU-Liquidity Sweep-1784567729068",
+      "symbol": "PENGU",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.00636744,
+      "sl": 0.0064080000000000005,
+      "tp1": 0.006247,
+      "tp2": 0.006173,
+      "r_realized": -1.0,
+      "mae_r": 1.4930966469427778,
+      "mfe_r": 2.2790927021696126,
+      "forensic_category": "correct_read_poor_rr",
+      "confidence": 0.795046722656555,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 23.464409017877326,
+        "volatility_pctl": 22.5,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1784596500000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -824,210 +1018,8 @@
       "r_realized": -1.0,
       "resolved_ts": 1784622600000,
       "forensic_category": "correct_read_poor_rr"
-    },
-    {
-      "id": "BTC-Mean Reversion-1784562330548",
-      "symbol": "BTC",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 65011.336353445935,
-      "sl": 65642.577,
-      "tp1": 63721.5,
-      "tp2": 63713.0,
-      "rr1": 2.0433353911652015,
-      "rr2": 2.0568009372234304,
-      "confidence": 0.7771232147288959,
-      "grade": "A",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 29.902333320853614,
-        "volatility_pctl": 78.33333333333333,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "1h",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "resolved",
-      "created_ts": 1784562330548,
-      "filled_ts": 1784561400000,
-      "mae_r": 1.3444375788962626,
-      "mfe_r": 0.350637042551372,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4066,
-      "_last_checked_t": 1784613600000,
-      "result": "loss",
-      "r_realized": -1.0,
-      "resolved_ts": 1784613600000,
-      "forensic_category": "genuine_variance"
-    },
-    {
-      "id": "XRP-Mean Reversion-1784563245711",
-      "symbol": "XRP",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 1.107732051217095,
-      "sl": 1.11916805,
-      "tp1": 1.082675,
-      "tp2": 1.0826,
-      "rr1": 2.191068020621943,
-      "rr2": 2.1976262584657733,
-      "confidence": 0.7824852311294783,
-      "grade": "A",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 26.209519158762138,
-        "volatility_pctl": 72.5,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "1h",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "resolved",
-      "created_ts": 1784563245711,
-      "filled_ts": 1784562300000,
-      "mae_r": 1.8160153019559298,
-      "mfe_r": 0.10773446556645458,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4074,
-      "_last_checked_t": 1784609100000,
-      "result": "loss",
-      "r_realized": -1.0,
-      "resolved_ts": 1784609100000,
-      "forensic_category": "genuine_variance"
-    },
-    {
-      "id": "ADA-Mean Reversion-1784563245711",
-      "symbol": "ADA",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.1676709201546191,
-      "sl": 0.16932916,
-      "tp1": 0.16499,
-      "tp2": 0.16494,
-      "rr1": 1.616726411494033,
-      "rr2": 1.6468788650967319,
-      "confidence": 0.7710941472741427,
-      "grade": "A",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 30.067250777632978,
-        "volatility_pctl": 98.33333333333333,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 9,
-      "status": "resolved",
-      "created_ts": 1784563245711,
-      "filled_ts": 1784570400000,
-      "mae_r": 2.9785075175577957,
-      "mfe_r": 0.30810992513675317,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4075,
-      "_last_checked_t": 1784600100000,
-      "result": "loss",
-      "r_realized": -1.0,
-      "resolved_ts": 1784600100000,
-      "forensic_category": "genuine_variance"
-    },
-    {
-      "id": "XLM-Mean Reversion-1784566844349",
-      "symbol": "XLM",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.18993067037497155,
-      "sl": 0.19211192000000002,
-      "tp1": 0.18502,
-      "tp2": 0.18491,
-      "rr1": 2.2513105875754436,
-      "rr2": 2.3017403956716,
-      "confidence": 0.8026709764934966,
-      "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 19.88540088743461,
-        "volatility_pctl": 55.0,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 6,
-      "status": "active",
-      "created_ts": 1784566844349,
-      "filled_ts": 1784571300000,
-      "mae_r": 0.03178436077784891,
-      "mfe_r": 1.238129897643555,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4088,
-      "_last_checked_t": 1784587500000
-    },
-    {
-      "id": "PENGU-Liquidity Sweep-1784567729068",
-      "symbol": "PENGU",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.00636744,
-      "sl": 0.0064080000000000005,
-      "tp1": 0.006247,
-      "tp2": 0.006173,
-      "rr1": 2.9694280078895354,
-      "rr2": 4.793885601577895,
-      "confidence": 0.795046722656555,
-      "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 14.860709405242817,
-        "volatility_pctl": 65.83333333333333,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "1h",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "resolved",
-      "created_ts": 1784567729068,
-      "filled_ts": 1784566800000,
-      "mae_r": 1.4930966469427778,
-      "mfe_r": 2.2790927021696126,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4091,
-      "_last_checked_t": 1784587500000,
-      "result": "loss",
-      "r_realized": -1.0,
-      "resolved_ts": 1784566800000,
-      "forensic_category": "genuine_variance"
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784588444888
+  "last_run_ts": 1784623869560
 }
