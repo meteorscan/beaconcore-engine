@@ -173,10 +173,10 @@
       "created_ts": 1784626239733,
       "filled_ts": 1784630700000,
       "mae_r": 0.10192234888318605,
-      "mfe_r": 1.4460522441425054,
+      "mfe_r": 1.6363942287468813,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4260,
-      "_last_checked_t": 1784640600000
+      "_last_checked_t": 1784641500000
     },
     {
       "id": "TAO-Liquidity Sweep-1784634332528",
@@ -210,10 +210,10 @@
       "created_ts": 1784634332528,
       "filled_ts": 1784634300000,
       "mae_r": 0.776727081691617,
-      "mfe_r": 0.49724192277384877,
+      "mfe_r": 0.536643026004741,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4279,
-      "_last_checked_t": 1784640600000
+      "_last_checked_t": 1784641500000
     },
     {
       "id": "ADA-Liquidity Sweep-1784635245978",
@@ -251,9 +251,9 @@
       "mfe_r": 0.006213592233011309,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4282,
-      "_last_checked_t": 1784640600000
+      "_last_checked_t": 1784641500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784641527024
+  "last_run_ts": 1784642447826
 }
