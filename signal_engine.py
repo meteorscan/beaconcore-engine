@@ -1,64 +1,8 @@
 #!/usr/bin/env python3
-"""
-SOVEREIGN SIGNAL ENGINE v1.0.0
-===============================
-Institutional-grade, multi-engine adaptive SMC/ICT signal engine for
-Hyperliquid perpetual futures. Single-file, scan-per-run architecture,
-designed to be invoked every 15 minutes by an external scheduler
-(GitHub Actions, cron-job.org, systemd timer, etc.).
-
---------------------------------------------------------------------------
-DESIGN SUMMARY (see inline section headers for the full implementation)
---------------------------------------------------------------------------
-  - Mandatory four-stage top-down sequence (Weekly+Daily bias -> 4H context
-    -> 1H zone-selection -> 15M MSS/FVG entry) gates every specialized
-    engine; no engine can bypass it (Section 7).
-  - Zone-Selection Sequence: HTF bias -> POI -> SFP purity (EQH/EQL sweep,
-    sweep-to-POI causality) -> MSS -> breaker confirmation -> Fibonacci OTE
-    refinement (Section 8).
-  - Thirteen specialized engines (SMC, Trend Continuation, Breakout,
-    Pullback, Liquidity Sweep, Order Block, Breaker Block, Fair Value Gap,
-    Momentum, Reversal, Mean Reversion, Range Trading, Volatility
-    Expansion) plus an opt-in Counter-Trend Reversal engine, each emitting
-    direction/entry/SL/TP1/TP2/confidence/RR/confluences/regime-fit.
-  - Composite Regime Vector (macro bias, volatility percentile, ADX trend
-    strength, session weight, session-open proximity, ERL/IRL liquidity
-    draw, noise index, breadth) feeds regime-fit veto, adaptive filter
-    routing, and the Decision Engine.
-  - Decision Engine: a small, bounded, continuous logistic blend over
-    regime fit, MTF alignment, confluence strength, historical segment
-    performance, EV, RR context, and liquidity/volatility context -- never
-    a discrete point stack. Every term is contribution-capped so no single
-    term can saturate the blend.
-  - Adaptive-percentile SL buffer + confluence-ranked, liquidity-wall-
-    clipped TP1/TP2, with a hard 1.5 TP1 RR floor (TP1 is the sole
-    resolving target; TP2 is an uncapped, informational-only reference).
-  - Entry-fill verification (`entry_kind` market/pending abstraction) with
-    bounded pending expiry -- phantom fills are structurally impossible.
-  - No automatic SL-to-breakeven repositioning on TP1 -- premature
-    stop-outs from that bug class are structurally impossible.
-  - Closed-candle-only structural detection shared by every code path
-    (Section 12A) -- no repainting, no live/backtest divergence.
-  - Closed-taxonomy loss/win forensics deterministically routes every
-    resolved trade's diagnosis to the one adaptive parameter it implicates
-    (Section 13), feeding a bounded, dampened, minimum-sample-gated,
-    circuit-breaker-protected learning loop (Section 5).
-  - Tier 1 (permanent aggregates) / Tier 2 (bounded raw log) state.json
-    structure so learned behavior survives Tier-2 pruning untouched.
-  - Correlation-cluster deduplication, macro/news blackout, filter-funnel
-    attrition logging, and fill-rate health tracking (Section 14).
-  - Hyperliquid client with weighted rate limiting, retries/backoff, and a
-    persisted, delta-fetched candle cache shared across every stage and
-    engine (Section 15).
-  - Clean, copy-paste-friendly Telegram formatting with reply-threaded
-    lifecycle status updates (Section 17).
-
-Only deliverable per the build spec is this Python file (Section 21) --
-no GitHub Actions YAML, requirements.txt, or state.json are produced here.
-
-Run:
-    python3 sovereign_signal_engine_v1_0_0.py
-"""
+# SOVEREIGN SIGNAL ENGINE -- adaptive multi-engine SMC/ICT signal engine for
+# Hyperliquid perps. Single-file, scan-per-run (external scheduler, ~15min).
+# Tier1 (permanent aggregates) / Tier2 (bounded raw log) state.json; delta-
+# fetched, persisted candle cache. Run: python3 sovereign_signal_engine.py
 
 from __future__ import annotations
 
@@ -149,14 +93,9 @@ RR_MAX_GATE = 3.5               # hard ceiling: TP1 landing this far past the so
 MAX_CONCURRENT_ACTIVE_SIGNALS = 8
 MAX_CORRELATED_CONCURRENT = 2  # per correlation cluster (Section 14)
 
-# fix v1.0.5 (root cause: correlation_dedup only checks state["active_signals"],
-# and a resolved signal is dropped from active_signals in the SAME run_scan()
-# cycle, before the scan phase runs in that same cycle -- section 12/14 gap).
-# An SL hit on a liquidity-sweep setup doesn't invalidate the EQH/EQL pool it
-# was built on, so stage1-4 can regenerate a near-identical same-symbol/
-# same-direction candidate one cycle later with nothing left to block it.
-# SAME_SETUP_COOLDOWN_MS blocks same symbol+direction re-entry for a window
-# after a loss, independent of active_signals membership.
+# fix v1.0.5: correlation_dedup only checks active_signals, which drops a
+# resolved signal same-cycle -- SAME_SETUP_COOLDOWN_MS blocks same symbol+
+# direction re-entry after a loss independent of active_signals membership.
 SAME_SETUP_COOLDOWN_MS = 60 * 60 * 1000  # 1h
 
 ENABLE_COUNTERTREND_ENGINE = os.environ.get("ENABLE_COUNTERTREND_ENGINE", "false").lower() == "true"
@@ -180,23 +119,12 @@ CIRCUIT_BREAKER_PF_DROP = 0.35  # material sustained profit-factor drop (relativ
 TIER2_RETENTION_DAYS = 15
 TIER2_MAX_TRADES = 1500
 
-# --- Section 13: baseline (documented pre-deployment reference) -------------
-# The reference engines in this project have demonstrated very low real-world
-# win rates (well under the ~45-50% a 1.5-2.0R strategy needs for positive
-# expectancy after Sections 11/12's integrity fixes). This baseline is the
-# comparison point the live-performance circuit breaker below measures
-# against once enough trades have resolved to be meaningful; it is
-# deliberately conservative rather than aspirational.
+# Baseline for the live-performance circuit breaker below (conservative, not aspirational).
 BASELINE_WIN_RATE = 0.42
 BASELINE_PROFIT_FACTOR = 1.35
 BASELINE_AVG_RR = 1.7
 
-# --- Section 13: macro/news blackout (static high-impact calendar hooks) ---
-# Exact scheduled timestamps are out of scope for a self-contained engine
-# with no external economic-calendar feed; instead this enforces the
-# mechanism -- a documented window around any event the operator flags via
-# state.json's "macro_events" list (unix ms timestamps + affected symbols) --
-# so the blackout is real and reachable rather than a no-op placeholder.
+# Macro/news blackout window around operator-flagged events (state.json "macro_events").
 MACRO_BLACKOUT_MINUTES_BEFORE = 30
 MACRO_BLACKOUT_MINUTES_AFTER = 30
 
@@ -239,12 +167,6 @@ def utcnow_ms() -> int:
 
 
 def human_label(raw: str) -> str:
-    """Section 17: convert any snake/underscore identifier into clean Title
-    Case for every user-facing surface -- the single shared formatting
-    function every message-construction path must funnel through. Idempotent
-    on strings that are already human-authored (e.g. engine names like
-    "Order Block" or acronyms like "EQH/EQL"): a word that already carries
-    internal capitalization is left untouched rather than lower-cased away."""
     if not raw:
         return ""
     words = str(raw).replace("-", "_").split("_")
@@ -302,14 +224,10 @@ def load_state() -> dict:
             finally:
                 fcntl.flock(f.fileno(), fcntl.LOCK_UN)
         base = _default_state()
-        # fix v1.0.5: tier1 merge must run BEFORE the top-level update below.
-        # base.update() matches on the "tier1" key too and was replacing the
-        # freshly-defaulted tier1 dict wholesale with the raw on-disk dict,
-        # so any tier1 sub-key not present in an already-existing state.json
-        # (e.g. symbol_cooldown, added this version) was silently discarded
-        # on every load -> KeyError in process_resolution the first time that
-        # sub-key was written to. The old per-key loop ran *after* the clobber
-        # and was merging data["tier1"] into itself, a no-op.
+        # fix v1.0.5: tier1 merge must run BEFORE base.update() below, which
+        # also matches "tier1" and was clobbering fresh defaults with the raw
+        # on-disk dict -> new tier1 sub-keys (e.g. symbol_cooldown) silently
+        # dropped on load -> KeyError in process_resolution.
         for k in ("tier1",):
             merged = base[k]
             merged.update(data.get(k, {}))
@@ -322,22 +240,6 @@ def load_state() -> dict:
 
 
 def save_state(state: dict) -> None:
-    """Atomic write (tmp + os.replace) so a crash mid-write can never
-    corrupt state.json.
-
-    NOTE: this does NOT take its own flock on LOCK_PATH. main() already
-    holds an exclusive LOCK_EX on LOCK_PATH for the full lifetime of the
-    process (see main()'s lock_f), which already guarantees only one run
-    is ever active and therefore already prevents interleaved writes.
-    Re-opening LOCK_PATH here and blocking on fcntl.flock(..., LOCK_EX)
-    self-deadlocks: flock() locks are per open-file-description, not
-    per-process, so a second fd on the same file blocks on the first fd's
-    lock even within the same process -- and that first fd is never
-    released until this call returns. That deadlock is why previous runs
-    hung indefinitely after logging "run_scan finished" and never wrote
-    state.json/candle_cache.json. Do not add locking back here; if a
-    standalone caller of save_state() ever needs mutual exclusion outside
-    of main(), use a distinct lock file (not LOCK_PATH) with LOCK_NB."""
     tmp_path = f"{STATE_PATH}.tmp"
     try:
         with open(tmp_path, "w") as f:
@@ -348,10 +250,6 @@ def save_state(state: dict) -> None:
 
 
 def prune_tier2(state: dict) -> None:
-    """Bounded, prunable raw log (Section 5). Tier 1 aggregates are already
-    updated incrementally per resolved trade, so pruning Tier 2 never
-    changes any learned parameter -- only the detailed forensic record of
-    already-summarized old trades is discarded."""
     cutoff_ms = utcnow_ms() - TIER2_RETENTION_DAYS * 86_400_000
     trades = [t for t in state["tier2_trades"] if t.get("resolved_ts", 0) >= cutoff_ms]
     if len(trades) > TIER2_MAX_TRADES:
@@ -390,8 +288,6 @@ HL_ENDPOINT_BASE_WEIGHT = {"metaAndAssetCtxs": 20, "l2Book": 2, "candleSnapshot"
 
 
 class _WeightedRateLimiter:
-    """Sliding-60s-window pacer shared across all threads, tracking request
-    weight (not raw count) so heavier calls are paced proportionally."""
 
     def __init__(self, budget_per_minute: float):
         self.budget = budget_per_minute
@@ -470,10 +366,6 @@ def current_bar_open_ms(reference_ms: int, interval: str) -> int:
 
 
 def filter_closed_candles(candles: list, interval: str, reference_ms: int) -> list:
-    """Section 12A: never trust a still-forming candle. Anything whose open
-    time is >= the current bar's open is provisional and is dropped here,
-    once, at the source -- every downstream consumer inherits closed-only
-    data automatically rather than re-implementing this check itself."""
     cutoff = current_bar_open_ms(reference_ms, interval)
     return [c for c in candles if c["t"] < cutoff]
 
@@ -496,10 +388,6 @@ def _request_candles(symbol: str, interval: str, start_ms: int, end_ms: int) -> 
 
 def get_candles(symbol: str, interval: str, n: int, reference_ms: Optional[int] = None,
                  cache_entry: Optional[list] = None) -> list:
-    """Return the last `n` closed candles. Delta-fetches only new bars past
-    the cached watermark when a cache entry is available (Section 15's
-    persistent candle_cache requirement), falling back to a full pull
-    otherwise or on a failed delta fetch."""
     reference_ms = reference_ms or utcnow_ms()
 
     if cache_entry:
@@ -524,9 +412,6 @@ def get_candles(symbol: str, interval: str, n: int, reference_ms: Optional[int] 
 
 
 def fetch_all_candles(symbol: str, candle_cache: dict, reference_ms: Optional[int] = None) -> Optional[dict]:
-    """Bounded, shared, persisted per Section 15: every stage and every
-    specialized engine reads this same bundle rather than each fetching or
-    caching its own copy."""
     bundle = {}
     sym_cache = candle_cache.get(symbol, {})
     for tf in ALL_TFS:
@@ -550,7 +435,6 @@ def get_meta_and_ctx():
 
 
 def get_market_snapshot() -> dict:
-    """symbol -> {mark, funding, oi_usd} via one batched metaAndAssetCtxs call."""
     out = {}
     got = get_meta_and_ctx()
     if not got:
@@ -707,13 +591,7 @@ def percentile_rank(vals: list, x: float) -> float:
 # ============================================================================
 # SECTION 4 -- STRUCTURAL PRIMITIVES (Pivots, OB, Breaker, FVG, BOS/CHoCH,
 #              EQH/EQL liquidity pools, SFP purity)
-#
-# Section 12A mandate: these are the ONE set of detection functions used by
-# every code path (live scan today; the same functions would drive any
-# future backtest harness) -- never a parallel, simplified reimplementation.
-# Every function here operates strictly on the closed-candle list handed to
-# it; callers are responsible for having already stripped the forming
-# candle via filter_closed_candles(), so nothing here can repaint.
+# One shared detection set for every code path; closed-candle-only inputs.
 # ============================================================================
 
 @dataclass
@@ -761,11 +639,6 @@ def find_pivots(candles: list, lookback: int = SWING_LOOKBACK) -> list:
 
 
 def liquidity_pools(candles: list, pivots: list, atr: float) -> list:
-    """EQH/EQL -> BSL/SSL identification (Section 8 step 3). Clusters swing
-    points within EQ_CLUSTER_TOLERANCE_ATR * ATR of each other; an isolated
-    swing point (no cluster partner) is still returned, tagged equal=False,
-    since a sweep of an isolated point is not disqualified -- just a weaker
-    case per the spec."""
     highs = sorted([p for p in pivots if p.kind == "high"], key=lambda p: p.price)
     lows = sorted([p for p in pivots if p.kind == "low"], key=lambda p: p.price)
     tol = max(atr * EQ_CLUSTER_TOLERANCE_ATR, 1e-9)
@@ -795,10 +668,6 @@ def liquidity_pools(candles: list, pivots: list, atr: float) -> list:
 
 
 def mark_sweeps(candles: list, pools: list) -> None:
-    """Mutates pools in place: for each pool, find the first closed candle
-    whose wick trades through the level and closes back on the origin side
-    (a genuine wick-based rejection -- SFP purity), vs. one that merely
-    trades through without closing back (impure / not a sweep at all)."""
     n = len(candles)
     for pool in pools:
         origin_idx = max(pool.idx_list)
@@ -815,8 +684,6 @@ def mark_sweeps(candles: list, pools: list) -> None:
 
 
 def find_fvgs(candles: list, origin_idx_min: int = 0) -> list:
-    """Three-candle imbalance: gap between candle i-2's high/low and candle
-    i's low/high, left unfilled by candle i-1."""
     zones = []
     for i in range(2, len(candles)):
         if i - 2 < origin_idx_min:
@@ -831,11 +698,6 @@ def find_fvgs(candles: list, origin_idx_min: int = 0) -> list:
 
 def structure_shift(candles: list, pivots: list, direction: str, kind: str,
                      start_idx: int = 0) -> Optional[Pivot]:
-    """BOS (break of structure, trend continuation) or CHoCH (change of
-    character, counter-trend) detection, shared by every caller (Section
-    12A -- one function, all paths). `direction` is the direction of the
-    break being sought (bullish break = close above the last swing high).
-    Returns the pivot that was broken, or None."""
     highs = [p for p in pivots if p.kind == "high" and p.idx >= start_idx]
     lows = [p for p in pivots if p.kind == "low" and p.idx >= start_idx]
     if direction == "bullish" and highs:
@@ -863,7 +725,6 @@ def structure_shift(candles: list, pivots: list, direction: str, kind: str,
 
 
 def find_order_blocks(candles: list, direction: str, since_idx: int = 0) -> list:
-    """Last opposite-colored candle before an impulsive move in `direction`."""
     zones = []
     n = len(candles)
     for i in range(max(since_idx, 1), n - 1):
@@ -880,9 +741,6 @@ def find_order_blocks(candles: list, direction: str, since_idx: int = 0) -> list
 
 
 def find_breaker_blocks(candles: list, pivots: list, direction: str, since_idx: int = 0) -> list:
-    """A breaker block is a former order block on the losing side of a
-    confirmed structure shift, flipped and retested. Reuses structure_shift
-    and find_order_blocks rather than re-deriving structure detection."""
     shift = structure_shift(candles, pivots, direction, "any", since_idx)
     if shift is None:
         return []
@@ -908,9 +766,6 @@ def mark_mitigated(zones: list, candles: list) -> None:
 
 
 def tag_sweep_to_poi_causality(zones: list, pools: list, candles: list, lookahead_bars: int = 6) -> None:
-    """Sweep-to-POI causality (Section 8 step 3, mandatory framing): a zone
-    only counts as arising from a sweep if it forms within a short window
-    after that specific pool's sweep, not merely nearby in price."""
     swept = [p for p in pools if p.swept and p.pure_sfp]
     for z in zones:
         for p in swept:
@@ -1026,8 +881,6 @@ def active_session(ts_ms: int) -> str:
 
 
 def session_open_proximity(ts_ms: int) -> float:
-    """Continuous, decaying score for closeness to a London/NY session-open
-    window -- soft input only (Section 6), never a hard gate anywhere."""
     dt = datetime.fromtimestamp(ts_ms / 1000, tz=timezone.utc)
     minutes_now = dt.hour * 60 + dt.minute
     best = 0.0
@@ -1040,9 +893,6 @@ def session_open_proximity(ts_ms: int) -> float:
 
 
 def noise_index(view: View) -> float:
-    """Choppiness independent of raw volatility: ratio of net directional
-    displacement to summed absolute bar-to-bar movement over a recent
-    window -- low ratio = whipsaw, high ratio = clean directional travel."""
     window = view.candles[-30:]
     if len(window) < 10:
         return 0.5
@@ -1067,10 +917,6 @@ def compute_breadth(views_by_symbol: dict, macro_bias: str) -> float:
 
 
 def liquidity_draw_state(view_1h: View) -> str:
-    """ERL (external range liquidity -- an unswept EQH/EQL cluster) vs IRL
-    (internal range liquidity -- an unmitigated FVG/OB/breaker inside the
-    current range). Soft continuous read, never a standalone directional
-    call (Section 6)."""
     unswept_pools = [p for p in view_1h.pools if not p.swept and p.equal]
     unmitigated_zones = [z for z in (view_1h.fvgs + view_1h.bull_obs + view_1h.bear_obs) if not z.mitigated]
     if len(unswept_pools) > len(unmitigated_zones):
@@ -1111,8 +957,6 @@ class StageResult:
 
 
 def stage1_bias(views: dict) -> StageResult:
-    """Weekly + Daily -> Market Bias. Resolves exactly one of Bullish /
-    Bearish / Neutral (Section 7 Stage 1)."""
     w, d = views[TF_WEEKLY], views[TF_DAILY]
     w_bull = w.close > w.ema_slow and w.ema_fast > w.ema_slow
     w_bear = w.close < w.ema_slow and w.ema_fast < w.ema_slow
@@ -1126,7 +970,6 @@ def stage1_bias(views: dict) -> StageResult:
 
 
 def stage2_context(views: dict, bias: str) -> StageResult:
-    """4H -> Market Context. Confirms the 4H agrees with the Stage 1 bias."""
     h4 = views[TF_4H]
     h4_bull = h4.close > h4.ema_slow and h4.ema_fast >= h4.ema_slow * 0.999
     h4_bear = h4.close < h4.ema_slow and h4.ema_fast <= h4.ema_slow * 1.001
@@ -1138,10 +981,6 @@ def stage2_context(views: dict, bias: str) -> StageResult:
 
 
 def zone_selection_sequence(views: dict, bias: str, state: dict, symbol: str):
-    """Section 8's mandatory Zone-Selection Sequence, executed within Stage
-    3 (1H Trade Setup). Steps 2-5; step 6 (Fibonacci OTE) is applied later,
-    inside Stage 4, as a placement refinement only. Returns (outcome, poi)
-    where outcome in {"VALID","NOT READY","INVALID"}."""
     h1 = views[TF_1H]
     direction = bias
     # Step 2: POI candidate pool -- order blocks, breaker blocks, FVGs matching bias
@@ -1184,10 +1023,6 @@ def stage3_zone_selection(views: dict, bias: str, state: dict, symbol: str) -> S
 
 def fibonacci_ote_refine(direction: str, impulse_low: float, impulse_high: float,
                           poi_top: float, poi_bottom: float):
-    """Step 6: Fibonacci OTE refinement -- a placement adjustment inside an
-    already-validated zone, never a standalone confluence point (Section
-    8). Returns a refined entry price if the 61.8-79% pocket overlaps the
-    structural POI, else None (caller falls back to the POI midpoint)."""
     span = impulse_high - impulse_low
     if span <= 0:
         return None
@@ -1205,9 +1040,6 @@ def fibonacci_ote_refine(direction: str, impulse_low: float, impulse_high: float
 
 
 def stage4_entry(views: dict, bias: str, poi: Zone) -> StageResult:
-    """15M -> Trade Entry. Requires a confirmed 15M MSS in the bias
-    direction occurring inside the Stage 3 POI, with the FVG created by
-    that specific break as the entry vehicle (Section 7 Stage 4)."""
     m15 = views[TF_15M]
     shift = structure_shift(m15.candles, m15.pivots, bias, "any")
     if shift is None:
@@ -1251,12 +1083,7 @@ MIN_ENTRY_SL_DISTANCE_ATR = 0.5   # was 0.25 -- too small a multiple of a 15m AT
 MAX_ENTRY_FROM_MARKET_ATR = 1.2  # cap on how far a pending/zone entry may sit from current price
 NOISE_SURVIVAL_FLOOR_ATR = 0.5   # was 0.35 -- 15m-anchored SL must clear this vs recent adverse wicks
 MIN_SL_DISTANCE_PCT = 0.006     # hard floor: risk must be >= 0.6% of entry regardless of ATR.
-                                 # ATR-based floors above can still be tiny in $ terms during quiet
-                                 # periods; this is the belt-and-suspenders guarantee that no
-                                 # signal is ever scalp-tight just because volatility was low when
-                                 # it fired. Raise this further (e.g. 0.01-0.015) for a stricter,
-                                 # more swing-oriented floor -- it only rejects tighter candidates,
-                                 # never loosens a genuinely wider structural stop.
+                                 # Absolute floor so a quiet-volatility ATR reading can't produce a scalp-tight SL.
 MAX_SL_DISTANCE_PCT = 0.025     # hard ceiling: risk must be <= 2.5% of entry regardless of ATR.
                                  # MAX_SL_DISTANCE_ATR above is ATR-relative, so on a volatility
                                  # spike day 3x ATR can itself become a wide, uncomfortable % move --
@@ -1265,27 +1092,6 @@ MAX_SL_DISTANCE_PCT = 0.025     # hard ceiling: risk must be <= 2.5% of entry re
 
 
 def _valid_structural_anchor(direction: str, entry: float, pivots: list) -> Optional[float]:
-    """Most recent opposing pivot that price has NOT already traded
-    through -- the genuine invalidation level the trade thesis depends on.
-
-    Bug fix (v1.0.1 -> v1.0.2): the previous version took the most recent
-    CONFIRMED pivot unconditionally (opp_pivots_15m[-1]), with no check on
-    which side of entry it actually sat. A confirmed pivot lags price by
-    `lookback` bars by construction (Section 4), so on precisely the setups
-    where this matters most -- e.g. Mean Reversion shorting a fresh 1H
-    high -- the last confirmed 15m pivot high is almost always BELOW the
-    current price making that fresh high, because price has already broken
-    above it. Anchoring a short's stop there put the "stop" on the same
-    side of entry as the take-profit: a level that price moving in the
-    PROFITABLE direction would hit, not the adverse direction. That is
-    what produced SL levels below entry on shorts (and above entry on
-    longs) at nonsensically tight distances -- the anchor was already
-    invalidated before the trade was even placed.
-
-    A short's stop anchor must sit above entry; a long's must sit below.
-    We walk backward from most recent and take the first pivot that still
-    satisfies that -- i.e. still-standing structure, not broken structure.
-    """
     opp_kind = "low" if direction == "bullish" else "high"
     candidates = [p for p in pivots if p.kind == opp_kind]
     for p in reversed(candidates):
@@ -1297,21 +1103,6 @@ def _valid_structural_anchor(direction: str, entry: float, pivots: list) -> Opti
 
 
 def _liquidity_extension_buffer(direction: str, sl: float, view: View) -> float:
-    """Second, distinct layer of SL safety on top of _adaptive_sl_buffer's
-    generic noise cushion. A deliberate liquidity-grab wick isn't ordinary
-    noise -- it's aimed at a specific, known cluster of resting stops (an
-    EQH/EQL pool the engine already detects via liquidity_pools/mark_sweeps).
-    If an unswept opposing pool sits between the raw SL and where a hunt
-    would actually reach, the SL is parked in FRONT of the real target: the
-    hunt tags it on the way to the pool, before the reversal that was the
-    whole thesis. This pushes the SL just past the farthest such pool
-    within a bounded window instead, so the stop only triggers on a
-    genuine break of the level smart money was actually going for -- not
-    the hunt that precedes the reversal. Bounded by `view.atr * 1.5` so a
-    distant pool doesn't quietly balloon the stop; if extending past a pool
-    would blow the MAX_SL_DISTANCE ceilings, build_risk_plan's existing
-    ceiling checks reject the trade rather than accept a stop that's still
-    sitting in the hunt's way."""
     wanted_kind = "SSL" if direction == "bullish" else "BSL"
     window = view.atr * 1.5
     if direction == "bullish":
@@ -1333,10 +1124,6 @@ def _liquidity_extension_buffer(direction: str, sl: float, view: View) -> float:
 
 
 def _adaptive_sl_buffer(symbol: str, tf: str, view: View, state: dict) -> float:
-    """Nth percentile of recent adverse-wick excursions beyond structure,
-    where N is itself a bounded, dampened adaptive parameter (Section 5),
-    not a fixed constant -- widens on noisy assets/timeframes, tightens on
-    clean ones."""
     key = f"{symbol}|{tf}"
     pctl = state["tier1"]["sl_buffer_percentile"].get(key, 70.0)
     pctl = max(SL_BUFFER_PCTL_MIN, min(SL_BUFFER_PCTL_MAX, pctl))
@@ -1352,8 +1139,6 @@ def _adaptive_sl_buffer(symbol: str, tf: str, view: View, state: dict) -> float:
 
 
 def _opposing_structural_levels(direction: str, view: View) -> list:
-    """Genuine opposing structural levels on the given view: opposite-side
-    pivots, unmitigated opposing zones, and opposing liquidity pools."""
     levels = []
     opp_pivot_kind = "high" if direction == "bullish" else "low"
     for p in view.pivots:
@@ -1372,10 +1157,6 @@ def _opposing_structural_levels(direction: str, view: View) -> list:
 
 def _tp_selection_band(direction: str, entry: float, sl: float, view: View,
                         rank_preference: int) -> dict:
-    """Confluence-ranked TP candidate selection (Section 10 mandatory
-    pattern): among genuine opposing levels within the runway near-band,
-    picks the strongest by confluence -- not simply nearest by price --
-    then clips to the closest liquidity wall inside the path."""
     risk = abs(entry - sl)
     levels = _opposing_structural_levels(direction, view)
     if direction == "bullish":
@@ -1414,13 +1195,6 @@ def _tp_selection_band(direction: str, entry: float, sl: float, view: View,
 
 def build_risk_plan(direction: str, entry: float, view_15m: View, view_1h: View, view_4h: View,
                      state: dict, symbol: str, rr_min_gate: float = RR_MIN_GATE) -> Optional[dict]:
-    """The single mandatory risk-plan construction (Section 10 Reference
-    Implementation) -- SL-anchor hierarchy, adaptive-percentile noise
-    buffer, liquidity-grab extension buffer, confluence-ranked/liquidity-
-    wall-clipped TP, RR floor+ceiling, TP-ordering integrity, entry-
-    placement rules. Fully replaces any fixed ATR multiple, RR formula, or
-    percentage target anywhere else in the engine. Returns None (reject) on
-    any hard gate failure."""
 
     # --- SL anchor: 15M primary, escalate to H1/H4 only on noise-survival
     # failure OR when no still-valid (unbroken) 15m structure exists ---
@@ -1498,16 +1272,9 @@ def build_risk_plan(direction: str, entry: float, view_15m: View, view_1h: View,
         return None  # reject-only gate, never rescued by widening SL/target
     if rr1 > RR_MAX_GATE:
         return None  # TP1 too far to be a realistic target -- reject, don't relabel (fix v1.0.2:
-                      # a prior version clamped this number instead of the price, which is exactly
-                      # the kind of mismatch we don't want to reintroduce on the far side either)
-    # NOTE (fix v1.0.2): previously clamped rr1 to RR_SOFT_TARGET here. That
-    # only mutated the reported number -- tp1 stayed at its real structural
-    # price -- so the RR shown on the signal card didn't match the RR you'd
-    # compute yourself from entry/SL/TP1. It also fed monitor_signal()'s
-    # r_realized on a win, so the engine's own stats undercounted real wins.
-    # _rr_context_term() already saturates its OWN contribution to the
-    # confidence score at RR_SOFT_TARGET independently, so nothing here
-    # needs a clamp -- rr1 is left as the true, price-consistent value.
+                      # (avoid the v1.0.2 bug: clamping this number instead of price mismatched
+                      # displayed RR vs. real entry/SL/TP1 and undercounted realized wins.)
+    # fix v1.0.2: rr1 is left as the true, price-consistent value -- not clamped.
 
     tp2 = band.get("tp2")
     # TP ordering integrity: TP2 must sit strictly farther than TP1, guaranteed by construction
@@ -1553,26 +1320,15 @@ def make_pending_state() -> dict:
 
 
 def entry_kind_for(engine_name: str, is_zone_based: bool) -> str:
-    """Which entry_kind each engine/setup type uses is explicitly
-    documented here, never silently assumed (Section 12)."""
     return "pending" if is_zone_based else "market"
 
 
 # ============================================================================
 # SECTION 10 -- SPECIALIZED ENGINES (Section 4's ensemble, minimum 13)
-#
-# Every engine is locked to the Stage-1 bias as its trade direction (Section
-# 7/8 step 1 -- "nothing downstream is evaluated against a level that fights
-# this bias"). Each independently returns a Candidate carrying direction,
-# entry, SL, TP1(+TP2), confidence, RR, confluences, and documented regime
-# fit, or None. All construct SL/TP exclusively via build_risk_plan -- no
-# engine computes its own RR formula, ATR multiple, or percentage target.
+# Each locked to Stage-1 bias; returns a Candidate or None via build_risk_plan.
 # ============================================================================
 
 def _base_confidence(confluence_count: int, rr1: float, regime: RegimeVector, best_fit: bool) -> float:
-    """Shared raw-confidence starting point every engine derives from,
-    before the Decision Engine's own continuous blend (Section 4) --
-    intentionally simple and bounded so no engine pre-biases the blend."""
     c = 0.42 + 0.06 * min(confluence_count, 5)
     c += 0.05 if best_fit else -0.05
     c += 0.03 if regime.trend_strength >= 22 else 0.0
@@ -1580,16 +1336,6 @@ def _base_confidence(confluence_count: int, rr1: float, regime: RegimeVector, be
 
 
 def _retracement_entry(direction: str, m15: View, since_idx: int, fallback: float) -> float:
-    """Shared 'perfect entry' helper (fix v1.0.2 -> v1.0.3): every engine
-    below used to set entry = m15.close, i.e. whatever the last candle
-    happened to print, then fire a market order on it -- no different from
-    the SL/TP anchor bug, just applied to entry instead of risk. This is
-    the same OTE-pocket principle Stage 4 already uses for the SMC engine
-    (fibonacci_ote_refine), generalized: find the impulse leg since the
-    event that triggered this setup (a sweep, a CHoCH, etc.) and place the
-    entry at the 61.8-79% retracement of it, not at whatever price already
-    reached. If the leg is too short/flat to produce a real pocket, falls
-    back to the given price rather than guessing."""
     leg = m15.candles[max(0, since_idx):]
     if len(leg) < 2:
         return fallback
@@ -1609,8 +1355,6 @@ def _retracement_entry(direction: str, m15: View, since_idx: int, fallback: floa
 
 def run_smc_engine(bias: str, views: dict, stage3: StageResult, stage4: StageResult,
                     regime: RegimeVector, state: dict, symbol: str) -> Optional[Candidate]:
-    """Primary SMC/ICT engine: the full Section 7/8 pipeline itself --
-    HTF bias -> zone-selection sequence -> MSS/FVG entry -> risk plan."""
     if stage3.outcome != "VALID" or stage4.outcome != "VALID":
         return None
     poi = stage3.poi  # type: ignore[attr-defined]
@@ -1966,9 +1710,6 @@ BASE_ENGINE_RUNNERS = {
 # ============================================================================
 
 def _htf_poi_pool(direction: str, weekly_view: View, daily_view: View) -> Optional[dict]:
-    """Step 1: Weekly/Daily-sourced POI pool, reusing the same detection
-    functions Section 8 step 2 uses for the 1H pool -- invoked against
-    Weekly/Daily views instead."""
     for view in (daily_view, weekly_view):
         pool = (view.bull_obs + view.bull_breakers + [z for z in view.fvgs if z.direction == "bullish"]) \
             if direction == "bullish" else \
@@ -1986,9 +1727,6 @@ def _htf_poi_pool(direction: str, weekly_view: View, daily_view: View) -> Option
 
 
 def _exhaustion_signature(direction: str, view: View) -> Optional[float]:
-    """Step 2: momentum-exhaustion signature on 4H/1H -- shrinking bodies,
-    elongated opposing wick, failure to make a new swing extreme, RSI
-    divergence as an optional soft booster only."""
     candles = view.candles[-8:]
     if len(candles) < 6:
         return None
@@ -2017,11 +1755,6 @@ def _exhaustion_signature(direction: str, view: View) -> Optional[float]:
 
 
 def _retest_and_hold(direction: str, choch_level: float, m15: View, state: dict, symbol: str):
-    """Step 4: retest-and-hold stage. Not an instant entry on the CHoCH
-    candle -- tracks the broken level and waits (bounded by
-    COUNTERTREND_RETEST_EXPIRY_BARS) for a closed-candle hold or rejection
-    wick back at it, hooking into the standard entry_kind='pending'
-    machinery rather than a separate tracker."""
     recent = m15.candles[-COUNTERTREND_RETEST_EXPIRY_BARS:]
     for c in recent:
         touched = c["l"] <= choch_level <= c["h"]
@@ -2038,10 +1771,6 @@ def _retest_and_hold(direction: str, choch_level: float, m15: View, state: dict,
 
 def run_countertrend_engine(base_bias: str, views: dict, regime: RegimeVector,
                              state: dict, symbol: str) -> Optional[Candidate]:
-    """Section 4A: opt-in, separate gate. Fires only when Stage 1 resolves
-    Bullish/Bearish and produces the OPPOSITE direction only. Strictly
-    additive -- never called unless ENABLE_COUNTERTREND_ENGINE is true, and
-    never suppresses/alters base-ensemble output."""
     if not ENABLE_COUNTERTREND_ENGINE:
         return None
     if base_bias not in ("bullish", "bearish"):
@@ -2081,8 +1810,6 @@ def run_countertrend_engine(base_bias: str, views: dict, regime: RegimeVector,
 
 def run_specialized_engines(bias: str, views: dict, stage3: StageResult, stage4: StageResult,
                              regime: RegimeVector, state: dict, symbol: str) -> list:
-    """Runs every base-ensemble engine additively, plus the opt-in
-    counter-trend engine as a strictly separate, non-suppressing call."""
     candidates = []
     if bias in ("bullish", "bearish"):
         cand = run_smc_engine(bias, views, stage3, stage4, regime, state, symbol)
@@ -2162,10 +1889,6 @@ def _liquidity_vol_context_term(regime: RegimeVector) -> float:
 
 
 def regime_fit_score(candidate: Candidate, regime: RegimeVector) -> float:
-    """Regime-fit veto/discount (Section 13). Counter-trend's documented
-    best-fit is explicitly reversal/high-vol against the dominant bias --
-    its 'against Stage 1 bias' nature must never itself be penalized here,
-    unlike a base-ensemble engine."""
     regime_tags = []
     if regime.is_trending():
         regime_tags.append("trending")
@@ -2185,10 +1908,6 @@ def regime_fit_score(candidate: Candidate, regime: RegimeVector) -> float:
 
 
 def liquidity_sanity_check(candidate: Candidate, view_1h: View) -> bool:
-    """Section 13: reject/heavily discount entries sitting directly inside
-    a level about to be swept or immediately adjacent to an obvious
-    unmitigated EQH/EQL cluster, unless the setup IS a liquidity-sweep
-    engine designed to trade that behavior."""
     if candidate.engine in ("Liquidity Sweep", "Reversal", "Counter-Trend Reversal"):
         return True
     danger_kind = "BSL" if candidate.direction == "bullish" else "SSL"
@@ -2200,9 +1919,6 @@ def liquidity_sanity_check(candidate: Candidate, view_1h: View) -> bool:
 
 
 def macro_blackout_active(symbol: str, state: dict, now_ms: int) -> bool:
-    """Section 13 macro/news blackout: a documented window around any
-    operator-flagged high-impact event, for the directly affected asset(s)
-    and correlated majors."""
     events = state.get("macro_events", [])
     cluster = correlation_cluster(symbol)
     before_ms = MACRO_BLACKOUT_MINUTES_BEFORE * 60_000
@@ -2219,10 +1935,6 @@ def macro_blackout_active(symbol: str, state: dict, now_ms: int) -> bool:
 
 
 def composite_score(candidate: Candidate, views: dict, regime: RegimeVector, state: dict) -> dict:
-    """Section 4 mandatory continuous blend: a small number of weighted
-    terms, each individually contribution-capped so none can saturate the
-    output, combined through a logistic transform. Returns the score plus
-    each term's raw and capped contribution for auditability."""
     weights = dict(SCORE_TERM_WEIGHTS_DEFAULT)
     for term in weights:
         adj = state["tier1"]["filter_thresholds"].get(f"score_term::{term}", 1.0)
@@ -2268,9 +1980,6 @@ def _confidence_bucket(score: float) -> str:
 
 def rank_and_select(candidates: list, views: dict, regime: RegimeVector, state: dict, symbol: str,
                      now_ms: int) -> list:
-    """Decision Engine: score every candidate, apply regime-fit veto,
-    liquidity sanity check, macro blackout, and TP-ordering final
-    assertion; return ranked, tiered signals."""
     if macro_blackout_active(symbol, state, now_ms):
         _log_funnel(state, "macro_blackout", seen=len(candidates), rejected=len(candidates))
         return []
@@ -2306,22 +2015,6 @@ def _bump_funnel_rejected(state: dict, name: str) -> None:
 
 
 def correlation_dedup(ranked: list, active_signals: list, state: dict, now_ms: int) -> list:
-    """Section 14 correlation cap: caps concurrent exposure per correlation
-    cluster jointly across the base ensemble and the counter-trend engine
-    -- never a separate exempt pool.
-
-    Also enforces one active signal per symbol: a symbol that already has
-    an active/pending signal is skipped entirely, and if multiple new
-    candidates exist for the same symbol in this batch (e.g. Mean
-    Reversion and Liquidity Sweep both firing on the same asset), only the
-    single highest-scored one is accepted -- `ranked` is already sorted by
-    score descending, so the first candidate seen per symbol is the best.
-
-    fix v1.0.5: also rejects a same-symbol/same-direction candidate while
-    that symbol is inside its post-loss SAME_SETUP_COOLDOWN_MS window (see
-    process_resolution) -- this is the actual gap that let a swept-but-
-    unresolved liquidity pool re-dispatch an almost-identical signal one
-    scan cycle after the prior one resolved as a loss."""
     cluster_counts = collections.Counter(correlation_cluster(s["symbol"]) for s in active_signals)
     symbols_with_active = {s["symbol"] for s in active_signals}
     symbols_accepted_this_batch = set()
@@ -2346,14 +2039,8 @@ def correlation_dedup(ranked: list, active_signals: list, state: dict, now_ms: i
 
 # ============================================================================
 # SECTION 12 -- SIGNAL LIFECYCLE: DISPATCH, FILL VERIFICATION, RESOLUTION
-#
-# Position-exit model (declared explicitly, per Section 11's mandatory
-# declaration rule): FULL EXIT AT TP1. 100% of position size closes at
-# TP1; nothing remains open afterward, so a later touch of the original SL
-# is bookkeeping only and has zero effect on realized P&L. The engine never
-# auto-repositions SL to breakeven on TP1 -- the original structure-based
-# SL stays in the record unchanged, for internal tracking only, and is
-# simply never evaluated again once TP1 has resolved the trade as a WIN.
+# Position-exit model: FULL EXIT AT TP1. SL is never repositioned to
+# breakeven and is never re-evaluated once TP1 resolves the trade a WIN.
 # ============================================================================
 
 def new_signal_record(candidate: Candidate, score: float, grade: str, symbol: str, now_ms: int) -> dict:
@@ -2387,30 +2074,13 @@ def new_signal_record(candidate: Candidate, score: float, grade: str, symbol: st
         "mfe_r": 0.0,
         "resolution_logic_version": RESOLUTION_LOGIC_VERSION,
         "tg_message_id": None,
-        # Seeds the monitor_signal() watermark to the last CLOSED 15m candle
-        # at creation time, minus one extra step. Without this, sig.get(
-        # "_last_checked_t", -1) defaults to -1 and the first monitoring
-        # pass (get_candles returns up to 30 closed candles, ~7.5h of
-        # history) walks every candle in that window, including ones from
-        # BEFORE the signal existed -- any pre-creation wick that happened
-        # to cross the SL/TP level then falsely resolves the signal as an
-        # instant win/loss on the very next run. Subtracting one extra step
-        # (rather than just the last-closed candle's own open time) keeps
-        # that most-recent-closed candle eligible for the first pass, which
-        # is what "same-candle fill allowed" (Section 12) actually means --
-        # not "allow any candle from the signal's whole lookback window."
+        # Seeds the watermark one step before creation-time so the first monitor
+        # pass can't walk pre-creation candles into a false instant win/loss.
         "_last_checked_t": current_bar_open_ms(now_ms, MONITOR_TF) - 2 * TF_MS[MONITOR_TF],
     }
 
 
 def monitor_signal(sig: dict, monitor_candles: list) -> Optional[dict]:
-    """Advances a single signal's lifecycle against newly-closed monitor-TF
-    candles. Returns an event dict describing what happened (for Telegram +
-    forensic logging), or None if nothing changed. Section 12 rules:
-      - pending signals: entry not filled -> only check fill, never SL/TP
-      - once filled (same candle allowed): evaluate SL vs TP1 that candle
-      - Section 11: single-TP resolution, no TP2 monitoring, no auto-BE
-    """
     direction = sig["direction"]
     risk = abs(sig["entry"] - sig["sl"])
     for c in monitor_candles:
@@ -2443,13 +2113,7 @@ def monitor_signal(sig: dict, monitor_candles: list) -> Optional[dict]:
             sig["mfe_r"] = max(sig["mfe_r"], mfe)
             sig["mae_r"] = max(sig["mae_r"], mae)
 
-        # Resolution order (documented, Section 11): SL is checked first on
-        # the fill candle to avoid ever crediting a win from a candle whose
-        # wick would have stopped the trade out first at conservative
-        # worst-case ordering -- this can only ever make the engine more
-        # conservative about crediting wins, never manufacture a false
-        # stop-out that wouldn't otherwise have happened, since SL and TP1
-        # are evaluated against the same single candle's actual high/low.
+        # SL checked first on the fill candle (conservative worst-case ordering).
         sl_hit = (c["l"] <= sig["sl"]) if direction == "bullish" else (c["h"] >= sig["sl"])
         tp1_hit = (c["h"] >= sig["tp1"]) if direction == "bullish" else (c["l"] <= sig["tp1"])
 
@@ -2483,10 +2147,6 @@ FORENSIC_CATEGORIES = [
 
 
 def classify_forensics(sig: dict, views: dict, regime: RegimeVector, state: dict) -> str:
-    """Every category is a positive, verifiable condition on recorded trade
-    data (Section 13.1a) -- checked in order of diagnostic specificity, not
-    reached by elimination. 'genuine_variance' is the deliberate final
-    fallback only after every positive check has failed."""
     is_loss = sig["result"] == "loss"
     mfe = sig.get("mfe_r", 0.0)
     mae = sig.get("mae_r", 0.0)
@@ -2537,9 +2197,6 @@ def classify_forensics(sig: dict, views: dict, regime: RegimeVector, state: dict
 
 
 def adaptive_route(category: str, sig: dict, state: dict) -> None:
-    """One diagnosis, one deterministic route (Section 13.3) -- each
-    category maps to exactly the specific adaptive parameter it implicates,
-    bounded and dampened (Section 5)."""
     t1 = state["tier1"]
     symbol, engine = sig["symbol"], sig["engine"]
 
@@ -2597,8 +2254,6 @@ def adaptive_route(category: str, sig: dict, state: dict) -> None:
 
 
 def reinforce_win(sig: dict, state: dict) -> None:
-    """Win reinforcement (Section 13.2): raise, within bounds, the weights
-    of factors genuinely present and predictive."""
     t1 = state["tier1"]
     engine = sig["engine"]
     seg_key = f"{sig['symbol']}|{'trend' if sig.get('regime_at_entry', {}).get('trend_strength', 0) and sig['regime_at_entry']['trend_strength'] >= 22 else 'range'}|{sig['style']}|{engine}"
@@ -2611,17 +2266,12 @@ def reinforce_win(sig: dict, state: dict) -> None:
 
 
 def _damp(current: float, target: float, lo: float, hi: float, step: float) -> float:
-    """Dampened, capped update (Section 5 mandatory): moves at most `step`
-    toward `target`, then clamps into [lo, hi]. Prevents any single run's
-    result from swinging a parameter far in one update."""
     direction = 1 if target > current else -1
     moved = current + direction * min(abs(target - current), step)
     return max(lo, min(hi, moved))
 
 
 def update_segment_stats(sig: dict, state: dict) -> None:
-    """Tier 1 incremental update -- one resolved trade at a time, never a
-    rescan of Tier 2 (Section 5 mandatory)."""
     trending = sig.get("regime_at_entry", {}).get("trend_strength")
     regime_bucket = "trend" if (trending is not None and trending >= 22) else "range"
     key = f"{sig['symbol']}|{regime_bucket}|{sig['style']}|{sig['engine']}"
@@ -2647,10 +2297,6 @@ def update_segment_stats(sig: dict, state: dict) -> None:
 
 
 def check_circuit_breaker(state: dict) -> None:
-    """Live-performance circuit breaker (Section 5 mandatory): compares
-    rolling live performance against the Section 13 baseline once enough
-    trades have resolved; freezes adaptation and alerts on material
-    sustained deviation; auto-resumes on recovery."""
     trades = [t for t in state["tier2_trades"] if t.get("result") in ("win", "loss")
               and t.get("resolution_logic_version") == RESOLUTION_LOGIC_VERSION]
     if len(trades) < CIRCUIT_BREAKER_WINDOW:
@@ -2680,10 +2326,6 @@ def check_circuit_breaker(state: dict) -> None:
 
 
 def process_resolution(sig: dict, views: dict, regime: RegimeVector, state: dict) -> None:
-    """Section 13's closed-loop: classify, route to the exactly-one
-    implicated parameter, reinforce wins, update Tier-1 aggregates, append
-    to the bounded Tier-2 log, and check the circuit breaker -- all gated
-    by whether adaptation is currently frozen."""
     sig["regime_at_entry"] = {
         "trend_strength": regime.trend_strength, "volatility_pctl": regime.volatility_pctl,
         "macro_bias": regime.macro_bias,
@@ -2769,9 +2411,6 @@ def _price_line(label: str, value: float) -> str:
 
 
 def format_signal_message(sig: dict) -> str:
-    """Section 17: clean, deliberately laid-out card. Entry/SL/TP1/TP2 each
-    individually copy-paste-friendly monospace, no underscores anywhere,
-    TP2 clearly labeled as suggestion-only."""
     is_long = sig["direction"] == "bullish"
     direction_label = f"{'🟢' if is_long else '🔴'} {'LONG' if is_long else 'SHORT'}"
     engine_label = human_label(sig["engine"])
@@ -2887,10 +2526,6 @@ def format_daily_summary(state: dict, day_key: str) -> str:
 # ============================================================================
 
 def scan_symbol(symbol: str, candle_cache: dict, state: dict, now_ms: int) -> list:
-    """Runs the full mandatory pipeline for one asset: fetch -> build views
-    -> Stage 1-4 -> specialized engines -> Decision Engine scoring. Returns
-    ranked (score, grade, candidate, result) tuples, or [] on any NO TRADE
-    halt (Section 7's Trade Filter)."""
     bundle = fetch_all_candles(symbol, candle_cache, now_ms)
     if bundle is None:
         return []
