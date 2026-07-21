@@ -63,7 +63,7 @@
     },
     "fill_stats": {
       "Reversal|pending": {
-        "dispatched": 3,
+        "dispatched": 4,
         "filled": 1,
         "expired": 1
       },
@@ -80,7 +80,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 50,
+        "seen": 51,
         "rejected": 0
       }
     },
@@ -284,7 +284,7 @@
       "mfe_r": 1.6700458503344016,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4260,
-      "_last_checked_t": 1784674800000
+      "_last_checked_t": 1784675700000
     },
     {
       "id": "APT-Reversal-1784647839031",
@@ -322,9 +322,47 @@
       "mfe_r": 1.421085122436378,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4309,
+      "_last_checked_t": 1784675700000
+    },
+    {
+      "id": "XLM-Reversal-1784676637325",
+      "symbol": "XLM",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.19241328000000002,
+      "sl": 0.19450431,
+      "tp1": 0.18807000000000001,
+      "tp2": 0.18806,
+      "rr1": 2.0771007589561212,
+      "rr2": 2.081883091108223,
+      "confidence": 0.7886180986395329,
+      "grade": "A",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 32.783933074703526,
+        "volatility_pctl": 67.5,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784676637325,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4339,
       "_last_checked_t": 1784674800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784675731311
+  "last_run_ts": 1784676637325
 }
