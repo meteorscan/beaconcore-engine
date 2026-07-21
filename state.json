@@ -246,7 +246,7 @@
       "mfe_r": 1.6700458503344016,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4260,
-      "_last_checked_t": 1784672100000
+      "_last_checked_t": 1784673000000
     },
     {
       "id": "PENGU-Reversal-1784645129252",
@@ -281,10 +281,10 @@
       "created_ts": 1784645129252,
       "filled_ts": 1784650500000,
       "mae_r": 0.40491933350965365,
-      "mfe_r": 1.3307326104205448,
+      "mfe_r": 1.413382702988646,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4297,
-      "_last_checked_t": 1784672100000
+      "_last_checked_t": 1784673000000
     },
     {
       "id": "APT-Reversal-1784647839031",
@@ -322,9 +322,9 @@
       "mfe_r": 1.421085122436378,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4309,
-      "_last_checked_t": 1784672100000
+      "_last_checked_t": 1784673000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784673034143
+  "last_run_ts": 1784673927771
 }
