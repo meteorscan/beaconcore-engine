@@ -157,7 +157,7 @@
       }
     },
     "forensic_counts": {
-      "genuine_variance": 50,
+      "genuine_variance": 51,
       "correct_read_poor_rr": 10,
       "structural_invalidation_too_tight": 2
     },
@@ -819,7 +819,7 @@
       "mfe_r": 0.8844074978920458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4060,
-      "_last_checked_t": 1784613600000,
+      "_last_checked_t": 1784614500000,
       "result": "loss",
       "r_realized": -1.0,
       "resolved_ts": 1784613600000,
@@ -860,10 +860,10 @@
       "mfe_r": 0.350637042551372,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4066,
-      "_last_checked_t": 1784612700000,
+      "_last_checked_t": 1784613600000,
       "result": "loss",
       "r_realized": -1.0,
-      "resolved_ts": 1784612700000,
+      "resolved_ts": 1784613600000,
       "forensic_category": "genuine_variance"
     },
     {
