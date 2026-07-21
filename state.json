@@ -156,7 +156,7 @@
       }
     },
     "forensic_counts": {
-      "genuine_variance": 43,
+      "genuine_variance": 44,
       "correct_read_poor_rr": 9,
       "structural_invalidation_too_tight": 2
     },
@@ -818,7 +818,7 @@
       "mfe_r": 0.8844074978920458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4060,
-      "_last_checked_t": 1784606400000
+      "_last_checked_t": 1784607300000
     },
     {
       "id": "BTC-Mean Reversion-1784562330548",
@@ -855,10 +855,10 @@
       "mfe_r": 0.350637042551372,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4066,
-      "_last_checked_t": 1784606400000,
+      "_last_checked_t": 1784607300000,
       "result": "loss",
       "r_realized": -1.0,
-      "resolved_ts": 1784606400000,
+      "resolved_ts": 1784607300000,
       "forensic_category": "genuine_variance"
     },
     {
