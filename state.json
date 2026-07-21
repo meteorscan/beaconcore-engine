@@ -15,6 +15,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "XLM|trend|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -22,10 +28,15 @@
         "n": 1,
         "wins": 0,
         "sum_conf": 0.806386566574309
+      },
+      "Mean Reversion|A": {
+        "n": 1,
+        "wins": 0,
+        "sum_conf": 0.7835711403484492
       }
     },
     "forensic_counts": {
-      "genuine_variance": 1
+      "genuine_variance": 2
     },
     "fill_stats": {
       "Reversal|pending": {
@@ -40,7 +51,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 1,
-        "filled": 0,
+        "filled": 1,
         "expired": 0
       }
     },
@@ -65,6 +76,10 @@
       "TAO": {
         "direction": "bearish",
         "until_ts": 1784630700000
+      },
+      "XLM": {
+        "direction": "bearish",
+        "until_ts": 1784642400000
       }
     }
   },
@@ -91,6 +106,33 @@
         "macro_bias": "bearish"
       },
       "resolved_ts": 1784627100000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "XLM-Mean Reversion-1784627129891",
+      "symbol": "XLM",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.19187177289063495,
+      "sl": 0.193874,
+      "tp1": 0.18807000000000001,
+      "tp2": 0.18806,
+      "r_realized": -1.0,
+      "mae_r": 2.2466118295599076,
+      "mfe_r": 0.22064074977741144,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7835711403484492,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 26.756538246977122,
+        "volatility_pctl": 34.166666666666664,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1784638800000,
       "result": "loss",
       "style": "intraday",
       "entry_kind": "pending",
@@ -131,47 +173,10 @@
       "created_ts": 1784626239733,
       "filled_ts": 1784630700000,
       "mae_r": 0.10192234888318605,
-      "mfe_r": 1.1211037731880606,
+      "mfe_r": 1.4460522441425054,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4260,
-      "_last_checked_t": 1784637900000
-    },
-    {
-      "id": "XLM-Mean Reversion-1784627129891",
-      "symbol": "XLM",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.19187177289063495,
-      "sl": 0.193874,
-      "tp1": 0.18807000000000001,
-      "tp2": 0.18806,
-      "rr1": 1.8987720588003525,
-      "rr2": 1.9037664972200687,
-      "confidence": 0.7835711403484492,
-      "grade": "A",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 21.18215399915294,
-        "volatility_pctl": 35.0,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1784627129891,
-      "filled_ts": 1784626200000,
-      "mae_r": 0.6483915352523423,
-      "mfe_r": 0.22064074977741144,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4262,
-      "_last_checked_t": 1784637900000
+      "_last_checked_t": 1784638800000
     },
     {
       "id": "TAO-Liquidity Sweep-1784634332528",
@@ -208,7 +213,7 @@
       "mfe_r": 0.40530601523509396,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4279,
-      "_last_checked_t": 1784637900000
+      "_last_checked_t": 1784638800000
     },
     {
       "id": "ADA-Liquidity Sweep-1784635245978",
@@ -246,9 +251,9 @@
       "mfe_r": 0.006213592233011309,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4282,
-      "_last_checked_t": 1784637900000
+      "_last_checked_t": 1784638800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784638846251
+  "last_run_ts": 1784639727914
 }
