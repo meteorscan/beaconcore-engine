@@ -53,7 +53,7 @@
       "Liquidity Sweep|pending": {
         "dispatched": 5,
         "filled": 2,
-        "expired": 0
+        "expired": 1
       },
       "Mean Reversion|pending": {
         "dispatched": 1,
@@ -63,7 +63,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 37,
+        "seen": 39,
         "rejected": 0
       }
     },
@@ -213,7 +213,7 @@
       "mfe_r": 1.6700458503344016,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4260,
-      "_last_checked_t": 1784651400000
+      "_last_checked_t": 1784652300000
     },
     {
       "id": "TAO-Liquidity Sweep-1784634332528",
@@ -250,44 +250,7 @@
       "mfe_r": 1.6398739164696674,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4279,
-      "_last_checked_t": 1784651400000
-    },
-    {
-      "id": "XLM-Liquidity Sweep-1784643331167",
-      "symbol": "XLM",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.1952452,
-      "sl": 0.19660999999999998,
-      "tp1": 0.19171,
-      "tp2": 0.19143,
-      "rr1": 2.5902696365768536,
-      "rr2": 2.795427901524105,
-      "confidence": 0.7749626898159647,
-      "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 29.021609438730923,
-        "volatility_pctl": 52.5,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1784643331167,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4291,
-      "_last_checked_t": 1784651400000
+      "_last_checked_t": 1784652300000
     },
     {
       "id": "PENGU-Reversal-1784645129252",
@@ -321,11 +284,11 @@
       "status": "active",
       "created_ts": 1784645129252,
       "filled_ts": 1784650500000,
-      "mae_r": 0.22308912985982796,
-      "mfe_r": 0.223221370007939,
+      "mae_r": 0.40491933350965365,
+      "mfe_r": 0.25628140703518526,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4297,
-      "_last_checked_t": 1784651400000
+      "_last_checked_t": 1784652300000
     },
     {
       "id": "APT-Reversal-1784647839031",
@@ -363,9 +326,9 @@
       "mfe_r": 0.8552026887989451,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4309,
-      "_last_checked_t": 1784651400000
+      "_last_checked_t": 1784652300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784652328944
+  "last_run_ts": 1784653244783
 }
