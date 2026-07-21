@@ -34,7 +34,7 @@
         "expired": 0
       },
       "Liquidity Sweep|pending": {
-        "dispatched": 2,
+        "dispatched": 3,
         "filled": 1,
         "expired": 0
       },
@@ -46,7 +46,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 13,
+        "seen": 15,
         "rejected": 0
       }
     },
@@ -126,7 +126,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 10,
+      "pending_bars": 11,
       "status": "pending",
       "created_ts": 1784625334302,
       "filled_ts": null,
@@ -134,7 +134,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4257,
-      "_last_checked_t": 1784632500000
+      "_last_checked_t": 1784633400000
     },
     {
       "id": "ZEC-Liquidity Sweep-1784626239733",
@@ -169,10 +169,10 @@
       "created_ts": 1784626239733,
       "filled_ts": 1784630700000,
       "mae_r": 0.10192234888318605,
-      "mfe_r": 0.7625036806461076,
+      "mfe_r": 1.0422327850923225,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4260,
-      "_last_checked_t": 1784632500000
+      "_last_checked_t": 1784633400000
     },
     {
       "id": "XLM-Mean Reversion-1784627129891",
@@ -209,9 +209,46 @@
       "mfe_r": 0.22064074977741144,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4262,
+      "_last_checked_t": 1784633400000
+    },
+    {
+      "id": "TAO-Liquidity Sweep-1784634332528",
+      "symbol": "TAO",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 201.3572,
+      "sl": 202.88,
+      "tp1": 198.27,
+      "tp2": 198.03,
+      "rr1": 2.0273180982400953,
+      "rr2": 2.184922511163664,
+      "confidence": 0.8418563262482143,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 19.614784228141676,
+        "volatility_pctl": 70.83333333333333,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784634332528,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4279,
       "_last_checked_t": 1784632500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784633442149
+  "last_run_ts": 1784634332528
 }
