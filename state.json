@@ -63,7 +63,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 40,
+        "seen": 41,
         "rejected": 0
       }
     },
@@ -209,11 +209,11 @@
       "status": "active",
       "created_ts": 1784626239733,
       "filled_ts": 1784630700000,
-      "mae_r": 0.10192234888318605,
+      "mae_r": 0.4100450090438767,
       "mfe_r": 1.6700458503344016,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4260,
-      "_last_checked_t": 1784653200000
+      "_last_checked_t": 1784654100000
     },
     {
       "id": "TAO-Liquidity Sweep-1784634332528",
@@ -250,7 +250,7 @@
       "mfe_r": 1.6398739164696674,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4279,
-      "_last_checked_t": 1784653200000
+      "_last_checked_t": 1784654100000
     },
     {
       "id": "PENGU-Reversal-1784645129252",
@@ -285,10 +285,10 @@
       "created_ts": 1784645129252,
       "filled_ts": 1784650500000,
       "mae_r": 0.40491933350965365,
-      "mfe_r": 0.4215815921713878,
+      "mfe_r": 0.8183020364982854,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4297,
-      "_last_checked_t": 1784653200000
+      "_last_checked_t": 1784654100000
     },
     {
       "id": "APT-Reversal-1784647839031",
@@ -323,12 +323,12 @@
       "created_ts": 1784647839031,
       "filled_ts": 1784646900000,
       "mae_r": 0.39659784621715904,
-      "mfe_r": 0.8552026887989451,
+      "mfe_r": 0.9237944989368256,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4309,
-      "_last_checked_t": 1784653200000
+      "_last_checked_t": 1784654100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784654127217
+  "last_run_ts": 1784655035743
 }
