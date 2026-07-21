@@ -16,7 +16,8 @@
       "SUI": 4,
       "BTC": 4,
       "SOL": 4,
-      "XRP": 4
+      "XRP": 4,
+      "AVAX": 4
     },
     "regime_fit_discount": {},
     "segment_stats": {
@@ -157,7 +158,7 @@
     },
     "forensic_counts": {
       "genuine_variance": 50,
-      "correct_read_poor_rr": 9,
+      "correct_read_poor_rr": 10,
       "structural_invalidation_too_tight": 2
     },
     "fill_stats": {
@@ -804,21 +805,25 @@
         "OTE retracement entry"
       ],
       "regime_at_entry": {
-        "trend_strength": 19.924736598751004,
-        "volatility_pctl": 100.0,
+        "trend_strength": 23.624772829658806,
+        "volatility_pctl": 60.833333333333336,
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
       "entry_filled": true,
       "pending_bars": 0,
-      "status": "active",
+      "status": "resolved",
       "created_ts": 1784560528609,
       "filled_ts": 1784559600000,
-      "mae_r": 0.9965515750329736,
+      "mae_r": 1.0533046505091594,
       "mfe_r": 0.8844074978920458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4060,
-      "_last_checked_t": 1784612700000
+      "_last_checked_t": 1784613600000,
+      "result": "loss",
+      "r_realized": -1.0,
+      "resolved_ts": 1784613600000,
+      "forensic_category": "correct_read_poor_rr"
     },
     {
       "id": "BTC-Mean Reversion-1784562330548",
