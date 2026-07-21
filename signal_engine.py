@@ -94,7 +94,7 @@ CANDLE_CACHE_PATH = os.environ.get("SOVEREIGN_CANDLE_CACHE_PATH", "candle_cache.
 CANDLE_DELTA_OVERLAP_BARS = 3  # extra closed bars re-fetched past the cached watermark
 
 ENGINE_NAME = "SOVEREIGN"
-ENGINE_VERSION = "1.0.4"
+ENGINE_VERSION = "1.0.5"
 RESOLUTION_LOGIC_VERSION = "1.0.4"  # Section 11 legacy-data tag; bump on any resolution-logic change
 
 # Same watchlist as the reference engines in this project (Section: "use the
@@ -302,11 +302,19 @@ def load_state() -> dict:
             finally:
                 fcntl.flock(f.fileno(), fcntl.LOCK_UN)
         base = _default_state()
-        base.update({k: v for k, v in data.items() if k in base})
+        # fix v1.0.5: tier1 merge must run BEFORE the top-level update below.
+        # base.update() matches on the "tier1" key too and was replacing the
+        # freshly-defaulted tier1 dict wholesale with the raw on-disk dict,
+        # so any tier1 sub-key not present in an already-existing state.json
+        # (e.g. symbol_cooldown, added this version) was silently discarded
+        # on every load -> KeyError in process_resolution the first time that
+        # sub-key was written to. The old per-key loop ran *after* the clobber
+        # and was merging data["tier1"] into itself, a no-op.
         for k in ("tier1",):
             merged = base[k]
             merged.update(data.get(k, {}))
             base[k] = merged
+        base.update({k: v for k, v in data.items() if k in base and k != "tier1"})
         return base
     except (json.JSONDecodeError, OSError, ValueError) as e:
         log.error("load_state failed (%s); starting from a fresh default state", e)
