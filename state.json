@@ -126,7 +126,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 6,
+      "pending_bars": 7,
       "status": "pending",
       "created_ts": 1784625334302,
       "filled_ts": null,
@@ -134,7 +134,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4257,
-      "_last_checked_t": 1784628900000
+      "_last_checked_t": 1784629800000
     },
     {
       "id": "ZEC-Liquidity Sweep-1784626239733",
@@ -164,7 +164,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 5,
+      "pending_bars": 6,
       "status": "pending",
       "created_ts": 1784626239733,
       "filled_ts": null,
@@ -172,7 +172,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4260,
-      "_last_checked_t": 1784628900000
+      "_last_checked_t": 1784629800000
     },
     {
       "id": "XLM-Mean Reversion-1784627129891",
@@ -209,9 +209,9 @@
       "mfe_r": 0.19067411925914216,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4262,
-      "_last_checked_t": 1784628900000
+      "_last_checked_t": 1784629800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784629838439
+  "last_run_ts": 1784630726983
 }
