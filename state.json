@@ -69,7 +69,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 47,
+        "seen": 48,
         "rejected": 0
       }
     },
@@ -246,7 +246,7 @@
       "mfe_r": 1.6700458503344016,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4260,
-      "_last_checked_t": 1784660400000
+      "_last_checked_t": 1784661300000
     },
     {
       "id": "PENGU-Reversal-1784645129252",
@@ -284,7 +284,7 @@
       "mfe_r": 1.3307326104205448,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4297,
-      "_last_checked_t": 1784660400000
+      "_last_checked_t": 1784661300000
     },
     {
       "id": "APT-Reversal-1784647839031",
@@ -322,7 +322,7 @@
       "mfe_r": 1.421085122436378,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4309,
-      "_last_checked_t": 1784660400000
+      "_last_checked_t": 1784661300000
     },
     {
       "id": "XLM-Liquidity Sweep-1784657731101",
@@ -351,7 +351,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 5,
+      "pending_bars": 6,
       "status": "pending",
       "created_ts": 1784657731101,
       "filled_ts": null,
@@ -359,9 +359,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4329,
-      "_last_checked_t": 1784660400000
+      "_last_checked_t": 1784661300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784661326719
+  "last_run_ts": 1784662238853
 }
