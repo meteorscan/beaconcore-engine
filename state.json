@@ -17,7 +17,7 @@
       "BTC": 4,
       "SOL": 4,
       "XRP": 4,
-      "AVAX": 4
+      "AVAX": 5
     },
     "regime_fit_discount": {},
     "segment_stats": {
@@ -158,7 +158,7 @@
     },
     "forensic_counts": {
       "genuine_variance": 51,
-      "correct_read_poor_rr": 10,
+      "correct_read_poor_rr": 11,
       "structural_invalidation_too_tight": 2
     },
     "fill_stats": {
@@ -815,14 +815,14 @@
       "status": "resolved",
       "created_ts": 1784560528609,
       "filled_ts": 1784559600000,
-      "mae_r": 1.0533046505091594,
+      "mae_r": 1.3086934901520013,
       "mfe_r": 0.8844074978920458,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4060,
-      "_last_checked_t": 1784614500000,
+      "_last_checked_t": 1784615400000,
       "result": "loss",
       "r_realized": -1.0,
-      "resolved_ts": 1784613600000,
+      "resolved_ts": 1784615400000,
       "forensic_category": "correct_read_poor_rr"
     },
     {
