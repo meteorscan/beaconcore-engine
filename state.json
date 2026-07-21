@@ -31,10 +31,10 @@
       "Reversal|pending": {
         "dispatched": 1,
         "filled": 0,
-        "expired": 0
+        "expired": 1
       },
       "Liquidity Sweep|pending": {
-        "dispatched": 3,
+        "dispatched": 4,
         "filled": 1,
         "expired": 0
       },
@@ -46,7 +46,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 15,
+        "seen": 16,
         "rejected": 0
       }
     },
@@ -99,44 +99,6 @@
   ],
   "active_signals": [
     {
-      "id": "ADA-Reversal-1784625334302",
-      "symbol": "ADA",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.17579768,
-      "sl": 0.17769752,
-      "tp1": 0.16946,
-      "tp2": 0.1688,
-      "rr1": 3.3359019706922997,
-      "rr2": 3.6832996462860335,
-      "confidence": 0.7742787065621615,
-      "grade": "A",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 41.19334907723489,
-        "volatility_pctl": 97.5,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1784625334302,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4257,
-      "_last_checked_t": 1784633400000
-    },
-    {
       "id": "ZEC-Liquidity Sweep-1784626239733",
       "symbol": "ZEC",
       "engine": "Liquidity Sweep",
@@ -169,10 +131,10 @@
       "created_ts": 1784626239733,
       "filled_ts": 1784630700000,
       "mae_r": 0.10192234888318605,
-      "mfe_r": 1.0422327850923225,
+      "mfe_r": 1.1211037731880606,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4260,
-      "_last_checked_t": 1784633400000
+      "_last_checked_t": 1784634300000
     },
     {
       "id": "XLM-Mean Reversion-1784627129891",
@@ -209,7 +171,7 @@
       "mfe_r": 0.22064074977741144,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4262,
-      "_last_checked_t": 1784633400000
+      "_last_checked_t": 1784634300000
     },
     {
       "id": "TAO-Liquidity Sweep-1784634332528",
@@ -237,18 +199,56 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
+      "entry_filled": true,
+      "pending_bars": 1,
+      "status": "active",
+      "created_ts": 1784634332528,
+      "filled_ts": 1784634300000,
+      "mae_r": 0.3761491988442375,
+      "mfe_r": 0.40530601523509396,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4279,
+      "_last_checked_t": 1784634300000
+    },
+    {
+      "id": "ADA-Liquidity Sweep-1784635245978",
+      "symbol": "ADA",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.17445344000000002,
+      "sl": 0.17661644,
+      "tp1": 0.16946,
+      "tp2": 0.1688,
+      "rr1": 2.3085714285714376,
+      "rr2": 2.6137031900138763,
+      "confidence": 0.820074939025421,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 43.18259023781051,
+        "volatility_pctl": 89.16666666666667,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
       "entry_filled": false,
       "pending_bars": 0,
       "status": "pending",
-      "created_ts": 1784634332528,
+      "created_ts": 1784635245978,
       "filled_ts": null,
       "mae_r": 0.0,
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4279,
-      "_last_checked_t": 1784632500000
+      "tg_message_id": 4282,
+      "_last_checked_t": 1784633400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784634332528
+  "last_run_ts": 1784635245978
 }
