@@ -603,7 +603,7 @@
       "mfe_r": 1.2778927716221997,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4379,
-      "_last_checked_t": 1784762100000
+      "_last_checked_t": 1784763000000
     },
     {
       "id": "DOGE-Liquidity Sweep-1784733329050",
@@ -640,7 +640,7 @@
       "mfe_r": 1.6213961123456058,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4381,
-      "_last_checked_t": 1784762100000
+      "_last_checked_t": 1784763000000
     },
     {
       "id": "PENGU-Liquidity Sweep-1784734240049",
@@ -678,7 +678,7 @@
       "mfe_r": 2.537559092562022,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4382,
-      "_last_checked_t": 1784762100000
+      "_last_checked_t": 1784763000000
     },
     {
       "id": "ZEC-Liquidity Sweep-1784738729333",
@@ -715,7 +715,7 @@
       "mfe_r": 0.8881224510347036,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4391,
-      "_last_checked_t": 1784762100000
+      "_last_checked_t": 1784763000000
     },
     {
       "id": "ADA-Liquidity Sweep-1784741438047",
@@ -752,7 +752,7 @@
       "mfe_r": 2.4749899046649357,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4395,
-      "_last_checked_t": 1784762100000
+      "_last_checked_t": 1784763000000
     },
     {
       "id": "AVAX-Liquidity Sweep-1784761242300",
@@ -782,7 +782,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 3,
+      "pending_bars": 4,
       "status": "pending",
       "created_ts": 1784761242300,
       "filled_ts": null,
@@ -790,9 +790,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4403,
-      "_last_checked_t": 1784762100000
+      "_last_checked_t": 1784763000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784763035606
+  "last_run_ts": 1784763924271
 }
