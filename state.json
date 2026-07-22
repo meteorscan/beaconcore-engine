@@ -106,7 +106,7 @@
         "expired": 1
       },
       "Liquidity Sweep|pending": {
-        "dispatched": 14,
+        "dispatched": 15,
         "filled": 6,
         "expired": 3
       },
@@ -128,7 +128,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 114,
+        "seen": 119,
         "rejected": 0
       }
     },
@@ -502,7 +502,7 @@
       "mfe_r": 0.9773622839961023,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4374,
-      "_last_checked_t": 1784736000000
+      "_last_checked_t": 1784736900000
     },
     {
       "id": "BCH-Liquidity Sweep-1784731527619",
@@ -539,7 +539,7 @@
       "mfe_r": 0.7959332765128293,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4379,
-      "_last_checked_t": 1784736000000
+      "_last_checked_t": 1784736900000
     },
     {
       "id": "SUI-Liquidity Sweep-1784732451563",
@@ -576,7 +576,7 @@
       "mfe_r": 0.28864106575160453,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4380,
-      "_last_checked_t": 1784736000000
+      "_last_checked_t": 1784736900000
     },
     {
       "id": "DOGE-Liquidity Sweep-1784733329050",
@@ -613,7 +613,7 @@
       "mfe_r": 0.4843272676315719,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4381,
-      "_last_checked_t": 1784736000000
+      "_last_checked_t": 1784736900000
     },
     {
       "id": "PENGU-Liquidity Sweep-1784734240049",
@@ -643,7 +643,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 4,
+      "pending_bars": 5,
       "status": "pending",
       "created_ts": 1784734240049,
       "filled_ts": null,
@@ -651,9 +651,47 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4382,
+      "_last_checked_t": 1784736900000
+    },
+    {
+      "id": "XRP-Liquidity Sweep-1784737832873",
+      "symbol": "XRP",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1.148508,
+      "sl": 1.1562,
+      "tp1": 1.136,
+      "tp2": 1.1329,
+      "rr1": 1.6261050442018323,
+      "rr2": 2.0291211648466527,
+      "confidence": 0.7717426215725006,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 22.695982520162907,
+        "volatility_pctl": 75.83333333333333,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784737832873,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4387,
       "_last_checked_t": 1784736000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784736931740
+  "last_run_ts": 1784737832873
 }
