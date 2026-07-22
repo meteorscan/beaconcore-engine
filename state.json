@@ -106,7 +106,7 @@
         "expired": 1
       },
       "Liquidity Sweep|pending": {
-        "dispatched": 9,
+        "dispatched": 10,
         "filled": 5,
         "expired": 3
       },
@@ -128,7 +128,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 89,
+        "seen": 92,
         "rejected": 0
       }
     },
@@ -471,13 +471,50 @@
       "status": "active",
       "created_ts": 1784727927395,
       "filled_ts": 1784727900000,
-      "mae_r": 0.14124932510432267,
+      "mae_r": 0.6110662009265062,
       "mfe_r": 0.48069872955550746,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4374,
+      "_last_checked_t": 1784728800000
+    },
+    {
+      "id": "ADA-Liquidity Sweep-1784729728450",
+      "symbol": "ADA",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.17564072,
+      "sl": 0.17708000000000002,
+      "tp1": 0.17163,
+      "tp2": 0.1705,
+      "rr1": 2.7866155299871838,
+      "rr2": 3.5717303095991983,
+      "confidence": 0.7660859626101204,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 22.935324376439514,
+        "volatility_pctl": 55.0,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784729728450,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4376,
       "_last_checked_t": 1784727900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784728849356
+  "last_run_ts": 1784729728450
 }
