@@ -95,7 +95,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 71,
+        "seen": 73,
         "rejected": 0
       }
     },
@@ -354,10 +354,10 @@
       "created_ts": 1784647839031,
       "filled_ts": 1784646900000,
       "mae_r": 0.4137457987516244,
-      "mfe_r": 1.421085122436378,
+      "mfe_r": 1.5925646477810507,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4309,
-      "_last_checked_t": 1784696400000
+      "_last_checked_t": 1784697300000
     },
     {
       "id": "TAO-Liquidity Sweep-1784677524982",
@@ -391,10 +391,10 @@
       "created_ts": 1784677524982,
       "filled_ts": 1784678400000,
       "mae_r": 0.6068134563096366,
-      "mfe_r": 1.312470011195852,
+      "mfe_r": 1.6390147678200564,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4341,
-      "_last_checked_t": 1784696400000
+      "_last_checked_t": 1784697300000
     },
     {
       "id": "ZEC-Mean Reversion-1784695524111",
@@ -423,7 +423,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 3,
+      "pending_bars": 4,
       "status": "pending",
       "created_ts": 1784695524111,
       "filled_ts": null,
@@ -431,9 +431,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4348,
-      "_last_checked_t": 1784696400000
+      "_last_checked_t": 1784697300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784697329831
+  "last_run_ts": 1784698236805
 }
