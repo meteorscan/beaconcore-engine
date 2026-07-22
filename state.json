@@ -7,7 +7,9 @@
     "confidence_calibration": {},
     "filter_thresholds": {},
     "sl_buffer_percentile": {},
-    "tp1_rank_preference": {},
+    "tp1_rank_preference": {
+      "ZEC": 4
+    },
     "regime_fit_discount": {},
     "segment_stats": {
       "TAO|range|intraday|Liquidity Sweep": {
@@ -45,13 +47,19 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "ZEC|range|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
       "Liquidity Sweep|A+": {
-        "n": 3,
+        "n": 4,
         "wins": 1,
-        "sum_conf": 2.468317831847944
+        "sum_conf": 3.2715222369210095
       },
       "Mean Reversion|A": {
         "n": 1,
@@ -65,7 +73,8 @@
       }
     },
     "forensic_counts": {
-      "genuine_variance": 4
+      "genuine_variance": 4,
+      "correct_read_poor_rr": 1
     },
     "fill_stats": {
       "Reversal|pending": {
@@ -75,7 +84,7 @@
       },
       "Liquidity Sweep|pending": {
         "dispatched": 7,
-        "filled": 3,
+        "filled": 4,
         "expired": 2
       },
       "Mean Reversion|pending": {
@@ -113,6 +122,10 @@
       "ADA": {
         "direction": "bearish",
         "until_ts": 1784648700000
+      },
+      "ZEC": {
+        "direction": "bullish",
+        "until_ts": 1784695500000
       }
     }
   },
@@ -278,47 +291,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "ZEC-Liquidity Sweep-1784626239733",
       "symbol": "ZEC",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 534.6992,
       "sl": 525.1899999999999,
       "tp1": 551.1700000000001,
       "tp2": 551.24,
-      "rr1": 1.7320910276363857,
-      "rr2": 1.7394523198586478,
+      "r_realized": -1.0,
+      "mae_r": 1.8686324822277294,
+      "mfe_r": 1.6700458503344016,
+      "forensic_category": "correct_read_poor_rr",
       "confidence": 0.8032044050730653,
       "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 17.942091387587414,
-        "volatility_pctl": 54.166666666666664,
-        "macro_bias": "neutral"
+        "trend_strength": 16.62402900812693,
+        "volatility_pctl": 48.333333333333336,
+        "macro_bias": "bullish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 6,
-      "status": "active",
-      "created_ts": 1784626239733,
-      "filled_ts": 1784630700000,
-      "mae_r": 0.7602321961889468,
-      "mfe_r": 1.6700458503344016,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4260,
-      "_last_checked_t": 1784691000000
-    },
+      "resolved_ts": 1784691900000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "APT-Reversal-1784647839031",
       "symbol": "APT",
@@ -355,7 +357,7 @@
       "mfe_r": 1.421085122436378,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4309,
-      "_last_checked_t": 1784691000000
+      "_last_checked_t": 1784691900000
     },
     {
       "id": "TAO-Liquidity Sweep-1784677524982",
@@ -392,9 +394,9 @@
       "mfe_r": 1.312470011195852,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4341,
-      "_last_checked_t": 1784691000000
+      "_last_checked_t": 1784691900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784691925997
+  "last_run_ts": 1784692839743
 }
