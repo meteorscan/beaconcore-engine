@@ -140,7 +140,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 140,
+        "seen": 143,
         "rejected": 0
       }
     },
@@ -573,10 +573,10 @@
       "created_ts": 1784727927395,
       "filled_ts": 1784727900000,
       "mae_r": 0.6110662009265062,
-      "mfe_r": 0.9773622839961023,
+      "mfe_r": 1.1876612665069817,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4374,
-      "_last_checked_t": 1784745000000
+      "_last_checked_t": 1784745900000
     },
     {
       "id": "BCH-Liquidity Sweep-1784731527619",
@@ -613,7 +613,7 @@
       "mfe_r": 1.0394496529891406,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4379,
-      "_last_checked_t": 1784745000000
+      "_last_checked_t": 1784745900000
     },
     {
       "id": "DOGE-Liquidity Sweep-1784733329050",
@@ -650,7 +650,7 @@
       "mfe_r": 0.8887073849418606,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4381,
-      "_last_checked_t": 1784745000000
+      "_last_checked_t": 1784745900000
     },
     {
       "id": "PENGU-Liquidity Sweep-1784734240049",
@@ -688,7 +688,7 @@
       "mfe_r": 2.0340485048532813,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4382,
-      "_last_checked_t": 1784745000000
+      "_last_checked_t": 1784745900000
     },
     {
       "id": "ZEC-Liquidity Sweep-1784738729333",
@@ -725,7 +725,7 @@
       "mfe_r": 0.7412684826208829,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4391,
-      "_last_checked_t": 1784745000000
+      "_last_checked_t": 1784745900000
     },
     {
       "id": "ADA-Liquidity Sweep-1784741438047",
@@ -759,12 +759,12 @@
       "created_ts": 1784741438047,
       "filled_ts": 1784740500000,
       "mae_r": 0.21124708113136847,
-      "mfe_r": 1.4040065312428784,
+      "mfe_r": 1.4127850834840394,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4395,
-      "_last_checked_t": 1784745000000
+      "_last_checked_t": 1784745900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784745933358
+  "last_run_ts": 1784746845501
 }
