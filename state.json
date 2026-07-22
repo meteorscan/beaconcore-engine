@@ -26,10 +26,10 @@
         "sum_r": -1.0
       },
       "ADA|trend|intraday|Liquidity Sweep": {
-        "n": 1,
+        "n": 2,
         "wins": 0,
-        "losses": 1,
-        "sum_r": -1.0
+        "losses": 2,
+        "sum_r": -2.0
       },
       "TAO|trend|intraday|Liquidity Sweep": {
         "n": 2,
@@ -85,9 +85,9 @@
         "sum_conf": 2.3363662645457857
       },
       "Liquidity Sweep|A": {
-        "n": 1,
+        "n": 2,
         "wins": 1,
-        "sum_conf": 0.7626344504679055
+        "sum_conf": 1.5287204130780259
       },
       "Momentum|A": {
         "n": 1,
@@ -96,7 +96,7 @@
       }
     },
     "forensic_counts": {
-      "genuine_variance": 4,
+      "genuine_variance": 5,
       "correct_read_poor_rr": 2
     },
     "fill_stats": {
@@ -107,7 +107,7 @@
       },
       "Liquidity Sweep|pending": {
         "dispatched": 10,
-        "filled": 5,
+        "filled": 6,
         "expired": 3
       },
       "Mean Reversion|pending": {
@@ -155,7 +155,7 @@
       },
       "ADA": {
         "direction": "bearish",
-        "until_ts": 1784648700000
+        "until_ts": 1784732400000
       },
       "ZEC": {
         "direction": "bullish",
@@ -437,6 +437,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "ADA-Liquidity Sweep-1784729728450",
+      "symbol": "ADA",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.17564072,
+      "sl": 0.17708000000000002,
+      "tp1": 0.17163,
+      "tp2": 0.1705,
+      "r_realized": -1.0,
+      "mae_r": 1.5280417986770989,
+      "mfe_r": 0.26452114946361865,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7660859626101204,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 22.935324376439514,
+        "volatility_pctl": 55.0,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1784728800000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -472,49 +499,12 @@
       "created_ts": 1784727927395,
       "filled_ts": 1784727900000,
       "mae_r": 0.6110662009265062,
-      "mfe_r": 0.48069872955550746,
+      "mfe_r": 0.9102455874500742,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4374,
-      "_last_checked_t": 1784728800000
-    },
-    {
-      "id": "ADA-Liquidity Sweep-1784729728450",
-      "symbol": "ADA",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.17564072,
-      "sl": 0.17708000000000002,
-      "tp1": 0.17163,
-      "tp2": 0.1705,
-      "rr1": 2.7866155299871838,
-      "rr2": 3.5717303095991983,
-      "confidence": 0.7660859626101204,
-      "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 22.935324376439514,
-        "volatility_pctl": 55.0,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
-      "created_ts": 1784729728450,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4376,
-      "_last_checked_t": 1784727900000
+      "_last_checked_t": 1784729700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784729728450
+  "last_run_ts": 1784730643822
 }
