@@ -106,7 +106,7 @@
       "Breakout|pending": {
         "dispatched": 1,
         "filled": 0,
-        "expired": 0
+        "expired": 1
       }
     },
     "filter_funnel": {
@@ -391,46 +391,7 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [
-    {
-      "id": "SUI-Breakout-1784700039992",
-      "symbol": "SUI",
-      "engine": "Breakout",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.76204,
-      "sl": 0.7682500000000001,
-      "tp1": 0.74728,
-      "tp2": 0.74656,
-      "rr1": 2.376811594202879,
-      "rr2": 2.492753623188394,
-      "confidence": 0.7900543338192366,
-      "grade": "A",
-      "confluences": [
-        "1H range breakout",
-        "volume confirmation",
-        "retest entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 16.57995215284511,
-        "volatility_pctl": 44.166666666666664,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1784700039992,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4355,
-      "_last_checked_t": 1784708100000
-    }
-  ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1784709054130
+  "last_run_ts": 1784709929578
 }
