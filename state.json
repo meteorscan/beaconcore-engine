@@ -88,14 +88,14 @@
         "expired": 2
       },
       "Mean Reversion|pending": {
-        "dispatched": 1,
+        "dispatched": 2,
         "filled": 1,
         "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 65,
+        "seen": 67,
         "rejected": 0
       }
     },
@@ -357,7 +357,7 @@
       "mfe_r": 1.421085122436378,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4309,
-      "_last_checked_t": 1784693700000
+      "_last_checked_t": 1784694600000
     },
     {
       "id": "TAO-Liquidity Sweep-1784677524982",
@@ -394,9 +394,46 @@
       "mfe_r": 1.312470011195852,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4341,
+      "_last_checked_t": 1784694600000
+    },
+    {
+      "id": "ZEC-Mean Reversion-1784695524111",
+      "symbol": "ZEC",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 524.1296827940432,
+      "sl": 515.9469999999999,
+      "tp1": 538.4866666666667,
+      "tp2": 538.57,
+      "rr1": 1.7545570608058736,
+      "rr2": 1.7647411697871034,
+      "confidence": 0.818307164675736,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 16.62402900812693,
+        "volatility_pctl": 48.333333333333336,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784695524111,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4348,
       "_last_checked_t": 1784693700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784694632121
+  "last_run_ts": 1784695524111
 }
