@@ -418,7 +418,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 7,
+      "pending_bars": 8,
       "status": "pending",
       "created_ts": 1784695524111,
       "filled_ts": null,
@@ -426,7 +426,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4348,
-      "_last_checked_t": 1784700000000
+      "_last_checked_t": 1784700900000
     },
     {
       "id": "SUI-Breakout-1784700039992",
@@ -456,7 +456,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 2,
+      "pending_bars": 3,
       "status": "pending",
       "created_ts": 1784700039992,
       "filled_ts": null,
@@ -464,9 +464,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4355,
-      "_last_checked_t": 1784700000000
+      "_last_checked_t": 1784700900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784700925730
+  "last_run_ts": 1784701833755
 }
