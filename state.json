@@ -317,7 +317,7 @@
       "mfe_r": 1.6700458503344016,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4260,
-      "_last_checked_t": 1784685600000
+      "_last_checked_t": 1784686500000
     },
     {
       "id": "APT-Reversal-1784647839031",
@@ -355,7 +355,7 @@
       "mfe_r": 1.421085122436378,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4309,
-      "_last_checked_t": 1784685600000
+      "_last_checked_t": 1784686500000
     },
     {
       "id": "TAO-Liquidity Sweep-1784677524982",
@@ -388,13 +388,13 @@
       "status": "active",
       "created_ts": 1784677524982,
       "filled_ts": 1784678400000,
-      "mae_r": 0.5401716692434775,
+      "mae_r": 0.6068134563096366,
       "mfe_r": 1.312470011195852,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4341,
-      "_last_checked_t": 1784685600000
+      "_last_checked_t": 1784686500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784686525885
+  "last_run_ts": 1784687435072
 }
