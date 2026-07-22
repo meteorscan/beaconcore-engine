@@ -106,7 +106,7 @@
         "expired": 1
       },
       "Liquidity Sweep|pending": {
-        "dispatched": 11,
+        "dispatched": 12,
         "filled": 6,
         "expired": 3
       },
@@ -128,7 +128,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 94,
+        "seen": 96,
         "rejected": 0
       }
     },
@@ -499,10 +499,10 @@
       "created_ts": 1784727927395,
       "filled_ts": 1784727900000,
       "mae_r": 0.6110662009265062,
-      "mfe_r": 0.9549900518140887,
+      "mfe_r": 0.9773622839961023,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4374,
-      "_last_checked_t": 1784730600000
+      "_last_checked_t": 1784731500000
     },
     {
       "id": "BCH-Liquidity Sweep-1784731527619",
@@ -531,7 +531,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1784731527619,
       "filled_ts": null,
@@ -539,9 +539,46 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4379,
-      "_last_checked_t": 1784729700000
+      "_last_checked_t": 1784731500000
+    },
+    {
+      "id": "SUI-Liquidity Sweep-1784732451563",
+      "symbol": "SUI",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.7704143999999999,
+      "sl": 0.77576499,
+      "tp1": 0.75593,
+      "tp2": 0.75292,
+      "rr1": 2.707065949736353,
+      "rr2": 3.2696207334144023,
+      "confidence": 0.7644938287711971,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 17.716070740025824,
+        "volatility_pctl": 51.666666666666664,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784732451563,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4380,
+      "_last_checked_t": 1784730600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784731527619
+  "last_run_ts": 1784732451563
 }
