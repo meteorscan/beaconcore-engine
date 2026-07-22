@@ -53,6 +53,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "APT|range|intraday|Reversal": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 1.661156457918912
       }
     },
     "calibration_buckets": {
@@ -67,9 +73,9 @@
         "sum_conf": 0.7835711403484492
       },
       "Reversal|A": {
-        "n": 2,
-        "wins": 1,
-        "sum_conf": 1.5442466327823396
+        "n": 3,
+        "wins": 2,
+        "sum_conf": 2.3363662645457857
       },
       "Liquidity Sweep|A": {
         "n": 1,
@@ -84,7 +90,7 @@
     "fill_stats": {
       "Reversal|pending": {
         "dispatched": 4,
-        "filled": 2,
+        "filled": 3,
         "expired": 1
       },
       "Liquidity Sweep|pending": {
@@ -105,7 +111,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 76,
+        "seen": 78,
         "rejected": 0
       }
     },
@@ -355,47 +361,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "APT-Reversal-1784647839031",
       "symbol": "APT",
       "engine": "Reversal",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.6135872,
       "sl": 0.6194188,
       "tp1": 0.6039,
       "tp2": 0.6022,
-      "rr1": 1.661156457918912,
-      "rr2": 1.9526716510048612,
+      "r_realized": 1.661156457918912,
+      "mae_r": 0.4137457987516244,
+      "mfe_r": 2.055559366211653,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7921196317634461,
       "grade": "A",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 32.89942989626283,
-        "volatility_pctl": 37.5,
-        "macro_bias": "neutral"
+        "trend_strength": 19.242971772283887,
+        "volatility_pctl": 30.833333333333332,
+        "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1784647839031,
-      "filled_ts": 1784646900000,
-      "mae_r": 0.4137457987516244,
-      "mfe_r": 1.6440085053844467,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4309,
-      "_last_checked_t": 1784699100000
-    },
+      "resolved_ts": 1784700000000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "ZEC-Mean Reversion-1784695524111",
       "symbol": "ZEC",
@@ -423,7 +418,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 6,
+      "pending_bars": 7,
       "status": "pending",
       "created_ts": 1784695524111,
       "filled_ts": null,
@@ -431,7 +426,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4348,
-      "_last_checked_t": 1784699100000
+      "_last_checked_t": 1784700000000
     },
     {
       "id": "SUI-Breakout-1784700039992",
@@ -461,7 +456,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1784700039992,
       "filled_ts": null,
@@ -469,9 +464,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4355,
-      "_last_checked_t": 1784698200000
+      "_last_checked_t": 1784700000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784700039992
+  "last_run_ts": 1784700925730
 }
