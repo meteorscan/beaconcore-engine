@@ -214,7 +214,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 204,
+        "seen": 205,
         "rejected": 0
       }
     },
@@ -1006,7 +1006,7 @@
       "mfe_r": 1.7897456216815972,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4481,
-      "_last_checked_t": 1784833200000
+      "_last_checked_t": 1784834100000
     },
     {
       "id": "APT-Reversal-1784831437907",
@@ -1036,7 +1036,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 4,
+      "pending_bars": 5,
       "status": "pending",
       "created_ts": 1784831437907,
       "filled_ts": null,
@@ -1044,7 +1044,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4493,
-      "_last_checked_t": 1784833200000
+      "_last_checked_t": 1784834100000
     },
     {
       "id": "ZEC-Liquidity Sweep-1784832330583",
@@ -1082,9 +1082,9 @@
       "mfe_r": 0.2969894546813223,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4495,
-      "_last_checked_t": 1784833200000
+      "_last_checked_t": 1784834100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784834128783
+  "last_run_ts": 1784835039081
 }
