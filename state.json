@@ -179,7 +179,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 178,
+        "seen": 179,
         "rejected": 0
       }
     },
@@ -809,7 +809,7 @@
       "mfe_r": 2.8480783749144187,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4395,
-      "_last_checked_t": 1784807100000
+      "_last_checked_t": 1784808000000
     },
     {
       "id": "SUI-Mean Reversion-1784790042118",
@@ -843,12 +843,12 @@
       "created_ts": 1784790042118,
       "filled_ts": 1784795400000,
       "mae_r": 0.19186123326129456,
-      "mfe_r": 1.158642174252342,
+      "mfe_r": 1.200362531235045,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4415,
-      "_last_checked_t": 1784807100000
+      "_last_checked_t": 1784808000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784808043022
+  "last_run_ts": 1784808927188
 }
