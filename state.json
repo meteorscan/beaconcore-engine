@@ -196,7 +196,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 184,
+        "seen": 185,
         "rejected": 0
       }
     },
@@ -907,7 +907,7 @@
       "mfe_r": 1.3618194785640858,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4460,
-      "_last_checked_t": 1784815200000
+      "_last_checked_t": 1784816100000
     },
     {
       "id": "APT-Reversal-1784814328879",
@@ -941,13 +941,13 @@
       "status": "active",
       "created_ts": 1784814328879,
       "filled_ts": 1784815200000,
-      "mae_r": 0.04861758777340992,
+      "mae_r": 0.5149372724811251,
       "mfe_r": 0.8238514997442571,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4461,
-      "_last_checked_t": 1784815200000
+      "_last_checked_t": 1784816100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784816133614
+  "last_run_ts": 1784817043737
 }
