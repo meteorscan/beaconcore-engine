@@ -181,7 +181,7 @@
         "expired": 1
       },
       "Liquidity Sweep|pending": {
-        "dispatched": 22,
+        "dispatched": 23,
         "filled": 18,
         "expired": 4
       },
@@ -203,7 +203,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 192,
+        "seen": 194,
         "rejected": 0
       }
     },
@@ -968,9 +968,46 @@
       "mfe_r": 1.0546198942873797,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4472,
+      "_last_checked_t": 1784823300000
+    },
+    {
+      "id": "NEAR-Liquidity Sweep-1784824239255",
+      "symbol": "NEAR",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1.8930848,
+      "sl": 1.9057038,
+      "tp1": 1.867275,
+      "tp2": 1.8668,
+      "rr1": 2.045312623821232,
+      "rr2": 2.0829542752991625,
+      "confidence": 0.8484243964489556,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 30.30255957426535,
+        "volatility_pctl": 48.333333333333336,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784824239255,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4481,
       "_last_checked_t": 1784822400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784823334342
+  "last_run_ts": 1784824239255
 }
