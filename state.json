@@ -122,6 +122,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 1.5627115576217205
+      },
+      "ADA|range|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 3.107045666028772
       }
     },
     "calibration_buckets": {
@@ -141,9 +147,9 @@
         "sum_conf": 2.3363662645457857
       },
       "Liquidity Sweep|A": {
-        "n": 8,
-        "wins": 5,
-        "sum_conf": 6.097787261056159
+        "n": 9,
+        "wins": 6,
+        "sum_conf": 6.882233240557454
       },
       "Momentum|A": {
         "n": 1,
@@ -164,7 +170,7 @@
       },
       "Liquidity Sweep|pending": {
         "dispatched": 21,
-        "filled": 15,
+        "filled": 16,
         "expired": 4
       },
       "Mean Reversion|pending": {
@@ -804,46 +810,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "ADA-Liquidity Sweep-1784741438047",
       "symbol": "ADA",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.17870872000000002,
       "sl": 0.180987,
       "tp1": 0.17163,
       "tp2": 0.1705,
-      "rr1": 3.107045666028772,
-      "rr2": 3.6030338676545575,
+      "r_realized": 3.107045666028772,
+      "mae_r": 0.21124708113136847,
+      "mfe_r": 3.4494092034341852,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7844459795012948,
       "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 27.244478069088366,
-        "volatility_pctl": 95.83333333333333,
-        "macro_bias": "neutral"
+        "trend_strength": 14.497816726713376,
+        "volatility_pctl": 61.666666666666664,
+        "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1784741438047,
-      "filled_ts": 1784740500000,
-      "mae_r": 0.21124708113136847,
-      "mfe_r": 2.9709781062907212,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4395,
-      "_last_checked_t": 1784811600000
-    },
+      "resolved_ts": 1784812500000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "ZEC-Liquidity Sweep-1784810727134",
       "symbol": "ZEC",
@@ -879,9 +875,9 @@
       "mfe_r": 0.9376367931749213,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4447,
-      "_last_checked_t": 1784811600000
+      "_last_checked_t": 1784812500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784812526625
+  "last_run_ts": 1784813441583
 }
