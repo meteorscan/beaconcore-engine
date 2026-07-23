@@ -173,7 +173,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 171,
+        "seen": 172,
         "rejected": 0
       }
     },
@@ -777,7 +777,7 @@
       "mfe_r": 2.571126465075943,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4382,
-      "_last_checked_t": 1784795400000
+      "_last_checked_t": 1784796300000
     },
     {
       "id": "ADA-Liquidity Sweep-1784741438047",
@@ -814,7 +814,7 @@
       "mfe_r": 2.8480783749144187,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4395,
-      "_last_checked_t": 1784795400000
+      "_last_checked_t": 1784796300000
     },
     {
       "id": "SUI-Mean Reversion-1784790042118",
@@ -848,12 +848,12 @@
       "created_ts": 1784790042118,
       "filled_ts": 1784795400000,
       "mae_r": 0.19186123326129456,
-      "mfe_r": 0.1480824162272619,
+      "mfe_r": 0.2330683285994096,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4415,
-      "_last_checked_t": 1784795400000
+      "_last_checked_t": 1784796300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784796330214
+  "last_run_ts": 1784797241946
 }
