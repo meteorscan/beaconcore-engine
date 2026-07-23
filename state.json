@@ -187,7 +187,7 @@
     },
     "fill_stats": {
       "Reversal|pending": {
-        "dispatched": 5,
+        "dispatched": 6,
         "filled": 4,
         "expired": 1
       },
@@ -214,7 +214,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 199,
+        "seen": 202,
         "rejected": 0
       }
     },
@@ -1006,9 +1006,47 @@
       "mfe_r": 1.7897456216815972,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4481,
+      "_last_checked_t": 1784830500000
+    },
+    {
+      "id": "APT-Reversal-1784831437907",
+      "symbol": "APT",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.6135328,
+      "sl": 0.61746685,
+      "tp1": 0.6025,
+      "tp2": 0.6024,
+      "rr1": 2.804438174400399,
+      "rr2": 2.829857271768249,
+      "confidence": 0.7663395892863217,
+      "grade": "A",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 15.172957924065312,
+        "volatility_pctl": 96.66666666666667,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784831437907,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4493,
       "_last_checked_t": 1784829600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784830533546
+  "last_run_ts": 1784831437907
 }
