@@ -1150,13 +1150,13 @@
       "status": "active",
       "created_ts": 1784905242849,
       "filled_ts": 1784906100000,
-      "mae_r": 0.42369667342789635,
+      "mae_r": 0.9453925781928461,
       "mfe_r": 0.2085142516610932,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4567,
-      "_last_checked_t": 1784912400000
+      "_last_checked_t": 1784913300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784913327363
+  "last_run_ts": 1784914235347
 }
