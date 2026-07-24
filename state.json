@@ -204,7 +204,7 @@
         "expired": 4
       },
       "Mean Reversion|pending": {
-        "dispatched": 4,
+        "dispatched": 5,
         "filled": 3,
         "expired": 1
       },
@@ -221,7 +221,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 230,
+        "seen": 231,
         "rejected": 0
       }
     },
@@ -236,7 +236,8 @@
     "daily_totals": {
       "2026-07-21": "sent",
       "2026-07-22": "sent",
-      "2026-07-23": "sent"
+      "2026-07-23": "sent",
+      "2026-07-24": "sent"
     },
     "symbol_cooldown": {
       "TAO": {
@@ -1089,7 +1090,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "APT-Mean Reversion-1784880047000",
+      "symbol": "APT",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.6249982283358683,
+      "sl": 0.6288,
+      "tp1": 0.6157,
+      "tp2": 0.6138,
+      "rr1": 2.4457619124245205,
+      "rr2": 2.945528907356324,
+      "confidence": 0.7903754614067993,
+      "grade": "A",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 12.47380674435166,
+        "volatility_pctl": 74.16666666666667,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784880047000,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4538,
+      "_last_checked_t": 1784878200000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1784879132565
+  "last_run_ts": 1784880047000
 }
