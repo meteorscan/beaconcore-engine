@@ -1056,13 +1056,13 @@
       "status": "active",
       "created_ts": 1784824239255,
       "filled_ts": 1784827800000,
-      "mae_r": 0.1517711387590154,
+      "mae_r": 0.6589428639353363,
       "mfe_r": 2.0433314842697663,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4481,
-      "_last_checked_t": 1784853900000
+      "_last_checked_t": 1784854800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784854844368
+  "last_run_ts": 1784855727755
 }
