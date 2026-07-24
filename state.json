@@ -210,7 +210,7 @@
         "expired": 1
       },
       "Liquidity Sweep|pending": {
-        "dispatched": 27,
+        "dispatched": 28,
         "filled": 22,
         "expired": 5
       },
@@ -232,7 +232,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 244,
+        "seen": 245,
         "rejected": 0
       }
     },
@@ -1159,7 +1159,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "ZEC-Liquidity Sweep-1784928634065",
+      "symbol": "ZEC",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 491.1292,
+      "sl": 487.66,
+      "tp1": 497.43,
+      "tp2": 501.44,
+      "rr1": 1.816211230254808,
+      "rr2": 2.972097313501663,
+      "confidence": 0.7083842836209508,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 34.15095917377145,
+        "volatility_pctl": 2.5,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784928634065,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4584,
+      "_last_checked_t": 1784926800000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1784927729348
+  "last_run_ts": 1784928634065
 }
