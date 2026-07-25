@@ -205,7 +205,7 @@
     },
     "fill_stats": {
       "Reversal|pending": {
-        "dispatched": 6,
+        "dispatched": 7,
         "filled": 5,
         "expired": 1
       },
@@ -232,7 +232,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 249,
+        "seen": 250,
         "rejected": 0
       }
     },
@@ -1213,7 +1213,46 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "BCH-Reversal-1784963732800",
+      "symbol": "BCH",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 211.71344,
+      "sl": 213.26999999999998,
+      "tp1": 209.23,
+      "tp2": 209.14,
+      "rr1": 1.59546692706996,
+      "rr2": 1.653286734851224,
+      "confidence": 0.8016057950825655,
+      "grade": "A+",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 33.44242052496494,
+        "volatility_pctl": 3.3333333333333335,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1784963732800,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4609,
+      "_last_checked_t": 1784961900000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1784962842246
+  "last_run_ts": 1784963732800
 }
