@@ -232,7 +232,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 252,
+        "seen": 253,
         "rejected": 0
       }
     },
@@ -1251,7 +1251,7 @@
       "mfe_r": 1.5697692347227195,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4609,
-      "_last_checked_t": 1785004200000
+      "_last_checked_t": 1785005100000
     },
     {
       "id": "DOGE-Liquidity Sweep-1785002440791",
@@ -1285,10 +1285,10 @@
       "created_ts": 1785002440791,
       "filled_ts": 1785002400000,
       "mae_r": 0.6160017444453868,
-      "mfe_r": 0.29385492545707537,
+      "mfe_r": 0.4399632958063678,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4636,
-      "_last_checked_t": 1785004200000
+      "_last_checked_t": 1785005100000
     },
     {
       "id": "PENGU-Liquidity Sweep-1785005125218",
@@ -1317,7 +1317,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1785005125218,
       "filled_ts": null,
@@ -1325,9 +1325,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4639,
-      "_last_checked_t": 1785003300000
+      "_last_checked_t": 1785005100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785005125218
+  "last_run_ts": 1785006041350
 }
