@@ -1251,7 +1251,7 @@
       "mfe_r": 1.5697692347227195,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4609,
-      "_last_checked_t": 1785002400000
+      "_last_checked_t": 1785003300000
     },
     {
       "id": "DOGE-Liquidity Sweep-1785002440791",
@@ -1285,12 +1285,12 @@
       "created_ts": 1785002440791,
       "filled_ts": 1785002400000,
       "mae_r": 0.6160017444453868,
-      "mfe_r": 0.08908183064933933,
+      "mfe_r": 0.18095300291442915,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4636,
-      "_last_checked_t": 1785002400000
+      "_last_checked_t": 1785003300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785003324235
+  "last_run_ts": 1785004245330
 }
