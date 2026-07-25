@@ -210,7 +210,7 @@
         "expired": 1
       },
       "Liquidity Sweep|pending": {
-        "dispatched": 29,
+        "dispatched": 30,
         "filled": 24,
         "expired": 5
       },
@@ -232,7 +232,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 250,
+        "seen": 251,
         "rejected": 0
       }
     },
@@ -1251,9 +1251,46 @@
       "mfe_r": 1.5697692347227195,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4609,
+      "_last_checked_t": 1785001500000
+    },
+    {
+      "id": "DOGE-Liquidity Sweep-1785002440791",
+      "symbol": "DOGE",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.07308948000000001,
+      "sl": 0.073992919,
+      "tp1": 0.071416,
+      "tp2": 0.071141,
+      "rr1": 1.8523442091829483,
+      "rr2": 2.1567366474106535,
+      "confidence": 0.8255512694569345,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 30.247641883072188,
+        "volatility_pctl": 85.83333333333333,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "1h",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785002440791,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4636,
       "_last_checked_t": 1785000600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785001527283
+  "last_run_ts": 1785002440791
 }
