@@ -1251,7 +1251,7 @@
       "mfe_r": 1.5697692347227195,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4609,
-      "_last_checked_t": 1785006000000
+      "_last_checked_t": 1785006900000
     },
     {
       "id": "DOGE-Liquidity Sweep-1785002440791",
@@ -1285,10 +1285,10 @@
       "created_ts": 1785002440791,
       "filled_ts": 1785002400000,
       "mae_r": 0.6160017444453868,
-      "mfe_r": 0.4399632958063678,
+      "mfe_r": 0.47206286201947295,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4636,
-      "_last_checked_t": 1785006000000
+      "_last_checked_t": 1785006900000
     },
     {
       "id": "PENGU-Liquidity Sweep-1785005125218",
@@ -1322,12 +1322,12 @@
       "created_ts": 1785005125218,
       "filled_ts": 1785006000000,
       "mae_r": 0.45621667134437555,
-      "mfe_r": 0.017401066516980226,
+      "mfe_r": 0.49101880437833595,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4639,
-      "_last_checked_t": 1785006000000
+      "_last_checked_t": 1785006900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785006928015
+  "last_run_ts": 1785007837078
 }
