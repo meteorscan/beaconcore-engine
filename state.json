@@ -1355,10 +1355,10 @@
       "created_ts": 1785002440791,
       "filled_ts": 1785002400000,
       "mae_r": 0.6160017444453868,
-      "mfe_r": 1.3531406104894992,
+      "mfe_r": 1.549058652548784,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4636,
-      "_last_checked_t": 1785020400000
+      "_last_checked_t": 1785021300000
     },
     {
       "id": "AVAX-Liquidity Sweep-1785021331060",
@@ -1387,7 +1387,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1785021331060,
       "filled_ts": null,
@@ -1395,9 +1395,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4648,
-      "_last_checked_t": 1785019500000
+      "_last_checked_t": 1785021300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785021331060
+  "last_run_ts": 1785022238732
 }
