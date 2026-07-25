@@ -1218,13 +1218,13 @@
       "status": "active",
       "created_ts": 1784934928241,
       "filled_ts": 1784934000000,
-      "mae_r": 0.6733060614915182,
+      "mae_r": 0.6854809908769283,
       "mfe_r": 0.43664166747832794,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4591,
-      "_last_checked_t": 1784954700000
+      "_last_checked_t": 1784955600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784955641517
+  "last_run_ts": 1784956529195
 }
