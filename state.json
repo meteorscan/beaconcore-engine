@@ -210,7 +210,7 @@
         "expired": 1
       },
       "Liquidity Sweep|pending": {
-        "dispatched": 30,
+        "dispatched": 31,
         "filled": 24,
         "expired": 5
       },
@@ -232,7 +232,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 251,
+        "seen": 252,
         "rejected": 0
       }
     },
@@ -1251,7 +1251,7 @@
       "mfe_r": 1.5697692347227195,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4609,
-      "_last_checked_t": 1785003300000
+      "_last_checked_t": 1785004200000
     },
     {
       "id": "DOGE-Liquidity Sweep-1785002440791",
@@ -1285,12 +1285,49 @@
       "created_ts": 1785002440791,
       "filled_ts": 1785002400000,
       "mae_r": 0.6160017444453868,
-      "mfe_r": 0.18095300291442915,
+      "mfe_r": 0.29385492545707537,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4636,
+      "_last_checked_t": 1785004200000
+    },
+    {
+      "id": "PENGU-Liquidity Sweep-1785005125218",
+      "symbol": "PENGU",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.006216992,
+      "sl": 0.006274,
+      "tp1": 0.006114,
+      "tp2": 0.006075,
+      "rr1": 1.8066236317709925,
+      "rr2": 2.4907381420151697,
+      "confidence": 0.8219365367419155,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 34.50296801488329,
+        "volatility_pctl": 18.333333333333332,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785005125218,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4639,
       "_last_checked_t": 1785003300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785004245330
+  "last_run_ts": 1785005125218
 }
