@@ -1241,18 +1241,18 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 0,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1784963732800,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1784962800000,
+      "mae_r": 0.5438659608367272,
+      "mfe_r": 0.47761730996556323,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4609,
-      "_last_checked_t": 1784961900000
+      "_last_checked_t": 1784963700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1784963732800
+  "last_run_ts": 1784964637831
 }
