@@ -1318,12 +1318,12 @@
       "created_ts": 1785002440791,
       "filled_ts": 1785002400000,
       "mae_r": 0.6160017444453868,
-      "mfe_r": 0.6879047727627577,
+      "mfe_r": 0.8151961560216219,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4636,
-      "_last_checked_t": 1785010500000
+      "_last_checked_t": 1785011400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785011439143
+  "last_run_ts": 1785012325863
 }
