@@ -54,7 +54,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 4,
+        "dispatched": 5,
         "filled": 2,
         "expired": 1
       },
@@ -71,7 +71,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 16,
+        "seen": 19,
         "rejected": 0
       }
     },
@@ -212,7 +212,7 @@
       "mfe_r": 0.44915208944083707,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4733,
-      "_last_checked_t": 1785105000000
+      "_last_checked_t": 1785105900000
     },
     {
       "id": "ADA-Mean Reversion-1785105928090",
@@ -240,18 +240,55 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
+      "entry_filled": true,
+      "pending_bars": 0,
+      "status": "active",
+      "created_ts": 1785105928090,
+      "filled_ts": 1785105000000,
+      "mae_r": 0.17198130856803334,
+      "mfe_r": 0.3145999546976174,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4734,
+      "_last_checked_t": 1785105900000
+    },
+    {
+      "id": "PENGU-Liquidity Sweep-1785106842464",
+      "symbol": "PENGU",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.006351496,
+      "sl": 0.006394388,
+      "tp1": 0.006285,
+      "tp2": 0.006264,
+      "rr1": 1.5503124125711072,
+      "rr2": 2.0399142031148014,
+      "confidence": 0.6951917803962033,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 38.24900212259559,
+        "volatility_pctl": 52.5,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
       "entry_filled": false,
       "pending_bars": 0,
       "status": "pending",
-      "created_ts": 1785105928090,
+      "created_ts": 1785106842464,
       "filled_ts": null,
       "mae_r": 0.0,
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4734,
-      "_last_checked_t": 1785104100000
+      "tg_message_id": 4735,
+      "_last_checked_t": 1785105000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785105928090
+  "last_run_ts": 1785106842464
 }
