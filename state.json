@@ -13,7 +13,8 @@
       "ZEC": 6,
       "PENGU": 5,
       "APT": 5,
-      "NEAR": 4
+      "NEAR": 4,
+      "DOGE": 4
     },
     "regime_fit_discount": {},
     "segment_stats": {
@@ -178,13 +179,19 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "DOGE|trend|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
       "Liquidity Sweep|A+": {
-        "n": 15,
+        "n": 16,
         "wins": 4,
-        "sum_conf": 12.398976234666076
+        "sum_conf": 13.22452750412301
       },
       "Mean Reversion|A": {
         "n": 2,
@@ -229,7 +236,7 @@
     },
     "forensic_counts": {
       "genuine_variance": 17,
-      "correct_read_poor_rr": 8,
+      "correct_read_poor_rr": 9,
       "structural_invalidation_too_tight": 1
     },
     "fill_stats": {
@@ -240,7 +247,7 @@
       },
       "Liquidity Sweep|pending": {
         "dispatched": 36,
-        "filled": 29,
+        "filled": 30,
         "expired": 5
       },
       "Mean Reversion|pending": {
@@ -324,6 +331,10 @@
       "AVAX": {
         "direction": "bearish",
         "until_ts": 1785016800000
+      },
+      "DOGE": {
+        "direction": "bearish",
+        "until_ts": 1785052800000
       }
     }
   },
@@ -1434,46 +1445,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "DOGE-Liquidity Sweep-1785002440791",
       "symbol": "DOGE",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.07308948000000001,
       "sl": 0.073992919,
       "tp1": 0.071416,
       "tp2": 0.071141,
-      "rr1": 1.8523442091829483,
-      "rr2": 2.1567366474106535,
+      "r_realized": -1.0,
+      "mae_r": 1.0565406186803923,
+      "mfe_r": 1.6674949830592123,
+      "forensic_category": "correct_read_poor_rr",
       "confidence": 0.8255512694569345,
       "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 30.247641883072188,
-        "volatility_pctl": 85.83333333333333,
+        "trend_strength": 40.74671876294151,
+        "volatility_pctl": 96.66666666666667,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "1h",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1785002440791,
-      "filled_ts": 1785002400000,
-      "mae_r": 0.8274161288144459,
-      "mfe_r": 1.6674949830592123,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4636,
-      "_last_checked_t": 1785048300000
-    },
+      "resolved_ts": 1785049200000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "AVAX-Liquidity Sweep-1785021331060",
       "symbol": "AVAX",
@@ -1505,13 +1506,13 @@
       "status": "active",
       "created_ts": 1785021331060,
       "filled_ts": 1785030300000,
-      "mae_r": 0.2176645996407989,
+      "mae_r": 0.5162820643149898,
       "mfe_r": 1.4130832570905971,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4648,
-      "_last_checked_t": 1785048300000
+      "_last_checked_t": 1785049200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785049242290
+  "last_run_ts": 1785050131165
 }
