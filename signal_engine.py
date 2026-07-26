@@ -2536,7 +2536,7 @@ def format_signal_message(sig: Dict[str, Any]) -> str:
     ct_badge = "\n>>> COUNTER-TREND: against the Weekly/Daily bias <<<" if sig["counter_trend"] else ""
     lines = [
         header, ct_badge,
-        f"{sig['signal']}  {sig['symbol']}",
+        f"{'🟢' if sig['signal'] == 'LONG' else '🔴'} {sig['signal']}  {sig['symbol']}",
         f"Engine: {_humanize(sig['engine'])}",
         f"Style: {_humanize(sig['style'])}   Grade: {sig['grade']} ({sig['confidence']:.1f})",
         "",
@@ -2880,14 +2880,10 @@ def _resolve_active_signals(state: Dict[str, Any], client: HyperliquidClient, ca
                     apply_win_reinforcement(state, trade)
 
                 status = {"win": "TP1", "loss": "SL", "expired": "Expired"}[result]
-                if sig.get("message_id"):
+                if sig.get("message_id") and result in ("win", "loss"):
                     notifier.reply(sig["message_id"], f"{ENGINE_NAME} v{ENGINE_VERSION} -- {asset}: {status}")
                 to_remove.append(sig_id)
                 break
-            elif sig.get("entry_filled") and not sig.get("_activated_notified"):
-                sig["_activated_notified"] = True
-                if sig.get("message_id"):
-                    notifier.reply(sig["message_id"], f"{ENGINE_NAME} v{ENGINE_VERSION} -- {asset}: Activated")
     for sig_id in to_remove:
         active.pop(sig_id, None)
 
