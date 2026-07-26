@@ -228,7 +228,7 @@
     },
     "fill_stats": {
       "Reversal|pending": {
-        "dispatched": 7,
+        "dispatched": 8,
         "filled": 6,
         "expired": 1
       },
@@ -255,7 +255,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 257,
+        "seen": 259,
         "rejected": 0
       }
     },
@@ -1358,7 +1358,7 @@
       "mfe_r": 1.6674949830592123,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4636,
-      "_last_checked_t": 1785025800000
+      "_last_checked_t": 1785026700000
     },
     {
       "id": "AVAX-Liquidity Sweep-1785021331060",
@@ -1387,7 +1387,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 7,
+      "pending_bars": 8,
       "status": "pending",
       "created_ts": 1785021331060,
       "filled_ts": null,
@@ -1395,9 +1395,47 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4648,
+      "_last_checked_t": 1785026700000
+    },
+    {
+      "id": "PENGU-Reversal-1785027680907",
+      "symbol": "PENGU",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.0062223600000000006,
+      "sl": 0.0062892830000000005,
+      "tp1": 0.006114,
+      "tp2": 0.006075,
+      "rr1": 1.6191742749129738,
+      "rr2": 2.2019335654408936,
+      "confidence": 0.7938561037268625,
+      "grade": "A",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 40.11067805979009,
+        "volatility_pctl": 61.666666666666664,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785027680907,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4653,
       "_last_checked_t": 1785025800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785026734062
+  "last_run_ts": 1785027680907
 }
