@@ -239,7 +239,7 @@
         "expired": 1
       },
       "Liquidity Sweep|pending": {
-        "dispatched": 34,
+        "dispatched": 35,
         "filled": 26,
         "expired": 5
       },
@@ -261,7 +261,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 261,
+        "seen": 262,
         "rejected": 0
       }
     },
@@ -1391,7 +1391,7 @@
       "mfe_r": 1.6674949830592123,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4636,
-      "_last_checked_t": 1785035700000
+      "_last_checked_t": 1785036600000
     },
     {
       "id": "AVAX-Liquidity Sweep-1785021331060",
@@ -1428,7 +1428,7 @@
       "mfe_r": 1.4130832570905971,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4648,
-      "_last_checked_t": 1785035700000
+      "_last_checked_t": 1785036600000
     },
     {
       "id": "PENGU-Liquidity Sweep-1785034837424",
@@ -1462,12 +1462,49 @@
       "created_ts": 1785034837424,
       "filled_ts": 1785033900000,
       "mae_r": 0.27007893058944943,
-      "mfe_r": 0.8841984917441642,
+      "mfe_r": 0.9061847283600359,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4658,
+      "_last_checked_t": 1785036600000
+    },
+    {
+      "id": "TAO-Liquidity Sweep-1785037528896",
+      "symbol": "TAO",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 194.54952000000003,
+      "sl": 195.90571,
+      "tp1": 190.86,
+      "tp2": 190.63,
+      "rr1": 2.7205037642219,
+      "rr2": 2.890096520399149,
+      "confidence": 0.8300682996061125,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 11.612368665179774,
+        "volatility_pctl": 3.3333333333333335,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785037528896,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4659,
       "_last_checked_t": 1785035700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785036633896
+  "last_run_ts": 1785037528896
 }
