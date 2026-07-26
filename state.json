@@ -285,7 +285,8 @@
       "2026-07-22": "sent",
       "2026-07-23": "sent",
       "2026-07-24": "sent",
-      "2026-07-25": "sent"
+      "2026-07-25": "sent",
+      "2026-07-26": "sent"
     },
     "symbol_cooldown": {
       "TAO": {
@@ -1510,9 +1511,9 @@
       "mfe_r": 1.4130832570905971,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4648,
-      "_last_checked_t": 1785051000000
+      "_last_checked_t": 1785051900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785051927373
+  "last_run_ts": 1785052842427
 }
