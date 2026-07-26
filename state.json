@@ -62,11 +62,16 @@
         "dispatched": 2,
         "filled": 1,
         "expired": 1
+      },
+      "Mean Reversion|pending": {
+        "dispatched": 1,
+        "filled": 0,
+        "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 14,
+        "seen": 16,
         "rejected": 0
       }
     },
@@ -198,18 +203,55 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
+      "entry_filled": true,
+      "pending_bars": 0,
+      "status": "active",
+      "created_ts": 1785105036307,
+      "filled_ts": 1785104100000,
+      "mae_r": 0.5425677427783527,
+      "mfe_r": 0.44915208944083707,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4733,
+      "_last_checked_t": 1785105000000
+    },
+    {
+      "id": "ADA-Mean Reversion-1785105928090",
+      "symbol": "ADA",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.165965,
+      "sl": 0.16715699,
+      "tp1": 0.16416,
+      "tp2": 0.16415,
+      "rr1": 1.514274448611142,
+      "rr2": 1.5226637807364198,
+      "confidence": 0.8320368582423204,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 15.002384503093461,
+        "volatility_pctl": 1.6666666666666667,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
       "entry_filled": false,
       "pending_bars": 0,
       "status": "pending",
-      "created_ts": 1785105036307,
+      "created_ts": 1785105928090,
       "filled_ts": null,
       "mae_r": 0.0,
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4733,
-      "_last_checked_t": 1785103200000
+      "tg_message_id": 4734,
+      "_last_checked_t": 1785104100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785105036307
+  "last_run_ts": 1785105928090
 }
