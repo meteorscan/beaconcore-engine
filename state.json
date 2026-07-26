@@ -71,7 +71,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 19,
+        "seen": 22,
         "rejected": 0
       }
     },
@@ -208,11 +208,11 @@
       "status": "active",
       "created_ts": 1785105036307,
       "filled_ts": 1785104100000,
-      "mae_r": 0.5425677427783527,
+      "mae_r": 0.8968947886211537,
       "mfe_r": 0.44915208944083707,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4733,
-      "_last_checked_t": 1785105900000
+      "_last_checked_t": 1785106800000
     },
     {
       "id": "ADA-Mean Reversion-1785105928090",
@@ -245,11 +245,11 @@
       "status": "active",
       "created_ts": 1785105928090,
       "filled_ts": 1785105000000,
-      "mae_r": 0.17198130856803334,
-      "mfe_r": 0.3145999546976174,
+      "mae_r": 0.4572186008271782,
+      "mfe_r": 0.47399726507773393,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4734,
-      "_last_checked_t": 1785105900000
+      "_last_checked_t": 1785106800000
     },
     {
       "id": "PENGU-Liquidity Sweep-1785106842464",
@@ -277,18 +277,18 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 0,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1785106842464,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1785105900000,
+      "mae_r": 0.035064813951325616,
+      "mfe_r": 0.45453697659236864,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4735,
-      "_last_checked_t": 1785105000000
+      "_last_checked_t": 1785106800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785106842464
+  "last_run_ts": 1785107727841
 }
