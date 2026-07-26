@@ -172,6 +172,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "PENGU|trend|intraday|Reversal": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -186,9 +192,9 @@
         "sum_conf": 1.5213677846423173
       },
       "Reversal|A": {
-        "n": 5,
+        "n": 6,
         "wins": 2,
-        "sum_conf": 3.844553783531017
+        "sum_conf": 4.638409887257879
       },
       "Liquidity Sweep|A": {
         "n": 13,
@@ -222,14 +228,14 @@
       }
     },
     "forensic_counts": {
-      "genuine_variance": 14,
+      "genuine_variance": 15,
       "correct_read_poor_rr": 7,
       "structural_invalidation_too_tight": 1
     },
     "fill_stats": {
       "Reversal|pending": {
         "dispatched": 8,
-        "filled": 6,
+        "filled": 7,
         "expired": 1
       },
       "Liquidity Sweep|pending": {
@@ -293,7 +299,7 @@
       },
       "PENGU": {
         "direction": "bearish",
-        "until_ts": 1785013200000
+        "until_ts": 1785034800000
       },
       "SUI": {
         "direction": "bearish",
@@ -1320,6 +1326,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "PENGU-Reversal-1785027680907",
+      "symbol": "PENGU",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.0062223600000000006,
+      "sl": 0.0062892830000000005,
+      "tp1": 0.006114,
+      "tp2": 0.006075,
+      "r_realized": -1.0,
+      "mae_r": 1.1003690808839985,
+      "mfe_r": 0.6180236988778255,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7938561037268625,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 40.66183338856772,
+        "volatility_pctl": 71.66666666666667,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1785031200000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -1358,7 +1391,7 @@
       "mfe_r": 1.6674949830592123,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4636,
-      "_last_checked_t": 1785030300000
+      "_last_checked_t": 1785031200000
     },
     {
       "id": "AVAX-Liquidity Sweep-1785021331060",
@@ -1395,47 +1428,9 @@
       "mfe_r": 0.7840805123513428,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4648,
-      "_last_checked_t": 1785030300000
-    },
-    {
-      "id": "PENGU-Reversal-1785027680907",
-      "symbol": "PENGU",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.0062223600000000006,
-      "sl": 0.0062892830000000005,
-      "tp1": 0.006114,
-      "tp2": 0.006075,
-      "rr1": 1.6191742749129738,
-      "rr2": 2.2019335654408936,
-      "confidence": 0.7938561037268625,
-      "grade": "A",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 40.11067805979009,
-        "volatility_pctl": 61.666666666666664,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1785027680907,
-      "filled_ts": 1785026700000,
-      "mae_r": 0.4877246985341301,
-      "mfe_r": 0.6180236988778255,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4653,
-      "_last_checked_t": 1785030300000
+      "_last_checked_t": 1785031200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785031243582
+  "last_run_ts": 1785032128709
 }
