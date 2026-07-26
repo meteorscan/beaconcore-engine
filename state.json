@@ -31,7 +31,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 2,
+        "dispatched": 3,
         "filled": 1,
         "expired": 0
       },
@@ -43,7 +43,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 10,
+        "seen": 12,
         "rejected": 0
       }
     },
@@ -121,18 +121,55 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 7,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1785077131615,
+      "filled_ts": 1785082500000,
+      "mae_r": 0.30342044581089034,
+      "mfe_r": 0.6573789392774964,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4704,
+      "_last_checked_t": 1785082500000
+    },
+    {
+      "id": "SUI-Liquidity Sweep-1785083442471",
+      "symbol": "SUI",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.72217752,
+      "sl": 0.726677,
+      "tp1": 0.71502,
+      "tp2": 0.7145,
+      "rr1": 1.5907438192857903,
+      "rr2": 1.7063127294709595,
+      "confidence": 0.7886933679728099,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 25.256046350654763,
+        "volatility_pctl": 13.333333333333334,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785083442471,
       "filled_ts": null,
       "mae_r": 0.0,
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4704,
+      "tg_message_id": 4714,
       "_last_checked_t": 1785081600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785082526298
+  "last_run_ts": 1785083442471
 }
