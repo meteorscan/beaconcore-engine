@@ -1,1 +1,83 @@
-{}
+{
+  "schema_version": 1,
+  "resolution_logic_version": "1.0.4",
+  "tier1": {
+    "engine_weights": {},
+    "combo_weights": {},
+    "confidence_calibration": {},
+    "filter_thresholds": {},
+    "sl_buffer_percentile": {},
+    "tp1_rank_preference": {},
+    "regime_fit_discount": {},
+    "segment_stats": {},
+    "calibration_buckets": {},
+    "forensic_counts": {},
+    "fill_stats": {
+      "Liquidity Sweep|pending": {
+        "dispatched": 1,
+        "filled": 0,
+        "expired": 0
+      }
+    },
+    "filter_funnel": {
+      "liquidity_sanity": {
+        "seen": 1,
+        "rejected": 0
+      }
+    },
+    "circuit_breaker": {
+      "tripped": false,
+      "tripped_ts": null,
+      "reason": null
+    },
+    "governor": {
+      "last_adjust_ts": 0
+    },
+    "daily_totals": {
+      "2026-07-26": "sent"
+    },
+    "symbol_cooldown": {}
+  },
+  "tier2_trades": [],
+  "active_signals": [
+    {
+      "id": "TAO-Liquidity Sweep-1785058236996",
+      "symbol": "TAO",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 196.12648,
+      "sl": 198.31,
+      "tp1": 190.86,
+      "tp2": 190.63,
+      "rr1": 2.411922034146669,
+      "rr2": 2.517256539898857,
+      "confidence": 0.8085101708121502,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 27.25687268519067,
+        "volatility_pctl": 37.5,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785058236996,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4691,
+      "_last_checked_t": 1785056400000
+    }
+  ],
+  "macro_events": [],
+  "last_run_ts": 1785058236996
+}
