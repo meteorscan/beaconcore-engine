@@ -18,10 +18,10 @@
     "regime_fit_discount": {},
     "segment_stats": {
       "TAO|range|intraday|Liquidity Sweep": {
-        "n": 2,
+        "n": 3,
         "wins": 1,
-        "losses": 1,
-        "sum_r": 0.6530036958927548
+        "losses": 2,
+        "sum_r": -0.34699630410724525
       },
       "XLM|trend|intraday|Mean Reversion": {
         "n": 1,
@@ -182,9 +182,9 @@
     },
     "calibration_buckets": {
       "Liquidity Sweep|A+": {
-        "n": 12,
+        "n": 13,
         "wins": 4,
-        "sum_conf": 9.895411257653095
+        "sum_conf": 10.725479557259208
       },
       "Mean Reversion|A": {
         "n": 2,
@@ -228,7 +228,7 @@
       }
     },
     "forensic_counts": {
-      "genuine_variance": 15,
+      "genuine_variance": 16,
       "correct_read_poor_rr": 7,
       "structural_invalidation_too_tight": 1
     },
@@ -240,7 +240,7 @@
       },
       "Liquidity Sweep|pending": {
         "dispatched": 35,
-        "filled": 26,
+        "filled": 27,
         "expired": 5
       },
       "Mean Reversion|pending": {
@@ -261,7 +261,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 262,
+        "seen": 263,
         "rejected": 0
       }
     },
@@ -283,7 +283,7 @@
     "symbol_cooldown": {
       "TAO": {
         "direction": "bearish",
-        "until_ts": 1784630700000
+        "until_ts": 1785042000000
       },
       "XLM": {
         "direction": "bearish",
@@ -1353,6 +1353,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "TAO-Liquidity Sweep-1785037528896",
+      "symbol": "TAO",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 194.54952000000003,
+      "sl": 195.90571,
+      "tp1": 190.86,
+      "tp2": 190.63,
+      "r_realized": -1.0,
+      "mae_r": 1.2391184126118007,
+      "mfe_r": 0.4420619529712314,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8300682996061125,
+      "grade": "A+",
+      "regime_at_entry": {
+        "trend_strength": 13.471117990692823,
+        "volatility_pctl": 10.0,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1785038400000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -1391,7 +1418,7 @@
       "mfe_r": 1.6674949830592123,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4636,
-      "_last_checked_t": 1785037500000
+      "_last_checked_t": 1785038400000
     },
     {
       "id": "AVAX-Liquidity Sweep-1785021331060",
@@ -1428,7 +1455,7 @@
       "mfe_r": 1.4130832570905971,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4648,
-      "_last_checked_t": 1785037500000
+      "_last_checked_t": 1785038400000
     },
     {
       "id": "PENGU-Liquidity Sweep-1785034837424",
@@ -1461,50 +1488,13 @@
       "status": "active",
       "created_ts": 1785034837424,
       "filled_ts": 1785033900000,
-      "mae_r": 0.6108655981355613,
+      "mae_r": 0.6768243079831955,
       "mfe_r": 0.9061847283600359,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4658,
-      "_last_checked_t": 1785037500000
-    },
-    {
-      "id": "TAO-Liquidity Sweep-1785037528896",
-      "symbol": "TAO",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 194.54952000000003,
-      "sl": 195.90571,
-      "tp1": 190.86,
-      "tp2": 190.63,
-      "rr1": 2.7205037642219,
-      "rr2": 2.890096520399149,
-      "confidence": 0.8300682996061125,
-      "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 11.612368665179774,
-        "volatility_pctl": 3.3333333333333335,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1785037528896,
-      "filled_ts": 1785037500000,
-      "mae_r": 0.7377137421747721,
-      "mfe_r": 0.4420619529712314,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4659,
-      "_last_checked_t": 1785037500000
+      "_last_checked_t": 1785038400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785038440644
+  "last_run_ts": 1785039329290
 }
