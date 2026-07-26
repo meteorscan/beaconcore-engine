@@ -54,7 +54,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 3,
+        "dispatched": 4,
         "filled": 2,
         "expired": 1
       },
@@ -66,7 +66,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 13,
+        "seen": 14,
         "rejected": 0
       }
     },
@@ -171,7 +171,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "DOT-Liquidity Sweep-1785105036307",
+      "symbol": "DOT",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.82664904,
+      "sl": 0.83170087,
+      "tp1": 0.81661,
+      "tp2": 0.81629,
+      "rr1": 1.9872085956969692,
+      "rr2": 2.050551978194001,
+      "confidence": 0.7795769184397128,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 30.745620631547997,
+        "volatility_pctl": 0.8333333333333334,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785105036307,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4733,
+      "_last_checked_t": 1785103200000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1785104127555
+  "last_run_ts": 1785105036307
 }
