@@ -31,7 +31,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 1,
+        "dispatched": 2,
         "filled": 1,
         "expired": 0
       },
@@ -43,7 +43,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 6,
+        "seen": 7,
         "rejected": 0
       }
     },
@@ -94,7 +94,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "APT-Liquidity Sweep-1785077131615",
+      "symbol": "APT",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.6342368,
+      "sl": 0.6384000000000001,
+      "tp1": 0.626,
+      "tp2": 0.6206,
+      "rr1": 1.9784780937740147,
+      "rr2": 3.275557263643326,
+      "confidence": 0.7754875731959019,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 33.57289392373035,
+        "volatility_pctl": 60.0,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785077131615,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4704,
+      "_last_checked_t": 1785075300000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1785076238087
+  "last_run_ts": 1785077131615
 }
