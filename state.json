@@ -255,7 +255,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 259,
+        "seen": 260,
         "rejected": 0
       }
     },
@@ -1358,7 +1358,7 @@
       "mfe_r": 1.6674949830592123,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4636,
-      "_last_checked_t": 1785026700000
+      "_last_checked_t": 1785027600000
     },
     {
       "id": "AVAX-Liquidity Sweep-1785021331060",
@@ -1387,7 +1387,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 8,
+      "pending_bars": 9,
       "status": "pending",
       "created_ts": 1785021331060,
       "filled_ts": null,
@@ -1395,7 +1395,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4648,
-      "_last_checked_t": 1785026700000
+      "_last_checked_t": 1785027600000
     },
     {
       "id": "PENGU-Reversal-1785027680907",
@@ -1424,18 +1424,18 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 0,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1785027680907,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1785026700000,
+      "mae_r": 0.27852905578051584,
+      "mfe_r": 0.6180236988778255,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4653,
-      "_last_checked_t": 1785025800000
+      "_last_checked_t": 1785027600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785027680907
+  "last_run_ts": 1785028528848
 }
