@@ -92,6 +92,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 2.8842138004214326
+      },
+      "BNB|trend|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 2.310559572963511
       }
     },
     "calibration_buckets": {
@@ -101,9 +107,9 @@
         "sum_conf": 1.6678138172590034
       },
       "Liquidity Sweep|A": {
-        "n": 7,
-        "wins": 6,
-        "sum_conf": 5.369259449463396
+        "n": 8,
+        "wins": 7,
+        "sum_conf": 6.148916971794181
       },
       "Reversal|A": {
         "n": 2,
@@ -133,7 +139,7 @@
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 13,
-        "filled": 9,
+        "filled": 10,
         "expired": 3
       },
       "Reversal|pending": {
@@ -598,47 +604,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "BNB-Liquidity Sweep-1785170727428",
       "symbol": "BNB",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 573.44304,
       "sl": 576.9499999999999,
       "tp1": 565.34,
       "tp2": 564.76,
-      "rr1": 2.310559572963511,
-      "rr2": 2.4759449779866793,
+      "r_realized": 2.310559572963511,
+      "mae_r": 0.660674772452505,
+      "mfe_r": 2.32196546296513,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7796575223307853,
       "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 32.660227075175975,
-        "volatility_pctl": 95.83333333333333,
-        "macro_bias": "neutral"
+        "trend_strength": 23.62396951282531,
+        "volatility_pctl": 100.0,
+        "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 3,
-      "status": "active",
-      "created_ts": 1785170727428,
-      "filled_ts": 1785172500000,
-      "mae_r": 0.660674772452505,
-      "mfe_r": 2.264936012957132,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4821,
-      "_last_checked_t": 1785192300000
+      "resolved_ts": 1785193200000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1785193244643
+  "last_run_ts": 1785194125796
 }
