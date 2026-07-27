@@ -137,7 +137,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 81,
+        "seen": 82,
         "rejected": 0
       }
     },
@@ -565,7 +565,7 @@
       "mfe_r": 0.46280539270478593,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4821,
-      "_last_checked_t": 1785181500000
+      "_last_checked_t": 1785182400000
     },
     {
       "id": "AVAX-Momentum-1785178842918",
@@ -599,11 +599,11 @@
       "status": "active",
       "created_ts": 1785178842918,
       "filled_ts": 1785178800000,
-      "mae_r": 0.5096021805623682,
+      "mae_r": 0.59441941348398,
       "mfe_r": 0.4465193541902567,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4830,
-      "_last_checked_t": 1785181500000
+      "_last_checked_t": 1785182400000
     },
     {
       "id": "PENGU-Momentum-1785182450634",
@@ -632,18 +632,18 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
+      "entry_filled": true,
+      "pending_bars": 1,
+      "status": "active",
       "created_ts": 1785182450634,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1785182400000,
+      "mae_r": 0.26249105055288063,
+      "mfe_r": 0.3275161090047978,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4832,
-      "_last_checked_t": 1785180600000
+      "_last_checked_t": 1785182400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785182450634
+  "last_run_ts": 1785183330176
 }
