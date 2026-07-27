@@ -80,11 +80,16 @@
         "dispatched": 1,
         "filled": 0,
         "expired": 0
+      },
+      "Momentum|pending": {
+        "dispatched": 1,
+        "filled": 0,
+        "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 45,
+        "seen": 46,
         "rejected": 0
       }
     },
@@ -283,7 +288,7 @@
       "mfe_r": 1.3129304776046826,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4734,
-      "_last_checked_t": 1785121200000
+      "_last_checked_t": 1785122100000
     },
     {
       "id": "PENGU-Liquidity Sweep-1785106842464",
@@ -320,7 +325,7 @@
       "mfe_r": 0.7109950573533427,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4735,
-      "_last_checked_t": 1785121200000
+      "_last_checked_t": 1785122100000
     },
     {
       "id": "XRP-Liquidity Sweep-1785112236492",
@@ -358,7 +363,7 @@
       "mfe_r": 1.2230561392975174,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4740,
-      "_last_checked_t": 1785121200000
+      "_last_checked_t": 1785122100000
     },
     {
       "id": "SUI-Liquidity Sweep-1785121240035",
@@ -387,7 +392,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 2,
+      "pending_bars": 3,
       "status": "pending",
       "created_ts": 1785121240035,
       "filled_ts": null,
@@ -395,9 +400,47 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4754,
+      "_last_checked_t": 1785122100000
+    },
+    {
+      "id": "ZEC-Momentum-1785123035880",
+      "symbol": "ZEC",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 504.3319968850764,
+      "sl": 500.37399999999997,
+      "tp1": 510.465,
+      "tp2": 510.53,
+      "rr1": 1.5495219660348687,
+      "rr2": 1.565944414532764,
+      "confidence": 0.8162638400858073,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 40.18043792421197,
+        "volatility_pctl": 36.666666666666664,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785123035880,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4756,
       "_last_checked_t": 1785121200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785122127527
+  "last_run_ts": 1785123035880
 }
