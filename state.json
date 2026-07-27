@@ -325,7 +325,7 @@
       "mfe_r": 1.3129304776046826,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4734,
-      "_last_checked_t": 1785130200000
+      "_last_checked_t": 1785131100000
     },
     {
       "id": "XRP-Liquidity Sweep-1785112236492",
@@ -363,7 +363,7 @@
       "mfe_r": 1.2230561392975174,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4740,
-      "_last_checked_t": 1785130200000
+      "_last_checked_t": 1785131100000
     },
     {
       "id": "ZEC-Momentum-1785123035880",
@@ -397,13 +397,13 @@
       "status": "active",
       "created_ts": 1785123035880,
       "filled_ts": 1785123000000,
-      "mae_r": 0.45528001597748613,
+      "mae_r": 0.46285960759189265,
       "mfe_r": 0.6867117872608148,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4756,
-      "_last_checked_t": 1785130200000
+      "_last_checked_t": 1785131100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785131131117
+  "last_run_ts": 1785132048706
 }
