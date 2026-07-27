@@ -130,14 +130,14 @@
         "expired": 1
       },
       "Momentum|pending": {
-        "dispatched": 1,
+        "dispatched": 2,
         "filled": 1,
         "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 74,
+        "seen": 76,
         "rejected": 0
       }
     },
@@ -561,13 +561,51 @@
       "status": "active",
       "created_ts": 1785170727428,
       "filled_ts": 1785172500000,
-      "mae_r": 0.41829960991856163,
+      "mae_r": 0.5295070374341289,
       "mfe_r": 0.46280539270478593,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4821,
+      "_last_checked_t": 1785177900000
+    },
+    {
+      "id": "AVAX-Momentum-1785178842918",
+      "symbol": "AVAX",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 6.585263749756527,
+      "sl": 6.63714,
+      "tp1": 6.4812,
+      "tp2": 6.2718,
+      "rr1": 2.005999841317017,
+      "rr2": 6.042529062631546,
+      "confidence": 0.7832843593696609,
+      "grade": "A",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 20.703435983543365,
+        "volatility_pctl": 77.5,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785178842918,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4830,
       "_last_checked_t": 1785177000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785177934514
+  "last_run_ts": 1785178842918
 }
