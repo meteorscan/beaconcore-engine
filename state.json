@@ -42,6 +42,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "PENGU|trend|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -51,9 +57,9 @@
         "sum_conf": 1.6678138172590034
       },
       "Liquidity Sweep|A": {
-        "n": 2,
+        "n": 3,
         "wins": 2,
-        "sum_conf": 1.5550644916356147
+        "sum_conf": 2.2502562720318178
       },
       "Reversal|A": {
         "n": 1,
@@ -63,12 +69,12 @@
     },
     "forensic_counts": {
       "structural_invalidation_too_tight": 2,
-      "genuine_variance": 1
+      "genuine_variance": 2
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 9,
-        "filled": 4,
+        "filled": 5,
         "expired": 2
       },
       "Reversal|pending": {
@@ -112,6 +118,10 @@
       "NEAR": {
         "direction": "bearish",
         "until_ts": 1785123900000
+      },
+      "PENGU": {
+        "direction": "bearish",
+        "until_ts": 1785132900000
       }
     }
   },
@@ -250,6 +260,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "PENGU-Liquidity Sweep-1785106842464",
+      "symbol": "PENGU",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.006351496,
+      "sl": 0.006394388,
+      "tp1": 0.006285,
+      "tp2": 0.006264,
+      "r_realized": -1.0,
+      "mae_r": 1.22409773384314,
+      "mfe_r": 0.7109950573533427,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.6951917803962033,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 34.01287854681982,
+        "volatility_pctl": 35.833333333333336,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1785129300000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -288,44 +325,7 @@
       "mfe_r": 1.3129304776046826,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4734,
-      "_last_checked_t": 1785128400000
-    },
-    {
-      "id": "PENGU-Liquidity Sweep-1785106842464",
-      "symbol": "PENGU",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.006351496,
-      "sl": 0.006394388,
-      "tp1": 0.006285,
-      "tp2": 0.006264,
-      "rr1": 1.5503124125711072,
-      "rr2": 2.0399142031148014,
-      "confidence": 0.6951917803962033,
-      "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 38.24900212259559,
-        "volatility_pctl": 52.5,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1785106842464,
-      "filled_ts": 1785105900000,
-      "mae_r": 0.921010911125618,
-      "mfe_r": 0.7109950573533427,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4735,
-      "_last_checked_t": 1785128400000
+      "_last_checked_t": 1785129300000
     },
     {
       "id": "XRP-Liquidity Sweep-1785112236492",
@@ -363,7 +363,7 @@
       "mfe_r": 1.2230561392975174,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4740,
-      "_last_checked_t": 1785128400000
+      "_last_checked_t": 1785129300000
     },
     {
       "id": "SUI-Liquidity Sweep-1785121240035",
@@ -392,7 +392,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 10,
+      "pending_bars": 11,
       "status": "pending",
       "created_ts": 1785121240035,
       "filled_ts": null,
@@ -400,7 +400,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4754,
-      "_last_checked_t": 1785128400000
+      "_last_checked_t": 1785129300000
     },
     {
       "id": "ZEC-Momentum-1785123035880",
@@ -435,12 +435,12 @@
       "created_ts": 1785123035880,
       "filled_ts": 1785123000000,
       "mae_r": 0.45528001597748613,
-      "mfe_r": 0.43405873344703366,
+      "mfe_r": 0.6867117872608148,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4756,
-      "_last_checked_t": 1785128400000
+      "_last_checked_t": 1785129300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785129330245
+  "last_run_ts": 1785130241434
 }
