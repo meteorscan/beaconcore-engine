@@ -565,7 +565,7 @@
       "mfe_r": 0.46280539270478593,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4821,
-      "_last_checked_t": 1785186900000
+      "_last_checked_t": 1785187800000
     },
     {
       "id": "AVAX-Momentum-1785178842918",
@@ -603,7 +603,7 @@
       "mfe_r": 0.4465193541902567,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4830,
-      "_last_checked_t": 1785186900000
+      "_last_checked_t": 1785187800000
     },
     {
       "id": "PENGU-Momentum-1785182450634",
@@ -641,9 +641,9 @@
       "mfe_r": 0.6716869520801173,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4832,
-      "_last_checked_t": 1785186900000
+      "_last_checked_t": 1785187800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785187839467
+  "last_run_ts": 1785188726563
 }
