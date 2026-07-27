@@ -80,6 +80,18 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 1.808355989568886
+      },
+      "AVAX|range|intraday|Momentum": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 2.005999841317017
+      },
+      "PENGU|trend|intraday|Momentum": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 2.8842138004214326
       }
     },
     "calibration_buckets": {
@@ -104,9 +116,14 @@
         "sum_conf": 0.8320368582423204
       },
       "Momentum|A+": {
+        "n": 2,
+        "wins": 1,
+        "sum_conf": 1.6645462838362277
+      },
+      "Momentum|A": {
         "n": 1,
-        "wins": 0,
-        "sum_conf": 0.8162638400858073
+        "wins": 1,
+        "sum_conf": 0.7832843593696609
       }
     },
     "forensic_counts": {
@@ -131,7 +148,7 @@
       },
       "Momentum|pending": {
         "dispatched": 3,
-        "filled": 1,
+        "filled": 3,
         "expired": 0
       }
     },
@@ -527,6 +544,60 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "AVAX-Momentum-1785178842918",
+      "symbol": "AVAX",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 6.585263749756527,
+      "sl": 6.63714,
+      "tp1": 6.4812,
+      "tp2": 6.2718,
+      "r_realized": 2.005999841317017,
+      "mae_r": 0.59441941348398,
+      "mfe_r": 2.832967862302664,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7832843593696609,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 20.346990994223976,
+        "volatility_pctl": 83.33333333333333,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1785192300000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "PENGU-Momentum-1785182450634",
+      "symbol": "PENGU",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.006130322527513069,
+      "sl": 0.006171,
+      "tp1": 0.006013,
+      "tp2": 0.006004,
+      "r_realized": 2.8842138004214326,
+      "mae_r": 0.26249105055288063,
+      "mfe_r": 3.867559066350911,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8482824437504204,
+      "grade": "A+",
+      "regime_at_entry": {
+        "trend_strength": 32.23824692831661,
+        "volatility_pctl": 95.0,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1785192300000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -562,88 +633,12 @@
       "created_ts": 1785170727428,
       "filled_ts": 1785172500000,
       "mae_r": 0.660674772452505,
-      "mfe_r": 1.4494148778429399,
+      "mfe_r": 2.264936012957132,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4821,
-      "_last_checked_t": 1785191400000
-    },
-    {
-      "id": "AVAX-Momentum-1785178842918",
-      "symbol": "AVAX",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 6.585263749756527,
-      "sl": 6.63714,
-      "tp1": 6.4812,
-      "tp2": 6.2718,
-      "rr1": 2.005999841317017,
-      "rr2": 6.042529062631546,
-      "confidence": 0.7832843593696609,
-      "grade": "A",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 20.703435983543365,
-        "volatility_pctl": 77.5,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1785178842918,
-      "filled_ts": 1785178800000,
-      "mae_r": 0.59441941348398,
-      "mfe_r": 1.491313450633648,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4830,
-      "_last_checked_t": 1785191400000
-    },
-    {
-      "id": "PENGU-Momentum-1785182450634",
-      "symbol": "PENGU",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.006130322527513069,
-      "sl": 0.006171,
-      "tp1": 0.006013,
-      "tp2": 0.006004,
-      "rr1": 2.8842138004214326,
-      "rr2": 3.105466485255573,
-      "confidence": 0.8482824437504204,
-      "grade": "A+",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 32.75566520876346,
-        "volatility_pctl": 95.83333333333333,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1785182450634,
-      "filled_ts": 1785182400000,
-      "mae_r": 0.26249105055288063,
-      "mfe_r": 2.3679575358084533,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4832,
-      "_last_checked_t": 1785191400000
+      "_last_checked_t": 1785192300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785192326060
+  "last_run_ts": 1785193244643
 }
