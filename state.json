@@ -89,7 +89,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 46,
+        "seen": 47,
         "rejected": 0
       }
     },
@@ -288,7 +288,7 @@
       "mfe_r": 1.3129304776046826,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4734,
-      "_last_checked_t": 1785122100000
+      "_last_checked_t": 1785123000000
     },
     {
       "id": "PENGU-Liquidity Sweep-1785106842464",
@@ -325,7 +325,7 @@
       "mfe_r": 0.7109950573533427,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4735,
-      "_last_checked_t": 1785122100000
+      "_last_checked_t": 1785123000000
     },
     {
       "id": "XRP-Liquidity Sweep-1785112236492",
@@ -363,7 +363,7 @@
       "mfe_r": 1.2230561392975174,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4740,
-      "_last_checked_t": 1785122100000
+      "_last_checked_t": 1785123000000
     },
     {
       "id": "SUI-Liquidity Sweep-1785121240035",
@@ -392,7 +392,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 3,
+      "pending_bars": 4,
       "status": "pending",
       "created_ts": 1785121240035,
       "filled_ts": null,
@@ -400,7 +400,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4754,
-      "_last_checked_t": 1785122100000
+      "_last_checked_t": 1785123000000
     },
     {
       "id": "ZEC-Momentum-1785123035880",
@@ -429,18 +429,18 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
+      "entry_filled": true,
+      "pending_bars": 1,
+      "status": "active",
       "created_ts": 1785123035880,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1785123000000,
+      "mae_r": 0.22283920646880337,
+      "mfe_r": 0.16371996586628942,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4756,
-      "_last_checked_t": 1785121200000
+      "_last_checked_t": 1785123000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785123035880
+  "last_run_ts": 1785123928353
 }
