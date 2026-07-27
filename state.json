@@ -562,10 +562,10 @@
       "created_ts": 1785170727428,
       "filled_ts": 1785172500000,
       "mae_r": 0.660674772452505,
-      "mfe_r": 0.46280539270478593,
+      "mfe_r": 1.4494148778429399,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4821,
-      "_last_checked_t": 1785190500000
+      "_last_checked_t": 1785191400000
     },
     {
       "id": "AVAX-Momentum-1785178842918",
@@ -600,10 +600,10 @@
       "created_ts": 1785178842918,
       "filled_ts": 1785178800000,
       "mae_r": 0.59441941348398,
-      "mfe_r": 0.9361461078740678,
+      "mfe_r": 1.491313450633648,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4830,
-      "_last_checked_t": 1785190500000
+      "_last_checked_t": 1785191400000
     },
     {
       "id": "PENGU-Momentum-1785182450634",
@@ -638,12 +638,12 @@
       "created_ts": 1785182450634,
       "filled_ts": 1785182400000,
       "mae_r": 0.26249105055288063,
-      "mfe_r": 1.6058649547131152,
+      "mfe_r": 2.3679575358084533,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4832,
-      "_last_checked_t": 1785190500000
+      "_last_checked_t": 1785191400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785191434461
+  "last_run_ts": 1785192326060
 }
