@@ -130,14 +130,14 @@
         "expired": 1
       },
       "Momentum|pending": {
-        "dispatched": 2,
+        "dispatched": 3,
         "filled": 1,
         "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 80,
+        "seen": 81,
         "rejected": 0
       }
     },
@@ -561,11 +561,11 @@
       "status": "active",
       "created_ts": 1785170727428,
       "filled_ts": 1785172500000,
-      "mae_r": 0.6350115199489027,
+      "mae_r": 0.660674772452505,
       "mfe_r": 0.46280539270478593,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4821,
-      "_last_checked_t": 1785180600000
+      "_last_checked_t": 1785181500000
     },
     {
       "id": "AVAX-Momentum-1785178842918",
@@ -599,13 +599,51 @@
       "status": "active",
       "created_ts": 1785178842918,
       "filled_ts": 1785178800000,
-      "mae_r": 0.5076745161777907,
+      "mae_r": 0.5096021805623682,
       "mfe_r": 0.4465193541902567,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4830,
+      "_last_checked_t": 1785181500000
+    },
+    {
+      "id": "PENGU-Momentum-1785182450634",
+      "symbol": "PENGU",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.006130322527513069,
+      "sl": 0.006171,
+      "tp1": 0.006013,
+      "tp2": 0.006004,
+      "rr1": 2.8842138004214326,
+      "rr2": 3.105466485255573,
+      "confidence": 0.8482824437504204,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 32.75566520876346,
+        "volatility_pctl": 95.83333333333333,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785182450634,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4832,
       "_last_checked_t": 1785180600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785181531624
+  "last_run_ts": 1785182450634
 }
