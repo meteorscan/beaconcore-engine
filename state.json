@@ -62,6 +62,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "PENGU|trend|intraday|Reversal": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -76,9 +82,9 @@
         "sum_conf": 2.2502562720318178
       },
       "Reversal|A": {
-        "n": 1,
+        "n": 2,
         "wins": 0,
-        "sum_conf": 0.7781886688712578
+        "sum_conf": 1.4955089951873846
       },
       "Mean Reversion|A+": {
         "n": 1,
@@ -93,7 +99,7 @@
     },
     "forensic_counts": {
       "structural_invalidation_too_tight": 4,
-      "genuine_variance": 2
+      "genuine_variance": 3
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
@@ -103,7 +109,7 @@
       },
       "Reversal|pending": {
         "dispatched": 4,
-        "filled": 1,
+        "filled": 2,
         "expired": 1
       },
       "Mean Reversion|pending": {
@@ -119,7 +125,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 52,
+        "seen": 53,
         "rejected": 0
       }
     },
@@ -146,7 +152,7 @@
       },
       "PENGU": {
         "direction": "bearish",
-        "until_ts": 1785132900000
+        "until_ts": 1785149100000
       },
       "ADA": {
         "direction": "bearish",
@@ -374,6 +380,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "PENGU-Reversal-1785142843692",
+      "symbol": "PENGU",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.00642532,
+      "sl": 0.006489483,
+      "tp1": 0.006328,
+      "tp2": 0.006321,
+      "r_realized": -1.0,
+      "mae_r": 1.0548135218116323,
+      "mfe_r": 0.20759627822888344,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7173203263161267,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 35.285381279095155,
+        "volatility_pctl": 82.5,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1785145500000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -413,7 +446,7 @@
       "mfe_r": 1.2230561392975174,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4740,
-      "_last_checked_t": 1785144600000
+      "_last_checked_t": 1785145500000
     },
     {
       "id": "NEAR-Reversal-1785141039529",
@@ -443,7 +476,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 6,
+      "pending_bars": 7,
       "status": "pending",
       "created_ts": 1785141039529,
       "filled_ts": null,
@@ -451,47 +484,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4775,
-      "_last_checked_t": 1785144600000
-    },
-    {
-      "id": "PENGU-Reversal-1785142843692",
-      "symbol": "PENGU",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.00642532,
-      "sl": 0.006489483,
-      "tp1": 0.006328,
-      "tp2": 0.006321,
-      "rr1": 1.5167619967894248,
-      "rr2": 1.6258591400028044,
-      "confidence": 0.7173203263161267,
-      "grade": "A",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 34.35666000616822,
-        "volatility_pctl": 47.5,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 3,
-      "status": "active",
-      "created_ts": 1785142843692,
-      "filled_ts": 1785144600000,
-      "mae_r": 0.6651808674781396,
-      "mfe_r": 0.1296697473621876,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4776,
-      "_last_checked_t": 1785144600000
+      "_last_checked_t": 1785145500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785145529995
+  "last_run_ts": 1785146451828
 }
