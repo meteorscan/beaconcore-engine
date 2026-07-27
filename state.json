@@ -137,7 +137,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 78,
+        "seen": 80,
         "rejected": 0
       }
     },
@@ -565,7 +565,7 @@
       "mfe_r": 0.46280539270478593,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4821,
-      "_last_checked_t": 1785178800000
+      "_last_checked_t": 1785179700000
     },
     {
       "id": "AVAX-Momentum-1785178842918",
@@ -599,13 +599,13 @@
       "status": "active",
       "created_ts": 1785178842918,
       "filled_ts": 1785178800000,
-      "mae_r": 0.36695501610331394,
+      "mae_r": 0.5076745161777907,
       "mfe_r": 0.4465193541902567,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4830,
-      "_last_checked_t": 1785178800000
+      "_last_checked_t": 1785179700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785179727049
+  "last_run_ts": 1785180642129
 }
