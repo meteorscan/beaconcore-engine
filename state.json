@@ -119,7 +119,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 51,
+        "seen": 52,
         "rejected": 0
       }
     },
@@ -413,7 +413,7 @@
       "mfe_r": 1.2230561392975174,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4740,
-      "_last_checked_t": 1785143700000
+      "_last_checked_t": 1785144600000
     },
     {
       "id": "NEAR-Reversal-1785141039529",
@@ -443,7 +443,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 5,
+      "pending_bars": 6,
       "status": "pending",
       "created_ts": 1785141039529,
       "filled_ts": null,
@@ -451,7 +451,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4775,
-      "_last_checked_t": 1785143700000
+      "_last_checked_t": 1785144600000
     },
     {
       "id": "PENGU-Reversal-1785142843692",
@@ -480,18 +480,18 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 3,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1785142843692,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1785144600000,
+      "mae_r": 0.6651808674781396,
+      "mfe_r": 0.1296697473621876,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4776,
-      "_last_checked_t": 1785143700000
+      "_last_checked_t": 1785144600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785144643464
+  "last_run_ts": 1785145529995
 }
