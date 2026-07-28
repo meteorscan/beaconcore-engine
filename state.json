@@ -159,14 +159,14 @@
         "expired": 1
       },
       "Momentum|pending": {
-        "dispatched": 4,
+        "dispatched": 5,
         "filled": 4,
         "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 91,
+        "seen": 92,
         "rejected": 0
       }
     },
@@ -667,7 +667,46 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "SUI-Momentum-1785249043950",
+      "symbol": "SUI",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.6816802923181037,
+      "sl": 0.686783,
+      "tp1": 0.67375,
+      "tp2": 0.6737,
+      "rr1": 1.554134160230108,
+      "rr2": 1.5639328794821215,
+      "confidence": 0.857989101076528,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 49.64064197481838,
+        "volatility_pctl": 66.66666666666667,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785249043950,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4899,
+      "_last_checked_t": 1785247200000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1785248140963
+  "last_run_ts": 1785249043950
 }
