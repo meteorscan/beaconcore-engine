@@ -38,7 +38,7 @@ CANDLE_CACHE_PATH = os.environ.get("SOVEREIGN_CANDLE_CACHE_PATH", "candle_cache.
 CANDLE_DELTA_OVERLAP_BARS = 3  # extra closed bars re-fetched past the cached watermark
 
 ENGINE_NAME = "SOVEREIGN"
-ENGINE_VERSION = "1.0.5"
+ENGINE_VERSION = "1.0.6"
 RESOLUTION_LOGIC_VERSION = "1.0.4"  # Section 11 legacy-data tag; bump on any resolution-logic change
 
 # Same watchlist as the reference engines in this project (Section: "use the
@@ -82,9 +82,25 @@ BB_LEN, BB_MULT = 20, 2.0
 SWING_LOOKBACK = 3  # bars each side for a fractal pivot high/low
 EQ_CLUSTER_TOLERANCE_ATR = 0.12  # swing points within this * ATR are "equal"
 
-RR_MIN_GATE = 1.5              # Section 10 hard floor -- shared by every core engine
-RR_MIN_GATE_COUNTERTREND = 2.0  # Section 4A stricter floor -- own call site only, never mutates RR_MIN_GATE
-RR_SOFT_TARGET = 2.0            # natural upper end of TP1's honest 1.5-2.0 range
+# fix v1.0.6: user wants a hard 2:1 minimum on every dispatched trade. Bumped
+# RR_MIN_GATE 1.5 -> 2.0. That alone would have silently broken two things
+# that were only true by virtue of the old 1.5/2.0 gap:
+#   1. _rr_context_term() computes (rr1-RR_MIN_GATE)/(RR_SOFT_TARGET-RR_MIN_GATE),
+#      documented as "bounded, saturating slowly". With RR_MIN_GATE raised to
+#      match RR_SOFT_TARGET, that denominator would collapse toward the 1e-9
+#      floor and the term would jump straight to 1.0 for any rr1 fractionally
+#      above the gate -- a step function, not the slow ramp the comment
+#      promises. Moved RR_SOFT_TARGET up by the same 0.5 the two constants
+#      were already apart, preserving the ramp's shape.
+#   2. RR_MIN_GATE_COUNTERTREND is documented as a "stricter floor" than
+#      RR_MIN_GATE -- true only while it's numerically greater. It already
+#      equaled the old RR_SOFT_TARGET (2.0) by coincidence, not by any
+#      enforced relationship, so it needed its own explicit bump: moved up by
+#      the same 0.5 gap it originally had over the base gate, so counter-
+#      trend setups still clear a strictly higher bar than everything else.
+RR_MIN_GATE = 2.0               # Section 10 hard floor -- shared by every core engine
+RR_MIN_GATE_COUNTERTREND = 2.5  # Section 4A stricter floor -- own call site only, never mutates RR_MIN_GATE
+RR_SOFT_TARGET = 2.5            # natural upper end of TP1's honest 2.0-2.5 range
 RR_MAX_GATE = 3.5               # hard ceiling: TP1 landing this far past the soft target means the
                                  # nearest "strong" structural level was actually just a distant,
                                  # low-conviction one -- reject rather than accept a TP1 that's honest
