@@ -666,13 +666,13 @@
       "status": "active",
       "created_ts": 1785208527853,
       "filled_ts": 1785215700000,
-      "mae_r": 0.04314641458325288,
-      "mfe_r": 0.206034206619021,
+      "mae_r": 0.39199928426645286,
+      "mfe_r": 0.40537870358081796,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4864,
-      "_last_checked_t": 1785215700000
+      "_last_checked_t": 1785216600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785216632147
+  "last_run_ts": 1785217536738
 }
