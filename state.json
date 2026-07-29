@@ -155,7 +155,7 @@
         "expired": 3
       },
       "Reversal|pending": {
-        "dispatched": 4,
+        "dispatched": 5,
         "filled": 2,
         "expired": 2
       },
@@ -172,7 +172,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 97,
+        "seen": 98,
         "rejected": 0
       }
     },
@@ -705,7 +705,46 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "SUI-Reversal-1785329131291",
+      "symbol": "SUI",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.68916496,
+      "sl": 0.6943536600000001,
+      "tp1": 0.67844,
+      "tp2": 0.67375,
+      "rr1": 2.066984022972982,
+      "rr2": 2.9708713165147245,
+      "confidence": 0.8260807804498352,
+      "grade": "A+",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 25.494844262652073,
+        "volatility_pctl": 50.833333333333336,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785329131291,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4935,
+      "_last_checked_t": 1785327300000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1785328235603
+  "last_run_ts": 1785329131291
 }
