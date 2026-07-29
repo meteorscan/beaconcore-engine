@@ -187,7 +187,8 @@
     "daily_totals": {
       "2026-07-26": "sent",
       "2026-07-27": "sent",
-      "2026-07-28": "sent"
+      "2026-07-28": "sent",
+      "2026-07-29": "sent"
     },
     "symbol_cooldown": {
       "TAO": {
@@ -706,5 +707,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1785311130191
+  "last_run_ts": 1785312040638
 }
