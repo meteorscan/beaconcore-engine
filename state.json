@@ -739,12 +739,12 @@
       "created_ts": 1785329131291,
       "filled_ts": 1785331800000,
       "mae_r": 0.30740647946498695,
-      "mfe_r": 1.138042284194503,
+      "mfe_r": 1.1900784396862427,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 4935,
-      "_last_checked_t": 1785336300000
+      "_last_checked_t": 1785337200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785337249696
+  "last_run_ts": 1785338138219
 }
