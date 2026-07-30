@@ -13,7 +13,8 @@
       "ZEC|15m": 72.0
     },
     "tp1_rank_preference": {
-      "SUI": 4
+      "SUI": 4,
+      "BCH": 4
     },
     "regime_fit_discount": {},
     "segment_stats": {
@@ -124,13 +125,19 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "BCH|range|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
       "Liquidity Sweep|A+": {
-        "n": 3,
+        "n": 4,
         "wins": 0,
-        "sum_conf": 2.526683102000459
+        "sum_conf": 3.406863771301279
       },
       "Liquidity Sweep|A": {
         "n": 8,
@@ -166,12 +173,12 @@
     "forensic_counts": {
       "structural_invalidation_too_tight": 4,
       "genuine_variance": 7,
-      "correct_read_poor_rr": 1
+      "correct_read_poor_rr": 2
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 15,
-        "filled": 11,
+        "filled": 12,
         "expired": 3
       },
       "Reversal|pending": {
@@ -192,7 +199,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 107,
+        "seen": 108,
         "rejected": 0
       }
     },
@@ -239,6 +246,10 @@
       "DOT": {
         "direction": "bearish",
         "until_ts": 1785351600000
+      },
+      "BCH": {
+        "direction": "bearish",
+        "until_ts": 1785422700000
       }
     }
   },
@@ -809,48 +820,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "BCH-Liquidity Sweep-1785420043714",
       "symbol": "BCH",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 218.41296,
       "sl": 219.95000000000002,
       "tp1": 213.76,
       "tp2": 213.69,
-      "rr1": 3.027221152344734,
-      "rr2": 3.072763233227465,
+      "r_realized": -1.0,
+      "mae_r": 1.9238536407640465,
+      "mfe_r": 3.5737261229375576,
+      "forensic_category": "correct_read_poor_rr",
       "confidence": 0.8801806693008198,
       "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
         "trend_strength": 12.504731607812792,
         "volatility_pctl": 99.16666666666667,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
-      "created_ts": 1785420043714,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4987,
-      "_last_checked_t": 1785418200000
+      "resolved_ts": 1785419100000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1785420043714
+  "last_run_ts": 1785420926279
 }
