@@ -195,11 +195,16 @@
         "dispatched": 6,
         "filled": 6,
         "expired": 0
+      },
+      "Range Trading|pending": {
+        "dispatched": 1,
+        "filled": 0,
+        "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 109,
+        "seen": 110,
         "rejected": 0
       }
     },
@@ -849,7 +854,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "PENGU-Range Trading-1785441643618",
+      "symbol": "PENGU",
+      "engine": "Range Trading",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.005992,
+      "sl": 0.006047,
+      "tp1": 0.00583175,
+      "tp2": 0.005831,
+      "rr1": 2.913636363636341,
+      "rr2": 2.9272727272727024,
+      "confidence": 0.8897989924730026,
+      "grade": "A+",
+      "confluences": [
+        "range extreme rejection",
+        "range-boundary entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 18.80869936984734,
+        "volatility_pctl": 20.0,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785441643618,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 4999,
+      "_last_checked_t": 1785439800000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1785440730200
+  "last_run_ts": 1785441643618
 }
