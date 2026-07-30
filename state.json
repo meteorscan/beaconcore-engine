@@ -14,7 +14,8 @@
     },
     "tp1_rank_preference": {
       "SUI": 4,
-      "BCH": 4
+      "BCH": 4,
+      "PENGU": 4
     },
     "regime_fit_discount": {},
     "segment_stats": {
@@ -131,6 +132,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "PENGU|range|intraday|Range Trading": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -168,12 +175,17 @@
         "n": 1,
         "wins": 0,
         "sum_conf": 0.8260807804498352
+      },
+      "Range Trading|A+": {
+        "n": 1,
+        "wins": 0,
+        "sum_conf": 0.8897989924730026
       }
     },
     "forensic_counts": {
       "structural_invalidation_too_tight": 4,
       "genuine_variance": 7,
-      "correct_read_poor_rr": 2
+      "correct_read_poor_rr": 3
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
@@ -198,7 +210,7 @@
       },
       "Range Trading|pending": {
         "dispatched": 1,
-        "filled": 0,
+        "filled": 1,
         "expired": 0
       }
     },
@@ -234,7 +246,7 @@
       },
       "PENGU": {
         "direction": "bearish",
-        "until_ts": 1785149100000
+        "until_ts": 1785445200000
       },
       "ADA": {
         "direction": "bearish",
@@ -852,47 +864,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "PENGU-Range Trading-1785441643618",
       "symbol": "PENGU",
       "engine": "Range Trading",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.005992,
       "sl": 0.006047,
       "tp1": 0.00583175,
       "tp2": 0.005831,
-      "rr1": 2.913636363636341,
-      "rr2": 2.9272727272727024,
+      "r_realized": -1.0,
+      "mae_r": 1.1090909090909071,
+      "mfe_r": 0.818181818181811,
+      "forensic_category": "correct_read_poor_rr",
       "confidence": 0.8897989924730026,
       "grade": "A+",
-      "confluences": [
-        "range extreme rejection",
-        "range-boundary entry"
-      ],
       "regime_at_entry": {
         "trend_strength": 18.80869936984734,
         "volatility_pctl": 20.0,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
-      "created_ts": 1785441643618,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 4999,
-      "_last_checked_t": 1785439800000
+      "resolved_ts": 1785441600000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1785441643618
+  "last_run_ts": 1785442537206
 }
