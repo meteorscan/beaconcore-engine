@@ -222,7 +222,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 130,
+        "seen": 131,
         "rejected": 0
       }
     },
@@ -990,7 +990,7 @@
       "mfe_r": 1.909734394861878,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5047,
-      "_last_checked_t": 1785510000000
+      "_last_checked_t": 1785510900000
     },
     {
       "id": "PENGU-Reversal-1785508234865",
@@ -1025,12 +1025,12 @@
       "created_ts": 1785508234865,
       "filled_ts": 1785507300000,
       "mae_r": 0.10548280983753078,
-      "mfe_r": 0.5505954821719836,
+      "mfe_r": 0.6781662611738268,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5055,
-      "_last_checked_t": 1785510000000
+      "_last_checked_t": 1785510900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785510936933
+  "last_run_ts": 1785511834782
 }
