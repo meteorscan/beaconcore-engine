@@ -926,12 +926,12 @@
       "created_ts": 1785466844096,
       "filled_ts": 1785465900000,
       "mae_r": 0.6215858868397569,
-      "mfe_r": 0.7638131660318942,
+      "mfe_r": 1.3116515747720114,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5014,
-      "_last_checked_t": 1785480300000
+      "_last_checked_t": 1785481200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785481240946
+  "last_run_ts": 1785482130330
 }
