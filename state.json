@@ -930,7 +930,7 @@
       "mfe_r": 1.3116515747720114,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5014,
-      "_last_checked_t": 1785485700000
+      "_last_checked_t": 1785486600000
     },
     {
       "id": "PENGU-Liquidity Sweep-1785484838542",
@@ -964,12 +964,12 @@
       "created_ts": 1785484838542,
       "filled_ts": 1785483900000,
       "mae_r": 0.19690660321237904,
-      "mfe_r": 0.7251635930993511,
+      "mfe_r": 0.8292682926829338,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5024,
-      "_last_checked_t": 1785485700000
+      "_last_checked_t": 1785486600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785486643386
+  "last_run_ts": 1785487541151
 }
