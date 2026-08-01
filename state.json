@@ -230,7 +230,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 19,
+        "dispatched": 20,
         "filled": 15,
         "expired": 3
       },
@@ -257,7 +257,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 161,
+        "seen": 162,
         "rejected": 0
       }
     },
@@ -1216,7 +1216,7 @@
       "mfe_r": 2.1975776941082854,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5118,
-      "_last_checked_t": 1785616200000
+      "_last_checked_t": 1785617100000
     },
     {
       "id": "NEAR-Liquidity Sweep-1785611730818",
@@ -1246,7 +1246,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 7,
+      "pending_bars": 8,
       "status": "pending",
       "created_ts": 1785611730818,
       "filled_ts": null,
@@ -1254,9 +1254,46 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5130,
+      "_last_checked_t": 1785617100000
+    },
+    {
+      "id": "ADA-Liquidity Sweep-1785618042488",
+      "symbol": "ADA",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.17452279999999998,
+      "sl": 0.17675658,
+      "tp1": 0.16963,
+      "tp2": 0.16949,
+      "rr1": 2.1903678965699105,
+      "rr2": 2.253041928927618,
+      "confidence": 0.7505670805316447,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 25.19841470560791,
+        "volatility_pctl": 77.5,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785618042488,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 5133,
       "_last_checked_t": 1785616200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785617127956
+  "last_run_ts": 1785618042488
 }
