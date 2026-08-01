@@ -1213,12 +1213,12 @@
       "created_ts": 1785596442765,
       "filled_ts": 1785599100000,
       "mae_r": 0.5976319417411913,
-      "mfe_r": 0.1130145758476705,
+      "mfe_r": 0.5630907036539401,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5118,
-      "_last_checked_t": 1785601800000
+      "_last_checked_t": 1785602700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785602728682
+  "last_run_ts": 1785603688132
 }
