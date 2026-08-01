@@ -150,6 +150,12 @@
         "wins": 1,
         "losses": 1,
         "sum_r": 1.0903726500301363
+      },
+      "TAO|range|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -169,9 +175,9 @@
         "sum_conf": 1.4955089951873846
       },
       "Mean Reversion|A+": {
-        "n": 1,
+        "n": 2,
         "wins": 0,
-        "sum_conf": 0.8320368582423204
+        "sum_conf": 1.6910337646847804
       },
       "Momentum|A+": {
         "n": 5,
@@ -196,7 +202,7 @@
     },
     "forensic_counts": {
       "structural_invalidation_too_tight": 4,
-      "genuine_variance": 8,
+      "genuine_variance": 9,
       "correct_read_poor_rr": 3
     },
     "fill_stats": {
@@ -212,7 +218,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 7,
-        "filled": 1,
+        "filled": 2,
         "expired": 4
       },
       "Momentum|pending": {
@@ -251,7 +257,7 @@
     "symbol_cooldown": {
       "TAO": {
         "direction": "bearish",
-        "until_ts": 1785378600000
+        "until_ts": 1785560400000
       },
       "NEAR": {
         "direction": "bearish",
@@ -1012,6 +1018,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "TAO-Mean Reversion-1785554126834",
+      "symbol": "TAO",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 196.6628865715922,
+      "sl": 198.04784999999998,
+      "tp1": 192.91500000000002,
+      "tp2": 192.9,
+      "r_realized": -1.0,
+      "mae_r": 1.716372706780155,
+      "mfe_r": 0.478631101728281,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8589969064424599,
+      "grade": "A+",
+      "regime_at_entry": {
+        "trend_strength": 14.733375885136734,
+        "volatility_pctl": 24.166666666666668,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1785556800000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -1047,11 +1080,11 @@
       "status": "active",
       "created_ts": 1785508234865,
       "filled_ts": 1785507300000,
-      "mae_r": 0.4881951468430841,
+      "mae_r": 0.8891318808488963,
       "mfe_r": 1.106439590680039,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5055,
-      "_last_checked_t": 1785555900000
+      "_last_checked_t": 1785556800000
     },
     {
       "id": "NEAR-Mean Reversion-1785521735549",
@@ -1088,46 +1121,9 @@
       "mfe_r": 2.403542952219927,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5066,
-      "_last_checked_t": 1785555900000
-    },
-    {
-      "id": "TAO-Mean Reversion-1785554126834",
-      "symbol": "TAO",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 196.6628865715922,
-      "sl": 198.04784999999998,
-      "tp1": 192.91500000000002,
-      "tp2": 192.9,
-      "rr1": 2.706126742928445,
-      "rr2": 2.716957353825701,
-      "confidence": 0.8589969064424599,
-      "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 13.831779272077176,
-        "volatility_pctl": 24.166666666666668,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1785554126834,
-      "filled_ts": 1785553200000,
-      "mae_r": 0.784940169617039,
-      "mfe_r": 0.478631101728281,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5079,
-      "_last_checked_t": 1785555900000
+      "_last_checked_t": 1785556800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785556838404
+  "last_run_ts": 1785557728244
 }
