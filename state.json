@@ -1051,7 +1051,7 @@
       "mfe_r": 1.106439590680039,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5055,
-      "_last_checked_t": 1785544200000
+      "_last_checked_t": 1785545100000
     },
     {
       "id": "NEAR-Mean Reversion-1785521735549",
@@ -1088,9 +1088,9 @@
       "mfe_r": 2.403542952219927,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5066,
-      "_last_checked_t": 1785544200000
+      "_last_checked_t": 1785545100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785545132399
+  "last_run_ts": 1785546056973
 }
