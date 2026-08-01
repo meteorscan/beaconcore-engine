@@ -211,7 +211,7 @@
         "expired": 2
       },
       "Mean Reversion|pending": {
-        "dispatched": 6,
+        "dispatched": 7,
         "filled": 1,
         "expired": 4
       },
@@ -228,7 +228,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 149,
+        "seen": 150,
         "rejected": 0
       }
     },
@@ -1051,7 +1051,7 @@
       "mfe_r": 1.106439590680039,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5055,
-      "_last_checked_t": 1785552300000
+      "_last_checked_t": 1785553200000
     },
     {
       "id": "NEAR-Mean Reversion-1785521735549",
@@ -1088,9 +1088,46 @@
       "mfe_r": 2.403542952219927,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5066,
+      "_last_checked_t": 1785553200000
+    },
+    {
+      "id": "TAO-Mean Reversion-1785554126834",
+      "symbol": "TAO",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 196.6628865715922,
+      "sl": 198.04784999999998,
+      "tp1": 192.91500000000002,
+      "tp2": 192.9,
+      "rr1": 2.706126742928445,
+      "rr2": 2.716957353825701,
+      "confidence": 0.8589969064424599,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 13.831779272077176,
+        "volatility_pctl": 24.166666666666668,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785554126834,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 5079,
       "_last_checked_t": 1785552300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785553239844
+  "last_run_ts": 1785554126834
 }
