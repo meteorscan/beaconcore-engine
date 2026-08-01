@@ -232,7 +232,7 @@
       "Liquidity Sweep|pending": {
         "dispatched": 20,
         "filled": 15,
-        "expired": 3
+        "expired": 4
       },
       "Reversal|pending": {
         "dispatched": 6,
@@ -1216,45 +1216,7 @@
       "mfe_r": 2.1975776941082854,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5118,
-      "_last_checked_t": 1785619800000
-    },
-    {
-      "id": "NEAR-Liquidity Sweep-1785611730818",
-      "symbol": "NEAR",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 1.6741784,
-      "sl": 1.6885,
-      "tp1": 1.64435,
-      "tp2": 1.6439,
-      "rr1": 2.0827561166350206,
-      "rr2": 2.1141771869065034,
-      "confidence": 0.7594503130842468,
-      "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 11.342169632531718,
-        "volatility_pctl": 16.666666666666668,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1785611730818,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5130,
-      "_last_checked_t": 1785619800000
+      "_last_checked_t": 1785620700000
     },
     {
       "id": "ADA-Liquidity Sweep-1785618042488",
@@ -1283,7 +1245,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 4,
+      "pending_bars": 5,
       "status": "pending",
       "created_ts": 1785618042488,
       "filled_ts": null,
@@ -1291,9 +1253,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5133,
-      "_last_checked_t": 1785619800000
+      "_last_checked_t": 1785620700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785620728242
+  "last_run_ts": 1785621646221
 }
