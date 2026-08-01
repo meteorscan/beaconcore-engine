@@ -234,7 +234,7 @@
         "expired": 2
       },
       "Mean Reversion|pending": {
-        "dispatched": 8,
+        "dispatched": 9,
         "filled": 4,
         "expired": 4
       },
@@ -251,7 +251,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 154,
+        "seen": 155,
         "rejected": 0
       }
     },
@@ -1146,7 +1146,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "ADA-Mean Reversion-1785579333649",
+      "symbol": "ADA",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.17286673053492657,
+      "sl": 0.1739984,
+      "tp1": 0.16932999999999998,
+      "tp2": 0.16929,
+      "rr1": 3.125232803464497,
+      "rr2": 3.1605788132619685,
+      "confidence": 0.8025674442000287,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 19.290490426114047,
+        "volatility_pctl": 49.166666666666664,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785579333649,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 5106,
+      "_last_checked_t": 1785577500000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1785578445106
+  "last_run_ts": 1785579333649
 }
