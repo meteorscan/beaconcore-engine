@@ -1336,7 +1336,7 @@
       "mfe_r": 1.0061008380531735,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5157,
-      "_last_checked_t": 1785685500000
+      "_last_checked_t": 1785686400000
     },
     {
       "id": "XRP-Liquidity Sweep-1785651335188",
@@ -1373,7 +1373,7 @@
       "mfe_r": 1.0297018683657526,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5158,
-      "_last_checked_t": 1785685500000
+      "_last_checked_t": 1785686400000
     },
     {
       "id": "XLM-Liquidity Sweep-1785658527542",
@@ -1407,12 +1407,12 @@
       "created_ts": 1785658527542,
       "filled_ts": 1785657600000,
       "mae_r": 0.06493280563649828,
-      "mfe_r": 0.9136258861392734,
+      "mfe_r": 0.9951724437872456,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5167,
-      "_last_checked_t": 1785685500000
+      "_last_checked_t": 1785686400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785686450125
+  "last_run_ts": 1785687328232
 }
