@@ -68,10 +68,10 @@
         "sum_r": -1.0
       },
       "PENGU|trend|intraday|Reversal": {
-        "n": 1,
+        "n": 2,
         "wins": 0,
-        "losses": 1,
-        "sum_r": -1.0
+        "losses": 2,
+        "sum_r": -2.0
       },
       "XRP|trend|intraday|Liquidity Sweep": {
         "n": 1,
@@ -200,9 +200,9 @@
         "sum_conf": 9.17015720775311
       },
       "Reversal|A": {
-        "n": 3,
+        "n": 4,
         "wins": 0,
-        "sum_conf": 2.284012759318388
+        "sum_conf": 3.0518391269692566
       },
       "Mean Reversion|A+": {
         "n": 5,
@@ -238,7 +238,7 @@
     "forensic_counts": {
       "structural_invalidation_too_tight": 4,
       "genuine_variance": 13,
-      "correct_read_poor_rr": 5
+      "correct_read_poor_rr": 6
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
@@ -248,7 +248,7 @@
       },
       "Reversal|pending": {
         "dispatched": 7,
-        "filled": 4,
+        "filled": 5,
         "expired": 2
       },
       "Mean Reversion|pending": {
@@ -302,7 +302,7 @@
       },
       "PENGU": {
         "direction": "bearish",
-        "until_ts": 1785635100000
+        "until_ts": 1785676500000
       },
       "ADA": {
         "direction": "bearish",
@@ -1271,47 +1271,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "PENGU-Reversal-1785649529076",
       "symbol": "PENGU",
       "engine": "Reversal",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.0061151999999999995,
       "sl": 0.0062109999999999995,
       "tp1": 0.005917,
       "tp2": 0.00591,
-      "rr1": 2.0688935281837053,
-      "rr2": 2.1419624217118898,
+      "r_realized": -1.0,
+      "mae_r": 1.438413361169106,
+      "mfe_r": 0.8580375782880924,
+      "forensic_category": "correct_read_poor_rr",
       "confidence": 0.7678263676508686,
       "grade": "A",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 21.259183905753684,
-        "volatility_pctl": 25.833333333333332,
+        "trend_strength": 26.956946863014405,
+        "volatility_pctl": 30.0,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1785649529076,
-      "filled_ts": 1785648600000,
-      "mae_r": 0.6555323590814284,
-      "mfe_r": 0.8580375782880924,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5155,
-      "_last_checked_t": 1785672000000
-    },
+      "resolved_ts": 1785672900000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "AVAX-Liquidity Sweep-1785651335188",
       "symbol": "AVAX",
@@ -1347,7 +1336,7 @@
       "mfe_r": 1.0061008380531735,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5157,
-      "_last_checked_t": 1785672000000
+      "_last_checked_t": 1785672900000
     },
     {
       "id": "XRP-Liquidity Sweep-1785651335188",
@@ -1384,7 +1373,7 @@
       "mfe_r": 1.0297018683657526,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5158,
-      "_last_checked_t": 1785672000000
+      "_last_checked_t": 1785672900000
     },
     {
       "id": "XLM-Liquidity Sweep-1785658527542",
@@ -1418,12 +1407,12 @@
       "created_ts": 1785658527542,
       "filled_ts": 1785657600000,
       "mae_r": 0.06493280563649828,
-      "mfe_r": 0.7831513939024938,
+      "mfe_r": 0.7994607054320912,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5167,
-      "_last_checked_t": 1785672000000
+      "_last_checked_t": 1785672900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785672929275
+  "last_run_ts": 1785673836409
 }
