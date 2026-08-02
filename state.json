@@ -243,7 +243,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 23,
+        "dispatched": 24,
         "filled": 17,
         "expired": 4
       },
@@ -270,7 +270,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 184,
+        "seen": 185,
         "rejected": 0
       }
     },
@@ -1365,10 +1365,10 @@
       "created_ts": 1785651335188,
       "filled_ts": 1785650400000,
       "mae_r": 0.7125282746971715,
-      "mfe_r": 1.0061008380531735,
+      "mfe_r": 1.3885105804950315,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5157,
-      "_last_checked_t": 1785712500000
+      "_last_checked_t": 1785713400000
     },
     {
       "id": "XLM-Liquidity Sweep-1785658527542",
@@ -1405,9 +1405,46 @@
       "mfe_r": 1.1310833732005476,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5167,
+      "_last_checked_t": 1785713400000
+    },
+    {
+      "id": "NEAR-Liquidity Sweep-1785714330911",
+      "symbol": "NEAR",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1.7217296,
+      "sl": 1.7335318,
+      "tp1": 1.6959,
+      "tp2": 1.6938,
+      "rr1": 2.188541119452309,
+      "rr2": 2.3664740472115398,
+      "confidence": 0.746676906158879,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 18.01986077968284,
+        "volatility_pctl": 0.8333333333333334,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785714330911,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 5202,
       "_last_checked_t": 1785712500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785713434678
+  "last_run_ts": 1785714330911
 }
