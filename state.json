@@ -15,7 +15,8 @@
     "tp1_rank_preference": {
       "SUI": 4,
       "BCH": 4,
-      "PENGU": 6
+      "PENGU": 6,
+      "XRP": 4
     },
     "regime_fit_discount": {},
     "segment_stats": {
@@ -74,10 +75,10 @@
         "sum_r": -2.0
       },
       "XRP|trend|intraday|Liquidity Sweep": {
-        "n": 1,
+        "n": 2,
         "wins": 1,
-        "losses": 0,
-        "sum_r": 1.5682978084659218
+        "losses": 1,
+        "sum_r": 0.5682978084659218
       },
       "XLM|range|intraday|Liquidity Sweep": {
         "n": 1,
@@ -190,9 +191,9 @@
     },
     "calibration_buckets": {
       "Liquidity Sweep|A+": {
-        "n": 4,
+        "n": 5,
         "wins": 0,
-        "sum_conf": 3.406863771301279
+        "sum_conf": 4.249048590452049
       },
       "Liquidity Sweep|A": {
         "n": 12,
@@ -238,12 +239,12 @@
     "forensic_counts": {
       "structural_invalidation_too_tight": 4,
       "genuine_variance": 13,
-      "correct_read_poor_rr": 6
+      "correct_read_poor_rr": 7
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 23,
-        "filled": 16,
+        "filled": 17,
         "expired": 4
       },
       "Reversal|pending": {
@@ -323,6 +324,10 @@
       "BCH": {
         "direction": "bearish",
         "until_ts": 1785422700000
+      },
+      "XRP": {
+        "direction": "bearish",
+        "until_ts": 1785711600000
       }
     }
   },
@@ -1298,6 +1303,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "XRP-Liquidity Sweep-1785651335188",
+      "symbol": "XRP",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 1.0836016,
+      "sl": 1.0907897,
+      "tp1": 1.0585,
+      "tp2": 1.0571,
+      "r_realized": -1.0,
+      "mae_r": 1.0849042166914693,
+      "mfe_r": 1.0297018683657526,
+      "forensic_category": "correct_read_poor_rr",
+      "confidence": 0.8421848191507705,
+      "grade": "A+",
+      "regime_at_entry": {
+        "trend_strength": 25.476796720046387,
+        "volatility_pctl": 22.5,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1785708000000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -1336,44 +1368,7 @@
       "mfe_r": 1.0061008380531735,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5157,
-      "_last_checked_t": 1785707100000
-    },
-    {
-      "id": "XRP-Liquidity Sweep-1785651335188",
-      "symbol": "XRP",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 1.0836016,
-      "sl": 1.0907897,
-      "tp1": 1.0585,
-      "tp2": 1.0571,
-      "rr1": 3.4921050068863595,
-      "rr2": 3.686871356825851,
-      "confidence": 0.8421848191507705,
-      "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 29.681022569057763,
-        "volatility_pctl": 20.833333333333332,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "1h",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1785651335188,
-      "filled_ts": 1785650400000,
-      "mae_r": 0.8484022203363785,
-      "mfe_r": 1.0297018683657526,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5158,
-      "_last_checked_t": 1785707100000
+      "_last_checked_t": 1785708000000
     },
     {
       "id": "XLM-Liquidity Sweep-1785658527542",
@@ -1410,9 +1405,9 @@
       "mfe_r": 1.1310833732005476,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5167,
-      "_last_checked_t": 1785707100000
+      "_last_checked_t": 1785708000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785708041406
+  "last_run_ts": 1785708927312
 }
