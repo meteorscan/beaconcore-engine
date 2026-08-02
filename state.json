@@ -1244,13 +1244,13 @@
       "status": "active",
       "created_ts": 1785618042488,
       "filled_ts": 1785621600000,
-      "mae_r": 0.31659339773836864,
+      "mae_r": 0.6926375918846142,
       "mfe_r": 0.7846788851184792,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5133,
-      "_last_checked_t": 1785632400000
+      "_last_checked_t": 1785633300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785633331984
+  "last_run_ts": 1785634239377
 }
