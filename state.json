@@ -269,7 +269,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 175,
+        "seen": 176,
         "rejected": 0
       }
     },
@@ -1306,10 +1306,10 @@
       "created_ts": 1785649529076,
       "filled_ts": 1785648600000,
       "mae_r": 0.05010438413361288,
-      "mfe_r": 0.5135699373695116,
+      "mfe_r": 0.5240083507306822,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5155,
-      "_last_checked_t": 1785652200000
+      "_last_checked_t": 1785653100000
     },
     {
       "id": "AVAX-Liquidity Sweep-1785651335188",
@@ -1346,7 +1346,7 @@
       "mfe_r": 0.7565747898961143,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5157,
-      "_last_checked_t": 1785652200000
+      "_last_checked_t": 1785653100000
     },
     {
       "id": "XRP-Liquidity Sweep-1785651335188",
@@ -1383,9 +1383,9 @@
       "mfe_r": 0.38975528999317594,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5158,
-      "_last_checked_t": 1785652200000
+      "_last_checked_t": 1785653100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785653126556
+  "last_run_ts": 1785654047496
 }
