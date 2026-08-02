@@ -269,7 +269,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 179,
+        "seen": 180,
         "rejected": 0
       }
     },
@@ -288,7 +288,8 @@
       "2026-07-29": "sent",
       "2026-07-30": "sent",
       "2026-07-31": "sent",
-      "2026-08-01": "sent"
+      "2026-08-01": "sent",
+      "2026-08-02": "sent"
     },
     "symbol_cooldown": {
       "TAO": {
@@ -1309,7 +1310,7 @@
       "mfe_r": 0.5970772442588664,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5155,
-      "_last_checked_t": 1785655800000
+      "_last_checked_t": 1785656700000
     },
     {
       "id": "AVAX-Liquidity Sweep-1785651335188",
@@ -1346,7 +1347,7 @@
       "mfe_r": 0.7565747898961143,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5157,
-      "_last_checked_t": 1785655800000
+      "_last_checked_t": 1785656700000
     },
     {
       "id": "XRP-Liquidity Sweep-1785651335188",
@@ -1383,9 +1384,9 @@
       "mfe_r": 0.38975528999317594,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5158,
-      "_last_checked_t": 1785655800000
+      "_last_checked_t": 1785656700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785656727904
+  "last_run_ts": 1785657642185
 }
