@@ -1310,7 +1310,7 @@
       "mfe_r": 0.5970772442588664,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5155,
-      "_last_checked_t": 1785661200000
+      "_last_checked_t": 1785662100000
     },
     {
       "id": "AVAX-Liquidity Sweep-1785651335188",
@@ -1347,7 +1347,7 @@
       "mfe_r": 1.0061008380531735,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5157,
-      "_last_checked_t": 1785661200000
+      "_last_checked_t": 1785662100000
     },
     {
       "id": "XRP-Liquidity Sweep-1785651335188",
@@ -1384,7 +1384,7 @@
       "mfe_r": 1.0297018683657526,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5158,
-      "_last_checked_t": 1785661200000
+      "_last_checked_t": 1785662100000
     },
     {
       "id": "XLM-Liquidity Sweep-1785658527542",
@@ -1421,9 +1421,9 @@
       "mfe_r": 0.5330752837820246,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5167,
-      "_last_checked_t": 1785661200000
+      "_last_checked_t": 1785662100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785662129301
+  "last_run_ts": 1785663039624
 }
