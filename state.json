@@ -187,13 +187,19 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "AVAX|trend|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 2.960967629532074
       }
     },
     "calibration_buckets": {
       "Liquidity Sweep|A+": {
-        "n": 5,
-        "wins": 0,
-        "sum_conf": 4.249048590452049
+        "n": 6,
+        "wins": 1,
+        "sum_conf": 5.110900877341198
       },
       "Liquidity Sweep|A": {
         "n": 12,
@@ -244,7 +250,7 @@
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 24,
-        "filled": 17,
+        "filled": 18,
         "expired": 4
       },
       "Reversal|pending": {
@@ -1330,46 +1336,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "AVAX-Liquidity Sweep-1785651335188",
       "symbol": "AVAX",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 6.6205416,
       "sl": 6.68827,
       "tp1": 6.42,
       "tp2": 6.4178,
-      "rr1": 2.960967629532074,
-      "rr2": 2.9934503103572556,
+      "r_realized": 2.960967629532074,
+      "mae_r": 0.7125282746971715,
+      "mfe_r": 3.132239946610281,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8618522868891485,
       "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 27.366678337761876,
-        "volatility_pctl": 100.0,
+        "trend_strength": 31.41556452780211,
+        "volatility_pctl": 66.66666666666667,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1785651335188,
-      "filled_ts": 1785650400000,
-      "mae_r": 0.7125282746971715,
-      "mfe_r": 2.3954736860755563,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5157,
-      "_last_checked_t": 1785726000000
-    },
+      "resolved_ts": 1785726900000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "XLM-Liquidity Sweep-1785658527542",
       "symbol": "XLM",
@@ -1402,10 +1398,10 @@
       "created_ts": 1785658527542,
       "filled_ts": 1785657600000,
       "mae_r": 0.06493280563649828,
-      "mfe_r": 2.185752185447784,
+      "mfe_r": 2.3053538033314886,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5167,
-      "_last_checked_t": 1785726000000
+      "_last_checked_t": 1785726900000
     },
     {
       "id": "NEAR-Liquidity Sweep-1785714330911",
@@ -1442,9 +1438,9 @@
       "mfe_r": 2.112284150412628,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5202,
-      "_last_checked_t": 1785726000000
+      "_last_checked_t": 1785726900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785726935606
+  "last_run_ts": 1785727840916
 }
