@@ -1365,10 +1365,10 @@
       "created_ts": 1785651335188,
       "filled_ts": 1785650400000,
       "mae_r": 0.7125282746971715,
-      "mfe_r": 1.5450180426527107,
+      "mfe_r": 1.6631368820169952,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5157,
-      "_last_checked_t": 1785718800000
+      "_last_checked_t": 1785719700000
     },
     {
       "id": "XLM-Liquidity Sweep-1785658527542",
@@ -1402,10 +1402,10 @@
       "created_ts": 1785658527542,
       "filled_ts": 1785657600000,
       "mae_r": 0.06493280563649828,
-      "mfe_r": 1.2724307397903871,
+      "mfe_r": 1.5823076588527236,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5167,
-      "_last_checked_t": 1785718800000
+      "_last_checked_t": 1785719700000
     },
     {
       "id": "NEAR-Liquidity Sweep-1785714330911",
@@ -1439,12 +1439,12 @@
       "created_ts": 1785714330911,
       "filled_ts": 1785713400000,
       "mae_r": 0.31099286573690316,
-      "mfe_r": 1.1802545288166617,
+      "mfe_r": 1.5784853671349355,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5202,
-      "_last_checked_t": 1785718800000
+      "_last_checked_t": 1785719700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785719729655
+  "last_run_ts": 1785720635136
 }
