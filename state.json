@@ -194,6 +194,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 2.960967629532074
+      },
+      "DOT|trend|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -213,9 +219,9 @@
         "sum_conf": 3.0518391269692566
       },
       "Mean Reversion|A+": {
-        "n": 5,
+        "n": 6,
         "wins": 1,
-        "sum_conf": 4.130741546724802
+        "sum_conf": 4.955842229247524
       },
       "Momentum|A+": {
         "n": 6,
@@ -245,7 +251,7 @@
     },
     "forensic_counts": {
       "structural_invalidation_too_tight": 4,
-      "genuine_variance": 14,
+      "genuine_variance": 15,
       "correct_read_poor_rr": 8
     },
     "fill_stats": {
@@ -261,7 +267,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 11,
-        "filled": 6,
+        "filled": 7,
         "expired": 4
       },
       "Momentum|pending": {
@@ -327,7 +333,7 @@
       },
       "DOT": {
         "direction": "bearish",
-        "until_ts": 1785739500000
+        "until_ts": 1785762000000
       },
       "BCH": {
         "direction": "bearish",
@@ -1473,47 +1479,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "DOT-Mean Reversion-1785753937589",
       "symbol": "DOT",
       "engine": "Mean Reversion",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.8023268924133203,
       "sl": 0.807485,
       "tp1": 0.79025,
       "tp2": 0.78927,
-      "rr1": 2.3413417053393317,
-      "rr2": 2.531333864969879,
+      "r_realized": -1.0,
+      "mae_r": 1.305344542263384,
+      "mfe_r": 0.46274575960460324,
+      "forensic_category": "genuine_variance",
       "confidence": 0.825100682522722,
       "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 21.748129607860307,
-        "volatility_pctl": 47.5,
+        "trend_strength": 22.35045889747193,
+        "volatility_pctl": 52.5,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1785753937589,
-      "filled_ts": 1785753000000,
-      "mae_r": 0.9117893544572475,
-      "mfe_r": 0.46274575960460324,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5253,
-      "_last_checked_t": 1785757500000
+      "resolved_ts": 1785758400000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1785758447175
+  "last_run_ts": 1785759337316
 }
