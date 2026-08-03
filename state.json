@@ -260,7 +260,7 @@
         "expired": 2
       },
       "Mean Reversion|pending": {
-        "dispatched": 10,
+        "dispatched": 11,
         "filled": 6,
         "expired": 4
       },
@@ -277,7 +277,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 196,
+        "seen": 197,
         "rejected": 0
       }
     },
@@ -1475,7 +1475,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "DOT-Mean Reversion-1785753937589",
+      "symbol": "DOT",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.8023268924133203,
+      "sl": 0.807485,
+      "tp1": 0.79025,
+      "tp2": 0.78927,
+      "rr1": 2.3413417053393317,
+      "rr2": 2.531333864969879,
+      "confidence": 0.825100682522722,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 21.748129607860307,
+        "volatility_pctl": 47.5,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785753937589,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 5253,
+      "_last_checked_t": 1785752100000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1785753038655
+  "last_run_ts": 1785753937589
 }
