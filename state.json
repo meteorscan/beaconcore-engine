@@ -272,7 +272,7 @@
         "expired": 2
       },
       "Mean Reversion|pending": {
-        "dispatched": 11,
+        "dispatched": 12,
         "filled": 7,
         "expired": 4
       },
@@ -289,7 +289,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 199,
+        "seen": 200,
         "rejected": 0
       }
     },
@@ -1541,7 +1541,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "PENGU-Mean Reversion-1785767441879",
+      "symbol": "PENGU",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.006230901431117854,
+      "sl": 0.006279,
+      "tp1": 0.006088,
+      "tp2": 0.006085,
+      "rr1": 2.9710121202982003,
+      "rr2": 3.0333840384180575,
+      "confidence": 0.7911437963339316,
+      "grade": "A",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 18.411199974478645,
+        "volatility_pctl": 30.833333333333332,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785767441879,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 5262,
+      "_last_checked_t": 1785765600000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1785766530416
+  "last_run_ts": 1785767441879
 }
