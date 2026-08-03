@@ -268,7 +268,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 29,
+        "dispatched": 30,
         "filled": 22,
         "expired": 6
       },
@@ -295,7 +295,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 219,
+        "seen": 220,
         "rejected": 0
       }
     },
@@ -1607,12 +1607,50 @@
       "created_ts": 1785795331588,
       "filled_ts": 1785794400000,
       "mae_r": 0.7245226878254536,
-      "mfe_r": 0.3106868336226361,
+      "mfe_r": 0.5834366476568582,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5287,
+      "_last_checked_t": 1785796200000
+    },
+    {
+      "id": "APT-Liquidity Sweep-1785797135185",
+      "symbol": "APT",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.5757439999999999,
+      "sl": 0.57961,
+      "tp1": 0.5668,
+      "tp2": 0.5664,
+      "rr1": 2.31350232798755,
+      "rr2": 2.4169684428349254,
+      "confidence": 0.8035762993020605,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 23.75150652279122,
+        "volatility_pctl": 30.0,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785797135185,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 5289,
       "_last_checked_t": 1785795300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785796245534
+  "last_run_ts": 1785797135185
 }
