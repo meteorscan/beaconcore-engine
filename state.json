@@ -270,7 +270,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 187,
+        "seen": 188,
         "rejected": 0
       }
     },
@@ -1365,10 +1365,10 @@
       "created_ts": 1785651335188,
       "filled_ts": 1785650400000,
       "mae_r": 0.7125282746971715,
-      "mfe_r": 1.5258237312560199,
+      "mfe_r": 1.537635615192447,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5157,
-      "_last_checked_t": 1785715200000
+      "_last_checked_t": 1785716100000
     },
     {
       "id": "XLM-Liquidity Sweep-1785658527542",
@@ -1405,7 +1405,7 @@
       "mfe_r": 1.1310833732005476,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5167,
-      "_last_checked_t": 1785715200000
+      "_last_checked_t": 1785716100000
     },
     {
       "id": "NEAR-Liquidity Sweep-1785714330911",
@@ -1442,9 +1442,9 @@
       "mfe_r": 0.6718747352188568,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5202,
-      "_last_checked_t": 1785715200000
+      "_last_checked_t": 1785716100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785716132904
+  "last_run_ts": 1785717032499
 }
