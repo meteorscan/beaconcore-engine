@@ -289,7 +289,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 209,
+        "seen": 211,
         "rejected": 0
       }
     },
@@ -1569,7 +1569,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 9,
+      "pending_bars": 10,
       "status": "pending",
       "created_ts": 1785771045137,
       "filled_ts": null,
@@ -1577,7 +1577,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5267,
-      "_last_checked_t": 1785777300000
+      "_last_checked_t": 1785778200000
     },
     {
       "id": "BCH-Mean Reversion-1785777331690",
@@ -1610,13 +1610,13 @@
       "status": "active",
       "created_ts": 1785777331690,
       "filled_ts": 1785777300000,
-      "mae_r": 0.26903551978122026,
+      "mae_r": 0.6054333630266705,
       "mfe_r": 0.4528181855163247,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5271,
-      "_last_checked_t": 1785777300000
+      "_last_checked_t": 1785778200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785778246628
+  "last_run_ts": 1785779131920
 }
