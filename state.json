@@ -28,10 +28,10 @@
         "sum_r": -1.0
       },
       "APT|trend|intraday|Liquidity Sweep": {
-        "n": 1,
+        "n": 2,
         "wins": 1,
-        "losses": 0,
-        "sum_r": 1.9784780937740147
+        "losses": 1,
+        "sum_r": 0.9784780937740147
       },
       "TAO|trend|intraday|Reversal": {
         "n": 1,
@@ -216,9 +216,9 @@
     },
     "calibration_buckets": {
       "Liquidity Sweep|A+": {
-        "n": 6,
+        "n": 7,
         "wins": 1,
-        "sum_conf": 5.110900877341198
+        "sum_conf": 5.914477176643258
       },
       "Liquidity Sweep|A": {
         "n": 18,
@@ -269,7 +269,7 @@
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 31,
-        "filled": 24,
+        "filled": 25,
         "expired": 6
       },
       "Reversal|pending": {
@@ -358,6 +358,10 @@
       "AVAX": {
         "direction": "bearish",
         "until_ts": 1785815100000
+      },
+      "APT": {
+        "direction": "bearish",
+        "until_ts": 1785820500000
       }
     }
   },
@@ -1630,47 +1634,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "APT-Liquidity Sweep-1785797135185",
       "symbol": "APT",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.5757439999999999,
       "sl": 0.57961,
       "tp1": 0.5668,
       "tp2": 0.5664,
-      "rr1": 2.31350232798755,
-      "rr2": 2.4169684428349254,
+      "r_realized": -1.0,
+      "mae_r": 1.2302121055354498,
+      "mfe_r": 1.615106052767682,
+      "forensic_category": "correct_read_poor_rr",
       "confidence": 0.8035762993020605,
       "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 23.75150652279122,
-        "volatility_pctl": 30.0,
+        "trend_strength": 25.040645760174932,
+        "volatility_pctl": 61.666666666666664,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1785797135185,
-      "filled_ts": 1785797100000,
-      "mae_r": 0.9974133471288271,
-      "mfe_r": 1.615106052767682,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5289,
-      "_last_checked_t": 1785816000000
-    },
+      "resolved_ts": 1785816900000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "PENGU-Mean Reversion-1785811528170",
       "symbol": "PENGU",
@@ -1698,7 +1691,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 7,
+      "pending_bars": 8,
       "status": "pending",
       "created_ts": 1785811528170,
       "filled_ts": null,
@@ -1706,9 +1699,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5297,
-      "_last_checked_t": 1785816000000
+      "_last_checked_t": 1785816900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785816936795
+  "last_run_ts": 1785817837532
 }
