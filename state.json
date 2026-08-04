@@ -294,14 +294,14 @@
         "expired": 0
       },
       "Range Trading|pending": {
-        "dispatched": 2,
+        "dispatched": 3,
         "filled": 2,
         "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 235,
+        "seen": 236,
         "rejected": 0
       }
     },
@@ -1697,7 +1697,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "TAO-Range Trading-1785866453714",
+      "symbol": "TAO",
+      "engine": "Range Trading",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 194.36,
+      "sl": 196.01582,
+      "tp1": 190.285,
+      "tp2": 190.2,
+      "rr1": 2.461016294041667,
+      "rr2": 2.512350376248676,
+      "confidence": 0.8971816865698846,
+      "grade": "A+",
+      "confluences": [
+        "range extreme rejection",
+        "range-boundary entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 15.891783486842266,
+        "volatility_pctl": 60.833333333333336,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "1h",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785866453714,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 5337,
+      "_last_checked_t": 1785864600000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1785865533408
+  "last_run_ts": 1785866453714
 }
