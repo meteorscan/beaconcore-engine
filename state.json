@@ -148,10 +148,10 @@
         "sum_r": 2.1931095272961882
       },
       "NEAR|range|intraday|Liquidity Sweep": {
-        "n": 4,
+        "n": 5,
         "wins": 2,
-        "losses": 2,
-        "sum_r": 2.278913769482445
+        "losses": 3,
+        "sum_r": 1.278913769482445
       },
       "TAO|range|intraday|Mean Reversion": {
         "n": 1,
@@ -221,9 +221,9 @@
         "sum_conf": 5.110900877341198
       },
       "Liquidity Sweep|A": {
-        "n": 16,
+        "n": 17,
         "wins": 11,
-        "sum_conf": 12.164510551341193
+        "sum_conf": 12.937074389751924
       },
       "Reversal|A": {
         "n": 5,
@@ -269,7 +269,7 @@
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 30,
-        "filled": 22,
+        "filled": 23,
         "expired": 6
       },
       "Reversal|pending": {
@@ -325,7 +325,7 @@
       },
       "NEAR": {
         "direction": "bearish",
-        "until_ts": 1785768300000
+        "until_ts": 1785811500000
       },
       "PENGU": {
         "direction": "bearish",
@@ -1572,46 +1572,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "NEAR-Liquidity Sweep-1785795331588",
       "symbol": "NEAR",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 1.7375120000000002,
       "sl": 1.7536439999999998,
       "tp1": 1.7002,
       "tp2": 1.699,
-      "rr1": 2.312918423010239,
-      "rr2": 2.387304735928656,
+      "r_realized": -1.0,
+      "mae_r": 1.3816017852715365,
+      "mfe_r": 0.5834366476568582,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7725638384107301,
       "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 22.906111654647933,
-        "volatility_pctl": 15.833333333333334,
+        "trend_strength": 20.950206890341892,
+        "volatility_pctl": 28.333333333333332,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1785795331588,
-      "filled_ts": 1785794400000,
-      "mae_r": 0.904289610711641,
-      "mfe_r": 0.5834366476568582,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5287,
-      "_last_checked_t": 1785807000000
-    },
+      "resolved_ts": 1785807900000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "APT-Liquidity Sweep-1785797135185",
       "symbol": "APT",
@@ -1648,9 +1638,9 @@
       "mfe_r": 1.615106052767682,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5289,
-      "_last_checked_t": 1785807000000
+      "_last_checked_t": 1785807900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785807931464
+  "last_run_ts": 1785808853043
 }
