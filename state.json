@@ -1758,12 +1758,12 @@
       "created_ts": 1785873648953,
       "filled_ts": 1785872700000,
       "mae_r": 0.7924488512771987,
-      "mfe_r": 0.13699539573628097,
+      "mfe_r": 0.6407697985292993,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5342,
-      "_last_checked_t": 1785873600000
+      "_last_checked_t": 1785874500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785874532749
+  "last_run_ts": 1785875435341
 }
