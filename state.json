@@ -301,7 +301,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 240,
+        "seen": 241,
         "rejected": 0
       }
     },
@@ -1761,7 +1761,7 @@
       "mfe_r": 1.1484494292509533,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5342,
-      "_last_checked_t": 1785881700000
+      "_last_checked_t": 1785882600000
     },
     {
       "id": "AVAX-Reversal-1785882636797",
@@ -1790,18 +1790,18 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
+      "entry_filled": true,
+      "pending_bars": 1,
+      "status": "active",
       "created_ts": 1785882636797,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1785882600000,
+      "mae_r": 0.09630371430452372,
+      "mfe_r": 0.14799003420112425,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5346,
-      "_last_checked_t": 1785880800000
+      "_last_checked_t": 1785882600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785882636797
+  "last_run_ts": 1785883529070
 }
