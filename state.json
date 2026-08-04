@@ -279,7 +279,7 @@
         "expired": 6
       },
       "Reversal|pending": {
-        "dispatched": 8,
+        "dispatched": 9,
         "filled": 6,
         "expired": 2
       },
@@ -301,7 +301,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 239,
+        "seen": 240,
         "rejected": 0
       }
     },
@@ -1758,12 +1758,50 @@
       "created_ts": 1785873648953,
       "filled_ts": 1785872700000,
       "mae_r": 0.7924488512771987,
-      "mfe_r": 1.1289232896078085,
+      "mfe_r": 1.1484494292509533,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5342,
+      "_last_checked_t": 1785881700000
+    },
+    {
+      "id": "AVAX-Reversal-1785882636797",
+      "symbol": "AVAX",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 6.7080416,
+      "sl": 6.765759,
+      "tp1": 6.561066666666666,
+      "tp2": 6.5609,
+      "rr1": 2.546457971657286,
+      "rr2": 2.549345604618334,
+      "confidence": 0.7930594555014555,
+      "grade": "A",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 26.426237111319555,
+        "volatility_pctl": 63.333333333333336,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785882636797,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 5346,
       "_last_checked_t": 1785880800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785881731789
+  "last_run_ts": 1785882636797
 }
