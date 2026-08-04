@@ -142,10 +142,10 @@
         "sum_r": -1.0
       },
       "TAO|range|intraday|Range Trading": {
-        "n": 1,
+        "n": 2,
         "wins": 1,
-        "losses": 0,
-        "sum_r": 2.1931095272961882
+        "losses": 1,
+        "sum_r": 1.1931095272961882
       },
       "NEAR|range|intraday|Liquidity Sweep": {
         "n": 5,
@@ -257,9 +257,9 @@
         "sum_conf": 0.8260807804498352
       },
       "Range Trading|A+": {
-        "n": 2,
+        "n": 3,
         "wins": 1,
-        "sum_conf": 1.7266995293861105
+        "sum_conf": 2.623881215955995
       },
       "Mean Reversion|A": {
         "n": 2,
@@ -295,7 +295,7 @@
       },
       "Range Trading|pending": {
         "dispatched": 3,
-        "filled": 2,
+        "filled": 3,
         "expired": 0
       }
     },
@@ -328,7 +328,7 @@
     "symbol_cooldown": {
       "TAO": {
         "direction": "bearish",
-        "until_ts": 1785560400000
+        "until_ts": 1785870900000
       },
       "NEAR": {
         "direction": "bearish",
@@ -1695,47 +1695,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "TAO-Range Trading-1785866453714",
       "symbol": "TAO",
       "engine": "Range Trading",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 194.36,
       "sl": 196.01582,
       "tp1": 190.285,
       "tp2": 190.2,
-      "rr1": 2.461016294041667,
-      "rr2": 2.512350376248676,
+      "r_realized": -1.0,
+      "mae_r": 1.999009554178606,
+      "mfe_r": 0.4287905690232137,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8971816865698846,
       "grade": "A+",
-      "confluences": [
-        "range extreme rejection",
-        "range-boundary entry"
-      ],
       "regime_at_entry": {
         "trend_strength": 15.891783486842266,
         "volatility_pctl": 60.833333333333336,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "1h",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1785866453714,
-      "filled_ts": 1785866400000,
-      "mae_r": 0.6582841130074465,
-      "mfe_r": 0.4287905690232137,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5337,
-      "_last_checked_t": 1785866400000
+      "resolved_ts": 1785867300000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1785867342997
+  "last_run_ts": 1785868237533
 }
