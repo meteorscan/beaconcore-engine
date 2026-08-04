@@ -295,7 +295,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 224,
+        "seen": 225,
         "rejected": 0
       }
     },
@@ -1610,7 +1610,7 @@
       "mfe_r": 0.5834366476568582,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5287,
-      "_last_checked_t": 1785799800000
+      "_last_checked_t": 1785800700000
     },
     {
       "id": "APT-Liquidity Sweep-1785797135185",
@@ -1644,13 +1644,13 @@
       "status": "active",
       "created_ts": 1785797135185,
       "filled_ts": 1785797100000,
-      "mae_r": 0.06621831350233616,
+      "mae_r": 0.11795137092605244,
       "mfe_r": 0.8132436627004385,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5289,
-      "_last_checked_t": 1785799800000
+      "_last_checked_t": 1785800700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785800727812
+  "last_run_ts": 1785801644200
 }
