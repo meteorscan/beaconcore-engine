@@ -1610,7 +1610,7 @@
       "mfe_r": 0.5834366476568582,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5287,
-      "_last_checked_t": 1785804300000
+      "_last_checked_t": 1785805200000
     },
     {
       "id": "APT-Liquidity Sweep-1785797135185",
@@ -1645,12 +1645,12 @@
       "created_ts": 1785797135185,
       "filled_ts": 1785797100000,
       "mae_r": 0.16968442834973999,
-      "mfe_r": 1.5633729953439943,
+      "mfe_r": 1.615106052767682,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5289,
-      "_last_checked_t": 1785804300000
+      "_last_checked_t": 1785805200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785805246313
+  "last_run_ts": 1785806134298
 }
