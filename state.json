@@ -1665,11 +1665,11 @@
       "status": "active",
       "created_ts": 1785797135185,
       "filled_ts": 1785797100000,
-      "mae_r": 0.816347646145892,
+      "mae_r": 0.9974133471288271,
       "mfe_r": 1.615106052767682,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5289,
-      "_last_checked_t": 1785815100000
+      "_last_checked_t": 1785816000000
     },
     {
       "id": "PENGU-Mean Reversion-1785811528170",
@@ -1698,7 +1698,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 6,
+      "pending_bars": 7,
       "status": "pending",
       "created_ts": 1785811528170,
       "filled_ts": null,
@@ -1706,9 +1706,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5297,
-      "_last_checked_t": 1785815100000
+      "_last_checked_t": 1785816000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785816043967
+  "last_run_ts": 1785816936795
 }
