@@ -268,7 +268,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 31,
+        "dispatched": 32,
         "filled": 25,
         "expired": 6
       },
@@ -280,7 +280,7 @@
       "Mean Reversion|pending": {
         "dispatched": 14,
         "filled": 8,
-        "expired": 5
+        "expired": 6
       },
       "Momentum|pending": {
         "dispatched": 7,
@@ -295,7 +295,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 232,
+        "seen": 233,
         "rejected": 0
       }
     },
@@ -1665,43 +1665,43 @@
   ],
   "active_signals": [
     {
-      "id": "PENGU-Mean Reversion-1785811528170",
+      "id": "PENGU-Liquidity Sweep-1785821435122",
       "symbol": "PENGU",
-      "engine": "Mean Reversion",
+      "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
       "style": "intraday",
       "entry_kind": "pending",
-      "entry": 0.006235407904643631,
-      "sl": 0.006279,
+      "entry": 0.00619104,
+      "sl": 0.006237231,
       "tp1": 0.0060875,
       "tp2": 0.006087,
-      "rr1": 3.392998281786452,
-      "rr2": 3.4044682511905857,
-      "confidence": 0.7942853719107804,
+      "rr1": 2.2415622090883462,
+      "rr2": 2.2523868286029622,
+      "confidence": 0.6942705587598665,
       "grade": "A",
       "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
+        "EQH/EQL sweep",
+        "OTE retracement entry"
       ],
       "regime_at_entry": {
-        "trend_strength": 19.110723420506417,
-        "volatility_pctl": 42.5,
+        "trend_strength": 18.30871939994637,
+        "volatility_pctl": 10.833333333333334,
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 11,
+      "pending_bars": 0,
       "status": "pending",
-      "created_ts": 1785811528170,
+      "created_ts": 1785821435122,
       "filled_ts": null,
       "mae_r": 0.0,
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5297,
+      "tg_message_id": 5308,
       "_last_checked_t": 1785819600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785820530180
+  "last_run_ts": 1785821435122
 }
