@@ -1761,7 +1761,7 @@
       "mfe_r": 1.4022892446117692,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5342,
-      "_last_checked_t": 1785886200000
+      "_last_checked_t": 1785887100000
     },
     {
       "id": "AVAX-Reversal-1785882636797",
@@ -1796,12 +1796,12 @@
       "created_ts": 1785882636797,
       "filled_ts": 1785882600000,
       "mae_r": 0.20892139978586532,
-      "mfe_r": 0.4234702186862055,
+      "mfe_r": 0.44252859622920104,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5346,
-      "_last_checked_t": 1785886200000
+      "_last_checked_t": 1785887100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785887136477
+  "last_run_ts": 1785888047517
 }
