@@ -230,13 +230,19 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 2.092045627376451
+      },
+      "APT|range|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
       "Liquidity Sweep|A+": {
-        "n": 7,
+        "n": 8,
         "wins": 1,
-        "sum_conf": 5.914477176643258
+        "sum_conf": 6.7192834171017175
       },
       "Liquidity Sweep|A": {
         "n": 19,
@@ -281,13 +287,13 @@
     },
     "forensic_counts": {
       "structural_invalidation_too_tight": 4,
-      "genuine_variance": 16,
+      "genuine_variance": 17,
       "correct_read_poor_rr": 9
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 34,
-        "filled": 26,
+        "dispatched": 35,
+        "filled": 27,
         "expired": 6
       },
       "Reversal|pending": {
@@ -313,7 +319,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 247,
+        "seen": 248,
         "rejected": 0
       }
     },
@@ -381,7 +387,7 @@
       },
       "APT": {
         "direction": "bearish",
-        "until_ts": 1785820500000
+        "until_ts": 1785944700000
       }
     }
   },
@@ -1789,6 +1795,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "APT-Liquidity Sweep-1785937527972",
+      "symbol": "APT",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.58744,
+      "sl": 0.5911,
+      "tp1": 0.5785,
+      "tp2": 0.578,
+      "r_realized": -1.0,
+      "mae_r": 1.7377049180327973,
+      "mfe_r": 0.6120218579234729,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8048062404584599,
+      "grade": "A+",
+      "regime_at_entry": {
+        "trend_strength": 18.51362943187718,
+        "volatility_pctl": 91.66666666666667,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1785941100000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -1828,46 +1861,46 @@
       "mfe_r": 1.9099688753334232,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5342,
-      "_last_checked_t": 1785940200000
+      "_last_checked_t": 1785941100000
     },
     {
-      "id": "APT-Liquidity Sweep-1785937527972",
-      "symbol": "APT",
+      "id": "PENDLE-Liquidity Sweep-1785942045246",
+      "symbol": "PENDLE",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
       "style": "intraday",
       "entry_kind": "pending",
-      "entry": 0.58744,
-      "sl": 0.5911,
-      "tp1": 0.5785,
-      "tp2": 0.578,
-      "rr1": 2.4426229508196604,
-      "rr2": 2.579234972677599,
-      "confidence": 0.8048062404584599,
-      "grade": "A+",
+      "entry": 1.392356,
+      "sl": 1.4090076,
+      "tp1": 1.3561,
+      "tp2": 1.3538,
+      "rr1": 2.1773283047875056,
+      "rr2": 2.3154531696653655,
+      "confidence": 0.7903399770187426,
+      "grade": "A",
       "confluences": [
         "EQH/EQL sweep",
         "OTE retracement entry"
       ],
       "regime_at_entry": {
-        "trend_strength": 18.208101299509245,
-        "volatility_pctl": 50.0,
+        "trend_strength": 27.894706609166878,
+        "volatility_pctl": 90.83333333333333,
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 2,
-      "status": "active",
-      "created_ts": 1785937527972,
-      "filled_ts": 1785938400000,
-      "mae_r": 0.5355191256830805,
-      "mfe_r": 0.6120218579234729,
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1785942045246,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5386,
+      "tg_message_id": 5388,
       "_last_checked_t": 1785940200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785941129758
+  "last_run_ts": 1785942045246
 }
