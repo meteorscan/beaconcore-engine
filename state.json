@@ -218,6 +218,18 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 2.2415622090883462
+      },
+      "AVAX|range|intraday|Reversal": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 2.546457971657286
+      },
+      "PENDLE|trend|intraday|Reversal": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 2.092045627376451
       }
     },
     "calibration_buckets": {
@@ -232,9 +244,9 @@
         "sum_conf": 14.37788239743722
       },
       "Reversal|A": {
-        "n": 5,
-        "wins": 0,
-        "sum_conf": 3.8197348233527353
+        "n": 7,
+        "wins": 2,
+        "sum_conf": 5.379542685470296
       },
       "Mean Reversion|A+": {
         "n": 6,
@@ -274,13 +286,13 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 33,
+        "dispatched": 34,
         "filled": 26,
         "expired": 6
       },
       "Reversal|pending": {
         "dispatched": 10,
-        "filled": 6,
+        "filled": 8,
         "expired": 2
       },
       "Mean Reversion|pending": {
@@ -301,14 +313,14 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 244,
+        "seen": 245,
         "rejected": 0
       }
     },
     "circuit_breaker": {
-      "tripped": true,
+      "tripped": false,
       "tripped_ts": 1785780938026,
-      "reason": "win_rate=0.27 profit_factor=0.87 vs baseline wr=0.42 pf=1.35"
+      "reason": null
     },
     "governor": {
       "last_adjust_ts": 0
@@ -1723,6 +1735,60 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "AVAX-Reversal-1785882636797",
+      "symbol": "AVAX",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 6.7080416,
+      "sl": 6.765759,
+      "tp1": 6.561066666666666,
+      "tp2": 6.5609,
+      "r_realized": 2.546457971657286,
+      "mae_r": 0.20892139978586532,
+      "mfe_r": 2.987688288107201,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7930594555014555,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 16.16520889766938,
+        "volatility_pctl": 20.0,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1785936600000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "PENDLE-Reversal-1785928529197",
+      "symbol": "PENDLE",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 1.3868328,
+      "sl": 1.3966953,
+      "tp1": 1.3662,
+      "tp2": 1.366,
+      "r_realized": 2.092045627376451,
+      "mae_r": 0.5442027883396785,
+      "mfe_r": 3.1161267427123307,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7667484066161059,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 30.27995992505968,
+        "volatility_pctl": 88.33333333333333,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1785936600000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -1759,88 +1825,49 @@
       "created_ts": 1785873648953,
       "filled_ts": 1785872700000,
       "mae_r": 0.7924488512771987,
-      "mfe_r": 1.55459313382827,
+      "mfe_r": 1.9099688753334232,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5342,
-      "_last_checked_t": 1785935700000
+      "_last_checked_t": 1785936600000
     },
     {
-      "id": "AVAX-Reversal-1785882636797",
-      "symbol": "AVAX",
-      "engine": "Reversal",
+      "id": "APT-Liquidity Sweep-1785937527972",
+      "symbol": "APT",
+      "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
       "style": "intraday",
       "entry_kind": "pending",
-      "entry": 6.7080416,
-      "sl": 6.765759,
-      "tp1": 6.561066666666666,
-      "tp2": 6.5609,
-      "rr1": 2.546457971657286,
-      "rr2": 2.549345604618334,
-      "confidence": 0.7930594555014555,
-      "grade": "A",
+      "entry": 0.58744,
+      "sl": 0.5911,
+      "tp1": 0.5785,
+      "tp2": 0.578,
+      "rr1": 2.4426229508196604,
+      "rr2": 2.579234972677599,
+      "confidence": 0.8048062404584599,
+      "grade": "A+",
       "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
+        "EQH/EQL sweep",
         "OTE retracement entry"
       ],
       "regime_at_entry": {
-        "trend_strength": 26.426237111319555,
-        "volatility_pctl": 63.333333333333336,
+        "trend_strength": 18.208101299509245,
+        "volatility_pctl": 50.0,
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1785882636797,
-      "filled_ts": 1785882600000,
-      "mae_r": 0.20892139978586532,
-      "mfe_r": 1.8303249973144748,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5346,
-      "_last_checked_t": 1785935700000
-    },
-    {
-      "id": "PENDLE-Reversal-1785928529197",
-      "symbol": "PENDLE",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 1.3868328,
-      "sl": 1.3966953,
-      "tp1": 1.3662,
-      "tp2": 1.366,
-      "rr1": 2.092045627376451,
-      "rr2": 2.112324461343496,
-      "confidence": 0.7667484066161059,
-      "grade": "A",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 29.263835857814236,
-        "volatility_pctl": 88.33333333333333,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
+      "entry_filled": false,
       "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1785928529197,
-      "filled_ts": 1785927600000,
-      "mae_r": 0.5442027883396785,
-      "mfe_r": 2.000790874524749,
+      "status": "pending",
+      "created_ts": 1785937527972,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5377,
+      "tg_message_id": 5386,
       "_last_checked_t": 1785935700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785936639657
+  "last_run_ts": 1785937527972
 }
