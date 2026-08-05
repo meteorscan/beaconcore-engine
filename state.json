@@ -319,7 +319,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 249,
+        "seen": 250,
         "rejected": 0
       }
     },
@@ -1861,7 +1861,7 @@
       "mfe_r": 1.9099688753334232,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5342,
-      "_last_checked_t": 1785942000000
+      "_last_checked_t": 1785942900000
     },
     {
       "id": "PENDLE-Liquidity Sweep-1785942045246",
@@ -1895,12 +1895,12 @@
       "created_ts": 1785942045246,
       "filled_ts": 1785942000000,
       "mae_r": 0.10473468015085381,
-      "mfe_r": 0.37569963246773763,
+      "mfe_r": 0.7840687981935597,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5388,
-      "_last_checked_t": 1785942000000
+      "_last_checked_t": 1785942900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1785942930765
+  "last_run_ts": 1785943839316
 }
