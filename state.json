@@ -1952,12 +1952,12 @@
       "created_ts": 1785873648953,
       "filled_ts": 1785872700000,
       "mae_r": 0.7924488512771987,
-      "mfe_r": 2.261439388909952,
+      "mfe_r": 2.4371746456982106,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5342,
-      "_last_checked_t": 1786009500000
+      "_last_checked_t": 1786010400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786010442848
+  "last_run_ts": 1786011333249
 }
