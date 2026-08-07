@@ -332,14 +332,14 @@
         "expired": 0
       },
       "Range Trading|pending": {
-        "dispatched": 4,
+        "dispatched": 5,
         "filled": 4,
         "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 281,
+        "seen": 282,
         "rejected": 0
       }
     },
@@ -2044,7 +2044,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 10,
+      "pending_bars": 11,
       "status": "pending",
       "created_ts": 1786134644902,
       "filled_ts": null,
@@ -2052,9 +2052,46 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5517,
+      "_last_checked_t": 1786142700000
+    },
+    {
+      "id": "PENDLE-Range Trading-1786143644691",
+      "symbol": "PENDLE",
+      "engine": "Range Trading",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1.3942,
+      "sl": 1.4042028,
+      "tp1": 1.3707,
+      "tp2": 1.3703,
+      "rr1": 2.349342184188466,
+      "rr2": 2.3893309873235844,
+      "confidence": 0.8482050333878891,
+      "grade": "A+",
+      "confluences": [
+        "range extreme rejection",
+        "range-boundary entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 15.766186604335031,
+        "volatility_pctl": 75.83333333333333,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1786143644691,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 5519,
       "_last_checked_t": 1786141800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786142732262
+  "last_run_ts": 1786143644691
 }
