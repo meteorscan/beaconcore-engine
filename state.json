@@ -250,6 +250,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 3.446676065248571
+      },
+      "LTC|range|intraday|Range Trading": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -289,9 +295,9 @@
         "sum_conf": 0.8260807804498352
       },
       "Range Trading|A+": {
-        "n": 3,
+        "n": 4,
         "wins": 1,
-        "sum_conf": 2.623881215955995
+        "sum_conf": 3.466280343494612
       },
       "Mean Reversion|A": {
         "n": 2,
@@ -301,7 +307,7 @@
     },
     "forensic_counts": {
       "structural_invalidation_too_tight": 5,
-      "genuine_variance": 17,
+      "genuine_variance": 18,
       "correct_read_poor_rr": 10
     },
     "fill_stats": {
@@ -327,7 +333,7 @@
       },
       "Range Trading|pending": {
         "dispatched": 4,
-        "filled": 3,
+        "filled": 4,
         "expired": 0
       }
     },
@@ -408,6 +414,10 @@
       "PENDLE": {
         "direction": "bearish",
         "until_ts": 1785954600000
+      },
+      "LTC": {
+        "direction": "bearish",
+        "until_ts": 1786098600000
       }
     }
   },
@@ -1950,46 +1960,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "LTC-Range Trading-1786028445366",
       "symbol": "LTC",
       "engine": "Range Trading",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 45.581,
       "sl": 45.9306,
       "tp1": 44.782,
       "tp2": 44.709,
-      "rr1": 2.2854691075515374,
-      "rr2": 2.4942791762014065,
+      "r_realized": -1.0,
+      "mae_r": 1.0554919908466955,
+      "mfe_r": 0.7694508009153579,
+      "forensic_category": "genuine_variance",
       "confidence": 0.842399127538617,
       "grade": "A+",
-      "confluences": [
-        "range extreme rejection",
-        "range-boundary entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 16.303904914169372,
-        "volatility_pctl": 80.0,
+        "trend_strength": 16.264536102673755,
+        "volatility_pctl": 35.0,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "1h",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1786028445366,
-      "filled_ts": 1786027500000,
-      "mae_r": 0.7408466819222078,
-      "mfe_r": 0.7694508009153579,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5452,
-      "_last_checked_t": 1786094100000
-    },
+      "resolved_ts": 1786095000000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "PENDLE-Mean Reversion-1786093245697",
       "symbol": "PENDLE",
@@ -2017,7 +2017,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 3,
+      "pending_bars": 4,
       "status": "pending",
       "created_ts": 1786093245697,
       "filled_ts": null,
@@ -2025,9 +2025,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5494,
-      "_last_checked_t": 1786094100000
+      "_last_checked_t": 1786095000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786095045861
+  "last_run_ts": 1786095932634
 }
