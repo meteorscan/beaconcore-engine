@@ -244,13 +244,19 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "TAO|range|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 3.446676065248571
       }
     },
     "calibration_buckets": {
       "Liquidity Sweep|A+": {
-        "n": 8,
-        "wins": 1,
-        "sum_conf": 6.7192834171017175
+        "n": 9,
+        "wins": 2,
+        "sum_conf": 7.569880660797577
       },
       "Liquidity Sweep|A": {
         "n": 21,
@@ -301,7 +307,7 @@
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 36,
-        "filled": 29,
+        "filled": 30,
         "expired": 6
       },
       "Reversal|pending": {
@@ -332,9 +338,9 @@
       }
     },
     "circuit_breaker": {
-      "tripped": true,
+      "tripped": false,
       "tripped_ts": 1785951932592,
-      "reason": "win_rate=0.27 profit_factor=0.89 vs baseline wr=0.42 pf=1.35"
+      "reason": null
     },
     "governor": {
       "last_adjust_ts": 0
@@ -1916,47 +1922,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "TAO-Liquidity Sweep-1785873648953",
       "symbol": "TAO",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 199.1108,
       "sl": 201.67147,
       "tp1": 190.285,
       "tp2": 190.2,
-      "rr1": 3.446676065248571,
-      "rr2": 3.4798705026419126,
+      "r_realized": 3.446676065248571,
+      "mae_r": 0.7924488512771987,
+      "mfe_r": 3.4798705026419126,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8505972436958593,
       "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 23.06678013676986,
-        "volatility_pctl": 100.0,
+        "trend_strength": 18.11855509912862,
+        "volatility_pctl": 45.0,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "1h",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1785873648953,
-      "filled_ts": 1785872700000,
-      "mae_r": 0.7924488512771987,
-      "mfe_r": 3.3822398044262107,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5342,
-      "_last_checked_t": 1786078800000
-    },
+      "resolved_ts": 1786079700000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "LTC-Range Trading-1786028445366",
       "symbol": "LTC",
@@ -1992,9 +1987,9 @@
       "mfe_r": 0.7694508009153579,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5452,
-      "_last_checked_t": 1786078800000
+      "_last_checked_t": 1786079700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786079729527
+  "last_run_ts": 1786080642062
 }
