@@ -324,7 +324,7 @@
       "Mean Reversion|pending": {
         "dispatched": 15,
         "filled": 8,
-        "expired": 6
+        "expired": 7
       },
       "Momentum|pending": {
         "dispatched": 7,
@@ -1989,45 +1989,7 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [
-    {
-      "id": "PENDLE-Mean Reversion-1786093245697",
-      "symbol": "PENDLE",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 1.3751294618922318,
-      "sl": 1.3866853,
-      "tp1": 1.3442,
-      "tp2": 1.3435,
-      "rr1": 2.6765226030157345,
-      "rr2": 2.737098044924149,
-      "confidence": 0.8748262010513668,
-      "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 17.13766219334836,
-        "volatility_pctl": 47.5,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1786093245697,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5494,
-      "_last_checked_t": 1786101300000
-    }
-  ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1786102238097
+  "last_run_ts": 1786103130260
 }
