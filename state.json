@@ -1955,7 +1955,7 @@
       "mfe_r": 3.206504547637941,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5342,
-      "_last_checked_t": 1786064400000
+      "_last_checked_t": 1786065300000
     },
     {
       "id": "LTC-Range Trading-1786028445366",
@@ -1992,9 +1992,9 @@
       "mfe_r": 0.7122425629290782,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5452,
-      "_last_checked_t": 1786064400000
+      "_last_checked_t": 1786065300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786065327202
+  "last_run_ts": 1786066233539
 }
