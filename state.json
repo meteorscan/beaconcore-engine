@@ -333,7 +333,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 272,
+        "seen": 273,
         "rejected": 0
       }
     },
@@ -1984,11 +1984,11 @@
       "status": "active",
       "created_ts": 1786028445366,
       "filled_ts": 1786027500000,
-      "mae_r": 0.7179633867276919,
+      "mae_r": 0.7408466819222078,
       "mfe_r": 0.7694508009153579,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5452,
-      "_last_checked_t": 1786092300000
+      "_last_checked_t": 1786093200000
     },
     {
       "id": "PENDLE-Mean Reversion-1786093245697",
@@ -2017,7 +2017,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1786093245697,
       "filled_ts": null,
@@ -2025,9 +2025,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5494,
-      "_last_checked_t": 1786091400000
+      "_last_checked_t": 1786093200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786093245697
+  "last_run_ts": 1786094133069
 }
