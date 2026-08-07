@@ -2044,7 +2044,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 5,
+      "pending_bars": 6,
       "status": "pending",
       "created_ts": 1786134644902,
       "filled_ts": null,
@@ -2052,9 +2052,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5517,
-      "_last_checked_t": 1786137300000
+      "_last_checked_t": 1786138200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786138250585
+  "last_run_ts": 1786139127998
 }
