@@ -256,6 +256,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "PENDLE|range|intraday|Range Trading": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 2.349342184188466
       }
     },
     "calibration_buckets": {
@@ -295,9 +301,9 @@
         "sum_conf": 0.8260807804498352
       },
       "Range Trading|A+": {
-        "n": 4,
-        "wins": 1,
-        "sum_conf": 3.466280343494612
+        "n": 5,
+        "wins": 2,
+        "sum_conf": 4.3144853768825016
       },
       "Mean Reversion|A": {
         "n": 3,
@@ -333,7 +339,7 @@
       },
       "Range Trading|pending": {
         "dispatched": 5,
-        "filled": 4,
+        "filled": 5,
         "expired": 0
       }
     },
@@ -2014,47 +2020,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "PENDLE-Range Trading-1786143644691",
       "symbol": "PENDLE",
       "engine": "Range Trading",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 1.3942,
       "sl": 1.4042028,
       "tp1": 1.3707,
       "tp2": 1.3703,
-      "rr1": 2.349342184188466,
-      "rr2": 2.3893309873235844,
+      "r_realized": 2.349342184188466,
+      "mae_r": 0.11996640940535487,
+      "mfe_r": 2.369336585756025,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8482050333878891,
       "grade": "A+",
-      "confluences": [
-        "range extreme rejection",
-        "range-boundary entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 15.766186604335031,
-        "volatility_pctl": 75.83333333333333,
+        "trend_strength": 14.637383243722528,
+        "volatility_pctl": 59.166666666666664,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1786143644691,
-      "filled_ts": 1786143600000,
-      "mae_r": 0.11996640940535487,
-      "mfe_r": 2.229375774783111,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5519,
-      "_last_checked_t": 1786167900000
+      "resolved_ts": 1786168800000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1786168848810
+  "last_run_ts": 1786169731438
 }
