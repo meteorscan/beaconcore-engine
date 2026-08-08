@@ -2113,7 +2113,7 @@
       "mfe_r": 2.580050912957364,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5545,
-      "_last_checked_t": 1786214700000
+      "_last_checked_t": 1786215600000
     },
     {
       "id": "SOL-Liquidity Sweep-1786205737264",
@@ -2147,12 +2147,12 @@
       "created_ts": 1786205737264,
       "filled_ts": 1786206600000,
       "mae_r": 0.4536572824270538,
-      "mfe_r": 0.23569867592236526,
+      "mfe_r": 0.24373312765137214,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5555,
-      "_last_checked_t": 1786214700000
+      "_last_checked_t": 1786215600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786215642446
+  "last_run_ts": 1786216531667
 }
