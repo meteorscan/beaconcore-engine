@@ -338,7 +338,7 @@
       "Reversal|pending": {
         "dispatched": 13,
         "filled": 10,
-        "expired": 2
+        "expired": 3
       },
       "Mean Reversion|pending": {
         "dispatched": 17,
@@ -2203,46 +2203,7 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [
-    {
-      "id": "PENDLE-Reversal-1786297526036",
-      "symbol": "PENDLE",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 1.3877016,
-      "sl": 1.3979000000000001,
-      "tp1": 1.3662,
-      "tp2": 1.3633,
-      "rr1": 2.1083307185440416,
-      "rr2": 2.3926890492625934,
-      "confidence": 0.759344731374801,
-      "grade": "A",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 17.967595255420356,
-        "volatility_pctl": 11.666666666666666,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1786297526036,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5619,
-      "_last_checked_t": 1786305600000
-    }
-  ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1786306528231
+  "last_run_ts": 1786307441000
 }
