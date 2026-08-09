@@ -36,10 +36,10 @@
         "sum_r": 0.9784780937740147
       },
       "TAO|trend|intraday|Reversal": {
-        "n": 1,
+        "n": 2,
         "wins": 0,
-        "losses": 1,
-        "sum_r": -1.0
+        "losses": 2,
+        "sum_r": -2.0
       },
       "DOT|trend|intraday|Liquidity Sweep": {
         "n": 3,
@@ -282,9 +282,9 @@
         "sum_conf": 16.65528943519952
       },
       "Reversal|A": {
-        "n": 8,
+        "n": 9,
         "wins": 3,
-        "sum_conf": 6.151244020518242
+        "sum_conf": 6.930387091584127
       },
       "Mean Reversion|A+": {
         "n": 7,
@@ -319,7 +319,7 @@
     },
     "forensic_counts": {
       "structural_invalidation_too_tight": 5,
-      "genuine_variance": 19,
+      "genuine_variance": 20,
       "correct_read_poor_rr": 10
     },
     "fill_stats": {
@@ -330,7 +330,7 @@
       },
       "Reversal|pending": {
         "dispatched": 12,
-        "filled": 9,
+        "filled": 10,
         "expired": 2
       },
       "Mean Reversion|pending": {
@@ -383,7 +383,7 @@
     "symbol_cooldown": {
       "TAO": {
         "direction": "bearish",
-        "until_ts": 1785870900000
+        "until_ts": 1786279500000
       },
       "NEAR": {
         "direction": "bearish",
@@ -2109,6 +2109,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "TAO-Reversal-1786275931992",
+      "symbol": "TAO",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 205.30367999999999,
+      "sl": 207.68000000000004,
+      "tp1": 198.805,
+      "tp2": 198.74,
+      "r_realized": -1.0,
+      "mae_r": 1.0547064368435077,
+      "mfe_r": 0.7211486668461935,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7791430710658845,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 54.107371974776605,
+        "volatility_pctl": 98.33333333333333,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1786275900000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -2147,47 +2174,9 @@
       "mfe_r": 0.7531173672708822,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5555,
-      "_last_checked_t": 1786275000000
-    },
-    {
-      "id": "TAO-Reversal-1786275931992",
-      "symbol": "TAO",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 205.30367999999999,
-      "sl": 207.68000000000004,
-      "tp1": 198.805,
-      "tp2": 198.74,
-      "rr1": 2.734766361432738,
-      "rr2": 2.7621195798544975,
-      "confidence": 0.7791430710658845,
-      "grade": "A",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 55.665834311180355,
-        "volatility_pctl": 92.5,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
-      "created_ts": 1786275931992,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 5592,
-      "_last_checked_t": 1786274100000
+      "_last_checked_t": 1786275900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786275931992
+  "last_run_ts": 1786276852213
 }
