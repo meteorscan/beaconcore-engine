@@ -354,11 +354,16 @@
         "dispatched": 5,
         "filled": 5,
         "expired": 0
+      },
+      "Breaker Block|pending": {
+        "dispatched": 1,
+        "filled": 0,
+        "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 305,
+        "seen": 306,
         "rejected": 0
       }
     },
@@ -2177,7 +2182,44 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "APT-Breaker Block-1786389337551",
+      "symbol": "APT",
+      "engine": "Breaker Block",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.5941000000000001,
+      "sl": 0.5980975000000001,
+      "tp1": 0.5849,
+      "tp2": 0.5797,
+      "rr1": 2.301438398999406,
+      "rr2": 3.6022514071294873,
+      "confidence": 0.7367318358471935,
+      "grade": "A",
+      "confluences": [
+        "confirmed breaker block retest"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 17.2855435429554,
+        "volatility_pctl": 89.16666666666667,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1786389337551,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 5685,
+      "_last_checked_t": 1786387500000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1786388448721
+  "last_run_ts": 1786389337551
 }
