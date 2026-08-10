@@ -341,7 +341,7 @@
         "expired": 3
       },
       "Mean Reversion|pending": {
-        "dispatched": 17,
+        "dispatched": 18,
         "filled": 10,
         "expired": 7
       },
@@ -358,7 +358,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 300,
+        "seen": 301,
         "rejected": 0
       }
     },
@@ -2203,7 +2203,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "XLM-Mean Reversion-1786327244992",
+      "symbol": "XLM",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.1640169500463866,
+      "sl": 0.16561545000000003,
+      "tp1": 0.16076,
+      "tp2": 0.16073,
+      "rr1": 2.0375039980603566,
+      "rr2": 2.0562715932249107,
+      "confidence": 0.8197126862921433,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 15.72217027061363,
+        "volatility_pctl": 82.5,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1786327244992,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 5645,
+      "_last_checked_t": 1786325400000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1786326331368
+  "last_run_ts": 1786327244992
 }
