@@ -454,33 +454,6 @@
   },
   "tier2_trades": [
     {
-      "id": "ADA-Mean Reversion-1785105928090",
-      "symbol": "ADA",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.165965,
-      "sl": 0.16715699,
-      "tp1": 0.16416,
-      "tp2": 0.16415,
-      "r_realized": -1.0,
-      "mae_r": 1.0193038532202368,
-      "mfe_r": 1.3129304776046826,
-      "forensic_category": "structural_invalidation_too_tight",
-      "confidence": 0.8320368582423204,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 20.989086684796565,
-        "volatility_pctl": 17.5,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785132000000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "ZEC-Momentum-1785123035880",
       "symbol": "ZEC",
       "engine": "Momentum",
@@ -2076,5 +2049,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1786427138272
+  "last_run_ts": 1786428049276
 }
