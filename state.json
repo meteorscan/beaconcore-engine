@@ -454,33 +454,6 @@
   },
   "tier2_trades": [
     {
-      "id": "NEAR-Liquidity Sweep-1785116728853",
-      "symbol": "NEAR",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 1.8304999999999998,
-      "sl": 1.8516498000000001,
-      "tp1": 1.7893666666666668,
-      "tp2": 1.789,
-      "r_realized": -1.0,
-      "mae_r": 1.026014430396502,
-      "mfe_r": 0.40189505338110043,
-      "forensic_category": "structural_invalidation_too_tight",
-      "confidence": 0.8593036464468533,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 24.980884443716786,
-        "volatility_pctl": 30.0,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785120300000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "PENGU-Liquidity Sweep-1785106842464",
       "symbol": "PENGU",
       "engine": "Liquidity Sweep",
@@ -2130,5 +2103,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1786415439595
+  "last_run_ts": 1786416330410
 }
