@@ -463,33 +463,6 @@
   },
   "tier2_trades": [
     {
-      "id": "SUI-Momentum-1785249043950",
-      "symbol": "SUI",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.6816802923181037,
-      "sl": 0.686783,
-      "tp1": 0.67375,
-      "tp2": 0.6737,
-      "r_realized": -1.0,
-      "mae_r": 2.0086801598023727,
-      "mfe_r": 0.6722494275487934,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.857989101076528,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 50.05199879564019,
-        "volatility_pctl": 72.5,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785251700000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "SUI-Reversal-1785329131291",
       "symbol": "SUI",
       "engine": "Reversal",
@@ -1815,5 +1788,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1786546848165
+  "last_run_ts": 1786547729169
 }
