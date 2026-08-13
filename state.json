@@ -354,7 +354,7 @@
         "expired": 4
       },
       "Mean Reversion|pending": {
-        "dispatched": 19,
+        "dispatched": 20,
         "filled": 11,
         "expired": 8
       },
@@ -376,7 +376,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 318,
+        "seen": 319,
         "rejected": 0
       }
     },
@@ -1847,7 +1847,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "ZEC-Mean Reversion-1786642239685",
+      "symbol": "ZEC",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 485.5130371119874,
+      "sl": 481.70520000000005,
+      "tp1": 496.24,
+      "tp2": 496.37,
+      "rr1": 2.817075040905344,
+      "rr2": 2.8512151567182675,
+      "confidence": 0.8308018529146823,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 16.794163497575948,
+        "volatility_pctl": 81.66666666666667,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1786642239685,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 5889,
+      "_last_checked_t": 1786640400000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1786641330385
+  "last_run_ts": 1786642239685
 }
