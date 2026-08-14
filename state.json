@@ -1826,13 +1826,13 @@
       "status": "active",
       "created_ts": 1786642239685,
       "filled_ts": 1786643100000,
-      "mae_r": 0.7203661898646166,
+      "mae_r": 0.7728894449614206,
       "mfe_r": 2.491430859305138,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5889,
-      "_last_checked_t": 1786711500000
+      "_last_checked_t": 1786712400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786712439333
+  "last_run_ts": 1786713323590
 }
