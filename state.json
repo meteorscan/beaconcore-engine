@@ -472,33 +472,6 @@
   },
   "tier2_trades": [
     {
-      "id": "PENGU-Range Trading-1785441643618",
-      "symbol": "PENGU",
-      "engine": "Range Trading",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.005992,
-      "sl": 0.006047,
-      "tp1": 0.00583175,
-      "tp2": 0.005831,
-      "r_realized": -1.0,
-      "mae_r": 1.1090909090909071,
-      "mfe_r": 0.818181818181811,
-      "forensic_category": "correct_read_poor_rr",
-      "confidence": 0.8897989924730026,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 18.80869936984734,
-        "volatility_pctl": 20.0,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785441600000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "TAO-Range Trading-1785466844096",
       "symbol": "TAO",
       "engine": "Range Trading",
@@ -1797,5 +1770,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1786736729937
+  "last_run_ts": 1786737638233
 }
