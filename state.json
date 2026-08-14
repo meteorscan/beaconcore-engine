@@ -1802,7 +1802,7 @@
       "mfe_r": 2.3758796980921635,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5889,
-      "_last_checked_t": 1786680000000
+      "_last_checked_t": 1786680900000
     },
     {
       "id": "TAO-Mean Reversion-1786672848823",
@@ -1839,9 +1839,9 @@
       "mfe_r": 2.0196338824200653,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5893,
-      "_last_checked_t": 1786680000000
+      "_last_checked_t": 1786680900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786680933071
+  "last_run_ts": 1786681829518
 }
