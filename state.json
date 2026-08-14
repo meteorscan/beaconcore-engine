@@ -1799,10 +1799,10 @@
       "created_ts": 1786642239685,
       "filled_ts": 1786643100000,
       "mae_r": 0.7203661898646166,
-      "mfe_r": 2.2183099328017364,
+      "mfe_r": 2.3574965588082826,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5889,
-      "_last_checked_t": 1786675500000
+      "_last_checked_t": 1786676400000
     },
     {
       "id": "TAO-Mean Reversion-1786672848823",
@@ -1836,12 +1836,12 @@
       "created_ts": 1786672848823,
       "filled_ts": 1786671900000,
       "mae_r": 0.5884698180277215,
-      "mfe_r": 1.0049743606020125,
+      "mfe_r": 1.240775517080862,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5893,
-      "_last_checked_t": 1786675500000
+      "_last_checked_t": 1786676400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786676446535
+  "last_run_ts": 1786677326886
 }
