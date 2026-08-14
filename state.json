@@ -471,33 +471,6 @@
   },
   "tier2_trades": [
     {
-      "id": "BCH-Liquidity Sweep-1785420043714",
-      "symbol": "BCH",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 218.41296,
-      "sl": 219.95000000000002,
-      "tp1": 213.76,
-      "tp2": 213.69,
-      "r_realized": -1.0,
-      "mae_r": 1.9238536407640465,
-      "mfe_r": 3.5737261229375576,
-      "forensic_category": "correct_read_poor_rr",
-      "confidence": 0.8801806693008198,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 12.504731607812792,
-        "volatility_pctl": 99.16666666666667,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785419100000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "PENGU-Range Trading-1785441643618",
       "symbol": "PENGU",
       "engine": "Range Trading",
@@ -1830,9 +1803,9 @@
       "mfe_r": 2.491430859305138,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5889,
-      "_last_checked_t": 1786713300000
+      "_last_checked_t": 1786714200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786714229878
+  "last_run_ts": 1786715125210
 }
