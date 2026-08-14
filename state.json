@@ -1826,12 +1826,12 @@
       "created_ts": 1786642239685,
       "filled_ts": 1786643100000,
       "mae_r": 0.7203661898646166,
-      "mfe_r": 1.6116663364336143,
+      "mfe_r": 1.7797407527434081,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5889,
-      "_last_checked_t": 1786665600000
+      "_last_checked_t": 1786666500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786666528237
+  "last_run_ts": 1786667439831
 }
