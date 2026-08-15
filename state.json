@@ -473,33 +473,6 @@
   },
   "tier2_trades": [
     {
-      "id": "PENGU-Liquidity Sweep-1785484838542",
-      "symbol": "PENGU",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.00611176,
-      "sl": 0.006179,
-      "tp1": 0.005977,
-      "tp2": 0.005976,
-      "r_realized": 2.004164187983357,
-      "mae_r": 0.19690660321237904,
-      "mfe_r": 2.6139202855443266,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.7802464794213727,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 33.293397242489874,
-        "volatility_pctl": 63.333333333333336,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785506400000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "NEAR-Liquidity Sweep-1785504639612",
       "symbol": "NEAR",
       "engine": "Liquidity Sweep",
@@ -1775,10 +1748,10 @@
       "created_ts": 1786765526529,
       "filled_ts": 1786764600000,
       "mae_r": 0.26445589350628806,
-      "mfe_r": 1.6741114627193616,
+      "mfe_r": 1.7288686350916744,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5969,
-      "_last_checked_t": 1786800600000
+      "_last_checked_t": 1786801500000
     },
     {
       "id": "ZEC-Liquidity Sweep-1786790724527",
@@ -1816,9 +1789,9 @@
       "mfe_r": 1.1177977519561242,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5982,
-      "_last_checked_t": 1786800600000
+      "_last_checked_t": 1786801500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786801527484
+  "last_run_ts": 1786802433107
 }
