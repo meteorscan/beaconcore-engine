@@ -473,33 +473,6 @@
   },
   "tier2_trades": [
     {
-      "id": "NEAR-Liquidity Sweep-1785504639612",
-      "symbol": "NEAR",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 1.6785448,
-      "sl": 1.6934917999999999,
-      "tp1": 1.6473,
-      "tp2": 1.6448,
-      "r_realized": 2.0903726500301363,
-      "mae_r": 0.8399812671439177,
-      "mfe_r": 2.157275707499856,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.7418848329103205,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 19.473266052078554,
-        "volatility_pctl": 45.833333333333336,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785511800000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "NEAR-Liquidity Sweep-1785513647421",
       "symbol": "NEAR",
       "engine": "Liquidity Sweep",
@@ -1751,7 +1724,7 @@
       "mfe_r": 1.7885294348406078,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5969,
-      "_last_checked_t": 1786806000000
+      "_last_checked_t": 1786806900000
     },
     {
       "id": "ZEC-Liquidity Sweep-1786790724527",
@@ -1789,9 +1762,9 @@
       "mfe_r": 1.1177977519561242,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5982,
-      "_last_checked_t": 1786806000000
+      "_last_checked_t": 1786806900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786806924167
+  "last_run_ts": 1786807830008
 }
