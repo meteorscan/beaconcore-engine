@@ -473,33 +473,6 @@
   },
   "tier2_trades": [
     {
-      "id": "TAO-Range Trading-1785466844096",
-      "symbol": "TAO",
-      "engine": "Range Trading",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 196.67,
-      "sl": 198.56837000000002,
-      "tp1": 192.50666666666666,
-      "tp2": 192.46,
-      "r_realized": 2.1931095272961882,
-      "mae_r": 0.6215858868397569,
-      "mfe_r": 2.4442021313020734,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.836900536913108,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 21.069296340060877,
-        "volatility_pctl": 28.333333333333332,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785489300000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "PENGU-Liquidity Sweep-1785484838542",
       "symbol": "PENGU",
       "engine": "Liquidity Sweep",
@@ -1802,12 +1775,12 @@
       "created_ts": 1786765526529,
       "filled_ts": 1786764600000,
       "mae_r": 0.26445589350628806,
-      "mfe_r": 1.3651829379920035,
+      "mfe_r": 1.4174882966760023,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 5969,
-      "_last_checked_t": 1786783500000
+      "_last_checked_t": 1786784400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786784436918
+  "last_run_ts": 1786785326261
 }
