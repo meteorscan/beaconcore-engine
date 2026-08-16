@@ -485,33 +485,6 @@
   },
   "tier2_trades": [
     {
-      "id": "TAO-Mean Reversion-1785554126834",
-      "symbol": "TAO",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 196.6628865715922,
-      "sl": 198.04784999999998,
-      "tp1": 192.91500000000002,
-      "tp2": 192.9,
-      "r_realized": -1.0,
-      "mae_r": 1.716372706780155,
-      "mfe_r": 0.478631101728281,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.8589969064424599,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 14.733375885136734,
-        "volatility_pctl": 24.166666666666668,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785556800000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "PENGU-Reversal-1785508234865",
       "symbol": "PENGU",
       "engine": "Reversal",
@@ -1729,5 +1702,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1786851925516
+  "last_run_ts": 1786852836787
 }
