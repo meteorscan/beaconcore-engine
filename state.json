@@ -486,33 +486,6 @@
   },
   "tier2_trades": [
     {
-      "id": "ADA-Mean Reversion-1785579333649",
-      "symbol": "ADA",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.17286673053492657,
-      "sl": 0.1739984,
-      "tp1": 0.16932999999999998,
-      "tp2": 0.16929,
-      "r_realized": -1.0,
-      "mae_r": 1.752516548588464,
-      "mfe_r": 0.544974088248082,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.8025674442000287,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 22.732973780997163,
-        "volatility_pctl": 46.666666666666664,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785588300000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "PENGU-Momentum-1785596442765",
       "symbol": "PENGU",
       "engine": "Momentum",
@@ -1622,5 +1595,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1786883434236
+  "last_run_ts": 1786884322765
 }
