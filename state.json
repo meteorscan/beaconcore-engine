@@ -367,7 +367,7 @@
         "expired": 4
       },
       "Mean Reversion|pending": {
-        "dispatched": 21,
+        "dispatched": 22,
         "filled": 13,
         "expired": 8
       },
@@ -389,7 +389,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 335,
+        "seen": 336,
         "rejected": 0
       }
     },
@@ -1548,9 +1548,46 @@
       "mfe_r": 0.3441058079356,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6040,
+      "_last_checked_t": 1786941900000
+    },
+    {
+      "id": "NEAR-Mean Reversion-1786942838318",
+      "symbol": "NEAR",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1.63720572711456,
+      "sl": 1.6489473,
+      "tp1": 1.607,
+      "tp2": 1.6054,
+      "rr1": 2.572545212576779,
+      "rr2": 2.708813156881252,
+      "confidence": 0.8913364142276491,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 20.422172701049846,
+        "volatility_pctl": 28.333333333333332,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1786942838318,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 6043,
       "_last_checked_t": 1786941000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786941926385
+  "last_run_ts": 1786942838318
 }
