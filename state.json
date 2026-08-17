@@ -486,33 +486,6 @@
   },
   "tier2_trades": [
     {
-      "id": "NEAR-Mean Reversion-1785639640728",
-      "symbol": "NEAR",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 1.6996280637950256,
-      "sl": 1.7136,
-      "tp1": 1.6712,
-      "tp2": 1.6694,
-      "r_realized": -1.0,
-      "mae_r": 1.4580610665629425,
-      "mfe_r": 0.044951808096715305,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.800955476935112,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 14.142821330931659,
-        "volatility_pctl": 6.666666666666667,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785643200000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "PENGU-Reversal-1785649529076",
       "symbol": "PENGU",
       "engine": "Reversal",
@@ -1572,12 +1545,12 @@
       "created_ts": 1786932037765,
       "filled_ts": 1786932000000,
       "mae_r": 0.9635848614571925,
-      "mfe_r": 0.08001192682045956,
+      "mfe_r": 0.3441058079356,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6040,
-      "_last_checked_t": 1786937400000
+      "_last_checked_t": 1786938300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786938324575
+  "last_run_ts": 1786939232367
 }
