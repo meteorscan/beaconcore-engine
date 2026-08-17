@@ -1581,7 +1581,7 @@
       },
       "sl_anchor_tf": "1h",
       "entry_filled": false,
-      "pending_bars": 8,
+      "pending_bars": 9,
       "status": "pending",
       "created_ts": 1786981523916,
       "filled_ts": null,
@@ -1589,7 +1589,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6061,
-      "_last_checked_t": 1786986900000
+      "_last_checked_t": 1786987800000
     },
     {
       "id": "AAVE-Mean Reversion-1786986038475",
@@ -1623,12 +1623,12 @@
       "created_ts": 1786986038475,
       "filled_ts": 1786986900000,
       "mae_r": 0.23790097125268356,
-      "mfe_r": 0.2636014174668083,
+      "mfe_r": 0.2666781192380863,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6065,
-      "_last_checked_t": 1786986900000
+      "_last_checked_t": 1786987800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786987829012
+  "last_run_ts": 1786988724835
 }
