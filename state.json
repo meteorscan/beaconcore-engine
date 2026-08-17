@@ -309,6 +309,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "AAVE|trend|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -328,9 +334,9 @@
         "sum_conf": 7.694632173937326
       },
       "Mean Reversion|A+": {
-        "n": 10,
+        "n": 11,
         "wins": 2,
-        "sum_conf": 8.345131788945071
+        "sum_conf": 9.16541949980928
       },
       "Momentum|A+": {
         "n": 7,
@@ -360,7 +366,7 @@
     },
     "forensic_counts": {
       "structural_invalidation_too_tight": 7,
-      "genuine_variance": 21,
+      "genuine_variance": 22,
       "correct_read_poor_rr": 15,
       "confidence_miscalibration": 1
     },
@@ -377,7 +383,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 24,
-        "filled": 14,
+        "filled": 15,
         "expired": 9
       },
       "Momentum|pending": {
@@ -495,37 +501,14 @@
       "ONDO": {
         "direction": "bearish",
         "until_ts": 1786947300000
+      },
+      "AAVE": {
+        "direction": "bearish",
+        "until_ts": 1787006700000
       }
     }
   },
   "tier2_trades": [
-    {
-      "id": "XRP-Liquidity Sweep-1785651335188",
-      "symbol": "XRP",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 1.0836016,
-      "sl": 1.0907897,
-      "tp1": 1.0585,
-      "tp2": 1.0571,
-      "r_realized": -1.0,
-      "mae_r": 1.0849042166914693,
-      "mfe_r": 1.0297018683657526,
-      "forensic_category": "correct_read_poor_rr",
-      "confidence": 0.8421848191507705,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 25.476796720046387,
-        "volatility_pctl": 22.5,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785708000000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
     {
       "id": "AVAX-Liquidity Sweep-1785651335188",
       "symbol": "AVAX",
@@ -1551,47 +1534,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "AAVE-Mean Reversion-1786986038475",
       "symbol": "AAVE",
       "engine": "Mean Reversion",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 87.90635324582122,
       "sl": 88.5564,
       "tp1": 86.4315,
       "tp2": 86.416,
-      "rr1": 2.2688417969019072,
-      "rr2": 2.292686235629372,
+      "r_realized": -1.0,
+      "mae_r": 1.6547221369294853,
+      "mfe_r": 0.4266666113449131,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8202877108642094,
       "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 18.228617875414834,
-        "volatility_pctl": 53.333333333333336,
+        "trend_strength": 22.958366963873438,
+        "volatility_pctl": 58.333333333333336,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 2,
-      "status": "active",
-      "created_ts": 1786986038475,
-      "filled_ts": 1786986900000,
-      "mae_r": 0.7794004829988548,
-      "mfe_r": 0.4266666113449131,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 6065,
-      "_last_checked_t": 1787002200000
+      "resolved_ts": 1787003100000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1787003125049
+  "last_run_ts": 1787004041633
 }
