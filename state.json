@@ -376,7 +376,7 @@
         "expired": 4
       },
       "Mean Reversion|pending": {
-        "dispatched": 23,
+        "dispatched": 24,
         "filled": 14,
         "expired": 8
       },
@@ -398,7 +398,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 341,
+        "seen": 343,
         "rejected": 0
       }
     },
@@ -1581,7 +1581,7 @@
       },
       "sl_anchor_tf": "1h",
       "entry_filled": false,
-      "pending_bars": 5,
+      "pending_bars": 6,
       "status": "pending",
       "created_ts": 1786981523916,
       "filled_ts": null,
@@ -1589,9 +1589,46 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6061,
+      "_last_checked_t": 1786985100000
+    },
+    {
+      "id": "AAVE-Mean Reversion-1786986038475",
+      "symbol": "AAVE",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 87.90635324582122,
+      "sl": 88.5564,
+      "tp1": 86.4315,
+      "tp2": 86.416,
+      "rr1": 2.2688417969019072,
+      "rr2": 2.292686235629372,
+      "confidence": 0.8202877108642094,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 18.228617875414834,
+        "volatility_pctl": 53.333333333333336,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1786986038475,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 6065,
       "_last_checked_t": 1786984200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1786985122444
+  "last_run_ts": 1786986038475
 }
