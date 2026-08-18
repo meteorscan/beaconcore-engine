@@ -511,33 +511,6 @@
   },
   "tier2_trades": [
     {
-      "id": "NEAR-Reversal-1785764743687",
-      "symbol": "NEAR",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 1.7205456,
-      "sl": 1.7335318,
-      "tp1": 1.6923666666666666,
-      "tp2": 1.692,
-      "r_realized": -1.0,
-      "mae_r": 1.0822565492599805,
-      "mfe_r": 1.1970861375921944,
-      "forensic_category": "correct_read_poor_rr",
-      "confidence": 0.7678956963834785,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 15.89205396442841,
-        "volatility_pctl": 20.833333333333332,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785764700000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "BCH-Mean Reversion-1785777331690",
       "symbol": "BCH",
       "engine": "Mean Reversion",
@@ -1404,5 +1377,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1787059830836
+  "last_run_ts": 1787060725660
 }
