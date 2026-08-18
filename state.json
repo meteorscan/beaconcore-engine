@@ -1442,10 +1442,10 @@
       "created_ts": 1787063436550,
       "filled_ts": 1787062500000,
       "mae_r": 0.4074539990615083,
-      "mfe_r": 1.7253621669112806,
+      "mfe_r": 1.7403380557302828,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6096,
-      "_last_checked_t": 1787085000000
+      "_last_checked_t": 1787085900000
     },
     {
       "id": "ZEC-Reversal-1787064327272",
@@ -1483,9 +1483,9 @@
       "mfe_r": 2.206495084973487,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6099,
-      "_last_checked_t": 1787085000000
+      "_last_checked_t": 1787085900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787085925856
+  "last_run_ts": 1787086835549
 }
