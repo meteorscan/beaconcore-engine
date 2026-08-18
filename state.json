@@ -404,7 +404,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 360,
+        "seen": 362,
         "rejected": 0
       }
     },
@@ -510,33 +510,6 @@
     }
   },
   "tier2_trades": [
-    {
-      "id": "BCH-Mean Reversion-1785777331690",
-      "symbol": "BCH",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 213.54611808134942,
-      "sl": 214.973,
-      "tp1": 210.58,
-      "tp2": 210.3,
-      "r_realized": -1.0,
-      "mae_r": 1.1170384162957967,
-      "mfe_r": 0.4528181855163247,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.7810999546371763,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 20.32909536406714,
-        "volatility_pctl": 44.166666666666664,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785780000000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
     {
       "id": "NEAR-Liquidity Sweep-1785795331588",
       "symbol": "NEAR",
@@ -1412,7 +1385,7 @@
       "mfe_r": 0.6970178013398526,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6096,
-      "_last_checked_t": 1787074200000
+      "_last_checked_t": 1787075100000
     },
     {
       "id": "PENDLE-Reversal-1787063436550",
@@ -1450,7 +1423,7 @@
       "mfe_r": 1.7699423905139926,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6097,
-      "_last_checked_t": 1787074200000
+      "_last_checked_t": 1787075100000
     },
     {
       "id": "ZEC-Reversal-1787064327272",
@@ -1488,7 +1461,7 @@
       "mfe_r": 0.9404226283131389,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6099,
-      "_last_checked_t": 1787074200000
+      "_last_checked_t": 1787075100000
     },
     {
       "id": "DOT-Liquidity Sweep-1787073321246",
@@ -1525,9 +1498,9 @@
       "mfe_r": 0.5509219369292002,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6106,
-      "_last_checked_t": 1787074200000
+      "_last_checked_t": 1787075100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787075124585
+  "last_run_ts": 1787076042501
 }
