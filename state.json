@@ -1442,10 +1442,10 @@
       "created_ts": 1787063436550,
       "filled_ts": 1787062500000,
       "mae_r": 0.4074539990615083,
-      "mfe_r": 1.8900969439203026,
+      "mfe_r": 1.9400165733169639,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6096,
-      "_last_checked_t": 1787090400000
+      "_last_checked_t": 1787091300000
     },
     {
       "id": "ZEC-Reversal-1787064327272",
@@ -1483,7 +1483,7 @@
       "mfe_r": 2.206495084973487,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6099,
-      "_last_checked_t": 1787090400000
+      "_last_checked_t": 1787091300000
     },
     {
       "id": "DOT-Liquidity Sweep-1787088633580",
@@ -1520,9 +1520,9 @@
       "mfe_r": 0.1103393783373936,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6118,
-      "_last_checked_t": 1787090400000
+      "_last_checked_t": 1787091300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787091322449
+  "last_run_ts": 1787092234683
 }
