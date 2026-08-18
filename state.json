@@ -1445,7 +1445,7 @@
       "mfe_r": 0.6970178013398526,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6096,
-      "_last_checked_t": 1787082300000
+      "_last_checked_t": 1787083200000
     },
     {
       "id": "ZEC-Reversal-1787064327272",
@@ -1483,9 +1483,9 @@
       "mfe_r": 2.022581401795471,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6099,
-      "_last_checked_t": 1787082300000
+      "_last_checked_t": 1787083200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787083241207
+  "last_run_ts": 1787084125005
 }
