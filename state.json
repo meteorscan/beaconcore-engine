@@ -372,12 +372,12 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 45,
+        "dispatched": 46,
         "filled": 37,
         "expired": 8
       },
       "Reversal|pending": {
-        "dispatched": 15,
+        "dispatched": 16,
         "filled": 11,
         "expired": 4
       },
@@ -404,7 +404,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 345,
+        "seen": 349,
         "rejected": 0
       }
     },
@@ -1375,7 +1375,84 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "AAVE-Liquidity Sweep-1787063436550",
+      "symbol": "AAVE",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 89.635512,
+      "sl": 90.4368,
+      "tp1": 87.56,
+      "tp2": 87.535,
+      "rr1": 2.59021974620861,
+      "rr2": 2.6214195145815364,
+      "confidence": 0.8421773000499309,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 21.874929079181676,
+        "volatility_pctl": 60.0,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "1h",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1787063436550,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 6096,
+      "_last_checked_t": 1787061600000
+    },
+    {
+      "id": "PENDLE-Reversal-1787063436550",
+      "symbol": "PENDLE",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1.3543224,
+      "sl": 1.3632619000000001,
+      "tp1": 1.3361,
+      "tp2": 1.3209,
+      "rr1": 2.0384137815313794,
+      "rr2": 3.7387325913082052,
+      "confidence": 0.7647760158319697,
+      "grade": "A",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 29.79479682627178,
+        "volatility_pctl": 88.33333333333333,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1787063436550,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 6097,
+      "_last_checked_t": 1787061600000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1787062525473
+  "last_run_ts": 1787063436550
 }
