@@ -410,7 +410,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 366,
+        "seen": 367,
         "rejected": 0
       }
     },
@@ -1418,7 +1418,7 @@
       "mfe_r": 0.6970178013398526,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6096,
-      "_last_checked_t": 1787077800000
+      "_last_checked_t": 1787078700000
     },
     {
       "id": "PENDLE-Reversal-1787063436550",
@@ -1453,10 +1453,10 @@
       "created_ts": 1787063436550,
       "filled_ts": 1787062500000,
       "mae_r": 0.5232507410928907,
-      "mfe_r": 1.7699423905139926,
+      "mfe_r": 1.9377370098998687,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6097,
-      "_last_checked_t": 1787077800000
+      "_last_checked_t": 1787078700000
     },
     {
       "id": "ZEC-Reversal-1787064327272",
@@ -1494,9 +1494,9 @@
       "mfe_r": 1.0230505149583422,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6099,
-      "_last_checked_t": 1787077800000
+      "_last_checked_t": 1787078700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787078727388
+  "last_run_ts": 1787079639733
 }
