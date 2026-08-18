@@ -404,7 +404,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 358,
+        "seen": 360,
         "rejected": 0
       }
     },
@@ -1412,7 +1412,7 @@
       "mfe_r": 0.6970178013398526,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6096,
-      "_last_checked_t": 1787073300000
+      "_last_checked_t": 1787074200000
     },
     {
       "id": "PENDLE-Reversal-1787063436550",
@@ -1450,7 +1450,7 @@
       "mfe_r": 1.7699423905139926,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6097,
-      "_last_checked_t": 1787073300000
+      "_last_checked_t": 1787074200000
     },
     {
       "id": "ZEC-Reversal-1787064327272",
@@ -1488,7 +1488,7 @@
       "mfe_r": 0.9404226283131389,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6099,
-      "_last_checked_t": 1787073300000
+      "_last_checked_t": 1787074200000
     },
     {
       "id": "DOT-Liquidity Sweep-1787073321246",
@@ -1522,12 +1522,12 @@
       "created_ts": 1787073321246,
       "filled_ts": 1787072400000,
       "mae_r": 0.8237588708034985,
-      "mfe_r": 0.5352560587784063,
+      "mfe_r": 0.5509219369292002,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6106,
-      "_last_checked_t": 1787073300000
+      "_last_checked_t": 1787074200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787074231231
+  "last_run_ts": 1787075124585
 }
