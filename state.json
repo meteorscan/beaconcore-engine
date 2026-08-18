@@ -511,33 +511,6 @@
   },
   "tier2_trades": [
     {
-      "id": "DOT-Mean Reversion-1785753937589",
-      "symbol": "DOT",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.8023268924133203,
-      "sl": 0.807485,
-      "tp1": 0.79025,
-      "tp2": 0.78927,
-      "r_realized": -1.0,
-      "mae_r": 1.305344542263384,
-      "mfe_r": 0.46274575960460324,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.825100682522722,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 22.35045889747193,
-        "volatility_pctl": 52.5,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785758400000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "NEAR-Reversal-1785764743687",
       "symbol": "NEAR",
       "engine": "Reversal",
@@ -1431,5 +1404,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1787053524187
+  "last_run_ts": 1787054435063
 }
