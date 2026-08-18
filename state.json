@@ -510,60 +510,6 @@
   },
   "tier2_trades": [
     {
-      "id": "XLM-Liquidity Sweep-1785658527542",
-      "symbol": "XLM",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.17566056,
-      "sl": 0.17749999999999996,
-      "tp1": 0.17135,
-      "tp2": 0.17129,
-      "r_realized": 2.343408863567206,
-      "mae_r": 0.06493280563649828,
-      "mfe_r": 2.6315400339234074,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.7809324858284763,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 18.76174214922864,
-        "volatility_pctl": 20.0,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785728700000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
-      "id": "NEAR-Liquidity Sweep-1785714330911",
-      "symbol": "NEAR",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 1.7217296,
-      "sl": 1.7335318,
-      "tp1": 1.6959,
-      "tp2": 1.6938,
-      "r_realized": 2.188541119452309,
-      "mae_r": 0.31099286573690316,
-      "mfe_r": 2.459677009371127,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.746676906158879,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 16.46803168400779,
-        "volatility_pctl": 1.6666666666666667,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785728700000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "DOT-Liquidity Sweep-1785729642335",
       "symbol": "DOT",
       "engine": "Liquidity Sweep",
@@ -1538,5 +1484,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1787023829380
+  "last_run_ts": 1787024724111
 }
