@@ -1412,7 +1412,7 @@
       "mfe_r": 0.6970178013398526,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6096,
-      "_last_checked_t": 1787070600000
+      "_last_checked_t": 1787071500000
     },
     {
       "id": "PENDLE-Reversal-1787063436550",
@@ -1450,7 +1450,7 @@
       "mfe_r": 1.7699423905139926,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6097,
-      "_last_checked_t": 1787070600000
+      "_last_checked_t": 1787071500000
     },
     {
       "id": "ZEC-Reversal-1787064327272",
@@ -1480,7 +1480,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 9,
+      "pending_bars": 10,
       "status": "pending",
       "created_ts": 1787064327272,
       "filled_ts": null,
@@ -1488,9 +1488,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6099,
-      "_last_checked_t": 1787070600000
+      "_last_checked_t": 1787071500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787071526525
+  "last_run_ts": 1787072741186
 }
