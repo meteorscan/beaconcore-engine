@@ -398,7 +398,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 54,
+        "dispatched": 55,
         "filled": 45,
         "expired": 9
       },
@@ -430,7 +430,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 395,
+        "seen": 396,
         "rejected": 0
       }
     },
@@ -1537,7 +1537,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "AVAX-Liquidity Sweep-1787174123576",
+      "symbol": "AVAX",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 6.7828968,
+      "sl": 6.889870000000001,
+      "tp1": 6.5025,
+      "tp2": 6.4945,
+      "rr1": 2.6211873628160647,
+      "rr2": 2.6959724491741426,
+      "confidence": 0.8300914040966072,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 31.945664926013983,
+        "volatility_pctl": 100.0,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "1h",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1787174123576,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 6278,
+      "_last_checked_t": 1787172300000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1787173240191
+  "last_run_ts": 1787174123576
 }
