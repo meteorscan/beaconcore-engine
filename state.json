@@ -335,13 +335,19 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "LTC|trend|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
       "Liquidity Sweep|A+": {
-        "n": 16,
+        "n": 17,
         "wins": 5,
-        "sum_conf": 13.427427036032558
+        "sum_conf": 14.237953351986722
       },
       "Liquidity Sweep|A": {
         "n": 27,
@@ -386,14 +392,14 @@
     },
     "forensic_counts": {
       "structural_invalidation_too_tight": 8,
-      "genuine_variance": 25,
+      "genuine_variance": 26,
       "correct_read_poor_rr": 16,
       "confidence_miscalibration": 2
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 54,
-        "filled": 43,
+        "filled": 44,
         "expired": 9
       },
       "Reversal|pending": {
@@ -514,7 +520,7 @@
       },
       "LTC": {
         "direction": "bearish",
-        "until_ts": 1786098600000
+        "until_ts": 1787174100000
       },
       "SOL": {
         "direction": "bearish",
@@ -1475,6 +1481,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "LTC-Liquidity Sweep-1787157033758",
+      "symbol": "LTC",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 45.763232,
+      "sl": 46.1726,
+      "tp1": 44.7695,
+      "tp2": 44.768,
+      "r_realized": -1.0,
+      "mae_r": 1.062046862480696,
+      "mfe_r": 0.5330949170428565,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8105263159541642,
+      "grade": "A+",
+      "regime_at_entry": {
+        "trend_strength": 42.45311960670091,
+        "volatility_pctl": 98.33333333333333,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1787170500000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -1513,47 +1546,9 @@
       "mfe_r": 0.5835622274799993,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6239,
-      "_last_checked_t": 1787169600000
-    },
-    {
-      "id": "LTC-Liquidity Sweep-1787157033758",
-      "symbol": "LTC",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 45.763232,
-      "sl": 46.1726,
-      "tp1": 44.7695,
-      "tp2": 44.768,
-      "rr1": 2.427478454593422,
-      "rr2": 2.4311426393855893,
-      "confidence": 0.8105263159541642,
-      "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 31.79927637875074,
-        "volatility_pctl": 100.0,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1787157033758,
-      "filled_ts": 1787156100000,
-      "mae_r": 0.9814347970530095,
-      "mfe_r": 0.5330949170428565,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 6242,
-      "_last_checked_t": 1787169600000
+      "_last_checked_t": 1787170500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787170528386
+  "last_run_ts": 1787171434063
 }
