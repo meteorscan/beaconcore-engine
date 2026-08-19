@@ -430,7 +430,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 401,
+        "seen": 402,
         "rejected": 0
       }
     },
@@ -1573,7 +1573,7 @@
       "mfe_r": 0.7122980335261442,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6278,
-      "_last_checked_t": 1787181300000
+      "_last_checked_t": 1787182200000
     },
     {
       "id": "DOGE-Liquidity Sweep-1787177726363",
@@ -1610,7 +1610,7 @@
       "mfe_r": 0.5372339057670193,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6297,
-      "_last_checked_t": 1787181300000
+      "_last_checked_t": 1787182200000
     },
     {
       "id": "DOT-Liquidity Sweep-1787180436641",
@@ -1639,7 +1639,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 3,
+      "pending_bars": 4,
       "status": "pending",
       "created_ts": 1787180436641,
       "filled_ts": null,
@@ -1647,9 +1647,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6306,
-      "_last_checked_t": 1787181300000
+      "_last_checked_t": 1787182200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787182229932
+  "last_run_ts": 1787183124908
 }
