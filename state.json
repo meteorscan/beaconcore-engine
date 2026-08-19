@@ -423,7 +423,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 389,
+        "seen": 391,
         "rejected": 0
       }
     },
@@ -1482,10 +1482,10 @@
       "created_ts": 1787156122246,
       "filled_ts": 1787156100000,
       "mae_r": 0.9482319908748033,
-      "mfe_r": 0.6859699921031815,
+      "mfe_r": 0.8669386680705325,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6238,
-      "_last_checked_t": 1787158800000
+      "_last_checked_t": 1787159700000
     },
     {
       "id": "AAVE-Liquidity Sweep-1787156122246",
@@ -1519,10 +1519,10 @@
       "created_ts": 1787156122246,
       "filled_ts": 1787155200000,
       "mae_r": 0.3297480804619549,
-      "mfe_r": 0.44418608867496395,
+      "mfe_r": 0.5450354899241363,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6239,
-      "_last_checked_t": 1787158800000
+      "_last_checked_t": 1787159700000
     },
     {
       "id": "NEAR-Liquidity Sweep-1787157033758",
@@ -1559,7 +1559,7 @@
       "mfe_r": 0.6110897189064459,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6240,
-      "_last_checked_t": 1787158800000
+      "_last_checked_t": 1787159700000
     },
     {
       "id": "DOGE-Liquidity Sweep-1787157033758",
@@ -1588,7 +1588,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 4,
+      "pending_bars": 5,
       "status": "pending",
       "created_ts": 1787157033758,
       "filled_ts": null,
@@ -1596,7 +1596,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6241,
-      "_last_checked_t": 1787158800000
+      "_last_checked_t": 1787159700000
     },
     {
       "id": "LTC-Liquidity Sweep-1787157033758",
@@ -1631,12 +1631,12 @@
       "created_ts": 1787157033758,
       "filled_ts": 1787156100000,
       "mae_r": 0.3145531648785462,
-      "mfe_r": 0.3498856774344953,
+      "mfe_r": 0.5330949170428565,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6242,
-      "_last_checked_t": 1787158800000
+      "_last_checked_t": 1787159700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787159724433
+  "last_run_ts": 1787160629065
 }
