@@ -423,7 +423,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 378,
+        "seen": 382,
         "rejected": 0
       }
     },
@@ -1485,7 +1485,7 @@
       "mfe_r": 0.6859699921031815,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6238,
-      "_last_checked_t": 1787156100000
+      "_last_checked_t": 1787157000000
     },
     {
       "id": "AAVE-Liquidity Sweep-1787156122246",
@@ -1522,7 +1522,7 @@
       "mfe_r": 0.187530028192514,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6239,
-      "_last_checked_t": 1787156100000
+      "_last_checked_t": 1787157000000
     },
     {
       "id": "NEAR-Liquidity Sweep-1787157033758",
@@ -1550,16 +1550,16 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 0,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1787157033758,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1787156100000,
+      "mae_r": 0.8184443588756196,
+      "mfe_r": 0.6110897189064459,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6240,
-      "_last_checked_t": 1787155200000
+      "_last_checked_t": 1787157000000
     },
     {
       "id": "DOGE-Liquidity Sweep-1787157033758",
@@ -1588,7 +1588,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1787157033758,
       "filled_ts": null,
@@ -1596,7 +1596,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6241,
-      "_last_checked_t": 1787155200000
+      "_last_checked_t": 1787157000000
     },
     {
       "id": "LTC-Liquidity Sweep-1787157033758",
@@ -1625,18 +1625,18 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 0,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1787157033758,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1787156100000,
+      "mae_r": 0.28279689667974894,
+      "mfe_r": 0.3498856774344953,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6242,
-      "_last_checked_t": 1787155200000
+      "_last_checked_t": 1787157000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787157033758
+  "last_run_ts": 1787157930180
 }
