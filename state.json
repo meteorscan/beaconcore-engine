@@ -5,7 +5,7 @@
     "engine_weights": {},
     "combo_weights": {},
     "confidence_calibration": {
-      "Liquidity Sweep|A": -0.03
+      "Liquidity Sweep|A": -0.06
     },
     "filter_thresholds": {},
     "sl_buffer_percentile": {
@@ -221,10 +221,10 @@
         "sum_r": -1.0
       },
       "PENGU|range|intraday|Liquidity Sweep": {
-        "n": 1,
+        "n": 2,
         "wins": 1,
-        "losses": 0,
-        "sum_r": 2.2415622090883462
+        "losses": 1,
+        "sum_r": 1.2415622090883462
       },
       "AVAX|range|intraday|Reversal": {
         "n": 2,
@@ -336,9 +336,9 @@
         "sum_conf": 11.737195697375242
       },
       "Liquidity Sweep|A": {
-        "n": 26,
+        "n": 27,
         "wins": 12,
-        "sum_conf": 19.669461163284183
+        "sum_conf": 20.41822485739113
       },
       "Reversal|A": {
         "n": 11,
@@ -380,12 +380,12 @@
       "structural_invalidation_too_tight": 7,
       "genuine_variance": 24,
       "correct_read_poor_rr": 15,
-      "confidence_miscalibration": 1
+      "confidence_miscalibration": 2
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 49,
-        "filled": 40,
+        "filled": 41,
         "expired": 8
       },
       "Reversal|pending": {
@@ -465,7 +465,7 @@
       },
       "PENGU": {
         "direction": "bearish",
-        "until_ts": 1786293900000
+        "until_ts": 1787112900000
       },
       "ADA": {
         "direction": "bearish",
@@ -1412,6 +1412,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "PENGU-Liquidity Sweep-1787100324749",
+      "symbol": "PENGU",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.006094888,
+      "sl": 0.0061371310000000005,
+      "tp1": 0.006009,
+      "tp2": 0.006001,
+      "r_realized": -1.0,
+      "mae_r": 1.1389342612977151,
+      "mfe_r": 0.37610965130315505,
+      "forensic_category": "confidence_miscalibration",
+      "confidence": 0.7487636941069478,
+      "grade": "A",
+      "regime_at_entry": {
+        "trend_strength": 17.146255205593494,
+        "volatility_pctl": 48.333333333333336,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1787109300000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -1451,46 +1478,9 @@
       "mfe_r": 2.206495084973487,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6099,
-      "_last_checked_t": 1787108400000
-    },
-    {
-      "id": "PENGU-Liquidity Sweep-1787100324749",
-      "symbol": "PENGU",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.006094888,
-      "sl": 0.0061371310000000005,
-      "tp1": 0.006009,
-      "tp2": 0.006001,
-      "rr1": 2.033188930710376,
-      "rr2": 2.2225694197854695,
-      "confidence": 0.7487636941069478,
-      "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 16.3959825079915,
-        "volatility_pctl": 57.5,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 10,
-      "status": "active",
-      "created_ts": 1787100324749,
-      "filled_ts": 1787108400000,
-      "mae_r": 0.45242998840043486,
-      "mfe_r": 0.37610965130315505,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 6129,
-      "_last_checked_t": 1787108400000
+      "_last_checked_t": 1787109300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787109325006
+  "last_run_ts": 1787110231139
 }
