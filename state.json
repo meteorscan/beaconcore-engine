@@ -1485,7 +1485,7 @@
       "mfe_r": 0.9930683513205204,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6238,
-      "_last_checked_t": 1787162400000
+      "_last_checked_t": 1787163300000
     },
     {
       "id": "AAVE-Liquidity Sweep-1787156122246",
@@ -1522,7 +1522,7 @@
       "mfe_r": 0.5835622274799993,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6239,
-      "_last_checked_t": 1787162400000
+      "_last_checked_t": 1787163300000
     },
     {
       "id": "DOGE-Liquidity Sweep-1787157033758",
@@ -1551,7 +1551,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 8,
+      "pending_bars": 9,
       "status": "pending",
       "created_ts": 1787157033758,
       "filled_ts": null,
@@ -1559,7 +1559,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6241,
-      "_last_checked_t": 1787162400000
+      "_last_checked_t": 1787163300000
     },
     {
       "id": "LTC-Liquidity Sweep-1787157033758",
@@ -1597,9 +1597,9 @@
       "mfe_r": 0.5330949170428565,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6242,
-      "_last_checked_t": 1787162400000
+      "_last_checked_t": 1787163300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787163325411
+  "last_run_ts": 1787164235200
 }
