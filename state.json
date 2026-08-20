@@ -416,7 +416,7 @@
         "expired": 11
       },
       "Reversal|pending": {
-        "dispatched": 18,
+        "dispatched": 19,
         "filled": 14,
         "expired": 4
       },
@@ -443,7 +443,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 422,
+        "seen": 427,
         "rejected": 0
       }
     },
@@ -1673,7 +1673,7 @@
       "mfe_r": 1.0151069654263525,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6352,
-      "_last_checked_t": 1787229000000
+      "_last_checked_t": 1787229900000
     },
     {
       "id": "SUI-Liquidity Sweep-1787227237527",
@@ -1707,12 +1707,50 @@
       "created_ts": 1787227237527,
       "filled_ts": 1787227200000,
       "mae_r": 0.40906485080679217,
-      "mfe_r": 0.5697097234262727,
+      "mfe_r": 0.7357518386979547,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6361,
+      "_last_checked_t": 1787229900000
+    },
+    {
+      "id": "ONDO-Reversal-1787230836229",
+      "symbol": "ONDO",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.35466536000000004,
+      "sl": 0.358252,
+      "tp1": 0.34745,
+      "tp2": 0.34554,
+      "rr1": 2.0117324292374232,
+      "rr2": 2.544264269622848,
+      "confidence": 0.7003822534965958,
+      "grade": "A",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 42.85892493864618,
+        "volatility_pctl": 100.0,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1787230836229,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 6364,
       "_last_checked_t": 1787229000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787229923636
+  "last_run_ts": 1787230836229
 }
