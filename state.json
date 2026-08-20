@@ -449,7 +449,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 437,
+        "seen": 440,
         "rejected": 0
       }
     },
@@ -1647,11 +1647,11 @@
       "status": "active",
       "created_ts": 1787227237527,
       "filled_ts": 1787227200000,
-      "mae_r": 0.40906485080679217,
+      "mae_r": 0.4676165440868111,
       "mfe_r": 0.82314242568305,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6361,
-      "_last_checked_t": 1787233500000
+      "_last_checked_t": 1787234400000
     },
     {
       "id": "ONDO-Reversal-1787230836229",
@@ -1681,7 +1681,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 5,
+      "pending_bars": 6,
       "status": "pending",
       "created_ts": 1787230836229,
       "filled_ts": null,
@@ -1689,9 +1689,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6364,
-      "_last_checked_t": 1787233500000
+      "_last_checked_t": 1787234400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787234435781
+  "last_run_ts": 1787235325045
 }
