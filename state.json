@@ -443,7 +443,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 416,
+        "seen": 419,
         "rejected": 0
       }
     },
@@ -1670,10 +1670,10 @@
       "created_ts": 1787220042339,
       "filled_ts": 1787220000000,
       "mae_r": 0.642603670282869,
-      "mfe_r": 0.9441346446314695,
+      "mfe_r": 1.0151069654263525,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6352,
-      "_last_checked_t": 1787227200000
+      "_last_checked_t": 1787228100000
     },
     {
       "id": "SUI-Liquidity Sweep-1787227237527",
@@ -1710,9 +1710,9 @@
       "mfe_r": 0.45435414860594814,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6361,
-      "_last_checked_t": 1787227200000
+      "_last_checked_t": 1787228100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787228124584
+  "last_run_ts": 1787229033561
 }
