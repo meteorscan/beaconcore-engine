@@ -1608,10 +1608,10 @@
       "created_ts": 1787174123576,
       "filled_ts": 1787173200000,
       "mae_r": 0.9217561033978512,
-      "mfe_r": 0.7122980335261442,
+      "mfe_r": 0.7609083396588893,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6278,
-      "_last_checked_t": 1787193900000
+      "_last_checked_t": 1787194800000
     },
     {
       "id": "APT-Reversal-1787191236061",
@@ -1646,12 +1646,12 @@
       "created_ts": 1787191236061,
       "filled_ts": 1787190300000,
       "mae_r": 0.6243824469630995,
-      "mfe_r": 0.4290903807032816,
+      "mfe_r": 1.4462365591397714,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6317,
-      "_last_checked_t": 1787193900000
+      "_last_checked_t": 1787194800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787194838989
+  "last_run_ts": 1787195723529
 }
