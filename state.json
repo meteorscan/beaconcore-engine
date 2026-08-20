@@ -461,7 +461,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 441,
+        "seen": 442,
         "rejected": 0
       }
     },
@@ -1629,5 +1629,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1787242523993
+  "last_run_ts": 1787243432975
 }
