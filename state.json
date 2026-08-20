@@ -1611,7 +1611,7 @@
       "mfe_r": 0.7609083396588893,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6278,
-      "_last_checked_t": 1787206500000
+      "_last_checked_t": 1787207400000
     },
     {
       "id": "APT-Reversal-1787191236061",
@@ -1649,9 +1649,9 @@
       "mfe_r": 1.4462365591397714,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6317,
-      "_last_checked_t": 1787206500000
+      "_last_checked_t": 1787207400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787207429466
+  "last_run_ts": 1787208324811
 }
