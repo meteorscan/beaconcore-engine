@@ -461,7 +461,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 445,
+        "seen": 446,
         "rejected": 0
       }
     },
@@ -573,33 +573,6 @@
     }
   },
   "tier2_trades": [
-    {
-      "id": "PENDLE-Liquidity Sweep-1785942045246",
-      "symbol": "PENDLE",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 1.392356,
-      "sl": 1.4090076,
-      "tp1": 1.3561,
-      "tp2": 1.3538,
-      "r_realized": -1.0,
-      "mae_r": 1.1496793100963232,
-      "mfe_r": 1.1323836748420495,
-      "forensic_category": "correct_read_poor_rr",
-      "confidence": 0.7903399770187426,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 27.823132433126034,
-        "volatility_pctl": 100.0,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785951000000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
     {
       "id": "AVAX-Reversal-1785981645141",
       "symbol": "AVAX",
@@ -1663,9 +1636,9 @@
       "mfe_r": 0.07374061581983497,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6389,
-      "_last_checked_t": 1787245200000
+      "_last_checked_t": 1787246100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787246124347
+  "last_run_ts": 1787247032774
 }
