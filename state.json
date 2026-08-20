@@ -354,13 +354,19 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "BCH|trend|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
       "Liquidity Sweep|A+": {
-        "n": 18,
+        "n": 19,
         "wins": 5,
-        "sum_conf": 15.068044756083328
+        "sum_conf": 15.868380495434211
       },
       "Liquidity Sweep|A": {
         "n": 29,
@@ -412,7 +418,7 @@
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 60,
-        "filled": 47,
+        "filled": 48,
         "expired": 11
       },
       "Reversal|pending": {
@@ -443,7 +449,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 434,
+        "seen": 437,
         "rejected": 0
       }
     },
@@ -514,7 +520,7 @@
       },
       "BCH": {
         "direction": "bearish",
-        "until_ts": 1785783600000
+        "until_ts": 1787237100000
       },
       "XRP": {
         "direction": "bearish",
@@ -1580,47 +1586,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "BCH-Liquidity Sweep-1787220042339",
       "symbol": "BCH",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 216.56240000000003,
       "sl": 218.53500000000003,
       "tp1": 211.44,
       "tp2": 210.95,
-      "rr1": 2.596775828855332,
-      "rr2": 2.8451789516374513,
+      "r_realized": -1.0,
+      "mae_r": 1.3624657812024612,
+      "mfe_r": 1.0151069654263525,
+      "forensic_category": "correct_read_poor_rr",
       "confidence": 0.800335739350884,
       "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 45.82915899328433,
+        "trend_strength": 45.111924363396675,
         "volatility_pctl": 100.0,
-        "macro_bias": "neutral"
+        "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1787220042339,
-      "filled_ts": 1787220000000,
-      "mae_r": 0.7541316029605527,
-      "mfe_r": 1.0151069654263525,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 6352,
-      "_last_checked_t": 1787232600000
-    },
+      "resolved_ts": 1787233500000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "SUI-Liquidity Sweep-1787227237527",
       "symbol": "SUI",
@@ -1656,7 +1651,7 @@
       "mfe_r": 0.82314242568305,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6361,
-      "_last_checked_t": 1787232600000
+      "_last_checked_t": 1787233500000
     },
     {
       "id": "ONDO-Reversal-1787230836229",
@@ -1686,7 +1681,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 4,
+      "pending_bars": 5,
       "status": "pending",
       "created_ts": 1787230836229,
       "filled_ts": null,
@@ -1694,9 +1689,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6364,
-      "_last_checked_t": 1787232600000
+      "_last_checked_t": 1787233500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787233526150
+  "last_run_ts": 1787234435781
 }
