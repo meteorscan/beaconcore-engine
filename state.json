@@ -200,10 +200,10 @@
         "sum_r": -1.0
       },
       "AVAX|trend|intraday|Liquidity Sweep": {
-        "n": 2,
+        "n": 3,
         "wins": 1,
-        "losses": 1,
-        "sum_r": 1.9609676295320742
+        "losses": 2,
+        "sum_r": 0.9609676295320742
       },
       "DOT|trend|intraday|Mean Reversion": {
         "n": 1,
@@ -352,9 +352,9 @@
     },
     "calibration_buckets": {
       "Liquidity Sweep|A+": {
-        "n": 17,
+        "n": 18,
         "wins": 5,
-        "sum_conf": 14.237953351986722
+        "sum_conf": 15.068044756083328
       },
       "Liquidity Sweep|A": {
         "n": 29,
@@ -399,14 +399,14 @@
     },
     "forensic_counts": {
       "structural_invalidation_too_tight": 9,
-      "genuine_variance": 26,
+      "genuine_variance": 27,
       "correct_read_poor_rr": 16,
       "confidence_miscalibration": 3
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 57,
-        "filled": 46,
+        "filled": 47,
         "expired": 10
       },
       "Reversal|pending": {
@@ -442,9 +442,9 @@
       }
     },
     "circuit_breaker": {
-      "tripped": false,
-      "tripped_ts": 1785951932592,
-      "reason": null
+      "tripped": true,
+      "tripped_ts": 1787213723190,
+      "reason": "win_rate=0.27 profit_factor=0.84 vs baseline wr=0.42 pf=1.35"
     },
     "governor": {
       "last_adjust_ts": 0
@@ -516,7 +516,7 @@
       },
       "AVAX": {
         "direction": "bearish",
-        "until_ts": 1786540500000
+        "until_ts": 1787216400000
       },
       "APT": {
         "direction": "bearish",
@@ -1574,46 +1574,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "AVAX-Liquidity Sweep-1787174123576",
       "symbol": "AVAX",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 6.7828968,
       "sl": 6.889870000000001,
       "tp1": 6.5025,
       "tp2": 6.4945,
-      "rr1": 2.6211873628160647,
-      "rr2": 2.6959724491741426,
+      "r_realized": -1.0,
+      "mae_r": 1.1900476007074516,
+      "mfe_r": 0.7609083396588893,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8300914040966072,
       "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 31.945664926013983,
-        "volatility_pctl": 100.0,
+        "trend_strength": 47.95007097369921,
+        "volatility_pctl": 90.83333333333333,
         "macro_bias": "neutral"
       },
-      "sl_anchor_tf": "1h",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1787174123576,
-      "filled_ts": 1787173200000,
-      "mae_r": 0.9217561033978512,
-      "mfe_r": 0.7609083396588893,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 6278,
-      "_last_checked_t": 1787211900000
-    },
+      "resolved_ts": 1787212800000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "APT-Reversal-1787191236061",
       "symbol": "APT",
@@ -1646,13 +1636,13 @@
       "status": "active",
       "created_ts": 1787191236061,
       "filled_ts": 1787190300000,
-      "mae_r": 0.6243824469630995,
+      "mae_r": 0.9331589654170438,
       "mfe_r": 1.4462365591397714,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6317,
-      "_last_checked_t": 1787211900000
+      "_last_checked_t": 1787212800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787212840230
+  "last_run_ts": 1787213722611
 }
