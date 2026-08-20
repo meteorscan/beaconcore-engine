@@ -443,7 +443,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 430,
+        "seen": 433,
         "rejected": 0
       }
     },
@@ -555,60 +555,6 @@
     }
   },
   "tier2_trades": [
-    {
-      "id": "AVAX-Reversal-1785882636797",
-      "symbol": "AVAX",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 6.7080416,
-      "sl": 6.765759,
-      "tp1": 6.561066666666666,
-      "tp2": 6.5609,
-      "r_realized": 2.546457971657286,
-      "mae_r": 0.20892139978586532,
-      "mfe_r": 2.987688288107201,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.7930594555014555,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 16.16520889766938,
-        "volatility_pctl": 20.0,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785936600000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
-      "id": "PENDLE-Reversal-1785928529197",
-      "symbol": "PENDLE",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 1.3868328,
-      "sl": 1.3966953,
-      "tp1": 1.3662,
-      "tp2": 1.366,
-      "r_realized": 2.092045627376451,
-      "mae_r": 0.5442027883396785,
-      "mfe_r": 3.1161267427123307,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.7667484066161059,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 30.27995992505968,
-        "volatility_pctl": 88.33333333333333,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1785936600000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
     {
       "id": "APT-Liquidity Sweep-1785937527972",
       "symbol": "APT",
@@ -1669,11 +1615,11 @@
       "status": "active",
       "created_ts": 1787220042339,
       "filled_ts": 1787220000000,
-      "mae_r": 0.642603670282869,
+      "mae_r": 0.7541316029605527,
       "mfe_r": 1.0151069654263525,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6352,
-      "_last_checked_t": 1787230800000
+      "_last_checked_t": 1787231700000
     },
     {
       "id": "SUI-Liquidity Sweep-1787227237527",
@@ -1710,7 +1656,7 @@
       "mfe_r": 0.7357518386979547,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6361,
-      "_last_checked_t": 1787230800000
+      "_last_checked_t": 1787231700000
     },
     {
       "id": "ONDO-Reversal-1787230836229",
@@ -1740,7 +1686,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 2,
+      "pending_bars": 3,
       "status": "pending",
       "created_ts": 1787230836229,
       "filled_ts": null,
@@ -1748,9 +1694,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6364,
-      "_last_checked_t": 1787230800000
+      "_last_checked_t": 1787231700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787231726033
+  "last_run_ts": 1787232634189
 }
