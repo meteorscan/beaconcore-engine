@@ -443,7 +443,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 433,
+        "seen": 434,
         "rejected": 0
       }
     },
@@ -1619,7 +1619,7 @@
       "mfe_r": 1.0151069654263525,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6352,
-      "_last_checked_t": 1787231700000
+      "_last_checked_t": 1787232600000
     },
     {
       "id": "SUI-Liquidity Sweep-1787227237527",
@@ -1653,10 +1653,10 @@
       "created_ts": 1787227237527,
       "filled_ts": 1787227200000,
       "mae_r": 0.40906485080679217,
-      "mfe_r": 0.7357518386979547,
+      "mfe_r": 0.82314242568305,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6361,
-      "_last_checked_t": 1787231700000
+      "_last_checked_t": 1787232600000
     },
     {
       "id": "ONDO-Reversal-1787230836229",
@@ -1686,7 +1686,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 3,
+      "pending_bars": 4,
       "status": "pending",
       "created_ts": 1787230836229,
       "filled_ts": null,
@@ -1694,9 +1694,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6364,
-      "_last_checked_t": 1787231700000
+      "_last_checked_t": 1787232600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787232634189
+  "last_run_ts": 1787233526150
 }
