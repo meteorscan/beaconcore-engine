@@ -38,10 +38,10 @@
         "sum_r": -2.0
       },
       "APT|trend|intraday|Liquidity Sweep": {
-        "n": 3,
+        "n": 4,
         "wins": 1,
-        "losses": 2,
-        "sum_r": -0.021521906225985266
+        "losses": 3,
+        "sum_r": -1.0215219062259853
       },
       "TAO|trend|intraday|Reversal": {
         "n": 2,
@@ -381,9 +381,9 @@
         "sum_conf": 15.868380495434211
       },
       "Liquidity Sweep|A": {
-        "n": 32,
+        "n": 33,
         "wins": 12,
-        "sum_conf": 24.23379175417004
+        "sum_conf": 24.957550175261765
       },
       "Reversal|A": {
         "n": 12,
@@ -430,7 +430,7 @@
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 63,
-        "filled": 51,
+        "filled": 52,
         "expired": 11
       },
       "Reversal|pending": {
@@ -461,7 +461,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 449,
+        "seen": 450,
         "rejected": 0
       }
     },
@@ -545,7 +545,7 @@
       },
       "APT": {
         "direction": "bearish",
-        "until_ts": 1787294700000
+        "until_ts": 1787306400000
       },
       "PENDLE": {
         "direction": "bearish",
@@ -1653,47 +1653,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "APT-Liquidity Sweep-1787303724005",
       "symbol": "APT",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.6108288,
       "sl": 0.6173000000000001,
       "tp1": 0.5976,
       "tp2": 0.5949,
-      "rr1": 2.044257633823662,
-      "rr2": 2.4614909135863003,
+      "r_realized": -1.0,
+      "mae_r": 1.5872172085548033,
+      "mfe_r": 1.395228087526236,
+      "forensic_category": "correct_read_poor_rr",
       "confidence": 0.7237584210917252,
       "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
         "trend_strength": 40.37167253592067,
         "volatility_pctl": 100.0,
-        "macro_bias": "neutral"
+        "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "1h",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
-      "created_ts": 1787303724005,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 6460,
-      "_last_checked_t": 1787301900000
+      "resolved_ts": 1787302800000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1787303724005
+  "last_run_ts": 1787304629706
 }
