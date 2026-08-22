@@ -576,33 +576,6 @@
   },
   "tier2_trades": [
     {
-      "id": "TAO-Mean Reversion-1786104044876",
-      "symbol": "TAO",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 193.9351507545636,
-      "sl": 195.3952,
-      "tp1": 191.01,
-      "tp2": 190.98,
-      "r_realized": 2.003460337866444,
-      "mae_r": 0.4622099203473826,
-      "mfe_r": 2.1061965986253375,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.7783618508075295,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 13.634077080130126,
-        "volatility_pctl": 56.666666666666664,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1786124700000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "PENDLE-Range Trading-1786143644691",
       "symbol": "PENDLE",
       "engine": "Range Trading",
@@ -1604,5 +1577,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1787419827616
+  "last_run_ts": 1787420724362
 }
