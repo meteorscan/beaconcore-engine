@@ -439,7 +439,7 @@
         "expired": 4
       },
       "Mean Reversion|pending": {
-        "dispatched": 24,
+        "dispatched": 25,
         "filled": 15,
         "expired": 9
       },
@@ -461,7 +461,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 453,
+        "seen": 454,
         "rejected": 0
       }
     },
@@ -1523,7 +1523,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "HYPE-Mean Reversion-1787562035123",
+      "symbol": "HYPE",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 78.21165445610683,
+      "sl": 77.142,
+      "tp1": 80.376,
+      "tp2": 80.518,
+      "rr1": 2.02340627997815,
+      "rr2": 2.1561594314181263,
+      "confidence": 0.8445665231107082,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 16.107657452118197,
+        "volatility_pctl": 26.666666666666668,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1787562035123,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 6638,
+      "_last_checked_t": 1787560200000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1787561123640
+  "last_run_ts": 1787562035123
 }
