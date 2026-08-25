@@ -1509,12 +1509,12 @@
       "created_ts": 1787604326010,
       "filled_ts": 1787603400000,
       "mae_r": 0.045191065420293254,
-      "mfe_r": 2.0361127807601513,
+      "mfe_r": 2.149245894390707,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6653,
-      "_last_checked_t": 1787621400000
+      "_last_checked_t": 1787622300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787622323476
+  "last_run_ts": 1787623235290
 }
