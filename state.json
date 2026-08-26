@@ -462,7 +462,7 @@
         "expired": 9
       },
       "Momentum|pending": {
-        "dispatched": 9,
+        "dispatched": 10,
         "filled": 9,
         "expired": 0
       },
@@ -479,7 +479,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 464,
+        "seen": 465,
         "rejected": 0
       }
     },
@@ -1515,7 +1515,46 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "APT-Momentum-1787715032235",
+      "symbol": "APT",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.5692342930945247,
+      "sl": 0.573972,
+      "tp1": 0.5597,
+      "tp2": 0.555,
+      "rr1": 2.012427802046156,
+      "rr2": 3.004468908381403,
+      "confidence": 0.7917405697474446,
+      "grade": "A",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 41.812178564068454,
+        "volatility_pctl": 5.833333333333333,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1787715032235,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 6687,
+      "_last_checked_t": 1787713200000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1787714125884
+  "last_run_ts": 1787715032235
 }
