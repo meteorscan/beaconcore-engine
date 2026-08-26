@@ -1553,7 +1553,7 @@
       "mfe_r": 1.5269608776693084,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6687,
-      "_last_checked_t": 1787733000000
+      "_last_checked_t": 1787733900000
     },
     {
       "id": "HYPE-Momentum-1787728523728",
@@ -1588,12 +1588,12 @@
       "created_ts": 1787728523728,
       "filled_ts": 1787727600000,
       "mae_r": 0.5005490308258039,
-      "mfe_r": 1.207896503175362,
+      "mfe_r": 1.5445834045832418,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6692,
-      "_last_checked_t": 1787733000000
+      "_last_checked_t": 1787733900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787733926756
+  "last_run_ts": 1787734838017
 }
