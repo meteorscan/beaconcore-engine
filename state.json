@@ -1553,7 +1553,7 @@
       "mfe_r": 1.5269608776693084,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6687,
-      "_last_checked_t": 1787732100000
+      "_last_checked_t": 1787733000000
     },
     {
       "id": "HYPE-Momentum-1787728523728",
@@ -1591,9 +1591,9 @@
       "mfe_r": 1.207896503175362,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6692,
-      "_last_checked_t": 1787732100000
+      "_last_checked_t": 1787733000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787733033772
+  "last_run_ts": 1787733926756
 }
