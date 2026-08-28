@@ -1571,7 +1571,7 @@
       "mfe_r": 1.9948540428829653,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6721,
-      "_last_checked_t": 1787947200000
+      "_last_checked_t": 1787948100000
     },
     {
       "id": "HYPE-Mean Reversion-1787944526093",
@@ -1600,7 +1600,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 5,
+      "pending_bars": 6,
       "status": "pending",
       "created_ts": 1787944526093,
       "filled_ts": null,
@@ -1608,9 +1608,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6730,
-      "_last_checked_t": 1787947200000
+      "_last_checked_t": 1787948100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787948122377
+  "last_run_ts": 1787949030377
 }
