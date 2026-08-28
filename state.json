@@ -1598,7 +1598,7 @@
       "mfe_r": 0.36607594936708737,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6721,
-      "_last_checked_t": 1787909400000
+      "_last_checked_t": 1787910300000
     },
     {
       "id": "APT-Reversal-1787902231859",
@@ -1628,7 +1628,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 10,
+      "pending_bars": 11,
       "status": "pending",
       "created_ts": 1787902231859,
       "filled_ts": null,
@@ -1636,9 +1636,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6722,
-      "_last_checked_t": 1787909400000
+      "_last_checked_t": 1787910300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787910327017
+  "last_run_ts": 1787911250597
 }
