@@ -616,33 +616,6 @@
   },
   "tier2_trades": [
     {
-      "id": "TAO-Mean Reversion-1786672848823",
-      "symbol": "TAO",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 204.7364457696094,
-      "sl": 206.13592999999997,
-      "tp1": 201.815,
-      "tp2": 201.8,
-      "r_realized": 2.0875160335276095,
-      "mae_r": 0.5884698180277215,
-      "mfe_r": 2.3911993411140036,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.7739087708122173,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 12.949153196021054,
-        "volatility_pctl": 23.333333333333332,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1786682700000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "ZEC-Mean Reversion-1786642239685",
       "symbol": "ZEC",
       "engine": "Mean Reversion",
@@ -1598,9 +1571,9 @@
       "mfe_r": 1.9948540428829653,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6721,
-      "_last_checked_t": 1787976900000
+      "_last_checked_t": 1787977800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1787977830082
+  "last_run_ts": 1787978726444
 }
