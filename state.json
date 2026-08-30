@@ -619,33 +619,6 @@
   },
   "tier2_trades": [
     {
-      "id": "AVAX-Liquidity Sweep-1786765526529",
-      "symbol": "AVAX",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 6.7615416,
-      "sl": 6.8839,
-      "tp1": 6.4773,
-      "tp2": 6.4771,
-      "r_realized": 2.323024818892709,
-      "mae_r": 0.26445589350628806,
-      "mfe_r": 2.9833799722781755,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.8118618327565088,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 17.365885855176042,
-        "volatility_pctl": 27.5,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1786833000000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "ZEC-Liquidity Sweep-1786790724527",
       "symbol": "ZEC",
       "engine": "Liquidity Sweep",
@@ -1566,5 +1539,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1788128121477
+  "last_run_ts": 1788129029944
 }
