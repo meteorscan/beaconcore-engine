@@ -28,7 +28,8 @@
       "AVAX": 4,
       "ZEC": 5,
       "TAO": 4,
-      "HYPE": 5
+      "HYPE": 5,
+      "DOT": 4
     },
     "regime_fit_discount": {},
     "segment_stats": {
@@ -409,6 +410,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "DOT|range|intraday|Reversal": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -443,9 +450,9 @@
         "sum_conf": 1.5750249291171055
       },
       "Reversal|A+": {
-        "n": 6,
+        "n": 7,
         "wins": 3,
-        "sum_conf": 5.057417035432068
+        "sum_conf": 5.902261925251754
       },
       "Range Trading|A+": {
         "n": 5,
@@ -461,7 +468,7 @@
     "forensic_counts": {
       "structural_invalidation_too_tight": 9,
       "genuine_variance": 27,
-      "correct_read_poor_rr": 18,
+      "correct_read_poor_rr": 19,
       "confidence_miscalibration": 3
     },
     "fill_stats": {
@@ -472,8 +479,8 @@
       },
       "Reversal|pending": {
         "dispatched": 27,
-        "filled": 19,
-        "expired": 6
+        "filled": 20,
+        "expired": 7
       },
       "Mean Reversion|pending": {
         "dispatched": 27,
@@ -503,9 +510,9 @@
       }
     },
     "circuit_breaker": {
-      "tripped": false,
-      "tripped_ts": 1787213723190,
-      "reason": null
+      "tripped": true,
+      "tripped_ts": 1788199241707,
+      "reason": "win_rate=0.27 profit_factor=0.86 vs baseline wr=0.42 pf=1.35"
     },
     "governor": {
       "last_adjust_ts": 0
@@ -576,7 +583,7 @@
       },
       "DOT": {
         "direction": "bearish",
-        "until_ts": 1787097600000
+        "until_ts": 1788201900000
       },
       "BCH": {
         "direction": "bearish",
@@ -1542,86 +1549,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "DOT-Reversal-1788178528590",
       "symbol": "DOT",
       "engine": "Reversal",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.8309392,
       "sl": 0.83698615,
       "tp1": 0.81727,
       "tp2": 0.81161,
-      "rr1": 2.260511497531805,
-      "rr2": 3.196520559951703,
+      "r_realized": -1.0,
+      "mae_r": 1.536443992425942,
+      "mfe_r": 1.4270334631508463,
+      "forensic_category": "correct_read_poor_rr",
       "confidence": 0.8448448898196854,
       "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 22.529150467137498,
-        "volatility_pctl": 45.833333333333336,
-        "macro_bias": "neutral"
+        "trend_strength": 19.426749140562954,
+        "volatility_pctl": 57.5,
+        "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 10,
-      "status": "active",
-      "created_ts": 1788178528590,
-      "filled_ts": 1788186600000,
-      "mae_r": 0.5442082372105013,
-      "mfe_r": 1.4270334631508463,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 6763,
-      "_last_checked_t": 1788197400000
-    },
-    {
-      "id": "ZEC-Reversal-1788189324703",
-      "symbol": "ZEC",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bullish",
+      "resolved_ts": 1788198300000,
+      "result": "loss",
       "style": "intraday",
       "entry_kind": "pending",
-      "entry": 823.10176,
-      "sl": 814.0336000000001,
-      "tp1": 843.0,
-      "tp2": 843.64,
-      "rr1": 2.194297409838397,
-      "rr2": 2.2648740207495406,
-      "confidence": 0.8244402940867215,
-      "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 22.220832720829357,
-        "volatility_pctl": 84.16666666666667,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1788189324703,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 6765,
-      "_last_checked_t": 1788197400000
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1788198325532
+  "last_run_ts": 1788199240808
 }
