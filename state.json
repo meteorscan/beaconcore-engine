@@ -633,33 +633,6 @@
   },
   "tier2_trades": [
     {
-      "id": "NEAR-Mean Reversion-1786942838318",
-      "symbol": "NEAR",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 1.63720572711456,
-      "sl": 1.6489473,
-      "tp1": 1.607,
-      "tp2": 1.6054,
-      "r_realized": -1.0,
-      "mae_r": 1.0811390440867947,
-      "mfe_r": 0.8606791622518849,
-      "forensic_category": "correct_read_poor_rr",
-      "confidence": 0.8913364142276491,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 21.023623688080175,
-        "volatility_pctl": 29.166666666666668,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1786948200000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "AAVE-Mean Reversion-1786986038475",
       "symbol": "AAVE",
       "engine": "Mean Reversion",
@@ -1580,5 +1553,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1788243331048
+  "last_run_ts": 1788244231316
 }
