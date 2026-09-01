@@ -40,10 +40,10 @@
         "sum_r": -2.0
       },
       "APT|trend|intraday|Liquidity Sweep": {
-        "n": 5,
-        "wins": 1,
+        "n": 6,
+        "wins": 2,
         "losses": 4,
-        "sum_r": -2.0215219062259853
+        "sum_r": 0.3406407454675566
       },
       "TAO|trend|intraday|Reversal": {
         "n": 2,
@@ -420,9 +420,9 @@
     },
     "calibration_buckets": {
       "Liquidity Sweep|A+": {
-        "n": 21,
-        "wins": 6,
-        "sum_conf": 17.57929726254891
+        "n": 22,
+        "wins": 7,
+        "sum_conf": 18.390965112178684
       },
       "Liquidity Sweep|A": {
         "n": 36,
@@ -474,7 +474,7 @@
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 70,
-        "filled": 57,
+        "filled": 58,
         "expired": 11
       },
       "Reversal|pending": {
@@ -1550,6 +1550,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "APT-Liquidity Sweep-1788289239205",
+      "symbol": "APT",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.5611664000000001,
+      "sl": 0.5700000000000001,
+      "tp1": 0.5403,
+      "tp2": 0.5402,
+      "r_realized": 2.362162651693542,
+      "mae_r": 0.026444484694795444,
+      "mfe_r": 2.407444303568197,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8116678496297758,
+      "grade": "A+",
+      "regime_at_entry": {
+        "trend_strength": 28.17946429788807,
+        "volatility_pctl": 98.33333333333333,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1788301800000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -1589,44 +1616,7 @@
       "mfe_r": 1.9076898814582366,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6784,
-      "_last_checked_t": 1788300900000
-    },
-    {
-      "id": "APT-Liquidity Sweep-1788289239205",
-      "symbol": "APT",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.5611664000000001,
-      "sl": 0.5700000000000001,
-      "tp1": 0.5403,
-      "tp2": 0.5402,
-      "rr1": 2.362162651693542,
-      "rr2": 2.3734830646622056,
-      "confidence": 0.8116678496297758,
-      "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 30.028729440999253,
-        "volatility_pctl": 100.0,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 2,
-      "status": "active",
-      "created_ts": 1788289239205,
-      "filled_ts": 1788290100000,
-      "mae_r": 0.026444484694795444,
-      "mfe_r": 2.169715631226231,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 6785,
-      "_last_checked_t": 1788300900000
+      "_last_checked_t": 1788301800000
     },
     {
       "id": "ZEC-Mean Reversion-1788300038186",
@@ -1660,12 +1650,12 @@
       "created_ts": 1788300038186,
       "filled_ts": 1788299100000,
       "mae_r": 0.03422001304878511,
-      "mfe_r": 0.7639452654232844,
+      "mfe_r": 0.9136012551367987,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6787,
-      "_last_checked_t": 1788300900000
+      "_last_checked_t": 1788301800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788301832904
+  "last_run_ts": 1788302722807
 }
