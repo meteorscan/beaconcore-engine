@@ -505,7 +505,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 514,
+        "seen": 515,
         "rejected": 0
       }
     },
@@ -1607,16 +1607,16 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 2,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1788289239205,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1788290100000,
+      "mae_r": 0.5487878602030889,
+      "mfe_r": 0.8431796875684454,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6784,
-      "_last_checked_t": 1788289200000
+      "_last_checked_t": 1788290100000
     },
     {
       "id": "APT-Liquidity Sweep-1788289239205",
@@ -1644,18 +1644,18 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 2,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1788289239205,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1788290100000,
+      "mae_r": 0.026444484694795444,
+      "mfe_r": 1.3772867234196733,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6785,
-      "_last_checked_t": 1788289200000
+      "_last_checked_t": 1788290100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788290121781
+  "last_run_ts": 1788291031884
 }
