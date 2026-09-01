@@ -633,33 +633,6 @@
   },
   "tier2_trades": [
     {
-      "id": "ONDO-Liquidity Sweep-1786932037765",
-      "symbol": "ONDO",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.33347784,
-      "sl": 0.33582549,
-      "tp1": 0.3286,
-      "tp2": 0.32799,
-      "r_realized": -1.0,
-      "mae_r": 1.0956318020147864,
-      "mfe_r": 0.3441058079356,
-      "forensic_category": "confidence_miscalibration",
-      "confidence": 0.7552262183332584,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 24.104868858110297,
-        "volatility_pctl": 40.0,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1786943700000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "NEAR-Mean Reversion-1786942838318",
       "symbol": "NEAR",
       "engine": "Mean Reversion",
@@ -1607,5 +1580,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1788238930396
+  "last_run_ts": 1788241523785
 }
