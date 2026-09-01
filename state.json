@@ -1589,7 +1589,7 @@
       "mfe_r": 1.9076898814582366,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6784,
-      "_last_checked_t": 1788300000000
+      "_last_checked_t": 1788300900000
     },
     {
       "id": "APT-Liquidity Sweep-1788289239205",
@@ -1626,7 +1626,7 @@
       "mfe_r": 2.169715631226231,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6785,
-      "_last_checked_t": 1788300000000
+      "_last_checked_t": 1788300900000
     },
     {
       "id": "ZEC-Mean Reversion-1788300038186",
@@ -1660,12 +1660,12 @@
       "created_ts": 1788300038186,
       "filled_ts": 1788299100000,
       "mae_r": 0.03422001304878511,
-      "mfe_r": 0.6934177300410399,
+      "mfe_r": 0.7639452654232844,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6787,
-      "_last_checked_t": 1788300000000
+      "_last_checked_t": 1788300900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788300924982
+  "last_run_ts": 1788301832904
 }
