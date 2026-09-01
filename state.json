@@ -1616,7 +1616,7 @@
       "mfe_r": 1.9076898814582366,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6784,
-      "_last_checked_t": 1788301800000
+      "_last_checked_t": 1788302700000
     },
     {
       "id": "ZEC-Mean Reversion-1788300038186",
@@ -1650,12 +1650,12 @@
       "created_ts": 1788300038186,
       "filled_ts": 1788299100000,
       "mae_r": 0.03422001304878511,
-      "mfe_r": 0.9136012551367987,
+      "mfe_r": 1.4313765758697576,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6787,
-      "_last_checked_t": 1788301800000
+      "_last_checked_t": 1788302700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788302722807
+  "last_run_ts": 1788303644657
 }
