@@ -634,33 +634,6 @@
   },
   "tier2_trades": [
     {
-      "id": "AAVE-Mean Reversion-1786986038475",
-      "symbol": "AAVE",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 87.90635324582122,
-      "sl": 88.5564,
-      "tp1": 86.4315,
-      "tp2": 86.416,
-      "r_realized": -1.0,
-      "mae_r": 1.6547221369294853,
-      "mfe_r": 0.4266666113449131,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.8202877108642094,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 22.958366963873438,
-        "volatility_pctl": 58.333333333333336,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1787003100000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "DOT-Liquidity Sweep-1787073321246",
       "symbol": "DOT",
       "engine": "Liquidity Sweep",
@@ -1616,7 +1589,7 @@
       "mfe_r": 1.9076898814582366,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6784,
-      "_last_checked_t": 1788297300000
+      "_last_checked_t": 1788298200000
     },
     {
       "id": "APT-Liquidity Sweep-1788289239205",
@@ -1653,9 +1626,9 @@
       "mfe_r": 2.169715631226231,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6785,
-      "_last_checked_t": 1788297300000
+      "_last_checked_t": 1788298200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788298233265
+  "last_run_ts": 1788299128355
 }
