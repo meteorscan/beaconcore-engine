@@ -1697,7 +1697,7 @@
       "mfe_r": 1.476224929817976,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6795,
-      "_last_checked_t": 1788358500000
+      "_last_checked_t": 1788359400000
     },
     {
       "id": "HYPE-Liquidity Sweep-1788342328714",
@@ -1735,7 +1735,7 @@
       "mfe_r": 0.9308830772614975,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6805,
-      "_last_checked_t": 1788358500000
+      "_last_checked_t": 1788359400000
     },
     {
       "id": "ZEC-Reversal-1788357640746",
@@ -1765,7 +1765,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 3,
+      "pending_bars": 4,
       "status": "pending",
       "created_ts": 1788357640746,
       "filled_ts": null,
@@ -1773,9 +1773,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6811,
-      "_last_checked_t": 1788358500000
+      "_last_checked_t": 1788359400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788359439690
+  "last_run_ts": 1788360327470
 }
