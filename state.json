@@ -511,7 +511,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 567,
+        "seen": 568,
         "rejected": 0
       }
     },
@@ -640,33 +640,6 @@
     }
   },
   "tier2_trades": [
-    {
-      "id": "AAVE-Liquidity Sweep-1787063436550",
-      "symbol": "AAVE",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 89.635512,
-      "sl": 90.4368,
-      "tp1": 87.56,
-      "tp2": 87.535,
-      "r_realized": 2.59021974620861,
-      "mae_r": 0.4074539990615083,
-      "mfe_r": 3.1093838919339882,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.8421773000499309,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 24.871591635744853,
-        "volatility_pctl": 57.5,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1787092200000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
     {
       "id": "DOT-Liquidity Sweep-1787088633580",
       "symbol": "DOT",
@@ -1704,7 +1677,7 @@
       "mfe_r": 1.0246087193538742,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6805,
-      "_last_checked_t": 1788386400000
+      "_last_checked_t": 1788387300000
     },
     {
       "id": "APT-Mean Reversion-1788383722825",
@@ -1741,9 +1714,9 @@
       "mfe_r": 0.6203855806399191,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6818,
-      "_last_checked_t": 1788386400000
+      "_last_checked_t": 1788387300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788387327604
+  "last_run_ts": 1788388230655
 }
