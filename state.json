@@ -635,33 +635,6 @@
   },
   "tier2_trades": [
     {
-      "id": "PENDLE-Reversal-1787063436550",
-      "symbol": "PENDLE",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 1.3543224,
-      "sl": 1.3632619000000001,
-      "tp1": 1.3361,
-      "tp2": 1.3209,
-      "r_realized": 2.0384137815313794,
-      "mae_r": 0.5232507410928907,
-      "mfe_r": 2.3851893282621885,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.7647760158319697,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 28.737993683595533,
-        "volatility_pctl": 88.33333333333333,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1787081400000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "AAVE-Liquidity Sweep-1787063436550",
       "symbol": "AAVE",
       "engine": "Liquidity Sweep",
@@ -1698,9 +1671,9 @@
       "mfe_r": 1.0246087193538742,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6805,
-      "_last_checked_t": 1788375600000
+      "_last_checked_t": 1788376500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788376529785
+  "last_run_ts": 1788377433781
 }
