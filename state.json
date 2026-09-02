@@ -505,7 +505,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 532,
+        "seen": 535,
         "rejected": 0
       }
     },
@@ -1694,10 +1694,10 @@
       "created_ts": 1788318924618,
       "filled_ts": 1788318900000,
       "mae_r": 0.3181199895812157,
-      "mfe_r": 0.6948166584667133,
+      "mfe_r": 0.7526987526408853,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6795,
-      "_last_checked_t": 1788341400000
+      "_last_checked_t": 1788342300000
     },
     {
       "id": "HYPE-Liquidity Sweep-1788342328714",
@@ -1727,7 +1727,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1788342328714,
       "filled_ts": null,
@@ -1735,9 +1735,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6805,
-      "_last_checked_t": 1788340500000
+      "_last_checked_t": 1788342300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788342328714
+  "last_run_ts": 1788343237883
 }
