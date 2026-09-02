@@ -304,10 +304,10 @@
         "sum_r": 2.323024818892709
       },
       "ZEC|range|intraday|Liquidity Sweep": {
-        "n": 2,
+        "n": 3,
         "wins": 1,
-        "losses": 1,
-        "sum_r": 1.8316612462388497
+        "losses": 2,
+        "sum_r": 0.8316612462388497
       },
       "ONDO|trend|intraday|Liquidity Sweep": {
         "n": 2,
@@ -420,9 +420,9 @@
     },
     "calibration_buckets": {
       "Liquidity Sweep|A+": {
-        "n": 22,
+        "n": 23,
         "wins": 7,
-        "sum_conf": 18.390965112178684
+        "sum_conf": 19.19293847202673
       },
       "Liquidity Sweep|A": {
         "n": 37,
@@ -473,8 +473,8 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 72,
-        "filled": 59,
+        "dispatched": 73,
+        "filled": 60,
         "expired": 11
       },
       "Reversal|pending": {
@@ -505,7 +505,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 530,
+        "seen": 532,
         "rejected": 0
       }
     },
@@ -577,7 +577,7 @@
       },
       "ZEC": {
         "direction": "bullish",
-        "until_ts": 1787695200000
+        "until_ts": 1788345000000
       },
       "SUI": {
         "direction": "bearish",
@@ -1632,6 +1632,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "ZEC-Liquidity Sweep-1788339641250",
+      "symbol": "ZEC",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bullish",
+      "entry": 822.7196799999999,
+      "sl": 816.347,
+      "tp1": 839.3,
+      "tp2": 839.89,
+      "r_realized": -1.0,
+      "mae_r": 3.4474789256639458,
+      "mfe_r": 0.8615401997276119,
+      "forensic_category": "correct_read_poor_rr",
+      "confidence": 0.8019733598480437,
+      "grade": "A+",
+      "regime_at_entry": {
+        "trend_strength": 16.516961888543488,
+        "volatility_pctl": 27.5,
+        "macro_bias": "bullish"
+      },
+      "resolved_ts": 1788341400000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -1667,49 +1694,50 @@
       "created_ts": 1788318924618,
       "filled_ts": 1788318900000,
       "mae_r": 0.3181199895812157,
-      "mfe_r": 0.5886994858140736,
+      "mfe_r": 0.6948166584667133,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6795,
-      "_last_checked_t": 1788340500000
+      "_last_checked_t": 1788341400000
     },
     {
-      "id": "ZEC-Liquidity Sweep-1788339641250",
-      "symbol": "ZEC",
+      "id": "HYPE-Liquidity Sweep-1788342328714",
+      "symbol": "HYPE",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bullish",
       "style": "intraday",
       "entry_kind": "pending",
-      "entry": 822.7196799999999,
-      "sl": 816.347,
-      "tp1": 839.3,
-      "tp2": 839.89,
-      "rr1": 2.601781354155578,
-      "rr2": 2.694364066609371,
-      "confidence": 0.8019733598480437,
+      "entry": 80.90666399999999,
+      "sl": 79.861059,
+      "tp1": 83.3935,
+      "tp2": 83.399,
+      "rr1": 2.378370417126949,
+      "rr2": 2.3836305296933555,
+      "confidence": 0.8260235058580276,
       "grade": "A+",
       "confluences": [
         "EQH/EQL sweep",
+        "equal-cluster liquidity",
         "OTE retracement entry"
       ],
       "regime_at_entry": {
-        "trend_strength": 16.516961888543488,
-        "volatility_pctl": 27.5,
+        "trend_strength": 16.84271292256076,
+        "volatility_pctl": 55.833333333333336,
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": true,
+      "entry_filled": false,
       "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1788339641250,
-      "filled_ts": 1788338700000,
-      "mae_r": 0.8049486244405709,
-      "mfe_r": 0.8615401997276119,
+      "status": "pending",
+      "created_ts": 1788342328714,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
-      "tg_message_id": 6803,
+      "tg_message_id": 6805,
       "_last_checked_t": 1788340500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788341431177
+  "last_run_ts": 1788342328714
 }
