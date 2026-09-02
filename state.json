@@ -478,7 +478,7 @@
         "expired": 12
       },
       "Reversal|pending": {
-        "dispatched": 27,
+        "dispatched": 28,
         "filled": 20,
         "expired": 7
       },
@@ -505,7 +505,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 552,
+        "seen": 554,
         "rejected": 0
       }
     },
@@ -1697,7 +1697,7 @@
       "mfe_r": 1.476224929817976,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6795,
-      "_last_checked_t": 1788355800000
+      "_last_checked_t": 1788356700000
     },
     {
       "id": "HYPE-Liquidity Sweep-1788342328714",
@@ -1732,12 +1732,50 @@
       "created_ts": 1788342328714,
       "filled_ts": 1788343200000,
       "mae_r": 0.7150539639730011,
-      "mfe_r": 0.6927434356186243,
+      "mfe_r": 0.7233477269140912,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6805,
+      "_last_checked_t": 1788356700000
+    },
+    {
+      "id": "ZEC-Reversal-1788357640746",
+      "symbol": "ZEC",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 800.4148,
+      "sl": 786.0292,
+      "tp1": 839.89,
+      "tp2": 841.82,
+      "rr1": 2.7440774107440626,
+      "rr2": 2.8782393504615618,
+      "confidence": 0.8368263029445026,
+      "grade": "A+",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 24.524667819332453,
+        "volatility_pctl": 60.833333333333336,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1788357640746,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 6811,
       "_last_checked_t": 1788355800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788356726041
+  "last_run_ts": 1788357640746
 }
