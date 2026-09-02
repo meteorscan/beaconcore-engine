@@ -505,7 +505,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 539,
+        "seen": 542,
         "rejected": 0
       }
     },
@@ -1694,10 +1694,10 @@
       "created_ts": 1788318924618,
       "filled_ts": 1788318900000,
       "mae_r": 0.3181199895812157,
-      "mfe_r": 1.1289323647729763,
+      "mfe_r": 1.3122256629911642,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6795,
-      "_last_checked_t": 1788344100000
+      "_last_checked_t": 1788345000000
     },
     {
       "id": "HYPE-Liquidity Sweep-1788342328714",
@@ -1735,7 +1735,7 @@
       "mfe_r": 0.4536474098727631,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6805,
-      "_last_checked_t": 1788344100000
+      "_last_checked_t": 1788345000000
     },
     {
       "id": "ZEC-Liquidity Sweep-1788345038002",
@@ -1764,7 +1764,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1788345038002,
       "filled_ts": null,
@@ -1772,9 +1772,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6806,
-      "_last_checked_t": 1788343200000
+      "_last_checked_t": 1788345000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788345038002
+  "last_run_ts": 1788345923811
 }
