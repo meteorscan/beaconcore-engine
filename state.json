@@ -483,7 +483,7 @@
         "expired": 8
       },
       "Mean Reversion|pending": {
-        "dispatched": 28,
+        "dispatched": 29,
         "filled": 18,
         "expired": 10
       },
@@ -505,7 +505,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 561,
+        "seen": 562,
         "rejected": 0
       }
     },
@@ -1671,9 +1671,46 @@
       "mfe_r": 1.0246087193538742,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6805,
+      "_last_checked_t": 1788378300000
+    },
+    {
+      "id": "APT-Mean Reversion-1788379238239",
+      "symbol": "APT",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.5735822836487258,
+      "sl": 0.5828519999999999,
+      "tp1": 0.5514,
+      "tp2": 0.5512,
+      "rr1": 2.392984079353919,
+      "rr2": 2.4145597125686815,
+      "confidence": 0.8149064431540491,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 16.083647418103872,
+        "volatility_pctl": 94.16666666666667,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1788379238239,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 6816,
       "_last_checked_t": 1788377400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788378340689
+  "last_run_ts": 1788379238239
 }
