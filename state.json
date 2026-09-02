@@ -635,33 +635,6 @@
   },
   "tier2_trades": [
     {
-      "id": "DOT-Liquidity Sweep-1787073321246",
-      "symbol": "DOT",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.7482533600000001,
-      "sl": 0.75336,
-      "tp1": 0.73499,
-      "tp2": 0.73368,
-      "r_realized": -1.0,
-      "mae_r": 1.1057446775178965,
-      "mfe_r": 0.5509219369292002,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.8618115944866392,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 21.54421795993641,
-        "volatility_pctl": 94.16666666666667,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1787077800000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "PENDLE-Reversal-1787063436550",
       "symbol": "PENDLE",
       "engine": "Reversal",
@@ -1697,7 +1670,7 @@
       "mfe_r": 1.476224929817976,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6795,
-      "_last_checked_t": 1788372000000
+      "_last_checked_t": 1788372900000
     },
     {
       "id": "HYPE-Liquidity Sweep-1788342328714",
@@ -1735,9 +1708,9 @@
       "mfe_r": 1.0246087193538742,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6805,
-      "_last_checked_t": 1788372000000
+      "_last_checked_t": 1788372900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788372933744
+  "last_run_ts": 1788373832878
 }
