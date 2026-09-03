@@ -496,7 +496,7 @@
         "expired": 12
       },
       "Reversal|pending": {
-        "dispatched": 28,
+        "dispatched": 29,
         "filled": 20,
         "expired": 8
       },
@@ -523,7 +523,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 594,
+        "seen": 595,
         "rejected": 0
       }
     },
@@ -1545,7 +1545,46 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "ONDO-Reversal-1788471924369",
+      "symbol": "ONDO",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.36797224,
+      "sl": 0.37244207,
+      "tp1": 0.3536,
+      "tp2": 0.35011,
+      "rr1": 3.2153885047082227,
+      "rr2": 3.996178825592919,
+      "confidence": 0.8310809164784871,
+      "grade": "A+",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 44.105047548066814,
+        "volatility_pctl": 85.0,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1788471924369,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 6846,
+      "_last_checked_t": 1788470100000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1788471028279
+  "last_run_ts": 1788471924369
 }
