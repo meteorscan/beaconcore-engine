@@ -517,7 +517,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 593,
+        "seen": 594,
         "rejected": 0
       }
     },
@@ -1657,7 +1657,7 @@
       "mfe_r": 1.6366945452632795,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6805,
-      "_last_checked_t": 1788428700000
+      "_last_checked_t": 1788429600000
     },
     {
       "id": "ONDO-Liquidity Sweep-1788414323104",
@@ -1695,9 +1695,9 @@
       "mfe_r": 1.0124316698995321,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6823,
-      "_last_checked_t": 1788428700000
+      "_last_checked_t": 1788429600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788429635944
+  "last_run_ts": 1788430528878
 }
