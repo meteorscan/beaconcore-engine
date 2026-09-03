@@ -1683,7 +1683,7 @@
       "mfe_r": 1.1011194475925619,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6805,
-      "_last_checked_t": 1788400800000
+      "_last_checked_t": 1788401700000
     },
     {
       "id": "APT-Mean Reversion-1788383722825",
@@ -1720,9 +1720,9 @@
       "mfe_r": 0.6203855806399191,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6818,
-      "_last_checked_t": 1788400800000
+      "_last_checked_t": 1788401700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788401723616
+  "last_run_ts": 1788402627426
 }
