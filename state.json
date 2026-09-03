@@ -647,33 +647,6 @@
   },
   "tier2_trades": [
     {
-      "id": "PENGU-Liquidity Sweep-1787100324749",
-      "symbol": "PENGU",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.006094888,
-      "sl": 0.0061371310000000005,
-      "tp1": 0.006009,
-      "tp2": 0.006001,
-      "r_realized": -1.0,
-      "mae_r": 1.1389342612977151,
-      "mfe_r": 0.37610965130315505,
-      "forensic_category": "confidence_miscalibration",
-      "confidence": 0.7487636941069478,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 17.146255205593494,
-        "volatility_pctl": 48.333333333333336,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1787109300000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "PENDLE-Momentum-1787121929179",
       "symbol": "PENDLE",
       "engine": "Momentum",
@@ -1710,9 +1683,9 @@
       "mfe_r": 1.4693273272411793,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6805,
-      "_last_checked_t": 1788403500000
+      "_last_checked_t": 1788404400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788404436030
+  "last_run_ts": 1788405331177
 }
