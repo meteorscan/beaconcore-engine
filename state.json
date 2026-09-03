@@ -1650,7 +1650,7 @@
       "mfe_r": 1.1011194475925619,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6805,
-      "_last_checked_t": 1788396300000
+      "_last_checked_t": 1788397200000
     },
     {
       "id": "APT-Mean Reversion-1788383722825",
@@ -1687,7 +1687,7 @@
       "mfe_r": 0.6203855806399191,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6818,
-      "_last_checked_t": 1788396300000
+      "_last_checked_t": 1788397200000
     },
     {
       "id": "ONDO-Liquidity Sweep-1788393636839",
@@ -1721,13 +1721,13 @@
       "status": "active",
       "created_ts": 1788393636839,
       "filled_ts": 1788393600000,
-      "mae_r": 0.36312985204017306,
+      "mae_r": 0.7852228488679673,
       "mfe_r": 1.0654925987616324,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6820,
-      "_last_checked_t": 1788396300000
+      "_last_checked_t": 1788397200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788397241762
+  "last_run_ts": 1788398120544
 }
