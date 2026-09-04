@@ -575,7 +575,8 @@
       "2026-08-31": "sent",
       "2026-09-01": "sent",
       "2026-09-02": "sent",
-      "2026-09-03": "sent"
+      "2026-09-03": "sent",
+      "2026-09-04": "sent"
     },
     "symbol_cooldown": {
       "TAO": {
@@ -653,33 +654,6 @@
     }
   },
   "tier2_trades": [
-    {
-      "id": "AVAX-Liquidity Sweep-1787174123576",
-      "symbol": "AVAX",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 6.7828968,
-      "sl": 6.889870000000001,
-      "tp1": 6.5025,
-      "tp2": 6.4945,
-      "r_realized": -1.0,
-      "mae_r": 1.1900476007074516,
-      "mfe_r": 0.7609083396588893,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.8300914040966072,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 47.95007097369921,
-        "volatility_pctl": 90.83333333333333,
-        "macro_bias": "neutral"
-      },
-      "resolved_ts": 1787212800000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
     {
       "id": "APT-Reversal-1787191236061",
       "symbol": "APT",
@@ -1555,9 +1529,9 @@
       "mfe_r": 2.0967777298018078,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6846,
-      "_last_checked_t": 1788507000000
+      "_last_checked_t": 1788507900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788507922835
+  "last_run_ts": 1788508837267
 }
