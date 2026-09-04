@@ -654,33 +654,6 @@
   },
   "tier2_trades": [
     {
-      "id": "DOGE-Liquidity Sweep-1787177726363",
-      "symbol": "DOGE",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.074853824,
-      "sl": 0.075631556,
-      "tp1": 0.07226,
-      "tp2": 0.072075,
-      "r_realized": -1.0,
-      "mae_r": 1.0172861602711492,
-      "mfe_r": 0.5372339057670193,
-      "forensic_category": "structural_invalidation_too_tight",
-      "confidence": 0.7948045517285522,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 50.20984404574849,
-        "volatility_pctl": 99.16666666666667,
-        "macro_bias": "neutral"
-      },
-      "resolved_ts": 1787185800000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "AVAX-Liquidity Sweep-1787174123576",
       "symbol": "AVAX",
       "engine": "Liquidity Sweep",
@@ -1582,9 +1555,9 @@
       "mfe_r": 1.5598445578467204,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 6846,
-      "_last_checked_t": 1788480000000
+      "_last_checked_t": 1788480900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788480923039
+  "last_run_ts": 1788481829231
 }
