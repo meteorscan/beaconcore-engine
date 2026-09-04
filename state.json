@@ -370,10 +370,10 @@
         "sum_r": -1.0
       },
       "ONDO|trend|intraday|Reversal": {
-        "n": 1,
-        "wins": 0,
+        "n": 2,
+        "wins": 1,
         "losses": 1,
-        "sum_r": -1.0
+        "sum_r": 2.2153885047082227
       },
       "HYPE|range|intraday|Mean Reversion": {
         "n": 2,
@@ -468,9 +468,9 @@
         "sum_conf": 1.5750249291171055
       },
       "Reversal|A+": {
-        "n": 7,
-        "wins": 3,
-        "sum_conf": 5.902261925251754
+        "n": 8,
+        "wins": 4,
+        "sum_conf": 6.733342841730241
       },
       "Range Trading|A+": {
         "n": 5,
@@ -497,7 +497,7 @@
       },
       "Reversal|pending": {
         "dispatched": 29,
-        "filled": 20,
+        "filled": 21,
         "expired": 8
       },
       "Mean Reversion|pending": {
@@ -1463,48 +1463,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "ONDO-Reversal-1788471924369",
       "symbol": "ONDO",
       "engine": "Reversal",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.36797224,
       "sl": 0.37244207,
       "tp1": 0.3536,
       "tp2": 0.35011,
-      "rr1": 3.2153885047082227,
-      "rr2": 3.996178825592919,
+      "r_realized": 3.2153885047082227,
+      "mae_r": 0.4044359628889663,
+      "mfe_r": 3.5957161681764154,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8310809164784871,
       "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 44.105047548066814,
-        "volatility_pctl": 85.0,
+        "trend_strength": 29.260235563422405,
+        "volatility_pctl": 33.333333333333336,
         "macro_bias": "neutral"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1788471924369,
-      "filled_ts": 1788471000000,
-      "mae_r": 0.4044359628889663,
-      "mfe_r": 2.0967777298018078,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 6846,
-      "_last_checked_t": 1788524100000
+      "resolved_ts": 1788525000000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1788525033930
+  "last_run_ts": 1788525926268
 }
