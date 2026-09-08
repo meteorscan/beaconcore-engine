@@ -442,6 +442,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 2.193950568021906
+      },
+      "ZEC|trend|intraday|Reversal": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -476,9 +482,9 @@
         "sum_conf": 1.5750249291171055
       },
       "Reversal|A+": {
-        "n": 8,
+        "n": 9,
         "wins": 4,
-        "sum_conf": 6.733342841730241
+        "sum_conf": 7.576425600192714
       },
       "Range Trading|A+": {
         "n": 5,
@@ -493,7 +499,7 @@
     },
     "forensic_counts": {
       "structural_invalidation_too_tight": 9,
-      "genuine_variance": 27,
+      "genuine_variance": 28,
       "correct_read_poor_rr": 21,
       "confidence_miscalibration": 4
     },
@@ -505,7 +511,7 @@
       },
       "Reversal|pending": {
         "dispatched": 30,
-        "filled": 21,
+        "filled": 22,
         "expired": 8
       },
       "Mean Reversion|pending": {
@@ -608,7 +614,7 @@
       },
       "ZEC": {
         "direction": "bullish",
-        "until_ts": 1788797700000
+        "until_ts": 1788840000000
       },
       "SUI": {
         "direction": "bearish",
@@ -1393,48 +1399,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "ZEC-Reversal-1788833722669",
       "symbol": "ZEC",
       "engine": "Reversal",
       "counter_trend": false,
       "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 1142.304,
       "sl": 1128.0,
       "tp1": 1173.6,
       "tp2": 1184.7,
-      "rr1": 2.1879194630872223,
-      "rr2": 2.963926174496623,
+      "r_realized": -1.0,
+      "mae_r": 1.1468120805369055,
+      "mfe_r": 0.7547539149887973,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8430827584624727,
       "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 23.086477270681453,
+        "trend_strength": 22.63873690919403,
         "volatility_pctl": 56.666666666666664,
-        "macro_bias": "neutral"
+        "macro_bias": "bullish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1788833722669,
-      "filled_ts": 1788833700000,
-      "mae_r": 0.9370805369127457,
-      "mfe_r": 0.7547539149887973,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 7016,
-      "_last_checked_t": 1788835500000
+      "resolved_ts": 1788836400000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1788836442735
+  "last_run_ts": 1788837322317
 }
