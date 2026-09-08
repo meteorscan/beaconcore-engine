@@ -505,7 +505,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 78,
+        "dispatched": 79,
         "filled": 66,
         "expired": 12
       },
@@ -537,7 +537,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 611,
+        "seen": 612,
         "rejected": 0
       }
     },
@@ -1466,9 +1466,47 @@
       "mfe_r": 1.9486820974989416,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7020,
+      "_last_checked_t": 1788863400000
+    },
+    {
+      "id": "HYPE-Liquidity Sweep-1788864329892",
+      "symbol": "HYPE",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 83.588512,
+      "sl": 83.0812,
+      "tp1": 84.894,
+      "tp2": 85.469,
+      "rr1": 2.573343425741977,
+      "rr2": 3.706768221528377,
+      "confidence": 0.7630979160904212,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 34.923222905480955,
+        "volatility_pctl": 21.666666666666668,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1788864329892,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 7036,
       "_last_checked_t": 1788862500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788863438169
+  "last_run_ts": 1788864329892
 }
