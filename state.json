@@ -436,6 +436,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 2.378370417126949
+      },
+      "ZEC|trend|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 2.193950568021906
       }
     },
     "calibration_buckets": {
@@ -455,9 +461,9 @@
         "sum_conf": 9.922334140314948
       },
       "Mean Reversion|A+": {
-        "n": 16,
-        "wins": 4,
-        "sum_conf": 13.31236334405121
+        "n": 17,
+        "wins": 5,
+        "sum_conf": 14.163178606653359
       },
       "Momentum|A+": {
         "n": 9,
@@ -504,7 +510,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 31,
-        "filled": 20,
+        "filled": 21,
         "expired": 10
       },
       "Momentum|pending": {
@@ -1360,47 +1366,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "ZEC-Mean Reversion-1788822037555",
       "symbol": "ZEC",
       "engine": "Mean Reversion",
       "counter_trend": false,
       "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 1134.7965445691113,
       "sl": 1123.4,
       "tp1": 1159.8,
       "tp2": 1167.1,
-      "rr1": 2.193950568021906,
-      "rr2": 2.8344955995208028,
+      "r_realized": 2.193950568021906,
+      "mae_r": 0.49107381058991817,
+      "mfe_r": 2.9134669047741,
+      "forensic_category": "genuine_variance",
       "confidence": 0.850815262602148,
       "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 21.917792219966493,
-        "volatility_pctl": 59.166666666666664,
-        "macro_bias": "neutral"
+        "trend_strength": 23.086477270681453,
+        "volatility_pctl": 56.666666666666664,
+        "macro_bias": "bullish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1788822037555,
-      "filled_ts": 1788822000000,
-      "mae_r": 0.49107381058991817,
-      "mfe_r": 1.1673235997291425,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 7013,
-      "_last_checked_t": 1788831000000
+      "resolved_ts": 1788831900000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1788831929016
+  "last_run_ts": 1788832839358
 }
