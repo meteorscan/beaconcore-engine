@@ -679,33 +679,6 @@
   },
   "tier2_trades": [
     {
-      "id": "ZEC-Liquidity Sweep-1787692522902",
-      "symbol": "ZEC",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 771.08824,
-      "sl": 762.3416,
-      "tp1": 796.57,
-      "tp2": 801.69,
-      "r_realized": -1.0,
-      "mae_r": 2.2315129009539474,
-      "mfe_r": 0.43008057951395634,
-      "forensic_category": "confidence_miscalibration",
-      "confidence": 0.7981149270399114,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 23.574926882970605,
-        "volatility_pctl": 15.833333333333334,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1787691600000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "APT-Momentum-1787715032235",
       "symbol": "APT",
       "engine": "Momentum",
@@ -1464,5 +1437,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1788986728446
+  "last_run_ts": 1788987640922
 }
