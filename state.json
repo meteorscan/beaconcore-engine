@@ -599,7 +599,8 @@
       "2026-09-05": "sent",
       "2026-09-06": "sent",
       "2026-09-07": "sent",
-      "2026-09-08": "sent"
+      "2026-09-08": "sent",
+      "2026-09-09": "sent"
     },
     "symbol_cooldown": {
       "TAO": {
@@ -1490,7 +1491,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 9,
+      "pending_bars": 10,
       "status": "pending",
       "created_ts": 1788932727782,
       "filled_ts": null,
@@ -1498,9 +1499,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7077,
-      "_last_checked_t": 1788939000000
+      "_last_checked_t": 1788939900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1788939926566
+  "last_run_ts": 1788940837864
 }
