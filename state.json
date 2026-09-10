@@ -680,60 +680,6 @@
   },
   "tier2_trades": [
     {
-      "id": "APT-Momentum-1787715032235",
-      "symbol": "APT",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.5692342930945247,
-      "sl": 0.573972,
-      "tp1": 0.5597,
-      "tp2": 0.555,
-      "r_realized": 2.012427802046156,
-      "mae_r": 0.45712133500120966,
-      "mfe_r": 2.033535059627755,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.7917405697474446,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 45.260388932107674,
-        "volatility_pctl": 0.8333333333333334,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1787735700000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
-      "id": "HYPE-Momentum-1787728523728",
-      "symbol": "HYPE",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 81.82717074031756,
-      "sl": 81.3074,
-      "tp1": 83.055,
-      "tp2": 83.253,
-      "r_realized": -1.0,
-      "mae_r": 1.1258247048689978,
-      "mfe_r": 1.5445834045832418,
-      "forensic_category": "correct_read_poor_rr",
-      "confidence": 0.8390236104478068,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 15.63312449628134,
-        "volatility_pctl": 2.5,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1787735700000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "ZEC-Reversal-1787818522734",
       "symbol": "ZEC",
       "engine": "Reversal",
@@ -1438,5 +1384,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1789030841880
+  "last_run_ts": 1789031730114
 }
