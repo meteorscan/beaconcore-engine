@@ -408,10 +408,10 @@
         "sum_r": -1.0
       },
       "HYPE|trend|intraday|Liquidity Sweep": {
-        "n": 5,
+        "n": 6,
         "wins": 0,
-        "losses": 5,
-        "sum_r": -5.0
+        "losses": 6,
+        "sum_r": -6.0
       },
       "DOT|range|intraday|Reversal": {
         "n": 1,
@@ -463,9 +463,9 @@
         "sum_conf": 22.463829701074367
       },
       "Liquidity Sweep|A": {
-        "n": 42,
+        "n": 43,
         "wins": 12,
-        "sum_conf": 31.912647004757826
+        "sum_conf": 32.70680670697763
       },
       "Reversal|A": {
         "n": 13,
@@ -512,12 +512,12 @@
       "structural_invalidation_too_tight": 9,
       "genuine_variance": 29,
       "correct_read_poor_rr": 22,
-      "confidence_miscalibration": 7
+      "confidence_miscalibration": 8
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 85,
-        "filled": 70,
+        "filled": 71,
         "expired": 14
       },
       "Reversal|pending": {
@@ -548,14 +548,14 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 635,
+        "seen": 636,
         "rejected": 0
       }
     },
     "circuit_breaker": {
-      "tripped": false,
-      "tripped_ts": 1788318925022,
-      "reason": null
+      "tripped": true,
+      "tripped_ts": 1789085727758,
+      "reason": "win_rate=0.27 profit_factor=0.87 vs baseline wr=0.42 pf=1.35"
     },
     "governor": {
       "last_adjust_ts": 0
@@ -680,7 +680,7 @@
       },
       "HYPE": {
         "direction": "bullish",
-        "until_ts": 1789059600000
+        "until_ts": 1789087500000
       }
     }
   },
@@ -1467,47 +1467,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "HYPE-Liquidity Sweep-1789084834977",
       "symbol": "HYPE",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 78.998912,
       "sl": 78.41499999999999,
       "tp1": 80.719,
       "tp2": 80.85,
-      "rr1": 2.9458000520625607,
-      "rr2": 3.170148926550493,
+      "r_realized": -1.0,
+      "mae_r": 1.4178711860691002,
+      "mfe_r": 0.3084163367082609,
+      "forensic_category": "confidence_miscalibration",
       "confidence": 0.7941597022198058,
       "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
         "trend_strength": 57.6980387317166,
         "volatility_pctl": 90.83333333333333,
-        "macro_bias": "neutral"
+        "macro_bias": "bullish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
-      "created_ts": 1789084834977,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 7145,
-      "_last_checked_t": 1789083000000
+      "resolved_ts": 1789083900000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1789084834977
+  "last_run_ts": 1789085727390
 }
