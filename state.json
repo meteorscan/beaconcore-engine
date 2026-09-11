@@ -521,7 +521,7 @@
         "expired": 14
       },
       "Reversal|pending": {
-        "dispatched": 33,
+        "dispatched": 34,
         "filled": 24,
         "expired": 9
       },
@@ -548,7 +548,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 637,
+        "seen": 638,
         "rejected": 0
       }
     },
@@ -1496,7 +1496,46 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "ZEC-Reversal-1789089325383",
+      "symbol": "ZEC",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1084.2344,
+      "sl": 1061.2160000000001,
+      "tp1": 1135.5,
+      "tp2": 1141.7,
+      "rr1": 2.2271574045111784,
+      "rr2": 2.4965071421124048,
+      "confidence": 0.8036367542423553,
+      "grade": "A+",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 47.70281697736789,
+        "volatility_pctl": 77.5,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1789089325383,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 7149,
+      "_last_checked_t": 1789087500000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1789088436476
+  "last_run_ts": 1789089325383
 }
