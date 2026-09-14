@@ -690,33 +690,6 @@
   },
   "tier2_trades": [
     {
-      "id": "HYPE-Reversal-1788100228898",
-      "symbol": "HYPE",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 83.491832,
-      "sl": 82.969281,
-      "tp1": 85.188,
-      "tp2": 85.256,
-      "r_realized": -1.0,
-      "mae_r": 1.813855489703383,
-      "mfe_r": 1.0949514975571435,
-      "forensic_category": "correct_read_poor_rr",
-      "confidence": 0.8547764127701338,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 19.57959545237288,
-        "volatility_pctl": 7.5,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1788110100000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "HYPE-Liquidity Sweep-1788132628075",
       "symbol": "HYPE",
       "engine": "Liquidity Sweep",
@@ -1564,9 +1537,9 @@
       "mfe_r": 1.4570576911565358,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7218,
-      "_last_checked_t": 1789404300000
+      "_last_checked_t": 1789405200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1789405244149
+  "last_run_ts": 1789406122820
 }
