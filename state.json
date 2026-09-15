@@ -548,7 +548,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 676,
+        "seen": 678,
         "rejected": 0
       }
     },
@@ -690,33 +690,6 @@
     }
   },
   "tier2_trades": [
-    {
-      "id": "DOT-Reversal-1788178528590",
-      "symbol": "DOT",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.8309392,
-      "sl": 0.83698615,
-      "tp1": 0.81727,
-      "tp2": 0.81161,
-      "r_realized": -1.0,
-      "mae_r": 1.536443992425942,
-      "mfe_r": 1.4270334631508463,
-      "forensic_category": "correct_read_poor_rr",
-      "confidence": 0.8448448898196854,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 19.426749140562954,
-        "volatility_pctl": 57.5,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1788198300000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
     {
       "id": "APT-Liquidity Sweep-1788207330208",
       "symbol": "APT",
@@ -1534,12 +1507,12 @@
       "created_ts": 1789487126262,
       "filled_ts": 1789486200000,
       "mae_r": 0.9108767271475597,
-      "mfe_r": 0.382947337365394,
+      "mfe_r": 0.8808083788169423,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7245,
-      "_last_checked_t": 1789492500000
+      "_last_checked_t": 1789493400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1789493433354
+  "last_run_ts": 1789494324211
 }
