@@ -692,33 +692,6 @@
   },
   "tier2_trades": [
     {
-      "id": "DOT-Liquidity Sweep-1788258635297",
-      "symbol": "DOT",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.8681298399999999,
-      "sl": 0.877003,
-      "tp1": 0.85003,
-      "tp2": 0.84936,
-      "r_realized": -1.0,
-      "mae_r": 1.3636810335889313,
-      "mfe_r": 1.700616240437435,
-      "forensic_category": "correct_read_poor_rr",
-      "confidence": 0.7814520310169742,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 23.437231979832536,
-        "volatility_pctl": 97.5,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1788283800000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "APT-Liquidity Sweep-1788289239205",
       "symbol": "APT",
       "engine": "Liquidity Sweep",
@@ -1504,7 +1477,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1789578922972,
       "filled_ts": null,
@@ -1512,9 +1485,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7278,
-      "_last_checked_t": 1789577100000
+      "_last_checked_t": 1789578900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1789578922972
+  "last_run_ts": 1789579832244
 }
