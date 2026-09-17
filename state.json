@@ -1458,7 +1458,7 @@
       "mfe_r": 0.7363885401209891,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7328,
-      "_last_checked_t": 1789658100000
+      "_last_checked_t": 1789659000000
     },
     {
       "id": "ONDO-Liquidity Sweep-1789658129254",
@@ -1491,13 +1491,13 @@
       "status": "active",
       "created_ts": 1789658129254,
       "filled_ts": 1789657200000,
-      "mae_r": 0.6499351317496476,
+      "mae_r": 0.7934654557926519,
       "mfe_r": 0.7723198974037669,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7330,
-      "_last_checked_t": 1789658100000
+      "_last_checked_t": 1789659000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1789659033815
+  "last_run_ts": 1789659926535
 }
