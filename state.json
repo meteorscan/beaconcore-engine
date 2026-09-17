@@ -516,7 +516,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 88,
+        "dispatched": 89,
         "filled": 73,
         "expired": 15
       },
@@ -548,7 +548,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 681,
+        "seen": 682,
         "rejected": 0
       }
     },
@@ -1421,7 +1421,46 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "ONDO-Liquidity Sweep-1789607724812",
+      "symbol": "ONDO",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.35198799999999997,
+      "sl": 0.354985,
+      "tp1": 0.34208,
+      "tp2": 0.3414,
+      "rr1": 3.305972639305933,
+      "rr2": 3.532866199532829,
+      "confidence": 0.7842953680222188,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 28.846333720224603,
+        "volatility_pctl": 96.66666666666667,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1789607724812,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 7295,
+      "_last_checked_t": 1789605900000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1789606836237
+  "last_run_ts": 1789607724812
 }
