@@ -516,7 +516,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 90,
+        "dispatched": 91,
         "filled": 75,
         "expired": 15
       },
@@ -548,7 +548,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 688,
+        "seen": 690,
         "rejected": 0
       }
     },
@@ -1422,7 +1422,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "BCH-Liquidity Sweep-1789656326368",
+      "symbol": "BCH",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 234.48672,
+      "sl": 238.692,
+      "tp1": 225.08,
+      "tp2": 224.57,
+      "rr1": 2.2368831564128766,
+      "rr2": 2.3581592664459823,
+      "confidence": 0.811748520593745,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 26.929781320498943,
+        "volatility_pctl": 77.5,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "1h",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1789656326368,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 7328,
+      "_last_checked_t": 1789654500000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1789655431943
+  "last_run_ts": 1789656326368
 }
