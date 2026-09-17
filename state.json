@@ -692,33 +692,6 @@
   },
   "tier2_trades": [
     {
-      "id": "ZEC-Mean Reversion-1788300038186",
-      "symbol": "ZEC",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 821.6389323074168,
-      "sl": 815.8256,
-      "tp1": 833.9833333333332,
-      "tp2": 834.11,
-      "r_realized": 2.1234638539701587,
-      "mae_r": 0.03422001304878511,
-      "mfe_r": 2.129771194532811,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.8005686701825323,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 17.21949283826261,
-        "volatility_pctl": 40.833333333333336,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1788307200000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "DOT-Liquidity Sweep-1788289239205",
       "symbol": "DOT",
       "engine": "Liquidity Sweep",
@@ -1450,5 +1423,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1789602323447
+  "last_run_ts": 1789603239596
 }
