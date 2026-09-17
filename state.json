@@ -523,7 +523,7 @@
       "Reversal|pending": {
         "dispatched": 36,
         "filled": 26,
-        "expired": 9
+        "expired": 10
       },
       "Mean Reversion|pending": {
         "dispatched": 32,
@@ -1421,46 +1421,7 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [
-    {
-      "id": "HYPE-Reversal-1789610436403",
-      "symbol": "HYPE",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 78.319432,
-      "sl": 77.53438799999999,
-      "tp1": 80.111,
-      "tp2": 80.152,
-      "rr1": 2.2821243140511456,
-      "rr2": 2.334350686076148,
-      "confidence": 0.7455141295219722,
-      "grade": "A",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 15.357787208593347,
-        "volatility_pctl": 87.5,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1789610436403,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 7299,
-      "_last_checked_t": 1789618500000
-    }
-  ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1789619432589
+  "last_run_ts": 1789620327773
 }
