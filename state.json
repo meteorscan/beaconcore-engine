@@ -694,33 +694,6 @@
   },
   "tier2_trades": [
     {
-      "id": "HYPE-Liquidity Sweep-1788342328714",
-      "symbol": "HYPE",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 80.90666399999999,
-      "sl": 79.861059,
-      "tp1": 83.3935,
-      "tp2": 83.399,
-      "r_realized": 2.378370417126949,
-      "mae_r": 0.7150539639730011,
-      "mfe_r": 2.5825584231139107,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.8260235058580276,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 21.60998926687415,
-        "volatility_pctl": 20.833333333333332,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1788444900000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "ONDO-Reversal-1788471924369",
       "symbol": "ONDO",
       "engine": "Reversal",
@@ -1344,5 +1317,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1789740039467
+  "last_run_ts": 1789740924689
 }
