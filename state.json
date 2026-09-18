@@ -693,33 +693,6 @@
   },
   "tier2_trades": [
     {
-      "id": "APT-Mean Reversion-1788383722825",
-      "symbol": "APT",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "entry": 0.578651715100271,
-      "sl": 0.589696,
-      "tp1": 0.5514,
-      "tp2": 0.5512,
-      "r_realized": -1.0,
-      "mae_r": 1.036580005284894,
-      "mfe_r": 0.6203855806399191,
-      "forensic_category": "structural_invalidation_too_tight",
-      "confidence": 0.8241221111454179,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 19.45318187013126,
-        "volatility_pctl": 98.33333333333333,
-        "macro_bias": "bearish"
-      },
-      "resolved_ts": 1788402600000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "ONDO-Liquidity Sweep-1788414323104",
       "symbol": "ONDO",
       "engine": "Liquidity Sweep",
@@ -1400,13 +1373,13 @@
       "status": "active",
       "created_ts": 1789656326368,
       "filled_ts": 1789656300000,
-      "mae_r": 0.5144199672792314,
+      "mae_r": 0.8758703344367039,
       "mfe_r": 0.8077274283757502,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7328,
-      "_last_checked_t": 1789696800000
+      "_last_checked_t": 1789697700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1789697763381
+  "last_run_ts": 1789698635189
 }
