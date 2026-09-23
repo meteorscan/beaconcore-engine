@@ -1272,12 +1272,12 @@
       "created_ts": 1790133326969,
       "filled_ts": 1790136900000,
       "mae_r": 0.09795562812249249,
-      "mfe_r": 2.0706086837046915,
+      "mfe_r": 2.469049716901848,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7761,
-      "_last_checked_t": 1790147700000
+      "_last_checked_t": 1790148600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790148635976
+  "last_run_ts": 1790149526032
 }
