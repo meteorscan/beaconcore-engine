@@ -698,33 +698,6 @@
   },
   "tier2_trades": [
     {
-      "id": "ZEC-Mean Reversion-1788822037555",
-      "symbol": "ZEC",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 1134.7965445691113,
-      "sl": 1123.4,
-      "tp1": 1159.8,
-      "tp2": 1167.1,
-      "r_realized": 2.193950568021906,
-      "mae_r": 0.49107381058991817,
-      "mfe_r": 2.9134669047741,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.850815262602148,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 23.086477270681453,
-        "volatility_pctl": 56.666666666666664,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1788831900000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "ZEC-Reversal-1788833722669",
       "symbol": "ZEC",
       "engine": "Reversal",
@@ -1294,5 +1267,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1790127032420
+  "last_run_ts": 1790127925064
 }
