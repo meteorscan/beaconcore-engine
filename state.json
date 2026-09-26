@@ -1221,13 +1221,13 @@
       "status": "active",
       "created_ts": 1790404233151,
       "filled_ts": 1790408700000,
-      "mae_r": 0.7444101046155656,
+      "mae_r": 0.9257824402559524,
       "mfe_r": 0.24769657133737932,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7900,
-      "_last_checked_t": 1790408700000
+      "_last_checked_t": 1790409600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790409642360
+  "last_run_ts": 1790410523878
 }
