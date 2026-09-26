@@ -521,7 +521,7 @@
         "expired": 20
       },
       "Reversal|pending": {
-        "dispatched": 37,
+        "dispatched": 38,
         "filled": 27,
         "expired": 10
       },
@@ -548,7 +548,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 728,
+        "seen": 729,
         "rejected": 0
       }
     },
@@ -1187,7 +1187,46 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "NEAR-Reversal-1790404233151",
+      "symbol": "NEAR",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 4.8841432,
+      "sl": 4.829008,
+      "tp1": 5.0011,
+      "tp2": 5.0019,
+      "rr1": 2.1212727985026145,
+      "rr2": 2.1357825853538444,
+      "confidence": 0.8120467021586193,
+      "grade": "A+",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 25.03389085357259,
+        "volatility_pctl": 8.333333333333334,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1790404233151,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 7900,
+      "_last_checked_t": 1790402400000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1790403323985
+  "last_run_ts": 1790404233151
 }
