@@ -537,7 +537,7 @@
         "expired": 11
       },
       "Momentum|pending": {
-        "dispatched": 14,
+        "dispatched": 15,
         "filled": 14,
         "expired": 0
       },
@@ -554,7 +554,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 740,
+        "seen": 741,
         "rejected": 0
       }
     },
@@ -1249,7 +1249,46 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "NEAR-Momentum-1790505030400",
+      "symbol": "NEAR",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 5.290769292821651,
+      "sl": 5.186336,
+      "tp1": 5.4999,
+      "tp2": 5.49995,
+      "rr1": 2.002529093241335,
+      "rr2": 2.0030078677647554,
+      "confidence": 0.846017638004765,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 29.280962577779622,
+        "volatility_pctl": 37.5,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1790505030400,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 7928,
+      "_last_checked_t": 1790503200000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1790504125490
+  "last_run_ts": 1790505030400
 }
