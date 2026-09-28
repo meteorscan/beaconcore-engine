@@ -1303,18 +1303,18 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 4,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1790563525750,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1790566200000,
+      "mae_r": 0.24673369997538894,
+      "mfe_r": 0.5072479526608349,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7938,
-      "_last_checked_t": 1790565300000
+      "_last_checked_t": 1790566200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790566231786
+  "last_run_ts": 1790567125048
 }
