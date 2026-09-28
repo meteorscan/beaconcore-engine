@@ -1308,13 +1308,13 @@
       "status": "active",
       "created_ts": 1790563525750,
       "filled_ts": 1790566200000,
-      "mae_r": 0.24673369997538894,
+      "mae_r": 0.31683825591311165,
       "mfe_r": 0.5072479526608349,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7938,
-      "_last_checked_t": 1790566200000
+      "_last_checked_t": 1790567100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790567125048
+  "last_run_ts": 1790568038878
 }
