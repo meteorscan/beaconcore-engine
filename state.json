@@ -1395,7 +1395,7 @@
       "mfe_r": 2.0923334897351498,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8003,
-      "_last_checked_t": 1790669700000
+      "_last_checked_t": 1790670600000
     },
     {
       "id": "ZEC-Liquidity Sweep-1790659834082",
@@ -1432,9 +1432,9 @@
       "mfe_r": 1.021813050820021,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8007,
-      "_last_checked_t": 1790669700000
+      "_last_checked_t": 1790670600000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790670634892
+  "last_run_ts": 1790671527068
 }
