@@ -631,7 +631,8 @@
       "2026-09-25": "sent",
       "2026-09-26": "sent",
       "2026-09-27": "sent",
-      "2026-09-28": "sent"
+      "2026-09-28": "sent",
+      "2026-09-29": "sent"
     },
     "symbol_cooldown": {
       "TAO": {
@@ -1394,7 +1395,7 @@
       "mfe_r": 1.6663948864291789,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8003,
-      "_last_checked_t": 1790667000000
+      "_last_checked_t": 1790667900000
     },
     {
       "id": "ZEC-Liquidity Sweep-1790659834082",
@@ -1431,9 +1432,9 @@
       "mfe_r": 0.8916980870208948,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8007,
-      "_last_checked_t": 1790667000000
+      "_last_checked_t": 1790667900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790667927773
+  "last_run_ts": 1790668842193
 }
