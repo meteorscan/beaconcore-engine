@@ -1418,11 +1418,11 @@
       "status": "active",
       "created_ts": 1790659834082,
       "filled_ts": 1790661600000,
-      "mae_r": 0.3024681362910839,
+      "mae_r": 0.6754643658485815,
       "mfe_r": 1.8892461428141953,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8007,
-      "_last_checked_t": 1790694000000
+      "_last_checked_t": 1790694900000
     },
     {
       "id": "HYPE-Liquidity Sweep-1790694926761",
@@ -1450,18 +1450,18 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
+      "entry_filled": true,
+      "pending_bars": 1,
+      "status": "active",
       "created_ts": 1790694926761,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1790694900000,
+      "mae_r": 0.09662521283145803,
+      "mfe_r": 0.7185772345011867,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8031,
-      "_last_checked_t": 1790693100000
+      "_last_checked_t": 1790694900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790694926761
+  "last_run_ts": 1790695838488
 }
