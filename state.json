@@ -554,7 +554,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 767,
+        "seen": 768,
         "rejected": 0
       }
     },
@@ -1364,10 +1364,10 @@
       "created_ts": 1790649034299,
       "filled_ts": 1790649000000,
       "mae_r": 0.35892734020860445,
-      "mfe_r": 1.8048762597738106,
+      "mfe_r": 1.8983965848578004,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7998,
-      "_last_checked_t": 1790653500000
+      "_last_checked_t": 1790654400000
     },
     {
       "id": "NEAR-Liquidity Sweep-1790654440417",
@@ -1395,18 +1395,18 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
+      "entry_filled": true,
+      "pending_bars": 1,
+      "status": "active",
       "created_ts": 1790654440417,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1790654400000,
+      "mae_r": 0.07581899436184841,
+      "mfe_r": 0.36165744921426896,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8003,
-      "_last_checked_t": 1790652600000
+      "_last_checked_t": 1790654400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790654440417
+  "last_run_ts": 1790655325647
 }
