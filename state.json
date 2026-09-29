@@ -1419,12 +1419,12 @@
       "created_ts": 1790659834082,
       "filled_ts": 1790661600000,
       "mae_r": 0.3024681362910839,
-      "mfe_r": 1.206865443778781,
+      "mfe_r": 1.8314172700145839,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8007,
-      "_last_checked_t": 1790681400000
+      "_last_checked_t": 1790682300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790682325878
+  "last_run_ts": 1790683241502
 }
