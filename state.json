@@ -1286,7 +1286,7 @@
       "mfe_r": 2.6329749878450657,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7974,
-      "_last_checked_t": 1790641800000
+      "_last_checked_t": 1790642700000
     },
     {
       "id": "HYPE-Liquidity Sweep-1790633727209",
@@ -1323,9 +1323,9 @@
       "mfe_r": 0.9137581863864178,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 7978,
-      "_last_checked_t": 1790641800000
+      "_last_checked_t": 1790642700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790642726465
+  "last_run_ts": 1790643640883
 }
