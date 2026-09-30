@@ -560,7 +560,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 793,
+        "seen": 794,
         "rejected": 0
       }
     },
@@ -1538,7 +1538,7 @@
       "mfe_r": 0.6878180622854276,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8065,
-      "_last_checked_t": 1790798400000
+      "_last_checked_t": 1790799300000
     },
     {
       "id": "HYPE-Momentum-1790797526988",
@@ -1573,12 +1573,12 @@
       "created_ts": 1790797526988,
       "filled_ts": 1790797500000,
       "mae_r": 0.27405653690925325,
-      "mfe_r": 0.9970270863043346,
+      "mfe_r": 2.861181946602079,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8070,
-      "_last_checked_t": 1790798400000
+      "_last_checked_t": 1790799300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790799323305
+  "last_run_ts": 1790800234362
 }
