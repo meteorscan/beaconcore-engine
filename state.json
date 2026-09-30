@@ -537,7 +537,7 @@
         "expired": 11
       },
       "Momentum|pending": {
-        "dispatched": 16,
+        "dispatched": 17,
         "filled": 14,
         "expired": 1
       },
@@ -554,7 +554,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 789,
+        "seen": 791,
         "rejected": 0
       }
     },
@@ -1502,10 +1502,10 @@
       "created_ts": 1790793925589,
       "filled_ts": 1790793900000,
       "mae_r": 0.05889275771668708,
-      "mfe_r": 0.3875104498932706,
+      "mfe_r": 0.6878180622854276,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8065,
-      "_last_checked_t": 1790795700000
+      "_last_checked_t": 1790796600000
     },
     {
       "id": "NEAR-Momentum-1790794843653",
@@ -1543,9 +1543,47 @@
       "mfe_r": 1.625512325543835,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8067,
+      "_last_checked_t": 1790796600000
+    },
+    {
+      "id": "HYPE-Momentum-1790797526988",
+      "symbol": "HYPE",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 88.71767999125764,
+      "sl": 88.05839999999999,
+      "tp1": 90.982,
+      "tp2": 91.428,
+      "rr1": 3.4345347026578543,
+      "rr2": 4.111030282554348,
+      "confidence": 0.8034061974664747,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 27.019087239625488,
+        "volatility_pctl": 100.0,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1790797526988,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 8070,
       "_last_checked_t": 1790795700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790796632770
+  "last_run_ts": 1790797526988
 }
