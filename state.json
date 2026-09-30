@@ -537,7 +537,7 @@
         "expired": 11
       },
       "Momentum|pending": {
-        "dispatched": 15,
+        "dispatched": 16,
         "filled": 14,
         "expired": 1
       },
@@ -554,7 +554,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 784,
+        "seen": 786,
         "rejected": 0
       }
     },
@@ -1496,18 +1496,56 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
+      "entry_filled": true,
+      "pending_bars": 1,
+      "status": "active",
+      "created_ts": 1790793925589,
+      "filled_ts": 1790793900000,
+      "mae_r": 0.050776335760140553,
+      "mfe_r": 0.3875104498932706,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 8065,
+      "_last_checked_t": 1790793900000
+    },
+    {
+      "id": "NEAR-Momentum-1790794843653",
+      "symbol": "NEAR",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 5.354621484643192,
+      "sl": 5.300744,
+      "tp1": 5.4772,
+      "tp2": 5.4796,
+      "rr1": 2.2751343380002504,
+      "rr2": 2.3196798474258284,
+      "confidence": 0.8621409552247069,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 26.22530648631389,
+        "volatility_pctl": 94.16666666666667,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
       "entry_filled": false,
       "pending_bars": 0,
       "status": "pending",
-      "created_ts": 1790793925589,
+      "created_ts": 1790794843653,
       "filled_ts": null,
       "mae_r": 0.0,
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
-      "tg_message_id": 8065,
-      "_last_checked_t": 1790792100000
+      "tg_message_id": 8067,
+      "_last_checked_t": 1790793000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790793925589
+  "last_run_ts": 1790794843653
 }
