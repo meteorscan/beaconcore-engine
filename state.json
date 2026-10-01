@@ -554,7 +554,7 @@
         "expired": 1
       },
       "Range Trading|pending": {
-        "dispatched": 5,
+        "dispatched": 6,
         "filled": 5,
         "expired": 0
       },
@@ -566,7 +566,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 805,
+        "seen": 806,
         "rejected": 0
       }
     },
@@ -1589,7 +1589,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "ZEC-Range Trading-1790868644434",
+      "symbol": "ZEC",
+      "engine": "Range Trading",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1363.5,
+      "sl": 1353.264,
+      "tp1": 1387.7,
+      "tp2": 1408.0,
+      "rr1": 2.3642047674872804,
+      "rr2": 4.347401328643958,
+      "confidence": 0.8167104498332419,
+      "grade": "A+",
+      "confluences": [
+        "range extreme rejection",
+        "range-boundary entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 17.775421858544682,
+        "volatility_pctl": 62.5,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1790868644434,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 8096,
+      "_last_checked_t": 1790866800000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1790867731048
+  "last_run_ts": 1790868644434
 }
