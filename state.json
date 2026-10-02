@@ -60,10 +60,10 @@
         "sum_r": 1.0966207272803565
       },
       "NEAR|trend|intraday|Liquidity Sweep": {
-        "n": 5,
-        "wins": 1,
+        "n": 6,
+        "wins": 2,
         "losses": 4,
-        "sum_r": -1.877860422900325
+        "sum_r": 0.17095306304277935
       },
       "PENGU|trend|intraday|Liquidity Sweep": {
         "n": 6,
@@ -527,9 +527,9 @@
         "sum_conf": 3.1236026831699206
       },
       "Liquidity Sweep|B": {
-        "n": 1,
-        "wins": 0,
-        "sum_conf": 0.6758429598450376
+        "n": 2,
+        "wins": 1,
+        "sum_conf": 1.2748265650432629
       }
     },
     "forensic_counts": {
@@ -541,7 +541,7 @@
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 117,
-        "filled": 95,
+        "filled": 96,
         "expired": 21
       },
       "Reversal|pending": {
@@ -1594,48 +1594,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "NEAR-Liquidity Sweep-1790934324123",
       "symbol": "NEAR",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 4.8495384,
       "sl": 4.80519,
       "tp1": 4.9404,
       "tp2": 4.95,
-      "rr1": 2.0488134859431044,
-      "rr2": 2.2652812728305616,
+      "r_realized": 2.0488134859431044,
+      "mae_r": 0.7990908352950705,
+      "mfe_r": 2.3554761840336607,
+      "forensic_category": "genuine_variance",
       "confidence": 0.5989836051982254,
       "grade": "B",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 28.414972651649034,
-        "volatility_pctl": 2.5,
-        "macro_bias": "neutral"
+        "trend_strength": 27.262663578417182,
+        "volatility_pctl": 1.6666666666666667,
+        "macro_bias": "bullish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 9,
-      "status": "active",
-      "created_ts": 1790934324123,
-      "filled_ts": 1790941500000,
-      "mae_r": 0.7990908352950705,
-      "mfe_r": 2.003716030341535,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 8120,
-      "_last_checked_t": 1790945100000
+      "resolved_ts": 1790946000000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1790946042636
+  "last_run_ts": 1790946925615
 }
