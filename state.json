@@ -1602,10 +1602,10 @@
       "created_ts": 1790899242998,
       "filled_ts": 1790903700000,
       "mae_r": 0.3380035117518645,
-      "mfe_r": 1.1104638742855284,
+      "mfe_r": 1.271983618771708,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8103,
-      "_last_checked_t": 1790909100000
+      "_last_checked_t": 1790910000000
     },
     {
       "id": "UNI-Liquidity Sweep-1790908231031",
@@ -1634,7 +1634,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 3,
+      "pending_bars": 4,
       "status": "pending",
       "created_ts": 1790908231031,
       "filled_ts": null,
@@ -1642,9 +1642,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8105,
-      "_last_checked_t": 1790909100000
+      "_last_checked_t": 1790910000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790910040788
+  "last_run_ts": 1790910931044
 }
