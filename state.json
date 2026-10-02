@@ -1630,12 +1630,12 @@
       "created_ts": 1790934324123,
       "filled_ts": 1790941500000,
       "mae_r": 0.7990908352950705,
-      "mfe_r": 1.7692092612134576,
+      "mfe_r": 2.003716030341535,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8120,
-      "_last_checked_t": 1790944200000
+      "_last_checked_t": 1790945100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790945124430
+  "last_run_ts": 1790946042636
 }
