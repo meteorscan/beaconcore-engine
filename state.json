@@ -444,10 +444,10 @@
         "sum_r": 1.193950568021906
       },
       "ZEC|trend|intraday|Reversal": {
-        "n": 4,
-        "wins": 1,
+        "n": 5,
+        "wins": 2,
         "losses": 3,
-        "sum_r": -0.6178618626973482
+        "sum_r": 1.9098075115959934
       },
       "HYPE|trend|intraday|Reversal": {
         "n": 2,
@@ -492,9 +492,9 @@
         "sum_conf": 42.60072317496953
       },
       "Reversal|A": {
-        "n": 15,
-        "wins": 5,
-        "sum_conf": 11.491827466563999
+        "n": 16,
+        "wins": 6,
+        "sum_conf": 12.291818850786548
       },
       "Mean Reversion|A+": {
         "n": 19,
@@ -546,7 +546,7 @@
       },
       "Reversal|pending": {
         "dispatched": 41,
-        "filled": 30,
+        "filled": 31,
         "expired": 10
       },
       "Mean Reversion|pending": {
@@ -1566,47 +1566,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "ZEC-Reversal-1790899242998",
       "symbol": "ZEC",
       "engine": "Reversal",
       "counter_trend": false,
       "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 1323.3872000000001,
       "sl": 1304.1945,
       "tp1": 1371.9,
       "tp2": 1387.7,
-      "rr1": 2.5276693742933416,
-      "rr2": 3.3508990397390535,
+      "r_realized": 2.5276693742933416,
+      "mae_r": 0.3380035117518645,
+      "mfe_r": 3.512418784225233,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7999913842225495,
       "grade": "A",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 35.28899993964104,
-        "volatility_pctl": 53.333333333333336,
-        "macro_bias": "neutral"
+        "trend_strength": 39.76544382459433,
+        "volatility_pctl": 36.666666666666664,
+        "macro_bias": "bullish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 6,
-      "status": "active",
-      "created_ts": 1790899242998,
-      "filled_ts": 1790903700000,
-      "mae_r": 0.3380035117518645,
-      "mfe_r": 1.271983618771708,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 8103,
-      "_last_checked_t": 1790913600000
-    },
+      "resolved_ts": 1790914500000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "UNI-Liquidity Sweep-1790908231031",
       "symbol": "UNI",
@@ -1634,7 +1623,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 8,
+      "pending_bars": 9,
       "status": "pending",
       "created_ts": 1790908231031,
       "filled_ts": null,
@@ -1642,9 +1631,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8105,
-      "_last_checked_t": 1790913600000
+      "_last_checked_t": 1790914500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1790914526581
+  "last_run_ts": 1790915434297
 }
