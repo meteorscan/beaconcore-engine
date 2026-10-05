@@ -1611,12 +1611,12 @@
       "created_ts": 1791178239437,
       "filled_ts": 1791179100000,
       "mae_r": 0.06870024763413778,
-      "mfe_r": 1.1915795598514025,
+      "mfe_r": 1.436111462796365,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8157,
-      "_last_checked_t": 1791187200000
+      "_last_checked_t": 1791188100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1791188127279
+  "last_run_ts": 1791189038453
 }
