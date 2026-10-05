@@ -578,7 +578,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 837,
+        "seen": 839,
         "rejected": 0
       }
     },
@@ -1605,7 +1605,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1791178239437,
       "filled_ts": null,
@@ -1613,7 +1613,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8157,
-      "_last_checked_t": 1791176400000
+      "_last_checked_t": 1791178200000
     },
     {
       "id": "UNI-Liquidity Sweep-1791178239437",
@@ -1643,7 +1643,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1791178239437,
       "filled_ts": null,
@@ -1651,9 +1651,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8158,
-      "_last_checked_t": 1791176400000
+      "_last_checked_t": 1791178200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1791178239437
+  "last_run_ts": 1791179125284
 }
