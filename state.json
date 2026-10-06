@@ -564,7 +564,7 @@
       "Mean Reversion|pending": {
         "dispatched": 38,
         "filled": 25,
-        "expired": 12
+        "expired": 13
       },
       "Momentum|pending": {
         "dispatched": 18,
@@ -1670,45 +1670,7 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [
-    {
-      "id": "UNI-Mean Reversion-1791270932454",
-      "symbol": "UNI",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 8.790318029982734,
-      "sl": 8.73614,
-      "tp1": 8.8991,
-      "tp2": 9.0206,
-      "rr1": 2.007861305624008,
-      "rr2": 4.250467765082248,
-      "confidence": 0.7221530670989056,
-      "grade": "A",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 18.790520614426278,
-        "volatility_pctl": 32.5,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1791270932454,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 8196,
-      "_last_checked_t": 1791279000000
-    }
-  ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1791279930964
+  "last_run_ts": 1791280842953
 }
