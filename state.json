@@ -590,7 +590,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 861,
+        "seen": 862,
         "rejected": 0
       }
     },
@@ -1740,9 +1740,9 @@
       "mfe_r": 1.6776122771383535,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8210,
-      "_last_checked_t": 1791301500000
+      "_last_checked_t": 1791302400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1791302447728
+  "last_run_ts": 1791303334114
 }
