@@ -438,10 +438,10 @@
         "sum_r": -0.6216295828730511
       },
       "ZEC|trend|intraday|Mean Reversion": {
-        "n": 2,
+        "n": 3,
         "wins": 1,
-        "losses": 1,
-        "sum_r": 1.193950568021906
+        "losses": 2,
+        "sum_r": 0.19395056802190602
       },
       "ZEC|trend|intraday|Reversal": {
         "n": 5,
@@ -540,9 +540,9 @@
         "sum_conf": 5.131195826715744
       },
       "Mean Reversion|A": {
-        "n": 5,
+        "n": 6,
         "wins": 2,
-        "sum_conf": 3.9131813708735828
+        "sum_conf": 4.698911162000157
       },
       "Liquidity Sweep|B": {
         "n": 3,
@@ -569,7 +569,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 40,
-        "filled": 26,
+        "filled": 27,
         "expired": 13
       },
       "Momentum|pending": {
@@ -698,7 +698,7 @@
       },
       "ZEC": {
         "direction": "bullish",
-        "until_ts": 1791436500000
+        "until_ts": 1791454500000
       },
       "SUI": {
         "direction": "bearish",
@@ -1811,46 +1811,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "ZEC-Mean Reversion-1791445530832",
       "symbol": "ZEC",
       "engine": "Mean Reversion",
       "counter_trend": false,
       "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 1249.1528497880497,
       "sl": 1224.068,
       "tp1": 1336.8,
       "tp2": 1338.0,
-      "rr1": 3.494027309412267,
-      "rr2": 3.541864948869519,
+      "r_realized": -1.0,
+      "mae_r": 1.4970330739608317,
+      "mfe_r": 0.2610001760931159,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7857297911265745,
       "grade": "A",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 19.969686957444228,
-        "volatility_pctl": 98.33333333333333,
-        "macro_bias": "neutral"
+        "trend_strength": 22.880042459899947,
+        "volatility_pctl": 96.66666666666667,
+        "macro_bias": "bullish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1791445530832,
-      "filled_ts": 1791444600000,
-      "mae_r": 0.6319690937755569,
-      "mfe_r": 0.2610001760931159,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 8271,
-      "_last_checked_t": 1791450000000
-    },
+      "resolved_ts": 1791450900000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "UNI-Liquidity Sweep-1791446443713",
       "symbol": "UNI",
@@ -1878,7 +1868,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 6,
+      "pending_bars": 7,
       "status": "pending",
       "created_ts": 1791446443713,
       "filled_ts": null,
@@ -1886,9 +1876,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8277,
-      "_last_checked_t": 1791450000000
+      "_last_checked_t": 1791450900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1791450926926
+  "last_run_ts": 1791451837888
 }
