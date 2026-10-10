@@ -573,7 +573,7 @@
         "expired": 14
       },
       "Momentum|pending": {
-        "dispatched": 18,
+        "dispatched": 19,
         "filled": 17,
         "expired": 1
       },
@@ -590,7 +590,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 898,
+        "seen": 899,
         "rejected": 0
       }
     },
@@ -1815,7 +1815,46 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "UNI-Momentum-1791666924448",
+      "symbol": "UNI",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 7.553317436190508,
+      "sl": 7.482469999999999,
+      "tp1": 7.7093,
+      "tp2": 7.8418,
+      "rr1": 2.201668432856955,
+      "rr2": 4.071884309740729,
+      "confidence": 0.7614943134468624,
+      "grade": "A",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 23.51808003957775,
+        "volatility_pctl": 0.8333333333333334,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1791666924448,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 8357,
+      "_last_checked_t": 1791665100000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1791666042762
+  "last_run_ts": 1791666924448
 }
