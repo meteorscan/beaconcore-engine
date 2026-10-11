@@ -769,33 +769,6 @@
   },
   "tier2_trades": [
     {
-      "id": "NEAR-Reversal-1790404233151",
-      "symbol": "NEAR",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 4.8841432,
-      "sl": 4.829008,
-      "tp1": 5.0011,
-      "tp2": 5.0019,
-      "r_realized": -1.0,
-      "mae_r": 1.0382332883529903,
-      "mfe_r": 0.24769657133737932,
-      "forensic_category": "structural_invalidation_too_tight",
-      "confidence": 0.8120467021586193,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 22.538202887800235,
-        "volatility_pctl": 7.5,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1790410500000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "NEAR-Liquidity Sweep-1790419524578",
       "symbol": "NEAR",
       "engine": "Liquidity Sweep",
@@ -1851,5 +1824,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1791705642323
+  "last_run_ts": 1791706528504
 }
