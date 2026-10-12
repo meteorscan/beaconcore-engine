@@ -1859,7 +1859,7 @@
       "mfe_r": 0.13533310939530996,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8386,
-      "_last_checked_t": 1791819900000
+      "_last_checked_t": 1791820800000
     },
     {
       "id": "NEAR-Liquidity Sweep-1791819927073",
@@ -1893,12 +1893,12 @@
       "created_ts": 1791819927073,
       "filled_ts": 1791819000000,
       "mae_r": 0.8715142359451614,
-      "mfe_r": 0.6777142328621285,
+      "mfe_r": 0.696983243668196,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8388,
-      "_last_checked_t": 1791819900000
+      "_last_checked_t": 1791820800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1791820843498
+  "last_run_ts": 1791821729664
 }
