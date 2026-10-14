@@ -1832,12 +1832,12 @@
       "created_ts": 1792005329553,
       "filled_ts": 1792008000000,
       "mae_r": 0.6928352699357997,
-      "mfe_r": 0.2877008263769642,
+      "mfe_r": 0.3322706489366247,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8459,
-      "_last_checked_t": 1792008000000
+      "_last_checked_t": 1792008900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792008931259
+  "last_run_ts": 1792009834485
 }
