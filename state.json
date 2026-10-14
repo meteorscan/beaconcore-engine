@@ -771,60 +771,6 @@
   },
   "tier2_trades": [
     {
-      "id": "NEAR-Liquidity Sweep-1790625645145",
-      "symbol": "NEAR",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 4.7336264,
-      "sl": 4.6892000000000005,
-      "tp1": 4.8706,
-      "tp2": 4.9084,
-      "r_realized": -1.0,
-      "mae_r": 2.2064898348729693,
-      "mfe_r": 2.6329749878450657,
-      "forensic_category": "correct_read_poor_rr",
-      "confidence": 0.8112153241948641,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 32.09717959979467,
-        "volatility_pctl": 51.666666666666664,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1790644500000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
-      "id": "HYPE-Liquidity Sweep-1790633727209",
-      "symbol": "HYPE",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 86.833992,
-      "sl": 85.96395,
-      "tp1": 89.763,
-      "tp2": 90.566,
-      "r_realized": -1.0,
-      "mae_r": 1.1803935901944909,
-      "mfe_r": 0.9137581863864178,
-      "forensic_category": "correct_read_poor_rr",
-      "confidence": 0.7681760680377708,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 34.63254059172966,
-        "volatility_pctl": 52.5,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1790644500000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "HYPE-Liquidity Sweep-1790649034299",
       "symbol": "HYPE",
       "engine": "Liquidity Sweep",
@@ -1826,5 +1772,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1791939640123
+  "last_run_ts": 1791940528631
 }
