@@ -180,10 +180,10 @@
         "sum_r": -1.0
       },
       "NEAR|range|intraday|Mean Reversion": {
-        "n": 3,
+        "n": 4,
         "wins": 1,
-        "losses": 2,
-        "sum_r": 1.094695627535343
+        "losses": 3,
+        "sum_r": 0.094695627535343
       },
       "ADA|trend|intraday|Mean Reversion": {
         "n": 1,
@@ -521,9 +521,9 @@
         "sum_conf": 13.068069727438548
       },
       "Mean Reversion|A+": {
-        "n": 22,
+        "n": 23,
         "wins": 6,
-        "sum_conf": 18.344500784252595
+        "sum_conf": 19.150354787301065
       },
       "Momentum|A+": {
         "n": 17,
@@ -575,7 +575,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 43,
-        "filled": 28,
+        "filled": 29,
         "expired": 14
       },
       "Momentum|pending": {
@@ -596,7 +596,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 927,
+        "seen": 928,
         "rejected": 0
       }
     },
@@ -698,7 +698,7 @@
       },
       "NEAR": {
         "direction": "bullish",
-        "until_ts": 1791826200000
+        "until_ts": 1791990000000
       },
       "PENGU": {
         "direction": "bearish",
@@ -1769,47 +1769,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "NEAR-Mean Reversion-1791982844595",
       "symbol": "NEAR",
       "engine": "Mean Reversion",
       "counter_trend": false,
       "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 4.961742791426267,
       "sl": 4.8763188,
       "tp1": 5.1527,
       "tp2": 5.157,
-      "rr1": 2.2354048948714462,
-      "rr2": 2.285742041710473,
+      "r_realized": -1.0,
+      "mae_r": 1.201568666044626,
+      "mfe_r": 0.9043970819417502,
+      "forensic_category": "correct_read_poor_rr",
       "confidence": 0.8058540030484697,
       "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 21.44151557182479,
-        "volatility_pctl": 33.333333333333336,
-        "macro_bias": "neutral"
+        "trend_strength": 21.74595304876603,
+        "volatility_pctl": 40.0,
+        "macro_bias": "bullish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1791982844595,
-      "filled_ts": 1791981900000,
-      "mae_r": 0.8655974766771425,
-      "mfe_r": 0.9043970819417502,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 8438,
-      "_last_checked_t": 1791985500000
+      "resolved_ts": 1791986400000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1791986445656
+  "last_run_ts": 1791987326213
 }
