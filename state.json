@@ -1858,10 +1858,10 @@
       "created_ts": 1792010728251,
       "filled_ts": 1792009800000,
       "mae_r": 0.8165765132594557,
-      "mfe_r": 0.6267146927044565,
+      "mfe_r": 0.6769161259553723,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8461,
-      "_last_checked_t": 1792017900000
+      "_last_checked_t": 1792018800000
     },
     {
       "id": "NEAR-Reversal-1792015241622",
@@ -1891,7 +1891,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 5,
+      "pending_bars": 6,
       "status": "pending",
       "created_ts": 1792015241622,
       "filled_ts": null,
@@ -1899,7 +1899,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8464,
-      "_last_checked_t": 1792017900000
+      "_last_checked_t": 1792018800000
     },
     {
       "id": "UNI-Reversal-1792018844101",
@@ -1928,18 +1928,18 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 0,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1792018844101,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1792017900000,
+      "mae_r": 0.2504927913144956,
+      "mfe_r": 0.8434523256653932,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8465,
-      "_last_checked_t": 1792017000000
+      "_last_checked_t": 1792018800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792018844101
+  "last_run_ts": 1792019729757
 }
