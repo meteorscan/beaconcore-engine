@@ -772,33 +772,6 @@
   },
   "tier2_trades": [
     {
-      "id": "NEAR-Reversal-1790723729732",
-      "symbol": "NEAR",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 4.93552,
-      "sl": 4.875616000000001,
-      "tp1": 5.0697,
-      "tp2": 5.0803,
-      "r_realized": -1.0,
-      "mae_r": 1.5411324786324905,
-      "mfe_r": 0.2984775641025648,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.7966697851921011,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 21.05263802545604,
-        "volatility_pctl": 66.66666666666667,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1790724600000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "ZEC-Liquidity Sweep-1790659834082",
       "symbol": "ZEC",
       "engine": "Liquidity Sweep",
@@ -1861,7 +1834,7 @@
       "mfe_r": 0.6769161259553723,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8461,
-      "_last_checked_t": 1792018800000
+      "_last_checked_t": 1792019700000
     },
     {
       "id": "NEAR-Reversal-1792015241622",
@@ -1891,7 +1864,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 6,
+      "pending_bars": 7,
       "status": "pending",
       "created_ts": 1792015241622,
       "filled_ts": null,
@@ -1899,7 +1872,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8464,
-      "_last_checked_t": 1792018800000
+      "_last_checked_t": 1792019700000
     },
     {
       "id": "UNI-Reversal-1792018844101",
@@ -1937,9 +1910,9 @@
       "mfe_r": 0.8434523256653932,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8465,
-      "_last_checked_t": 1792018800000
+      "_last_checked_t": 1792019700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792019729757
+  "last_run_ts": 1792020645145
 }
