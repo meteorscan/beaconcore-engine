@@ -1834,7 +1834,7 @@
       "mfe_r": 1.1287290252136433,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8461,
-      "_last_checked_t": 1792022400000
+      "_last_checked_t": 1792023300000
     },
     {
       "id": "NEAR-Reversal-1792015241622",
@@ -1864,7 +1864,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 10,
+      "pending_bars": 11,
       "status": "pending",
       "created_ts": 1792015241622,
       "filled_ts": null,
@@ -1872,7 +1872,7 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8464,
-      "_last_checked_t": 1792022400000
+      "_last_checked_t": 1792023300000
     },
     {
       "id": "UNI-Reversal-1792018844101",
@@ -1910,9 +1910,9 @@
       "mfe_r": 1.2240110632940036,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8465,
-      "_last_checked_t": 1792022400000
+      "_last_checked_t": 1792023300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792023325725
+  "last_run_ts": 1792024234225
 }
