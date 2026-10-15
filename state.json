@@ -60,10 +60,10 @@
         "sum_r": 1.0966207272803565
       },
       "NEAR|trend|intraday|Liquidity Sweep": {
-        "n": 14,
+        "n": 15,
         "wins": 2,
-        "losses": 12,
-        "sum_r": -7.829046936957221
+        "losses": 13,
+        "sum_r": -8.829046936957221
       },
       "PENGU|trend|intraday|Liquidity Sweep": {
         "n": 6,
@@ -557,9 +557,9 @@
         "sum_conf": 4.698911162000157
       },
       "Liquidity Sweep|B": {
-        "n": 7,
+        "n": 8,
         "wins": 1,
-        "sum_conf": 4.480791222328841
+        "sum_conf": 5.101364585122129
       }
     },
     "forensic_counts": {
@@ -571,7 +571,7 @@
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 143,
-        "filled": 117,
+        "filled": 118,
         "expired": 25
       },
       "Reversal|pending": {
@@ -602,7 +602,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 954,
+        "seen": 955,
         "rejected": 0
       }
     },
@@ -705,7 +705,7 @@
       },
       "NEAR": {
         "direction": "bullish",
-        "until_ts": 1792071900000
+        "until_ts": 1792075500000
       },
       "PENGU": {
         "direction": "bearish",
@@ -1884,48 +1884,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "NEAR-Liquidity Sweep-1792071929119",
       "symbol": "NEAR",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 4.6050743999999995,
       "sl": 4.533676,
       "tp1": 4.7715,
       "tp2": 4.8321,
-      "rr1": 2.3309429903191248,
-      "rr2": 3.179701505916117,
+      "r_realized": -1.0,
+      "mae_r": 1.1047082287558212,
+      "mfe_r": 0.7678827536751691,
+      "forensic_category": "genuine_variance",
       "confidence": 0.6205733627932879,
       "grade": "B",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 36.08919024567102,
-        "volatility_pctl": 41.666666666666664,
-        "macro_bias": "neutral"
+        "trend_strength": 36.70036902638062,
+        "volatility_pctl": 43.333333333333336,
+        "macro_bias": "bullish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
-      "created_ts": 1792071929119,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 8509,
-      "_last_checked_t": 1792070100000
+      "resolved_ts": 1792071900000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1792071929119
+  "last_run_ts": 1792072847317
 }
