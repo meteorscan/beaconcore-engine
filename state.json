@@ -779,33 +779,6 @@
   },
   "tier2_trades": [
     {
-      "id": "NEAR-Momentum-1790794843653",
-      "symbol": "NEAR",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 5.354621484643192,
-      "sl": 5.300744,
-      "tp1": 5.4772,
-      "tp2": 5.4796,
-      "r_realized": -1.0,
-      "mae_r": 1.1827108311606014,
-      "mfe_r": 1.625512325543835,
-      "forensic_category": "correct_read_poor_rr",
-      "confidence": 0.8621409552247069,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 27.233418045056908,
-        "volatility_pctl": 91.66666666666667,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1790798400000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "HYPE-Momentum-1790797526988",
       "symbol": "HYPE",
       "engine": "Momentum",
@@ -1861,5 +1834,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1792093531416
+  "last_run_ts": 1792094446040
 }
