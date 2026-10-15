@@ -779,33 +779,6 @@
   },
   "tier2_trades": [
     {
-      "id": "NEAR-Momentum-1790802041830",
-      "symbol": "NEAR",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 5.351213704351055,
-      "sl": 5.29816,
-      "tp1": 5.4772,
-      "tp2": 5.4796,
-      "r_realized": -1.0,
-      "mae_r": 1.5062794451122234,
-      "mfe_r": 1.0326573105324535,
-      "forensic_category": "correct_read_poor_rr",
-      "confidence": 0.8732703695517532,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 27.71705813388102,
-        "volatility_pctl": 88.33333333333333,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1790802900000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "ZEC-Liquidity Sweep-1790793925589",
       "symbol": "ZEC",
       "engine": "Liquidity Sweep",
@@ -1807,5 +1780,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1792098047425
+  "last_run_ts": 1792098932558
 }
