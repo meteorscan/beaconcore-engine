@@ -1834,7 +1834,7 @@
       "mfe_r": 1.1287290252136433,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8461,
-      "_last_checked_t": 1792027800000
+      "_last_checked_t": 1792028700000
     },
     {
       "id": "UNI-Reversal-1792018844101",
@@ -1868,13 +1868,13 @@
       "status": "active",
       "created_ts": 1792018844101,
       "filled_ts": 1792017900000,
-      "mae_r": 0.2504927913144956,
+      "mae_r": 0.419486671413978,
       "mfe_r": 1.2240110632940036,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8465,
-      "_last_checked_t": 1792027800000
+      "_last_checked_t": 1792028700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792028723714
+  "last_run_ts": 1792029640829
 }
