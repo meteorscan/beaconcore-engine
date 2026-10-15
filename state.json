@@ -779,33 +779,6 @@
   },
   "tier2_trades": [
     {
-      "id": "ZEC-Liquidity Sweep-1790659834082",
-      "symbol": "ZEC",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 1396.4607999999998,
-      "sl": 1361.876,
-      "tp1": 1489.15,
-      "tp2": 1489.6,
-      "r_realized": 2.6800559783488884,
-      "mae_r": 0.6754643658485815,
-      "mfe_r": 2.78848511484816,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.8418426897884279,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 18.322777453245155,
-        "volatility_pctl": 52.5,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1790774100000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "HYPE-Reversal-1790775926924",
       "symbol": "HYPE",
       "engine": "Reversal",
@@ -1915,5 +1888,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1792069244838
+  "last_run_ts": 1792070134478
 }
