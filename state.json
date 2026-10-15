@@ -1834,7 +1834,7 @@
       "mfe_r": 1.1287290252136433,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8461,
-      "_last_checked_t": 1792025100000
+      "_last_checked_t": 1792026000000
     },
     {
       "id": "UNI-Reversal-1792018844101",
@@ -1872,9 +1872,9 @@
       "mfe_r": 1.2240110632940036,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8465,
-      "_last_checked_t": 1792025100000
+      "_last_checked_t": 1792026000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792026041987
+  "last_run_ts": 1792026924703
 }
