@@ -570,7 +570,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 142,
+        "dispatched": 143,
         "filled": 117,
         "expired": 25
       },
@@ -602,7 +602,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 953,
+        "seen": 954,
         "rejected": 0
       }
     },
@@ -1886,7 +1886,46 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "NEAR-Liquidity Sweep-1792071929119",
+      "symbol": "NEAR",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 4.6050743999999995,
+      "sl": 4.533676,
+      "tp1": 4.7715,
+      "tp2": 4.8321,
+      "rr1": 2.3309429903191248,
+      "rr2": 3.179701505916117,
+      "confidence": 0.6205733627932879,
+      "grade": "B",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 36.08919024567102,
+        "volatility_pctl": 41.666666666666664,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1792071929119,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 8509,
+      "_last_checked_t": 1792070100000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1792071036167
+  "last_run_ts": 1792071929119
 }
