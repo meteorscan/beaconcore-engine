@@ -570,7 +570,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 143,
+        "dispatched": 144,
         "filled": 118,
         "expired": 25
       },
@@ -602,7 +602,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 955,
+        "seen": 956,
         "rejected": 0
       }
     },
@@ -1778,7 +1778,45 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "UNI-Liquidity Sweep-1792125038117",
+      "symbol": "UNI",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 7.3404864000000005,
+      "sl": 7.2562,
+      "tp1": 7.51075,
+      "tp2": 7.5129,
+      "rr1": 2.020060175781594,
+      "rr2": 2.0455684428329843,
+      "confidence": 0.7705874586499629,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 32.948832884938554,
+        "volatility_pctl": 83.33333333333333,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1792125038117,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 8528,
+      "_last_checked_t": 1792123200000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1792124128046
+  "last_run_ts": 1792125038117
 }
