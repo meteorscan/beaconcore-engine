@@ -781,60 +781,6 @@
   },
   "tier2_trades": [
     {
-      "id": "HYPE-Liquidity Sweep-1790963129052",
-      "symbol": "HYPE",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 87.913432,
-      "sl": 87.28020000000001,
-      "tp1": 89.56,
-      "tp2": 89.631,
-      "r_realized": -1.0,
-      "mae_r": 1.6335750562195335,
-      "mfe_r": 0.3530585946383046,
-      "forensic_category": "confidence_miscalibration",
-      "confidence": 0.831298544078918,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 18.163437746963435,
-        "volatility_pctl": 64.16666666666667,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1790965800000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
-      "id": "ZEC-Liquidity Sweep-1790965834915",
-      "symbol": "ZEC",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 1337.3496,
-      "sl": 1304.1945,
-      "tp1": 1408.0,
-      "tp2": 1413.1,
-      "r_realized": -1.0,
-      "mae_r": 1.8353013563524196,
-      "mfe_r": 0.5987133201226981,
-      "forensic_category": "confidence_miscalibration",
-      "confidence": 0.7314395916781937,
-      "grade": "A",
-      "regime_at_entry": {
-        "trend_strength": 20.181352084934023,
-        "volatility_pctl": 39.166666666666664,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1790965800000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "UNI-Liquidity Sweep-1790969433901",
       "symbol": "UNI",
       "engine": "Liquidity Sweep",
@@ -1728,5 +1674,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1792260926569
+  "last_run_ts": 1792261840335
 }
