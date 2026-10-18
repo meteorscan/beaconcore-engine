@@ -1706,12 +1706,12 @@
       "created_ts": 1792340125471,
       "filled_ts": 1792339200000,
       "mae_r": 0.25885048815260386,
-      "mfe_r": 0.6181275859871306,
+      "mfe_r": 1.0417331831564531,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8590,
-      "_last_checked_t": 1792341900000
+      "_last_checked_t": 1792342800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792342843036
+  "last_run_ts": 1792343726467
 }
