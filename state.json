@@ -180,10 +180,10 @@
         "sum_r": -1.0
       },
       "NEAR|range|intraday|Mean Reversion": {
-        "n": 4,
+        "n": 5,
         "wins": 1,
-        "losses": 3,
-        "sum_r": 0.094695627535343
+        "losses": 4,
+        "sum_r": -0.905304372464657
       },
       "ADA|trend|intraday|Mean Reversion": {
         "n": 1,
@@ -527,9 +527,9 @@
         "sum_conf": 13.820483041691698
       },
       "Mean Reversion|A+": {
-        "n": 23,
+        "n": 24,
         "wins": 6,
-        "sum_conf": 19.150354787301065
+        "sum_conf": 19.965991794088975
       },
       "Momentum|A+": {
         "n": 17,
@@ -581,7 +581,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 45,
-        "filled": 30,
+        "filled": 31,
         "expired": 14
       },
       "Momentum|pending": {
@@ -708,7 +708,7 @@
       },
       "NEAR": {
         "direction": "bullish",
-        "until_ts": 1792075500000
+        "until_ts": 1792335600000
       },
       "PENGU": {
         "direction": "bearish",
@@ -1644,47 +1644,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "NEAR-Mean Reversion-1792332043042",
       "symbol": "NEAR",
       "engine": "Mean Reversion",
       "counter_trend": false,
       "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 4.821456187155564,
       "sl": 4.7636316,
       "tp1": 5.02075,
       "tp2": 5.0211,
-      "rr1": 3.446523747904664,
-      "rr2": 3.4525765364712035,
+      "r_realized": -1.0,
+      "mae_r": 1.4795814611766158,
+      "mfe_r": 0.40715920342147854,
+      "forensic_category": "confidence_miscalibration",
       "confidence": 0.8156370067879083,
       "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
       "regime_at_entry": {
         "trend_strength": 13.398119596218356,
         "volatility_pctl": 4.166666666666667,
-        "macro_bias": "neutral"
+        "macro_bias": "bullish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
-      "created_ts": 1792332043042,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 8588,
-      "_last_checked_t": 1792330200000
+      "resolved_ts": 1792332000000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1792332043042
+  "last_run_ts": 1792332924381
 }
