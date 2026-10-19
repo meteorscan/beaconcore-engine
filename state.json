@@ -1733,13 +1733,13 @@
       "status": "active",
       "created_ts": 1792434638575,
       "filled_ts": 1792433700000,
-      "mae_r": 0.030511294667197913,
+      "mae_r": 0.08857792200910826,
       "mfe_r": 2.2036713192496515,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8610,
-      "_last_checked_t": 1792444500000
+      "_last_checked_t": 1792445400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792445437133
+  "last_run_ts": 1792446328987
 }
