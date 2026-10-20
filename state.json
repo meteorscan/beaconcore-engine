@@ -486,10 +486,10 @@
         "sum_r": 1.4483939598359656
       },
       "UNI|range|intraday|Mean Reversion": {
-        "n": 4,
-        "wins": 0,
+        "n": 5,
+        "wins": 1,
         "losses": 4,
-        "sum_r": -4.0
+        "sum_r": -0.9364078326221086
       },
       "UNI|trend|intraday|Liquidity Sweep": {
         "n": 1,
@@ -558,9 +558,9 @@
         "sum_conf": 5.131195826715744
       },
       "Mean Reversion|A": {
-        "n": 8,
-        "wins": 2,
-        "sum_conf": 6.246530569388676
+        "n": 9,
+        "wins": 3,
+        "sum_conf": 7.039227522981654
       },
       "Liquidity Sweep|B": {
         "n": 8,
@@ -587,7 +587,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 51,
-        "filled": 36,
+        "filled": 37,
         "expired": 14
       },
       "Momentum|pending": {
@@ -1787,47 +1787,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "UNI-Mean Reversion-1792489527221",
       "symbol": "UNI",
       "engine": "Mean Reversion",
       "counter_trend": false,
       "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 7.147409402511567,
       "sl": 7.0851,
       "tp1": 7.3383,
       "tp2": 7.3436,
-      "rr1": 3.0635921673778914,
-      "rr2": 3.1486515610868295,
+      "r_realized": 3.0635921673778914,
+      "mae_r": 0.8122273761519656,
+      "mfe_r": 5.772653612296481,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7926969535929785,
       "grade": "A",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 19.072833986960834,
-        "volatility_pctl": 31.666666666666668,
-        "macro_bias": "neutral"
+        "trend_strength": 21.57244635563226,
+        "volatility_pctl": 40.0,
+        "macro_bias": "bullish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 4,
-      "status": "active",
-      "created_ts": 1792489527221,
-      "filled_ts": 1792492200000,
-      "mae_r": 0.8122273761519656,
-      "mfe_r": 2.0942360579401904,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 8628,
-      "_last_checked_t": 1792503900000
+      "resolved_ts": 1792504800000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1792504854867
+  "last_run_ts": 1792505727952
 }
