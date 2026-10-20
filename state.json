@@ -602,7 +602,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 994,
+        "seen": 995,
         "rejected": 0
       }
     },
@@ -700,7 +700,8 @@
       "2026-10-16": "sent",
       "2026-10-17": "sent",
       "2026-10-18": "sent",
-      "2026-10-19": "sent"
+      "2026-10-19": "sent",
+      "2026-10-20": "sent"
     },
     "symbol_cooldown": {
       "TAO": {
@@ -1791,9 +1792,9 @@
       "mfe_r": 0.48381052723385726,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8621,
-      "_last_checked_t": 1792481400000
+      "_last_checked_t": 1792482300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792482329713
+  "last_run_ts": 1792483242567
 }
