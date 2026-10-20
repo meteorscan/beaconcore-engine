@@ -796,33 +796,6 @@
   },
   "tier2_trades": [
     {
-      "id": "UNI-Liquidity Sweep-1791215126830",
-      "symbol": "UNI",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 8.9377168,
-      "sl": 8.88374,
-      "tp1": 9.0832,
-      "tp2": 9.0844,
-      "r_realized": -1.0,
-      "mae_r": 1.6084095389130078,
-      "mfe_r": 0.7444531724740784,
-      "forensic_category": "confidence_miscalibration",
-      "confidence": 0.8264690558834933,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 11.685511350989044,
-        "volatility_pctl": 35.0,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1791214200000,
-      "result": "loss",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
-    {
       "id": "UNI-Liquidity Sweep-1791297045172",
       "symbol": "UNI",
       "engine": "Liquidity Sweep",
@@ -1824,5 +1797,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1792509328252
+  "last_run_ts": 1792510237232
 }
