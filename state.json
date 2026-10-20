@@ -508,6 +508,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "PENGU|range|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -527,9 +533,9 @@
         "sum_conf": 13.820483041691698
       },
       "Mean Reversion|A+": {
-        "n": 27,
+        "n": 28,
         "wins": 6,
-        "sum_conf": 22.444731185321857
+        "sum_conf": 23.297748797695537
       },
       "Momentum|A+": {
         "n": 17,
@@ -581,7 +587,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 51,
-        "filled": 35,
+        "filled": 36,
         "expired": 14
       },
       "Momentum|pending": {
@@ -714,7 +720,7 @@
       },
       "PENGU": {
         "direction": "bearish",
-        "until_ts": 1787112900000
+        "until_ts": 1792507500000
       },
       "ADA": {
         "direction": "bearish",
@@ -783,33 +789,6 @@
     }
   },
   "tier2_trades": [
-    {
-      "id": "ZEC-Mean Reversion-1791178239437",
-      "symbol": "ZEC",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bullish",
-      "entry": 1317.7956892027028,
-      "sl": 1301.8468500000001,
-      "tp1": 1354.8,
-      "tp2": 1358.2,
-      "r_realized": 2.3201883426742795,
-      "mae_r": 0.9465070787185977,
-      "mfe_r": 2.470669513717336,
-      "forensic_category": "genuine_variance",
-      "confidence": 0.8345876135431847,
-      "grade": "A+",
-      "regime_at_entry": {
-        "trend_strength": 11.932217871517368,
-        "volatility_pctl": 41.666666666666664,
-        "macro_bias": "bullish"
-      },
-      "resolved_ts": 1791208800000,
-      "result": "win",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "resolution_logic_version": "1.0.4"
-    },
     {
       "id": "UNI-Mean Reversion-1791210636589",
       "symbol": "UNI",
@@ -1781,6 +1760,33 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
+    },
+    {
+      "id": "PENGU-Mean Reversion-1792503926711",
+      "symbol": "PENGU",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.007605189312369166,
+      "sl": 0.007652,
+      "tp1": 0.007450666666666667,
+      "tp2": 0.00745,
+      "r_realized": -1.0,
+      "mae_r": 1.1709011425572537,
+      "mfe_r": 0.7944619968511172,
+      "forensic_category": "confidence_miscalibration",
+      "confidence": 0.8530176123736796,
+      "grade": "A+",
+      "regime_at_entry": {
+        "trend_strength": 12.70248679149542,
+        "volatility_pctl": 28.333333333333332,
+        "macro_bias": "bearish"
+      },
+      "resolved_ts": 1792503900000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
     }
   ],
   "active_signals": [
@@ -1816,49 +1822,12 @@
       "created_ts": 1792489527221,
       "filled_ts": 1792492200000,
       "mae_r": 0.8122273761519656,
-      "mfe_r": 0.7926668447713632,
+      "mfe_r": 2.0942360579401904,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8628,
-      "_last_checked_t": 1792503000000
-    },
-    {
-      "id": "PENGU-Mean Reversion-1792503926711",
-      "symbol": "PENGU",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.007605189312369166,
-      "sl": 0.007652,
-      "tp1": 0.007450666666666667,
-      "tp2": 0.00745,
-      "rr1": 3.30101208769077,
-      "rr2": 3.315253849570549,
-      "confidence": 0.8530176123736796,
-      "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 11.972124112863701,
-        "volatility_pctl": 15.0,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
-      "created_ts": 1792503926711,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 8629,
-      "_last_checked_t": 1792502100000
+      "_last_checked_t": 1792503900000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792503926711
+  "last_run_ts": 1792504854867
 }
