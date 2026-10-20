@@ -582,7 +582,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 146,
+        "dispatched": 147,
         "filled": 119,
         "expired": 27
       },
@@ -614,7 +614,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 1001,
+        "seen": 1002,
         "rejected": 0
       }
     },
@@ -1795,7 +1795,46 @@
       "resolution_logic_version": "1.0.4"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "PENGU-Liquidity Sweep-1792512925725",
+      "symbol": "PENGU",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.0078106320000000005,
+      "sl": 0.007902,
+      "tp1": 0.007500666666666667,
+      "tp2": 0.007498,
+      "rr1": 3.392493360184505,
+      "rr2": 3.421679362577755,
+      "confidence": 0.8533482059624649,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 17.08999148909876,
+        "volatility_pctl": 84.16666666666667,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1792512925725,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 8638,
+      "_last_checked_t": 1792511100000
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1792512044368
+  "last_run_ts": 1792512925725
 }
