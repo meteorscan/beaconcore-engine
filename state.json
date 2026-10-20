@@ -520,6 +520,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 2.7171717171717265
+      },
+      "DOGE|trend|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -564,9 +570,9 @@
         "sum_conf": 5.999785244587078
       },
       "Mean Reversion|A": {
-        "n": 9,
+        "n": 10,
         "wins": 3,
-        "sum_conf": 7.039227522981654
+        "sum_conf": 7.816465177305435
       },
       "Liquidity Sweep|B": {
         "n": 8,
@@ -593,7 +599,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 52,
-        "filled": 37,
+        "filled": 38,
         "expired": 14
       },
       "Momentum|pending": {
@@ -782,7 +788,7 @@
       },
       "DOGE": {
         "direction": "bearish",
-        "until_ts": 1787189400000
+        "until_ts": 1792539000000
       },
       "HYPE": {
         "direction": "bullish",
@@ -1847,46 +1853,36 @@
       "style": "intraday",
       "entry_kind": "pending",
       "resolution_logic_version": "1.0.4"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "DOGE-Mean Reversion-1792519243543",
       "symbol": "DOGE",
       "engine": "Mean Reversion",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.08140489706984923,
       "sl": 0.0821386,
       "tp1": 0.079906,
       "tp2": 0.079484,
-      "rr1": 2.0429209265133967,
-      "rr2": 2.6180855914729375,
+      "r_realized": -1.0,
+      "mae_r": 1.110944084662804,
+      "mfe_r": 0.594105668570316,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7772376543237817,
       "grade": "A",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
       "regime_at_entry": {
-        "trend_strength": 20.53851522477901,
-        "volatility_pctl": 80.0,
-        "macro_bias": "neutral"
+        "trend_strength": 27.051310054271386,
+        "volatility_pctl": 54.166666666666664,
+        "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 7,
-      "status": "active",
-      "created_ts": 1792519243543,
-      "filled_ts": 1792524600000,
-      "mae_r": 0.8029175105375512,
-      "mfe_r": 0.594105668570316,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": 8640,
-      "_last_checked_t": 1792534500000
-    },
+      "resolved_ts": 1792535400000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "resolution_logic_version": "1.0.4"
+    }
+  ],
+  "active_signals": [
     {
       "id": "PENGU-Liquidity Sweep-1792529137278",
       "symbol": "PENGU",
@@ -1923,9 +1919,9 @@
       "mfe_r": 0.42098109477325996,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8643,
-      "_last_checked_t": 1792534500000
+      "_last_checked_t": 1792535400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792535435098
+  "last_run_ts": 1792536326212
 }
