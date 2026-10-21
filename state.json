@@ -620,7 +620,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 1020,
+        "seen": 1021,
         "rejected": 0
       }
     },
@@ -1920,7 +1920,7 @@
       "mfe_r": 0.6475143127805958,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8643,
-      "_last_checked_t": 1792578600000
+      "_last_checked_t": 1792579500000
     },
     {
       "id": "XLM-Liquidity Sweep-1792575928450",
@@ -1957,7 +1957,7 @@
       "mfe_r": 0.89372257202821,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8655,
-      "_last_checked_t": 1792578600000
+      "_last_checked_t": 1792579500000
     },
     {
       "id": "XRP-Liquidity Sweep-1792579528786",
@@ -1985,18 +1985,18 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
+      "entry_filled": true,
+      "pending_bars": 1,
+      "status": "active",
       "created_ts": 1792579528786,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1792579500000,
+      "mae_r": 0.07270029673588797,
+      "mfe_r": 0.3636760342119209,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8656,
-      "_last_checked_t": 1792577700000
+      "_last_checked_t": 1792579500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792579528786
+  "last_run_ts": 1792580446376
 }
