@@ -38,8 +38,10 @@ CANDLE_CACHE_PATH = os.environ.get("SOVEREIGN_CANDLE_CACHE_PATH", "candle_cache.
 CANDLE_DELTA_OVERLAP_BARS = 3  # extra closed bars re-fetched past the cached watermark
 
 ENGINE_NAME = "SOVEREIGN"
-ENGINE_VERSION = "1.1.1"
-RESOLUTION_LOGIC_VERSION = "1.0.4"  # Section 11 legacy-data tag; bump on any resolution-logic change
+ENGINE_VERSION = "1.2.0"  # bumped for the remediation release (dispatch gating, managed exits, calibration, throttle)
+RESOLUTION_LOGIC_VERSION = "1.1.0"  # managed-exit (BE + partial) resolution logic; bump on any resolution-logic change
+RESOLUTION_LOGIC_VERSION_LEGACY = "1.0.4"  # tag carried by every trade resolved under the old full-exit-at-TP1 logic
+SCHEMA_VERSION = 2  # state.json schema; v2 = exit_model/regime_src stamps on trades + signals (see migrate_state)
 
 # Same watchlist as the reference engines in this project (Section: "use the
 # same watchlist ... unless the prompt's own rules require a change" -- no
@@ -132,8 +134,47 @@ CIRCUIT_BREAKER_WINDOW = 30     # rolling trade window compared against baseline
 CIRCUIT_BREAKER_WR_DROP = 0.15  # material sustained win-rate drop (absolute) vs baseline
 CIRCUIT_BREAKER_PF_DROP = 0.35  # material sustained profit-factor drop (relative) vs baseline
 
-TIER2_RETENTION_DAYS = 15
-TIER2_MAX_TRADES = 1500
+# Task 9: the old 15-day time cutoff left only 34 of 210 resolved trades in tier2, starving every trailing-
+# window statistic (symbol/segment/direction gates). Time-based pruning is removed; count-based rolling prune only.
+TIER2_MAX_TRADES = 2000
+
+# --- Remediation constants (exit model, dispatch gates, throttle, calibration) ---------------------------
+# Task 4 -- exit model. "managed" = BE move + partial (default); "legacy" = original full exit at TP1 / SL.
+# Env-overridable so the old behaviour stays reachable without a code change (EXIT_MODEL = "legacy").
+EXIT_MODEL = os.environ.get("SOVEREIGN_EXIT_MODEL", "managed").strip().lower()
+EXIT_BE_TRIGGER_R = 1.0              # favourable excursion (in R) that arms the break-even stop
+EXIT_BE_FEE_PCT = 0.0009             # round-trip taker fee (0.045% x 2) as a fraction of entry; BE stop = entry +/- this
+EXIT_PARTIAL_TP1_FRACTION = 0.5      # partial fills at this fraction of the entry->TP1 distance
+EXIT_PARTIAL_SIZE_FRACTION = 0.5     # share of the position closed at the partial (spec gives the level, not the size)
+
+# Task 1 -- dispatch gating while the circuit breaker is tripped.
+BREAKER_GATE_MIN_SEGMENT_N = 8       # segment (engine x regime tag) needs at least this many resolved trades ...
+                                     # ... AND strictly positive expectancy to keep dispatching while tripped
+
+# Task 2 -- Liquidity Sweep in trend regime.
+LS_TREND_SUPPRESS_MIN_N = 15         # trailing segment sample required before the hard suppress applies
+SEGMENT_TRAILING_WINDOW = 40         # trailing window (most recent trades from tier2) for segment expectancy
+COUNTERTREND_BAR_MIN_CONFIDENCE = 0.70  # raw composite score a counter-trend variant needs to bypass a suppressed segment
+                                     # (the RR half of the stricter bar is RR_MIN_GATE_COUNTERTREND)
+
+# Task 3 -- directional streak block.
+DIRECTION_STREAK_LEN = 10            # last N resolved trades in one direction with zero wins -> block that direction
+DIRECTION_BLOCK_MS = 24 * 60 * 60 * 1000  # block length, measured from the resolution of the streak-completing trade
+
+# Task 5 -- TP1 cap.
+TP1_MAX_R = 2.2                      # TP1 distance cap (R) unless 1H structure supports a farther target
+TP1_H1_SUPPORT_MIN_CONFLUENCE = 2    # 1H opposing level needs at least this confluence weight to "support" a far TP1
+TP1_H1_SUPPORT_TOL_ATR = 0.35        # ... and must sit within this * 1H ATR of the TP1 price
+
+# Task 7 -- per-symbol auto-throttle.
+SYMBOL_THROTTLE_MIN_N = 15           # resolved trades before a symbol can be throttled
+SYMBOL_THROTTLE_MAX_EXPECTANCY = -0.3  # throttle when symbol expectancy (R/trade) is below this
+SYMBOL_THROTTLE_COOLDOWN_MULT = 3    # post-loss cooldown multiplier for a throttled symbol
+SYMBOL_THROTTLE_REQUIRED_GRADE = "A+"  # only this grade dispatches on a throttled symbol
+
+# Task 8 -- calibration from calibration_buckets.
+CALIBRATION_GRADE_MIN_N = 15         # realized-WR bucket sample needed before grade/confidence are recomputed
+CALIBRATION_CONF_PRIOR_N = 15        # pseudo-count weight of the raw score when blending with realized WR
 
 # Baseline for the live-performance circuit breaker below (conservative, not aspirational).
 BASELINE_WIN_RATE = 0.42
@@ -178,8 +219,20 @@ if not log.handlers:
     log.addHandler(_sh)
 
 
+if EXIT_MODEL not in ("managed", "legacy"):
+    # Fail loud-but-safe: an unrecognised flag must not silently pick an exit model the operator didn't ask for.
+    log.warning("Unknown SOVEREIGN_EXIT_MODEL=%r -- falling back to 'managed'", EXIT_MODEL)
+    EXIT_MODEL = "managed"
+
+
 def utcnow_ms() -> int:
     return int(time.time() * 1000)
+
+
+def current_resolution_version() -> str:
+    # Trades are tagged by the exit logic that actually resolved them, so legacy-flag runs stay separable
+    # from managed runs in stats (and the circuit-breaker window only mixes like with like).
+    return RESOLUTION_LOGIC_VERSION if EXIT_MODEL == "managed" else RESOLUTION_LOGIC_VERSION_LEGACY
 
 
 def human_label(raw: str) -> str:
@@ -202,7 +255,7 @@ def human_label(raw: str) -> str:
 
 def _default_state() -> dict:
     return {
-        "schema_version": 1,
+        "schema_version": SCHEMA_VERSION,
         "resolution_logic_version": RESOLUTION_LOGIC_VERSION,
         "tier1": {
             "engine_weights": {},       # engine -> weight (bounded, dampened)
@@ -229,6 +282,22 @@ def _default_state() -> dict:
     }
 
 
+def migrate_state(state: dict) -> dict:
+    # v1 -> v2. Idempotent (setdefault only) and safe to run on every load.
+    # Pre-v2 trades/signals were all resolved under the legacy exit logic, and their regime_at_entry was
+    # overwritten at *resolution* time (process_resolution bug, fixed in this release) -- stamp both facts so
+    # stats can separate them from clean v2 records.
+    for t in state.get("tier2_trades", []):
+        t.setdefault("exit_model", "legacy")
+        t.setdefault("regime_src", "resolution")
+    for s in state.get("active_signals", []):
+        s.setdefault("exit_model", "legacy")  # in-flight signals finish under the rules they were dispatched with
+    if state.get("schema_version", 1) < SCHEMA_VERSION:
+        state["schema_version"] = SCHEMA_VERSION
+    state["resolution_logic_version"] = RESOLUTION_LOGIC_VERSION
+    return state
+
+
 def load_state() -> dict:
     if not os.path.exists(STATE_PATH):
         return _default_state()
@@ -249,7 +318,7 @@ def load_state() -> dict:
             merged.update(data.get(k, {}))
             base[k] = merged
         base.update({k: v for k, v in data.items() if k in base and k != "tier1"})
-        return base
+        return migrate_state(base)
     except (json.JSONDecodeError, OSError, ValueError) as e:
         log.error("load_state failed (%s); starting from a fresh default state", e)
         return _default_state()
@@ -266,8 +335,9 @@ def save_state(state: dict) -> None:
 
 
 def prune_tier2(state: dict) -> None:
-    cutoff_ms = utcnow_ms() - TIER2_RETENTION_DAYS * 86_400_000
-    trades = [t for t in state["tier2_trades"] if t.get("resolved_ts", 0) >= cutoff_ms]
+    # Task 9: rolling count-based prune only (see TIER2_MAX_TRADES) -- every resolved trade is kept until it ages out
+    # of the newest TIER2_MAX_TRADES.
+    trades = list(state["tier2_trades"])
     if len(trades) > TIER2_MAX_TRADES:
         trades = trades[-TIER2_MAX_TRADES:]
     state["tier2_trades"] = trades
@@ -1209,6 +1279,16 @@ def _tp_selection_band(direction: str, entry: float, sl: float, view: View,
     return {"tp1": tp1_level["price"], "tp2": tp2_price}
 
 
+def _h1_supports_tp1(direction: str, tp1: float, view_1h: View) -> bool:
+    # "1H structure supports further": an opposing 1H level of real weight (OB/breaker, equal-liquidity pool)
+    # sits at the far TP1 price, so the distant target is structurally backed rather than just a distant pivot.
+    for lv in _opposing_structural_levels(direction, view_1h):
+        if lv["confluence"] >= TP1_H1_SUPPORT_MIN_CONFLUENCE and \
+                abs(lv["price"] - tp1) <= view_1h.atr * TP1_H1_SUPPORT_TOL_ATR:
+            return True
+    return False
+
+
 def build_risk_plan(direction: str, entry: float, view_15m: View, view_1h: View, view_4h: View,
                      state: dict, symbol: str, rr_min_gate: float = RR_MIN_GATE) -> Optional[dict]:
 
@@ -1292,7 +1372,25 @@ def build_risk_plan(direction: str, entry: float, view_15m: View, view_1h: View,
                       # displayed RR vs. real entry/SL/TP1 and undercounted realized wins.)
     # fix v1.0.2: rr1 is left as the true, price-consistent value -- not clamped.
 
-    tp2 = band.get("tp2")
+    # Task 5: cap TP1 at TP1_MAX_R unless 1H structure backs the farther level. Runs AFTER the RR_MAX_GATE reject
+    # on the uncapped value so the cap never admits setups the old gate rejected, and the cap moves the actual TP1
+    # *price* (never relabels rr1 -- see v1.0.2 note above). tp1_rank_preference is already pinned at
+    # TP1_RANK_PREF_MAX for NEAR/HYPE, so the rank-based adaptation cannot pull these targets in any further.
+    # DEVIATION: the cap is floored at rr_min_gate -- counter-trend plans use RR_MIN_GATE_COUNTERTREND (2.5) which is
+    # above 2.2R; a flat 2.2R cap would reject every counter-trend plan outright instead of capping it.
+    tp1_cap_r = max(TP1_MAX_R, rr_min_gate)
+    band_tp2 = band.get("tp2")
+    if rr1 > tp1_cap_r and not _h1_supports_tp1(direction, tp1, view_1h):
+        orig_tp1, orig_rr1 = tp1, rr1
+        tp1 = entry + risk * tp1_cap_r if direction == "bullish" else entry - risk * tp1_cap_r
+        tp1_dist = risk * tp1_cap_r
+        rr1 = tp1_cap_r
+        band_tp2 = orig_tp1  # the structural level the cap displaced becomes TP2 (strictly beyond the new TP1)
+        _log_funnel(state, "tp1_capped", seen=1, rejected=1)
+        log.info("TP1 capped %s %s: %.2fR -> %.2fR (1H structure does not back %.6g)",
+                 symbol, direction, orig_rr1, tp1_cap_r, orig_tp1)
+
+    tp2 = band_tp2
     # TP ordering integrity: TP2 must sit strictly farther than TP1, guaranteed by construction
     if tp2 is None or abs(tp2 - entry) <= tp1_dist:
         extension = tp1_dist * 0.6
@@ -1994,6 +2092,156 @@ def _confidence_bucket(score: float) -> str:
     return "C"
 
 
+RESOLVED_RESULTS = ("win", "loss", "breakeven")
+GRADE_LADDER = ("A+", "A", "B", "C")
+
+
+def _regime_tag(trend_strength) -> str:
+    # Same tagging rule as update_segment_stats / RegimeVector.is_trending (ADX >= 22), kept in one place for the gates.
+    return "trend" if (trend_strength is not None and trend_strength >= 22.0) else "range"
+
+
+def _raw_bucket(sig: dict) -> str:
+    # Calibration buckets are keyed on the RAW score's grade. Dispatched grade/confidence are now calibration-adjusted
+    # (Task 8), so stats must read grade_raw or the adjusted trades would pollute (and bias) the very buckets that
+    # produced the adjustment. Pre-v2 records carry no grade_raw; their confidence IS the raw score.
+    return sig.get("grade_raw") or _confidence_bucket(sig["confidence"])
+
+
+def _segment_aggregate(state: dict, engine: Optional[str] = None, tag: Optional[str] = None,
+                        symbol: Optional[str] = None) -> tuple:
+    # Sums tier1 segment_stats ("symbol|regime|style|engine") over whichever dimensions are left unspecified.
+    n, sum_r = 0, 0.0
+    for key, seg in state["tier1"]["segment_stats"].items():
+        parts = key.split("|")
+        if len(parts) != 4:
+            continue
+        sym, rg, _style, eng = parts
+        if symbol is not None and sym != symbol:
+            continue
+        if tag is not None and rg != tag:
+            continue
+        if engine is not None and eng != engine:
+            continue
+        n += seg.get("n", 0)
+        sum_r += seg.get("sum_r", 0.0)
+    return n, sum_r
+
+
+def _trailing_segment_expectancy(state: dict, engine: str, tag: str) -> tuple:
+    # Trailing expectancy of an (engine x regime tag) segment from the newest SEGMENT_TRAILING_WINDOW tier2 trades.
+    # Falls back to the all-time tier1 aggregate while tier2 is still too thin (it was pruned to 15 days before this
+    # release, so right after deployment tier2 alone cannot reach LS_TREND_SUPPRESS_MIN_N).
+    rows = [t for t in state["tier2_trades"]
+            if t.get("engine") == engine and t.get("result") in RESOLVED_RESULTS
+            and _regime_tag((t.get("regime_at_entry") or {}).get("trend_strength")) == tag]
+    window = rows[-SEGMENT_TRAILING_WINDOW:]
+    if len(window) >= LS_TREND_SUPPRESS_MIN_N:
+        return len(window), statistics.fmean(t["r_realized"] for t in window), "tier2_trailing"
+    n, s = _segment_aggregate(state, engine=engine, tag=tag)
+    return n, (s / n if n else 0.0), "tier1_all_time"
+
+
+def symbol_throttle(state: dict, symbol: str) -> tuple:
+    # Task 7: (throttled, n, expectancy) from the symbol's all-engine/all-regime tier1 aggregate.
+    n, s = _segment_aggregate(state, symbol=symbol)
+    exp = s / n if n else 0.0
+    return (n >= SYMBOL_THROTTLE_MIN_N and exp < SYMBOL_THROTTLE_MAX_EXPECTANCY), n, exp
+
+
+def _direction_block_until(state: dict, direction: str) -> int:
+    # Task 3: if the last DIRECTION_STREAK_LEN resolved trades in `direction` contain zero wins, the direction is
+    # blocked until DIRECTION_BLOCK_MS after the streak-completing trade resolved; 0 = not blocked. Derived purely
+    # from tier2, so it needs no extra state, can't go stale, and self-releases into a single probe trade once the
+    # 24h elapses (a probe loss re-completes the streak and re-blocks; a probe win breaks it).
+    rows = [t for t in state["tier2_trades"]
+            if t.get("direction") == direction and t.get("result") in RESOLVED_RESULTS]
+    if len(rows) < DIRECTION_STREAK_LEN:
+        return 0
+    last = rows[-DIRECTION_STREAK_LEN:]
+    if any(t["result"] == "win" for t in last):
+        return 0
+    return int(last[-1].get("resolved_ts", 0)) + DIRECTION_BLOCK_MS
+
+
+def _is_countertrend(c: Candidate, regime: RegimeVector) -> bool:
+    # Counter-trend = the dedicated counter-trend engine, or a setup fighting the BTC macro bias.
+    if c.counter_trend:
+        return True
+    return regime.macro_bias in ("bullish", "bearish") and c.direction != regime.macro_bias
+
+
+def calibrate_grade(state: dict, c: Candidate, score: float, grade: str) -> tuple:
+    # Task 8: recompute grade/confidence from calibration_buckets (realized WR per engine|raw grade, n >= 15).
+    # Returns (grade_eff, conf_eff, suppress_reason|None).
+    #  - confidence: blended toward the bucket's realized WR (shrunk by CALIBRATION_CONF_PRIOR_N pseudo-trades)
+    #  - grade: when realized WR < breakeven WR (1/(1+rr1)) the grade drops one level (A+ -> A, A -> B, B -> C)
+    #  - suppression: any grade at B or below produced by that downgrade is not dispatched ("suppress B")
+    b = state["tier1"]["calibration_buckets"].get(f"{c.engine}|{grade}")
+    if not b or b.get("n", 0) < CALIBRATION_GRADE_MIN_N:
+        return grade, score, None
+    n = b["n"]
+    realized_wr = b["wins"] / n
+    conf = (n * realized_wr + CALIBRATION_CONF_PRIOR_N * score) / (n + CALIBRATION_CONF_PRIOR_N)
+    conf = max(0.05, min(0.95, conf))
+    breakeven_wr = 1.0 / (1.0 + c.rr1)
+    if realized_wr >= breakeven_wr:
+        return grade, conf, None
+    idx = GRADE_LADDER.index(grade)
+    downgraded = GRADE_LADDER[min(idx + 1, len(GRADE_LADDER) - 1)]
+    reason = None
+    if downgraded in ("B", "C"):
+        reason = (f"calibration: {c.engine}|{grade} realized WR {realized_wr:.0%} (n={n}) < breakeven "
+                  f"{breakeven_wr:.0%} at rr1={c.rr1:.2f} -> {downgraded} (suppressed)")
+    return downgraded, conf, reason
+
+
+def dispatch_gate(state: dict, c: Candidate, regime: RegimeVector, grade_eff: str, score_raw: float,
+                   now_ms: int) -> Optional[tuple]:
+    # Returns (gate_name, reason) when the candidate must be suppressed, else None. Gate order = cheapest/broadest first.
+    tag = _regime_tag(regime.trend_strength)
+
+    # Task 1: while the breaker is tripped (adaptation frozen) only proven segments may dispatch.
+    if state["tier1"]["circuit_breaker"].get("tripped"):
+        n, s = _segment_aggregate(state, engine=c.engine, tag=tag)
+        exp = s / n if n else 0.0
+        if n < BREAKER_GATE_MIN_SEGMENT_N or exp <= 0:
+            return "breaker_gate", (f"breaker tripped: segment {c.engine}/{tag} n={n} exp={exp:+.2f}R "
+                                    f"(needs n>={BREAKER_GATE_MIN_SEGMENT_N} and exp>0)")
+
+    # Task 2: Liquidity Sweep in trend regime with negative trailing expectancy is hard-suppressed; only a
+    # counter-trend variant clearing the stricter RR + confidence bar may through. (Segment has no recovery path
+    # other than those variants / a regime change -- intentional, per spec "hard-suppress".)
+    if c.engine == "Liquidity Sweep" and tag == "trend":
+        n, exp, src_name = _trailing_segment_expectancy(state, c.engine, tag)
+        if n >= LS_TREND_SUPPRESS_MIN_N and exp < 0:
+            bar_ok = (_is_countertrend(c, regime) and c.rr1 >= RR_MIN_GATE_COUNTERTREND
+                      and score_raw >= COUNTERTREND_BAR_MIN_CONFIDENCE)
+            if not bar_ok:
+                return "ls_trend_suppress", (f"Liquidity Sweep/trend trailing exp={exp:+.2f}R n={n} ({src_name}); "
+                                             f"counter-trend bar (rr1>={RR_MIN_GATE_COUNTERTREND}, "
+                                             f"score>={COUNTERTREND_BAR_MIN_CONFIDENCE}) not met")
+
+    # Task 3: direction streak block, lifted only when the BTC macro bias agrees with the trade direction (as specced).
+    # AUDIT RESULT: no hard-coded or sticky long bias exists -- every engine is direction-symmetric and direction is solely
+    # the Stage-1 Weekly/Daily EMA bias, so a lagging HTF trend makes every symbol fire the same way at once, and nothing
+    # fed a failing direction back into dispatch (macro_bias was only ever logged, and logged wrongly: see the
+    # process_resolution fix). Caveat: macro_bias is BTC's Stage-1 -- the same lagging signal -- so when BTC is bullish the
+    # override can re-admit the very longs that are failing; a one-sided streak with macro agreeing is NOT blocked here.
+    block_until = _direction_block_until(state, c.direction)
+    if now_ms < block_until and regime.macro_bias != c.direction:
+        return "direction_block", (f"last {DIRECTION_STREAK_LEN} {c.direction} trades have 0 wins; blocked until "
+                                   f"{datetime.fromtimestamp(block_until / 1000, tz=timezone.utc):%Y-%m-%d %H:%M}Z "
+                                   f"(macro_bias={regime.macro_bias})")
+
+    # Task 7: throttled symbols only dispatch SYMBOL_THROTTLE_REQUIRED_GRADE (post-calibration grade).
+    throttled, n, exp = symbol_throttle(state, c.symbol)
+    if throttled and grade_eff != SYMBOL_THROTTLE_REQUIRED_GRADE:
+        return "symbol_throttle", (f"{c.symbol} throttled (n={n} exp={exp:+.2f}R < {SYMBOL_THROTTLE_MAX_EXPECTANCY}R): "
+                                   f"grade {grade_eff} != {SYMBOL_THROTTLE_REQUIRED_GRADE}")
+    return None
+
+
 def rank_and_select(candidates: list, views: dict, regime: RegimeVector, state: dict, symbol: str,
                      now_ms: int) -> list:
     if macro_blackout_active(symbol, state, now_ms):
@@ -2014,8 +2262,21 @@ def rank_and_select(candidates: list, views: dict, regime: RegimeVector, state: 
         if c.rr1 < (RR_MIN_GATE_COUNTERTREND if c.counter_trend else RR_MIN_GATE):
             continue
         result = composite_score(c, views, regime, state)
-        grade = _confidence_bucket(result["score"])
-        scored.append((result["score"], grade, c, result))
+        score_raw = result["score"]
+        grade_raw = _confidence_bucket(score_raw)
+        result["score_raw"], result["grade_raw"] = score_raw, grade_raw
+        # Task 8: calibration-adjusted grade/confidence; this is what gets dispatched, graded against and ranked on.
+        grade, conf_eff, calib_reason = calibrate_grade(state, c, score_raw, grade_raw)
+        _log_funnel(state, "dispatch_gate", seen=1, rejected=0)
+        gate = ("calibration_gate", calib_reason) if calib_reason else \
+            dispatch_gate(state, c, regime, grade, score_raw, now_ms)
+        if gate:
+            _log_funnel(state, gate[0], seen=0, rejected=1)
+            _bump_funnel_rejected(state, "dispatch_gate")
+            log.info("SUPPRESSED %s %s %s [%s] grade=%s->%s score=%.2f: %s", symbol, c.engine, c.direction,
+                     gate[0], grade_raw, grade, score_raw, gate[1])
+            continue
+        scored.append((conf_eff, grade, c, result))
     scored.sort(key=lambda x: x[0], reverse=True)
     return scored
 
@@ -2055,12 +2316,15 @@ def correlation_dedup(ranked: list, active_signals: list, state: dict, now_ms: i
 
 # ============================================================================
 # SECTION 12 -- SIGNAL LIFECYCLE: DISPATCH, FILL VERIFICATION, RESOLUTION
-# Position-exit model: FULL EXIT AT TP1. SL is never repositioned to
-# breakeven and is never re-evaluated once TP1 resolves the trade a WIN.
+# Position-exit model (EXIT_MODEL): "legacy" = FULL EXIT AT TP1, SL never repositioned.
+# "managed" (default, resolution logic 1.1.0) = SL to entry+fees once price reaches +EXIT_BE_TRIGGER_R, a partial
+# at EXIT_PARTIAL_TP1_FRACTION of the TP1 distance, remainder exits at TP1 or the BE stop. Each signal carries the
+# exit_model it was dispatched under and finishes under it.
 # ============================================================================
 
-def new_signal_record(candidate: Candidate, score: float, grade: str, symbol: str, now_ms: int) -> dict:
-    return {
+def new_signal_record(candidate: Candidate, score: float, grade: str, symbol: str, now_ms: int,
+                       score_raw: Optional[float] = None, grade_raw: Optional[str] = None) -> dict:
+    rec = {
         "id": f"{symbol}-{candidate.engine}-{now_ms}",
         "symbol": symbol,
         "engine": candidate.engine,
@@ -2088,22 +2352,62 @@ def new_signal_record(candidate: Candidate, score: float, grade: str, symbol: st
         "filled_ts": now_ms if candidate.entry_kind == "market" else None,
         "mae_r": 0.0,
         "mfe_r": 0.0,
-        "resolution_logic_version": RESOLUTION_LOGIC_VERSION,
+        "resolution_logic_version": current_resolution_version(),
+        "exit_model": EXIT_MODEL,
+        # Task 8: `confidence`/`grade` above are calibration-adjusted; the raw pair keeps calibration_buckets keyed on
+        # what the engine actually scored (see _raw_bucket).
+        "score_raw": score if score_raw is None else score_raw,
+        "grade_raw": grade if grade_raw is None else grade_raw,
         "tg_message_id": None,
         # Seeds the watermark one step before creation-time so the first monitor
         # pass can't walk pre-creation candles into a false instant win/loss.
         "_last_checked_t": current_bar_open_ms(now_ms, MONITOR_TF) - 2 * TF_MS[MONITOR_TF],
     }
+    if EXIT_MODEL == "managed":
+        # Task 4 managed-exit working state. `sl` stays the ORIGINAL stop (record/forensics); `active_sl` is live.
+        rec.update({"active_sl": candidate.sl, "be_armed": False, "partial_done": False, "banked_r": 0.0,
+                    "tp1_hit": False})  # explicit False: a managed "win" is not necessarily a TP1 hit (see update_segment_stats)
+    return rec
+
+
+def _apply_managed_triggers(sig: dict, c: dict, mfe_r: float) -> None:
+    # Task 4. Evaluated AFTER the candle's stop/TP checks, so a trigger only protects from the NEXT candle on. Intrabar
+    # order inside a 15m candle is unknowable; assuming the stop was touched first (as the legacy path already does for
+    # SL-before-TP) keeps the managed model from over-claiming. Neither trigger is evaluated on the fill candle: its
+    # high/low may pre-date the fill.
+    # DEVIATION: acceptance says outcomes of trades with MFE >= 1R become "<= 0R". With the mandated partial, a trade
+    # whose MFE reaches the partial level (0.5 x TP1 dist >= 1.0R, since rr1 >= RR_MIN_GATE) banks positive R before the
+    # BE stop, so the guarantee actually delivered is "worst case ~0R (BE) instead of -1R", never worse than 0R.
+    bullish = sig["direction"] == "bullish"
+    entry = sig["entry"]
+    tp1_dist = abs(sig["tp1"] - entry)
+    part_px = entry + tp1_dist * EXIT_PARTIAL_TP1_FRACTION if bullish else entry - tp1_dist * EXIT_PARTIAL_TP1_FRACTION
+    part_hit = (c["h"] >= part_px) if bullish else (c["l"] <= part_px)
+    notify = sig.setdefault("_notify", [])  # drained by run_scan -> Telegram status replies (user must act manually)
+
+    if not sig.get("be_armed") and (mfe_r >= EXIT_BE_TRIGGER_R or part_hit):
+        fee = entry * EXIT_BE_FEE_PCT  # stop sits fees beyond entry so a BE exit is fee-neutral (r_realized = 0)
+        sig["active_sl"] = entry + fee if bullish else entry - fee
+        sig["be_armed"] = True
+        sig["be_ts"] = c["t"]
+        notify.append("be_armed")
+    if not sig.get("partial_done") and part_hit:
+        sig["partial_done"] = True
+        sig["banked_r"] = EXIT_PARTIAL_SIZE_FRACTION * EXIT_PARTIAL_TP1_FRACTION * sig["rr1"]
+        sig["partial_ts"] = c["t"]
+        notify.append("partial")
 
 
 def monitor_signal(sig: dict, monitor_candles: list) -> Optional[dict]:
     direction = sig["direction"]
     risk = abs(sig["entry"] - sig["sl"])
+    managed = sig.get("exit_model", "legacy") == "managed"  # pre-v2 / in-flight signals keep the legacy exits
     for c in monitor_candles:
         if c["t"] <= sig.get("_last_checked_t", -1):
             continue
         sig["_last_checked_t"] = c["t"]
 
+        just_filled = False
         if not sig["entry_filled"]:
             entry_in_range = c["l"] <= sig["entry"] <= c["h"]
             if not entry_in_range:
@@ -2116,9 +2420,11 @@ def monitor_signal(sig: dict, monitor_candles: list) -> Optional[dict]:
             sig["entry_filled"] = True
             sig["filled_ts"] = c["t"]
             sig["status"] = "active"
+            just_filled = True
             # same-candle ambiguity: conservative worst-case-first check documented below
 
         # MAE/MFE tracking (Section 13 schema requirement) -- runs every candle post-fill
+        mfe = 0.0
         if risk > 0:
             if direction == "bullish":
                 mfe = (c["h"] - sig["entry"]) / risk
@@ -2129,11 +2435,21 @@ def monitor_signal(sig: dict, monitor_candles: list) -> Optional[dict]:
             sig["mfe_r"] = max(sig["mfe_r"], mfe)
             sig["mae_r"] = max(sig["mae_r"], mae)
 
-        # SL checked first on the fill candle (conservative worst-case ordering).
-        sl_hit = (c["l"] <= sig["sl"]) if direction == "bullish" else (c["h"] >= sig["sl"])
+        # SL checked first on the fill candle (conservative worst-case ordering). Managed signals test against the
+        # live stop (original SL, or the BE stop once armed); legacy signals only ever have the original SL.
+        stop = sig.get("active_sl", sig["sl"]) if managed else sig["sl"]
+        sl_hit = (c["l"] <= stop) if direction == "bullish" else (c["h"] >= stop)
         tp1_hit = (c["h"] >= sig["tp1"]) if direction == "bullish" else (c["l"] <= sig["tp1"])
 
         if sl_hit:
+            if managed and sig.get("be_armed"):
+                # Stopped at break-even: whatever the partial banked, nothing more (BE stop is fee-neutral).
+                r_realized = sig.get("banked_r", 0.0) if sig.get("partial_done") else 0.0
+                sig["r_realized"] = r_realized
+                sig["result"] = "win" if r_realized > 0 else "breakeven"
+                sig["status"] = "resolved"
+                sig["resolved_ts"] = c["t"]
+                return {"type": sig["result"], "sig": sig}
             sig["status"] = "resolved"
             sig["result"] = "loss"
             r_realized = -1.0
@@ -2143,11 +2459,22 @@ def monitor_signal(sig: dict, monitor_candles: list) -> Optional[dict]:
         if tp1_hit:
             sig["status"] = "resolved"
             sig["result"] = "win"
-            r_realized = sig["rr1"]
+            sig["tp1_hit"] = True
+            if managed:
+                # Partial (if it hasn't been booked on an earlier candle it fills on this one: its level is strictly
+                # inside TP1) + remainder at TP1.
+                banked = sig["banked_r"] if sig.get("partial_done") else \
+                    EXIT_PARTIAL_SIZE_FRACTION * EXIT_PARTIAL_TP1_FRACTION * sig["rr1"]
+                r_realized = banked + (1.0 - EXIT_PARTIAL_SIZE_FRACTION) * sig["rr1"]
+            else:
+                r_realized = sig["rr1"]
             assert r_realized > 0, "win result with non-positive realized R -- resolution bug"
             sig["r_realized"] = r_realized
             sig["resolved_ts"] = c["t"]
             return {"type": "win", "sig": sig}
+
+        if managed and not just_filled:
+            _apply_managed_triggers(sig, c, mfe)
     return None
 
 
@@ -2159,6 +2486,7 @@ FORENSIC_CATEGORIES = [
     "regime_mismatch", "structural_invalidation_too_tight", "chased_swept_liquidity",
     "mtf_conflict_ignored", "sfp_mss_sequence_violated", "correct_read_poor_rr",
     "confidence_miscalibration", "filter_over_permissiveness", "genuine_variance",
+    "breakeven_exit",  # managed-exit stop-out at BE with nothing banked: no loss to learn from (see process_resolution)
 ]
 
 
@@ -2196,7 +2524,7 @@ def classify_forensics(sig: dict, views: dict, regime: RegimeVector, state: dict
         return "correct_read_poor_rr"
 
     # Confidence miscalibration: assigned confidence materially above the bucket's realized win rate
-    bucket = _confidence_bucket(sig["confidence"])
+    bucket = _raw_bucket(sig)  # raw-score grade: dispatched grade is calibration-adjusted (Task 8)
     calib_key = f"{sig['engine']}|{bucket}"
     calib = state["tier1"]["calibration_buckets"].get(calib_key, {"n": 0, "wins": 0})
     if is_loss and calib.get("n", 0) >= MIN_SAMPLE_SIZE:
@@ -2252,7 +2580,7 @@ def adaptive_route(category: str, sig: dict, state: dict) -> None:
         t1["tp1_rank_preference"][symbol] = int(max(TP1_RANK_PREF_MIN, min(TP1_RANK_PREF_MAX, cur + 1)))
 
     elif category == "confidence_miscalibration":
-        key = f"{engine}|{_confidence_bucket(sig['confidence'])}"
+        key = f"{engine}|{_raw_bucket(sig)}"
         cur = t1["confidence_calibration"].get(key, 0.0)
         t1["confidence_calibration"][key] = _damp(cur, cur - 0.03, CALIBRATION_ADJ_MIN, CALIBRATION_ADJ_MAX,
                                                     step=CALIBRATION_LR)
@@ -2274,7 +2602,9 @@ def reinforce_win(sig: dict, state: dict) -> None:
     engine = sig["engine"]
     seg_key = f"{sig['symbol']}|{'trend' if sig.get('regime_at_entry', {}).get('trend_strength', 0) and sig['regime_at_entry']['trend_strength'] >= 22 else 'range'}|{sig['style']}|{engine}"
     seg = t1["segment_stats"].get(seg_key, {"n": 0, "wins": 0, "losses": 0, "sum_r": 0.0})
-    if seg.get("n", 0) >= MIN_SAMPLE_SIZE:
+    # Task 6: MIN_SAMPLE_SIZE is now enforced exactly once, in process_resolution's gate, on this same segment key.
+    # The old inline `n >= MIN_SAMPLE_SIZE` here duplicated that gate (double-gating); only the n > 0 division guard stays.
+    if seg.get("n", 0) > 0:
         expectancy = seg["sum_r"] / seg["n"]
         cur = t1["engine_weights"].get(engine, 1.0)
         target = cur * (1.02 if expectancy > 0 else 0.99)
@@ -2296,15 +2626,19 @@ def update_segment_stats(sig: dict, state: dict) -> None:
     seg["sum_r"] += sig["r_realized"]
     if sig["result"] == "win":
         seg["wins"] += 1
+    elif sig["result"] == "breakeven":
+        seg["breakeven"] = seg.get("breakeven", 0) + 1  # neither a win nor a loss; still counts in n / sum_r
     else:
         seg["losses"] += 1
 
-    bucket = _confidence_bucket(sig["confidence"])
+    bucket = _raw_bucket(sig)
     calib_key = f"{sig['engine']}|{bucket}"
     calib = state["tier1"]["calibration_buckets"].setdefault(calib_key, {"n": 0, "wins": 0, "sum_conf": 0.0})
     calib["n"] += 1
-    calib["sum_conf"] += sig["confidence"]
-    if sig["result"] == "win":
+    calib["sum_conf"] += sig.get("score_raw", sig["confidence"])
+    # Calibration "wins" = TP1 reached (the legacy meaning of a win). A managed partial+BE-stop win has result "win" but
+    # banks only a fraction of rr1, so counting it would inflate realized WR against the 1/(1+rr1) breakeven used in Task 8.
+    if sig.get("tp1_hit", sig["result"] == "win"):
         calib["wins"] += 1
 
     fill_key = f"{sig['engine']}|{sig['entry_kind']}"
@@ -2314,7 +2648,10 @@ def update_segment_stats(sig: dict, state: dict) -> None:
 
 def check_circuit_breaker(state: dict) -> None:
     trades = [t for t in state["tier2_trades"] if t.get("result") in ("win", "loss")
-              and t.get("resolution_logic_version") == RESOLUTION_LOGIC_VERSION]
+              and t.get("resolution_logic_version") == current_resolution_version()]
+    # Note: after the 1.1.0 bump the window only fills with managed-exit trades, so a breaker tripped on legacy trades
+    # stays tripped (dispatch-gated per Task 1) until CIRCUIT_BREAKER_WINDOW new-version trades exist. Intended: legacy
+    # R-multiples aren't comparable with managed ones.
     if len(trades) < CIRCUIT_BREAKER_WINDOW:
         return
     window = trades[-CIRCUIT_BREAKER_WINDOW:]
@@ -2342,20 +2679,37 @@ def check_circuit_breaker(state: dict) -> None:
 
 
 def process_resolution(sig: dict, views: dict, regime: RegimeVector, state: dict) -> None:
-    sig["regime_at_entry"] = {
-        "trend_strength": regime.trend_strength, "volatility_pctl": regime.volatility_pctl,
-        "macro_bias": regime.macro_bias,
-    }
-    category = classify_forensics(sig, views, regime, state)
+    # Root-cause fix (Task 3 audit): this used to overwrite regime_at_entry with the regime at RESOLUTION time -- and
+    # run_scan builds that regime with the symbol's own Stage-1 bias as "macro_bias" -- so every tier2 record's
+    # macro_bias/trend tag described the exit, not the entry, and macro_bias trivially "agreed" with the trade.
+    # run_scan already stamps the true entry regime at dispatch; only fall back to resolution-time if it's missing.
+    entry_regime = sig.get("regime_at_entry") or {}
+    if entry_regime.get("trend_strength") is None:
+        sig["regime_at_entry"] = {
+            "trend_strength": regime.trend_strength, "volatility_pctl": regime.volatility_pctl,
+            "macro_bias": regime.macro_bias,
+        }
+        sig["regime_src"] = "resolution"
+    else:
+        sig["regime_src"] = "entry"
+    if sig["result"] == "breakeven":
+        category = "breakeven_exit"  # nothing to learn from a fee-neutral stop-out; skip loss forensics / adaptation
+        fc = state["tier1"]["forensic_counts"]
+        fc[category] = fc.get(category, 0) + 1  # adaptive_route (which normally counts) is skipped for BE exits
+    else:
+        category = classify_forensics(sig, views, regime, state)
     sig["forensic_category"] = category
 
     frozen = state["tier1"]["circuit_breaker"]["tripped"]
-    if not frozen:
+    if not frozen and sig["result"] in ("win", "loss"):
+        # Task 6: dead gate fixed -- `or True` removed, so MIN_SAMPLE_SIZE now actually applies. The gate also now reads
+        # THIS signal's own segment (regime tag from regime_at_entry); it was hard-wired to the "trend" segment for every
+        # signal. reinforce_win's duplicate inner n-check was removed and adaptive_route never had one, so this is the
+        # single sample-size gate for both paths.
+        seg_tag = _regime_tag(sig["regime_at_entry"].get("trend_strength"))
         seg_key_n = state["tier1"]["segment_stats"].get(
-            f"{sig['symbol']}|trend|{sig['style']}|{sig['engine']}", {}).get("n", 0)
-        if seg_key_n >= MIN_SAMPLE_SIZE or True:
-            # Section 13 minimum-sample-size gate is enforced inside adaptive_route/reinforce_win
-            # themselves (each reads the relevant segment's own sample size before acting)
+            f"{sig['symbol']}|{seg_tag}|{sig['style']}|{sig['engine']}", {}).get("n", 0)
+        if seg_key_n >= MIN_SAMPLE_SIZE:
             if sig["result"] == "loss":
                 adaptive_route(category, sig, state)
             else:
@@ -2365,9 +2719,12 @@ def process_resolution(sig: dict, views: dict, regime: RegimeVector, state: dict
         # fix v1.0.5: block same symbol+direction from re-firing until the
         # swept level has had time to actually invalidate, instead of only
         # relying on active_signals membership (see SAME_SETUP_COOLDOWN_MS).
+        # Task 7: a throttled symbol sits out SYMBOL_THROTTLE_COOLDOWN_MULT x longer.
+        throttled, _, _ = symbol_throttle(state, sig["symbol"])
+        cooldown_ms = SAME_SETUP_COOLDOWN_MS * (SYMBOL_THROTTLE_COOLDOWN_MULT if throttled else 1)
         state["tier1"]["symbol_cooldown"][sig["symbol"]] = {
             "direction": sig["direction"],
-            "until_ts": sig["resolved_ts"] + SAME_SETUP_COOLDOWN_MS,
+            "until_ts": sig["resolved_ts"] + cooldown_ms,
         }
 
     update_segment_stats(sig, state)
@@ -2377,8 +2734,11 @@ def process_resolution(sig: dict, views: dict, regime: RegimeVector, state: dict
         "entry": sig["entry"], "sl": sig["sl"], "tp1": sig["tp1"], "tp2": sig["tp2"],
         "r_realized": sig["r_realized"], "mae_r": sig["mae_r"], "mfe_r": sig["mfe_r"],
         "forensic_category": category, "confidence": sig["confidence"], "grade": sig["grade"],
-        "regime_at_entry": sig["regime_at_entry"], "resolved_ts": sig["resolved_ts"],
+        "grade_raw": _raw_bucket(sig), "score_raw": sig.get("score_raw", sig["confidence"]),
+        "regime_at_entry": sig["regime_at_entry"], "regime_src": sig["regime_src"],
+        "resolved_ts": sig["resolved_ts"],
         "result": sig["result"], "style": sig["style"], "entry_kind": sig["entry_kind"],
+        "exit_model": sig.get("exit_model", "legacy"), "tp1_hit": bool(sig.get("tp1_hit", False)),
         "resolution_logic_version": sig["resolution_logic_version"],
     })
     check_circuit_breaker(state)
@@ -2454,10 +2814,26 @@ def format_signal_message(sig: dict) -> str:
 def format_status_message(sig: dict, event_type: str) -> str:
     engine_label = human_label(sig["engine"])
     header = f"*{ENGINE_NAME} v{ENGINE_VERSION}* — {sig['symbol']} {engine_label}"
-    if event_type == "win":
+    managed = sig.get("exit_model", "legacy") == "managed"
+    if event_type == "win" and managed and not sig.get("tp1_hit"):
+        body = (f"🏁 *Stopped at break-even after partial — WIN.* Signal resolved.\n"
+                f"Realized R: {sig['r_realized']:.2f}")
+    elif event_type == "win" and managed:
+        body = (f"🏆 *TP1 hit — WIN.* Signal resolved.\n"
+                f"Realized R: {sig['r_realized']:.2f} (partial + remainder at TP1)")
+    elif event_type == "win":
         body = (f"🏆 *TP1 hit — WIN.* Signal resolved.\n"
                 f"Realized R: {sig['r_realized']:.2f}\n"
                 f"SL remains at its original level, unchanged, for the record.")
+    elif event_type == "breakeven":
+        body = f"⚖️ *Stopped at break-even.* Signal resolved.\nRealized R: {sig['r_realized']:.2f}"
+    elif event_type == "be_armed":
+        body = (f"🛡️ *Break-even armed* — price reached +{EXIT_BE_TRIGGER_R:.1f}R.\n"
+                f"Move SL to {_price_line('entry + fees', sig['active_sl'])}")
+    elif event_type == "partial":
+        body = (f"💰 *Partial* — price reached {EXIT_PARTIAL_TP1_FRACTION * 100:.0f}% of the TP1 distance.\n"
+                f"Close {EXIT_PARTIAL_SIZE_FRACTION * 100:.0f}% of the position ({sig['banked_r']:.2f}R banked); "
+                f"remainder runs to TP1 with SL at break-even.")
     elif event_type == "loss":
         body = f"😭 *SL hit — LOSS.* Signal resolved.\nRealized R: {sig['r_realized']:.2f}"
     elif event_type == "expired":
@@ -2472,7 +2848,9 @@ def format_status_message(sig: dict, event_type: str) -> str:
 def format_circuit_breaker_message(cb: dict, tripped: bool) -> str:
     header = f"*{ENGINE_NAME} v{ENGINE_VERSION}* — Live-Performance Circuit Breaker"
     if tripped:
-        return f"{header}\n\n🤯 Adaptation frozen: {cb['reason']}\nSignal generation continues on last-known-good parameters."
+        # Wording only (layout unchanged): the old "generation continues" line is false since Task 1 gates dispatch.
+        return (f"{header}\n\n🤯 Adaptation frozen: {cb['reason']}\n"
+                f"Dispatch restricted to proven segments (n>={BREAKER_GATE_MIN_SEGMENT_N}, positive expectancy).")
     return f"{header}\n\n👏 Adaptation resumed — live performance recovered to baseline."
 
 
@@ -2481,7 +2859,8 @@ def format_daily_summary(state: dict, day_key: str) -> str:
               if datetime.fromtimestamp(t["resolved_ts"] / 1000, tz=timezone.utc).strftime("%Y-%m-%d") == day_key]
     n = len(trades)
     wins = sum(1 for t in trades if t["result"] == "win")
-    losses = n - wins
+    breakevens = sum(1 for t in trades if t["result"] == "breakeven")
+    losses = n - wins - breakevens
     wr = (wins / n * 100) if n else 0.0
     gross_win = sum(t["r_realized"] for t in trades if t["r_realized"] > 0)
     gross_loss = abs(sum(t["r_realized"] for t in trades if t["r_realized"] < 0))
@@ -2518,7 +2897,7 @@ def format_daily_summary(state: dict, day_key: str) -> str:
     lines = [
         f"*{ENGINE_NAME} v{ENGINE_VERSION} — Daily Summary ({day_key})*",
         "",
-        f"Signals resolved: {n}    Wins: {wins}    Losses: {losses}",
+        f"Signals resolved: {n}    Wins: {wins}    Losses: {losses}" + (f"    Breakeven: {breakevens}" if breakevens else ""),
         f"Win rate: {wr:.1f}%    Profit factor: {pf:.2f}    Avg winning RR: {avg_rr:.2f}",
         "",
         "*By Engine:*", *(engine_lines or ["  (none)"]),
@@ -2591,6 +2970,10 @@ def run_scan(state: dict, candle_cache: dict) -> None:
         m_candles = get_candles(symbol, MONITOR_TF, 30, now_ms,
                                  candle_cache.get(symbol, {}).get(MONITOR_TF))
         event = monitor_signal(sig, m_candles)
+        # Managed-exit instructions (BE armed / partial) are manual actions for the user -- send before any terminal
+        # message so the thread reads chronologically.
+        for note in sig.pop("_notify", []):
+            send_telegram(format_status_message(sig, note), sig.get("tg_message_id"))
         if event is None:
             still_active.append(sig)
             continue
@@ -2600,8 +2983,9 @@ def run_scan(state: dict, candle_cache: dict) -> None:
             fs["expired"] += 1
             send_telegram(format_status_message(sig, "expired"), sig.get("tg_message_id"))
             continue  # excluded from win/loss stats (Section 12)
-        if event["type"] in ("win", "loss"):
+        if event["type"] in ("win", "loss", "breakeven"):
             bundle = fetch_all_candles(symbol, candle_cache, now_ms)
+            views = None  # was unbound (or stale from the previous signal) when build_all_views raised below
             if bundle:
                 try:
                     views = build_all_views(bundle)
@@ -2612,7 +2996,7 @@ def run_scan(state: dict, candle_cache: dict) -> None:
                     regime = RegimeVector("neutral", 50, 15, "off_hours", 0.5, 0.0, "neutral", 0.5, 0.0)
             else:
                 regime = RegimeVector("neutral", 50, 15, "off_hours", 0.5, 0.0, "neutral", 0.5, 0.0)
-            process_resolution(sig, {TF_1H: views[TF_1H]} if bundle else {}, regime, state)
+            process_resolution(sig, {TF_1H: views[TF_1H]} if (bundle and views) else {}, regime, state)
             send_telegram(format_status_message(sig, event["type"]), sig.get("tg_message_id"))
             continue  # resolved -- drop from active_signals
         still_active.append(sig)
@@ -2621,7 +3005,8 @@ def run_scan(state: dict, candle_cache: dict) -> None:
               time.monotonic() - t_start, len(still_active))
 
     if state["tier1"]["circuit_breaker"]["tripped"]:
-        log.info("Circuit breaker active -- adaptation frozen, signal generation continues")
+        log.info("Circuit breaker active -- adaptation frozen, dispatch restricted to proven segments "
+                 "(n>=%d, expectancy>0); suppressed candidates are logged", BREAKER_GATE_MIN_SEGMENT_N)
 
     # --- 2. scan every watchlist asset (bounded thread pool) --------------
     views_by_symbol_1h = {}
@@ -2666,7 +3051,8 @@ def run_scan(state: dict, candle_cache: dict) -> None:
         ranked = rank_and_select(candidates, views, regime, state, symbol, now_ms)
         accepted = correlation_dedup(ranked, state["active_signals"] + all_new_signals, state, now_ms)
         for score, grade, cand, res in accepted:
-            sig = new_signal_record(cand, score, grade, symbol, now_ms)
+            sig = new_signal_record(cand, score, grade, symbol, now_ms,
+                                     score_raw=res.get("score_raw"), grade_raw=res.get("grade_raw"))
             sig["regime_at_entry"] = {"trend_strength": regime.trend_strength,
                                        "volatility_pctl": regime.volatility_pctl, "macro_bias": macro_bias}
             fill_key = f"{cand.engine}|{cand.entry_kind}"
