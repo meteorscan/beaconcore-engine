@@ -605,7 +605,7 @@
       "Momentum|pending": {
         "dispatched": 22,
         "filled": 20,
-        "expired": 1
+        "expired": 2
       },
       "Range Trading|pending": {
         "dispatched": 7,
@@ -1919,47 +1919,9 @@
       "mfe_r": 0.6475143127805958,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8643,
-      "_last_checked_t": 1792553400000
-    },
-    {
-      "id": "ZEC-Momentum-1792545326266",
-      "symbol": "ZEC",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 1256.8767259868437,
-      "sl": 1247.364,
-      "tp1": 1282.1,
-      "tp2": 1297.2339644078936,
-      "rr1": 2.651529545583541,
-      "rr2": 4.242447272933661,
-      "confidence": 0.8543366843812729,
-      "grade": "A+",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 33.563204006872375,
-        "volatility_pctl": 99.16666666666667,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1792545326266,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.0.4",
-      "tg_message_id": null,
-      "_last_checked_t": 1792553400000
+      "_last_checked_t": 1792554300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792554327730
+  "last_run_ts": 1792555240387
 }
