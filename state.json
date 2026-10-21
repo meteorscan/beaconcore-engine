@@ -588,7 +588,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 149,
+        "dispatched": 150,
         "filled": 121,
         "expired": 27
       },
@@ -620,7 +620,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 1017,
+        "seen": 1018,
         "rejected": 0
       }
     },
@@ -1920,9 +1920,46 @@
       "mfe_r": 0.6475143127805958,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8643,
+      "_last_checked_t": 1792575000000
+    },
+    {
+      "id": "XLM-Liquidity Sweep-1792575928450",
+      "symbol": "XLM",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.18442888,
+      "sl": 0.18610600000000002,
+      "tp1": 0.180825,
+      "tp2": 0.18079,
+      "rr1": 2.1488504102270007,
+      "rr2": 2.1697195191756786,
+      "confidence": 0.768130125677086,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 31.411675950533997,
+        "volatility_pctl": 60.833333333333336,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "1h",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1792575928450,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 8655,
       "_last_checked_t": 1792574100000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792575037689
+  "last_run_ts": 1792575928450
 }
