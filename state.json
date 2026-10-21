@@ -588,7 +588,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 150,
+        "dispatched": 151,
         "filled": 121,
         "expired": 27
       },
@@ -620,7 +620,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 1019,
+        "seen": 1020,
         "rejected": 0
       }
     },
@@ -1920,7 +1920,7 @@
       "mfe_r": 0.6475143127805958,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8643,
-      "_last_checked_t": 1792576800000
+      "_last_checked_t": 1792578600000
     },
     {
       "id": "XLM-Liquidity Sweep-1792575928450",
@@ -1954,12 +1954,49 @@
       "created_ts": 1792575928450,
       "filled_ts": 1792575000000,
       "mae_r": 0.43593779813012057,
-      "mfe_r": 0.5836672390764935,
+      "mfe_r": 0.89372257202821,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8655,
-      "_last_checked_t": 1792576800000
+      "_last_checked_t": 1792578600000
+    },
+    {
+      "id": "XRP-Liquidity Sweep-1792579528786",
+      "symbol": "XRP",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1.3609336,
+      "sl": 1.3701,
+      "tp1": 1.3328333333333333,
+      "tp2": 1.3328,
+      "rr1": 3.0655728166637615,
+      "rr2": 3.069209286088326,
+      "confidence": 0.8417262667320347,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 42.74705544854965,
+        "volatility_pctl": 75.0,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1792579528786,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.0.4",
+      "tg_message_id": 8656,
+      "_last_checked_t": 1792577700000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792577730442
+  "last_run_ts": 1792579528786
 }
