@@ -626,7 +626,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 1032,
+        "seen": 1034,
         "rejected": 0
       }
     },
@@ -1956,7 +1956,7 @@
       "mfe_r": 0.25590524985029767,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8660,
-      "_last_checked_t": 1792601100000
+      "_last_checked_t": 1792602000000
     },
     {
       "id": "DOGE-Liquidity Sweep-1792600237189",
@@ -1990,12 +1990,12 @@
       "created_ts": 1792600237189,
       "filled_ts": 1792599300000,
       "mae_r": 0.6279320731446948,
-      "mfe_r": 0.1488153120034238,
+      "mfe_r": 0.26443801437279313,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8661,
-      "_last_checked_t": 1792601100000
+      "_last_checked_t": 1792602000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792602047551
+  "last_run_ts": 1792602929661
 }
