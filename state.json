@@ -620,7 +620,7 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 1016,
+        "seen": 1017,
         "rejected": 0
       }
     },
@@ -1916,10 +1916,10 @@
       "created_ts": 1792529137278,
       "filled_ts": 1792528200000,
       "mae_r": 0.15050043247251074,
-      "mfe_r": 0.6320688660982801,
+      "mfe_r": 0.6475143127805958,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": 8643,
-      "_last_checked_t": 1792544400000
+      "_last_checked_t": 1792545300000
     },
     {
       "id": "ZEC-Momentum-1792545326266",
@@ -1949,7 +1949,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1792545326266,
       "filled_ts": null,
@@ -1957,9 +1957,9 @@
       "mfe_r": 0.0,
       "resolution_logic_version": "1.0.4",
       "tg_message_id": null,
-      "_last_checked_t": 1792543500000
+      "_last_checked_t": 1792545300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792545326266
+  "last_run_ts": 1792546234984
 }
