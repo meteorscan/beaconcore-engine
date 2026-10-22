@@ -15,20 +15,26 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 1.6397851009156803
+      },
+      "UNI|trend|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
       "Liquidity Sweep|A": {
-        "n": 1,
+        "n": 2,
         "wins": 1,
-        "sum_conf": 0.7756375082832028
+        "sum_conf": 1.5337819718103387
       }
     },
     "forensic_counts": {},
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 2,
-        "filled": 1,
+        "filled": 2,
         "expired": 0
       },
       "Momentum|pending": {
@@ -63,7 +69,12 @@
       "2026-10-21": "sent",
       "2026-10-22": "sent"
     },
-    "symbol_cooldown": {}
+    "symbol_cooldown": {
+      "UNI": {
+        "direction": "bullish",
+        "until_ts": 1792714500000
+      }
+    }
   },
   "tier2_trades": [
     {
@@ -97,56 +108,41 @@
       "exit_model": "managed",
       "tp1_hit": true,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "UNI-Liquidity Sweep-1792687529726",
       "symbol": "UNI",
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 7.0314264,
       "sl": 6.976660000000001,
       "tp1": 7.151912479999998,
       "tp2": 7.1887,
-      "rr1": 2.2,
-      "rr2": 2.8717169651465526,
+      "r_realized": -1.0,
+      "mae_r": 1.0576996114406134,
+      "mfe_r": 0.7919746413859667,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7581444635271359,
       "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
+      "grade_raw": "A",
+      "score_raw": 0.7581444635271359,
       "regime_at_entry": {
         "trend_strength": 28.78831090621054,
         "volatility_pctl": 57.5,
         "macro_bias": "neutral"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 11,
-      "status": "active",
-      "created_ts": 1792687529726,
-      "filled_ts": 1792696500000,
-      "mae_r": 0.9225802681936477,
-      "mfe_r": 0.7919746413859667,
-      "resolution_logic_version": "1.1.0",
+      "regime_src": "entry",
+      "resolved_ts": 1792710900000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
       "exit_model": "managed",
-      "score_raw": 0.7581444635271359,
-      "grade_raw": "A",
-      "tg_message_id": 8716,
-      "_last_checked_t": 1792710000000,
-      "active_sl": 6.976660000000001,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1792710928374
+  "last_run_ts": 1792711837578
 }
