@@ -30,16 +30,25 @@
         "dispatched": 1,
         "filled": 1,
         "expired": 0
+      },
+      "Momentum|pending": {
+        "dispatched": 1,
+        "filled": 0,
+        "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 4,
+        "seen": 6,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 4,
+        "seen": 6,
         "rejected": 0
+      },
+      "tp1_capped": {
+        "seen": 2,
+        "rejected": 2
       }
     },
     "circuit_breaker": {
@@ -90,7 +99,54 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "PENGU-Momentum-1792679435770",
+      "symbol": "PENGU",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.007824868872582488,
+      "sl": 0.007905898,
+      "tp1": 0.007646604792263961,
+      "tp2": 0.007629,
+      "rr1": 2.2,
+      "rr2": 2.417264986370269,
+      "confidence": 0.7861310903284123,
+      "grade": "A",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 31.569854906936776,
+        "volatility_pctl": 32.5,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1792679435770,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7861310903284123,
+      "grade_raw": "A",
+      "tg_message_id": 8708,
+      "_last_checked_t": 1792677600000,
+      "active_sl": 0.007905898,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1792678527096
+  "last_run_ts": 1792679435770
 }
