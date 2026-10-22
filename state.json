@@ -132,14 +132,14 @@
       "status": "active",
       "created_ts": 1792687529726,
       "filled_ts": 1792696500000,
-      "mae_r": 0.3273247830786869,
+      "mae_r": 0.5007888048146455,
       "mfe_r": 0.6951999766280101,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7581444635271359,
       "grade_raw": "A",
       "tg_message_id": 8716,
-      "_last_checked_t": 1792697400000,
+      "_last_checked_t": 1792698300000,
       "active_sl": 6.976660000000001,
       "be_armed": false,
       "partial_done": false,
@@ -148,5 +148,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1792698327059
+  "last_run_ts": 1792699243518
 }
