@@ -51,7 +51,8 @@
       "last_adjust_ts": 0
     },
     "daily_totals": {
-      "2026-10-21": "sent"
+      "2026-10-21": "sent",
+      "2026-10-22": "sent"
     },
     "symbol_cooldown": {}
   },
@@ -91,5 +92,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1792655127269
+  "last_run_ts": 1792656046871
 }
