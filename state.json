@@ -67,7 +67,8 @@
     },
     "daily_totals": {
       "2026-10-21": "sent",
-      "2026-10-22": "sent"
+      "2026-10-22": "sent",
+      "2026-10-23": "sent"
     },
     "symbol_cooldown": {
       "UNI": {
@@ -144,5 +145,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1792741528258
+  "last_run_ts": 1792742443003
 }
