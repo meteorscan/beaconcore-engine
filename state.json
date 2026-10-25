@@ -65,23 +65,23 @@
         "expired": 1
       },
       "Reversal|pending": {
-        "dispatched": 1,
+        "dispatched": 2,
         "filled": 1,
         "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 36,
+        "seen": 37,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 36,
+        "seen": 37,
         "rejected": 0
       },
       "tp1_capped": {
-        "seen": 20,
-        "rejected": 20
+        "seen": 21,
+        "rejected": 21
       }
     },
     "circuit_breaker": {
@@ -276,7 +276,54 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "PENGU-Reversal-1792966526858",
+      "symbol": "PENGU",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.007525072,
+      "sl": 0.007602595,
+      "tp1": 0.007354521399999999,
+      "tp2": 0.007354,
+      "rr1": 2.2,
+      "rr2": 2.2067257459076504,
+      "confidence": 0.8129082862135866,
+      "grade": "A+",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 22.332355708695143,
+        "volatility_pctl": 1.6666666666666667,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1792966526858,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8129082862135866,
+      "grade_raw": "A+",
+      "tg_message_id": 8837,
+      "_last_checked_t": 1792964700000,
+      "active_sl": 0.007602595,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1792965644088
+  "last_run_ts": 1792966526858
 }
