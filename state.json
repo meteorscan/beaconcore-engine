@@ -386,19 +386,19 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 4,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1793092528434,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1793095200000,
+      "mae_r": 0.726386706932239,
+      "mfe_r": 0.6601167267665743,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.6972752967536033,
       "grade_raw": "A",
       "tg_message_id": 8879,
-      "_last_checked_t": 1793094300000,
+      "_last_checked_t": 1793095200000,
       "active_sl": 4.3797159,
       "be_armed": false,
       "partial_done": false,
@@ -407,5 +407,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793095244125
+  "last_run_ts": 1793096130839
 }
