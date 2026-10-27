@@ -45,6 +45,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "ADA|range|intraday|Reversal": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -59,9 +65,9 @@
         "sum_conf": 0.7422797048761202
       },
       "Reversal|A+": {
-        "n": 1,
+        "n": 2,
         "wins": 0,
-        "sum_conf": 0.8129082862135866
+        "sum_conf": 1.6370011155955408
       }
     },
     "forensic_counts": {},
@@ -83,7 +89,7 @@
       },
       "Reversal|pending": {
         "dispatched": 3,
-        "filled": 2,
+        "filled": 3,
         "expired": 0
       },
       "Range Trading|pending": {
@@ -139,6 +145,10 @@
       "XRP": {
         "direction": "bearish",
         "until_ts": 1793107800000
+      },
+      "ADA": {
+        "direction": "bearish",
+        "until_ts": 1793108700000
       }
     }
   },
@@ -430,55 +440,41 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "ADA-Reversal-1793097932296",
       "symbol": "ADA",
       "engine": "Reversal",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.20385448,
       "sl": 0.20525,
       "tp1": 0.20076,
       "tp2": 0.20049,
-      "rr1": 2.2174386608576353,
-      "rr2": 2.410914927768891,
+      "r_realized": -1.0,
+      "mae_r": 1.2722999312084555,
+      "mfe_r": 0.7842811281816253,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8240928293819544,
       "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
+      "grade_raw": "A+",
+      "score_raw": 0.8240928293819544,
       "regime_at_entry": {
         "trend_strength": 19.994431067603024,
         "volatility_pctl": 16.666666666666668,
         "macro_bias": "neutral"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1793097932296,
-      "filled_ts": 1793097900000,
-      "mae_r": 0.828021096078886,
-      "mfe_r": 0.7842811281816253,
-      "resolution_logic_version": "1.1.0",
+      "regime_src": "entry",
+      "resolved_ts": 1793105100000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
       "exit_model": "managed",
-      "score_raw": 0.8240928293819544,
-      "grade_raw": "A+",
-      "tg_message_id": 8885,
-      "_last_checked_t": 1793104200000,
-      "active_sl": 0.20525,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
+    }
+  ],
+  "active_signals": [
     {
       "id": "PENGU-Liquidity Sweep-1793105130973",
       "symbol": "PENGU",
@@ -506,7 +502,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1793105130973,
       "filled_ts": null,
@@ -517,7 +513,7 @@
       "score_raw": 0.7921156589790047,
       "grade_raw": "A",
       "tg_message_id": 8893,
-      "_last_checked_t": 1793103300000,
+      "_last_checked_t": 1793105100000,
       "active_sl": 0.00766766,
       "be_armed": false,
       "partial_done": false,
@@ -526,5 +522,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793105130973
+  "last_run_ts": 1793106049265
 }
