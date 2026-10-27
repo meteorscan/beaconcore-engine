@@ -57,6 +57,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "ZEC|trend|intraday|Momentum": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 1.6500000000000001
       }
     },
     "calibration_buckets": {
@@ -74,6 +80,11 @@
         "n": 2,
         "wins": 0,
         "sum_conf": 1.6370011155955408
+      },
+      "Momentum|A+": {
+        "n": 1,
+        "wins": 1,
+        "sum_conf": 0.8725020432888506
       }
     },
     "forensic_counts": {},
@@ -85,7 +96,7 @@
       },
       "Momentum|pending": {
         "dispatched": 3,
-        "filled": 0,
+        "filled": 1,
         "expired": 2
       },
       "Mean Reversion|pending": {
@@ -510,6 +521,38 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "ZEC-Momentum-1793127660752",
+      "symbol": "ZEC",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bullish",
+      "entry": 1292.7640931451815,
+      "sl": 1283.9,
+      "tp1": 1312.2650980645806,
+      "tp2": 1318.6,
+      "r_realized": 1.6500000000000001,
+      "mae_r": 0.1651712274681412,
+      "mfe_r": 2.813136825888826,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8725020432888506,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8725020432888506,
+      "regime_at_entry": {
+        "trend_strength": 30.146413677690422,
+        "volatility_pctl": 50.833333333333336,
+        "macro_bias": "neutral"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1793136600000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": true,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -544,61 +587,15 @@
       "status": "active",
       "created_ts": 1793108729969,
       "filled_ts": 1793114100000,
-      "mae_r": 0.6866968938724111,
+      "mae_r": 0.8654262224145446,
       "mfe_r": 0.6020356329840211,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8305572695212213,
       "grade_raw": "A+",
       "tg_message_id": 8896,
-      "_last_checked_t": 1793135700000,
+      "_last_checked_t": 1793136600000,
       "active_sl": 1.3319306,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "ZEC-Momentum-1793127660752",
-      "symbol": "ZEC",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 1292.7640931451815,
-      "sl": 1283.9,
-      "tp1": 1312.2650980645806,
-      "tp2": 1318.6,
-      "rr1": 2.2,
-      "rr2": 2.9146700549805247,
-      "confidence": 0.8725020432888506,
-      "grade": "A+",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 30.146413677690422,
-        "volatility_pctl": 50.833333333333336,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 10,
-      "status": "active",
-      "created_ts": 1793127660752,
-      "filled_ts": 1793135700000,
-      "mae_r": 0.1651712274681412,
-      "mfe_r": 0.8614425333480978,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8725020432888506,
-      "grade_raw": "A+",
-      "tg_message_id": 8906,
-      "_last_checked_t": 1793135700000,
-      "active_sl": 1283.9,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -606,5 +603,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793136635857
+  "last_run_ts": 1793137526201
 }
