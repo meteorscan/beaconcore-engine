@@ -632,13 +632,13 @@
       "created_ts": 1793213129564,
       "filled_ts": 1793216700000,
       "mae_r": 0.8504573583647551,
-      "mfe_r": 0.19136124018086267,
+      "mfe_r": 0.6830996186943886,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7420471832868825,
       "grade_raw": "A",
       "tg_message_id": 8947,
-      "_last_checked_t": 1793217600000,
+      "_last_checked_t": 1793218500000,
       "active_sl": 1.3455942500000002,
       "be_armed": false,
       "partial_done": false,
@@ -647,5 +647,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793218529553
+  "last_run_ts": 1793219435811
 }
