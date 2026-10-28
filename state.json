@@ -101,7 +101,7 @@
     "forensic_counts": {},
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 12,
+        "dispatched": 13,
         "filled": 8,
         "expired": 4
       },
@@ -128,11 +128,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 85,
+        "seen": 86,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 85,
+        "seen": 86,
         "rejected": 0
       },
       "tp1_capped": {
@@ -599,7 +599,53 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "XRP-Liquidity Sweep-1793213129564",
+      "symbol": "XRP",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1.333596,
+      "sl": 1.3455942500000002,
+      "tp1": 1.3079,
+      "tp2": 1.3067,
+      "rr1": 2.1416456566582203,
+      "rr2": 2.2416602421186056,
+      "confidence": 0.7420471832868825,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 22.89489731912214,
+        "volatility_pctl": 22.5,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793213129564,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7420471832868825,
+      "grade_raw": "A",
+      "tg_message_id": 8947,
+      "_last_checked_t": 1793211300000,
+      "active_sl": 1.3455942500000002,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1793212238279
+  "last_run_ts": 1793213129564
 }
