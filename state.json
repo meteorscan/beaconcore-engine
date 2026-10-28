@@ -101,7 +101,7 @@
     "forensic_counts": {},
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 11,
+        "dispatched": 12,
         "filled": 8,
         "expired": 3
       },
@@ -128,11 +128,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 84,
+        "seen": 85,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 84,
+        "seen": 85,
         "rejected": 0
       },
       "tp1_capped": {
@@ -599,7 +599,53 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "XLM-Liquidity Sweep-1793201440115",
+      "symbol": "XLM",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.17154088,
+      "sl": 0.17295278,
+      "tp1": 0.16857,
+      "tp2": 0.16847,
+      "rr1": 2.1041716835470092,
+      "rr2": 2.1749982293363637,
+      "confidence": 0.741691855685797,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 28.559676721229245,
+        "volatility_pctl": 24.166666666666668,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793201440115,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.741691855685797,
+      "grade_raw": "A",
+      "tg_message_id": 8941,
+      "_last_checked_t": 1793199600000,
+      "active_sl": 0.17295278,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1793200530800
+  "last_run_ts": 1793201440115
 }
