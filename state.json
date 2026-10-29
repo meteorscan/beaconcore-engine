@@ -113,7 +113,7 @@
     "forensic_counts": {},
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 13,
+        "dispatched": 14,
         "filled": 9,
         "expired": 4
       },
@@ -123,7 +123,7 @@
         "expired": 2
       },
       "Mean Reversion|pending": {
-        "dispatched": 2,
+        "dispatched": 4,
         "filled": 0,
         "expired": 2
       },
@@ -140,16 +140,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 94,
+        "seen": 97,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 94,
+        "seen": 97,
         "rejected": 0
       },
       "tp1_capped": {
-        "seen": 44,
-        "rejected": 44
+        "seen": 46,
+        "rejected": 46
       }
     },
     "circuit_breaker": {
@@ -676,7 +676,144 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "ETH-Mean Reversion-1793289646047",
+      "symbol": "ETH",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 2372.399052503124,
+      "sl": 2393.93,
+      "tp1": 2325.030968009997,
+      "tp2": 2312.4,
+      "rr1": 2.2,
+      "rr2": 2.786642460199672,
+      "confidence": 0.8371919223040571,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 17.26422115655741,
+        "volatility_pctl": 76.66666666666667,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793289646047,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8371919223040571,
+      "grade_raw": "A+",
+      "tg_message_id": 8996,
+      "_last_checked_t": 1793287800000,
+      "active_sl": 2393.93,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "SOL-Mean Reversion-1793289646047",
+      "symbol": "SOL",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 103.09881794504305,
+      "sl": 103.97999999999999,
+      "tp1": 101.16021742413778,
+      "tp2": 100.88,
+      "rr1": 2.2,
+      "rr2": 2.5180017370547656,
+      "confidence": 0.833938339485264,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 19.289482119685264,
+        "volatility_pctl": 84.16666666666667,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793289646047,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.833938339485264,
+      "grade_raw": "A+",
+      "tg_message_id": 8997,
+      "_last_checked_t": 1793287800000,
+      "active_sl": 103.97999999999999,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "XRP-Liquidity Sweep-1793289646047",
+      "symbol": "XRP",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1.3055512,
+      "sl": 1.3139,
+      "tp1": 1.2861500000000001,
+      "tp2": 1.2861,
+      "rr1": 2.3238309697201744,
+      "rr2": 2.3298198543503132,
+      "confidence": 0.855379387086852,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 24.364385621401375,
+        "volatility_pctl": 55.833333333333336,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793289646047,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.855379387086852,
+      "grade_raw": "A+",
+      "tg_message_id": 8998,
+      "_last_checked_t": 1793287800000,
+      "active_sl": 1.3139,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1793288730035
+  "last_run_ts": 1793289646047
 }
