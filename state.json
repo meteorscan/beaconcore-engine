@@ -107,10 +107,10 @@
         "sum_r": 0.5055191971935827
       },
       "PENDLE|trend|intraday|Liquidity Sweep": {
-        "n": 1,
+        "n": 2,
         "wins": 0,
-        "losses": 1,
-        "sum_r": -1.0
+        "losses": 2,
+        "sum_r": -2.0
       }
     },
     "calibration_buckets": {
@@ -145,16 +145,16 @@
         "sum_conf": 1.6711302617893211
       },
       "Liquidity Sweep|A+": {
-        "n": 2,
+        "n": 3,
         "wins": 1,
-        "sum_conf": 1.6784387413674444
+        "sum_conf": 2.519757508937891
       }
     },
     "forensic_counts": {},
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 18,
-        "filled": 11,
+        "filled": 12,
         "expired": 5
       },
       "Momentum|pending": {
@@ -235,7 +235,7 @@
       },
       "PENDLE": {
         "direction": "bearish",
-        "until_ts": 1793383200000
+        "until_ts": 1793386800000
       }
     }
   },
@@ -943,6 +943,38 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "PENDLE-Liquidity Sweep-1793383244087",
+      "symbol": "PENDLE",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 1.7542535999999997,
+      "sl": 1.7651999999999999,
+      "tp1": 1.7301715199999994,
+      "tp2": 1.7276,
+      "r_realized": -1.0,
+      "mae_r": 1.1096250822188185,
+      "mfe_r": 0.3977197982898197,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8413187675704465,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8413187675704465,
+      "regime_at_entry": {
+        "trend_strength": 35.58568086265963,
+        "volatility_pctl": 82.5,
+        "macro_bias": "neutral"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1793383200000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -979,13 +1011,13 @@
       "created_ts": 1793366127294,
       "filled_ts": 1793372400000,
       "mae_r": 0.8203715668517637,
-      "mfe_r": 0.5323260646442879,
+      "mfe_r": 0.7495987412058204,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8373532191129256,
       "grade_raw": "A+",
       "tg_message_id": 9056,
-      "_last_checked_t": 1793382300000,
+      "_last_checked_t": 1793383200000,
       "active_sl": 1.2641628999999999,
       "be_armed": false,
       "partial_done": false,
@@ -1020,7 +1052,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 5,
+      "pending_bars": 6,
       "status": "pending",
       "created_ts": 1793379642834,
       "filled_ts": null,
@@ -1031,53 +1063,8 @@
       "score_raw": 0.8189850515518805,
       "grade_raw": "A+",
       "tg_message_id": 9075,
-      "_last_checked_t": 1793382300000,
+      "_last_checked_t": 1793383200000,
       "active_sl": 1203.5900000000001,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "PENDLE-Liquidity Sweep-1793383244087",
-      "symbol": "PENDLE",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 1.7542535999999997,
-      "sl": 1.7651999999999999,
-      "tp1": 1.7301715199999994,
-      "tp2": 1.7276,
-      "rr1": 2.2,
-      "rr2": 2.4349192428560436,
-      "confidence": 0.8413187675704465,
-      "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 35.58568086265963,
-        "volatility_pctl": 82.5,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
-      "created_ts": 1793383244087,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8413187675704465,
-      "grade_raw": "A+",
-      "tg_message_id": 9078,
-      "_last_checked_t": 1793381400000,
-      "active_sl": 1.7651999999999999,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -1085,5 +1072,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793383244087
+  "last_run_ts": 1793384125263
 }
