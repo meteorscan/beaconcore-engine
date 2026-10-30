@@ -23,10 +23,10 @@
         "sum_r": -1.0
       },
       "PENGU|trend|intraday|Reversal": {
-        "n": 2,
+        "n": 3,
         "wins": 1,
-        "losses": 1,
-        "sum_r": -0.44999999999999996
+        "losses": 2,
+        "sum_r": -1.45
       },
       "NEAR|trend|intraday|Liquidity Sweep": {
         "n": 2,
@@ -119,9 +119,9 @@
         "sum_conf": 0.7422797048761202
       },
       "Reversal|A+": {
-        "n": 3,
+        "n": 4,
         "wins": 1,
-        "sum_conf": 2.4619145330804653
+        "sum_conf": 3.309767671629904
       },
       "Momentum|A+": {
         "n": 3,
@@ -163,7 +163,7 @@
       },
       "Reversal|pending": {
         "dispatched": 7,
-        "filled": 4,
+        "filled": 5,
         "expired": 2
       },
       "Range Trading|pending": {
@@ -213,7 +213,7 @@
       },
       "PENGU": {
         "direction": "bearish",
-        "until_ts": 1793121300000
+        "until_ts": 1793376000000
       },
       "NEAR": {
         "direction": "bullish",
@@ -869,6 +869,38 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "PENGU-Reversal-1793368844474",
+      "symbol": "PENGU",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.007258504,
+      "sl": 0.007338,
+      "tp1": 0.007069,
+      "tp2": 0.0070675,
+      "r_realized": -1.0,
+      "mae_r": 1.7044379591426038,
+      "mfe_r": 1.2768441179430357,
+      "forensic_category": "correct_read_poor_rr",
+      "confidence": 0.8478531385494389,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8478531385494389,
+      "regime_at_entry": {
+        "trend_strength": 25.378489167047036,
+        "volatility_pctl": 87.5,
+        "macro_bias": "neutral"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1793372400000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -899,66 +931,20 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 8,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1793366127294,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1793372400000,
+      "mae_r": 0.39984380576491,
+      "mfe_r": 0.5253172686261744,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8373532191129256,
       "grade_raw": "A+",
       "tg_message_id": 9056,
-      "_last_checked_t": 1793371500000,
+      "_last_checked_t": 1793372400000,
       "active_sl": 1.2641628999999999,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "PENGU-Reversal-1793368844474",
-      "symbol": "PENGU",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.007258504,
-      "sl": 0.007338,
-      "tp1": 0.007069,
-      "tp2": 0.0070675,
-      "rr1": 2.383818053738551,
-      "rr2": 2.4026869276441536,
-      "confidence": 0.8478531385494389,
-      "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 25.378489167047036,
-        "volatility_pctl": 87.5,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 3,
-      "status": "active",
-      "created_ts": 1793368844474,
-      "filled_ts": 1793370600000,
-      "mae_r": 0.37103753647982735,
-      "mfe_r": 1.2768441179430357,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8478531385494389,
-      "grade_raw": "A+",
-      "tg_message_id": 9060,
-      "_last_checked_t": 1793371500000,
-      "active_sl": 0.007338,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -992,7 +978,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 4,
+      "pending_bars": 5,
       "status": "pending",
       "created_ts": 1793369728266,
       "filled_ts": null,
@@ -1003,7 +989,7 @@
       "score_raw": 0.8157499243951489,
       "grade_raw": "A+",
       "tg_message_id": 9061,
-      "_last_checked_t": 1793371500000,
+      "_last_checked_t": 1793372400000,
       "active_sl": 1203.5000000000002,
       "be_armed": false,
       "partial_done": false,
@@ -1012,5 +998,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793372442236
+  "last_run_ts": 1793373327809
 }
