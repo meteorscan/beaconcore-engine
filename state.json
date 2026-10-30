@@ -1092,7 +1092,7 @@
       "score_raw": 0.7881886635478867,
       "grade_raw": "A",
       "tg_message_id": 9088,
-      "_last_checked_t": 1793391300000,
+      "_last_checked_t": 1793392200000,
       "active_sl": 1217.5227852,
       "be_armed": true,
       "partial_done": true,
@@ -1128,7 +1128,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 3,
+      "pending_bars": 4,
       "status": "pending",
       "created_ts": 1793390440885,
       "filled_ts": null,
@@ -1139,7 +1139,7 @@
       "score_raw": 0.839528950563623,
       "grade_raw": "A+",
       "tg_message_id": 9095,
-      "_last_checked_t": 1793391300000,
+      "_last_checked_t": 1793392200000,
       "active_sl": 1.7713999999999999,
       "be_armed": false,
       "partial_done": false,
@@ -1148,5 +1148,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793392234964
+  "last_run_ts": 1793393124988
 }
