@@ -175,7 +175,7 @@
         "expired": 2
       },
       "Mean Reversion|pending": {
-        "dispatched": 4,
+        "dispatched": 5,
         "filled": 2,
         "expired": 2
       },
@@ -192,16 +192,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 143,
+        "seen": 144,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 143,
+        "seen": 144,
         "rejected": 0
       },
       "tp1_capped": {
-        "seen": 74,
-        "rejected": 74
+        "seen": 75,
+        "rejected": 75
       }
     },
     "circuit_breaker": {
@@ -1113,7 +1113,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 8,
+      "pending_bars": 9,
       "status": "pending",
       "created_ts": 1793390440885,
       "filled_ts": null,
@@ -1124,8 +1124,53 @@
       "score_raw": 0.839528950563623,
       "grade_raw": "A+",
       "tg_message_id": 9095,
-      "_last_checked_t": 1793395800000,
+      "_last_checked_t": 1793396700000,
       "active_sl": 1.7713999999999999,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "PENGU-Mean Reversion-1793397638533",
+      "symbol": "PENGU",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.007430330529149689,
+      "sl": 0.0074894819999999996,
+      "tp1": 0.007300197293279006,
+      "tp2": 0.007256,
+      "rr1": 2.2,
+      "rr2": 2.9471884070448904,
+      "confidence": 0.8418010524432689,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 16.419012808729438,
+        "volatility_pctl": 79.16666666666667,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793397638533,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8418010524432689,
+      "grade_raw": "A+",
+      "tg_message_id": 9100,
+      "_last_checked_t": 1793395800000,
+      "active_sl": 0.0074894819999999996,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -1133,5 +1178,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793396727233
+  "last_run_ts": 1793397638533
 }
