@@ -123,6 +123,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 0.5062999041256521
+      },
+      "PENGU|range|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -152,9 +158,9 @@
         "sum_conf": 0.8305572695212213
       },
       "Mean Reversion|A+": {
-        "n": 2,
+        "n": 3,
         "wins": 2,
-        "sum_conf": 1.6711302617893211
+        "sum_conf": 2.51293131423259
       },
       "Liquidity Sweep|A+": {
         "n": 4,
@@ -167,7 +173,7 @@
       "Liquidity Sweep|pending": {
         "dispatched": 20,
         "filled": 14,
-        "expired": 5
+        "expired": 6
       },
       "Momentum|pending": {
         "dispatched": 6,
@@ -176,7 +182,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 5,
-        "filled": 2,
+        "filled": 3,
         "expired": 2
       },
       "Reversal|pending": {
@@ -231,7 +237,7 @@
       },
       "PENGU": {
         "direction": "bearish",
-        "until_ts": 1793376000000
+        "until_ts": 1793403000000
       },
       "NEAR": {
         "direction": "bullish",
@@ -1083,53 +1089,6 @@
       "exit_model": "managed",
       "tp1_hit": true,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
-    {
-      "id": "PENDLE-Liquidity Sweep-1793390440885",
-      "symbol": "PENDLE",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 1.7607024,
-      "sl": 1.7713999999999999,
-      "tp1": 1.7371676800000002,
-      "tp2": 1.7276,
-      "rr1": 2.2,
-      "rr2": 3.0943763087047937,
-      "confidence": 0.839528950563623,
-      "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 33.65257455514045,
-        "volatility_pctl": 86.66666666666667,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1793390440885,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.839528950563623,
-      "grade_raw": "A+",
-      "tg_message_id": 9095,
-      "_last_checked_t": 1793398500000,
-      "active_sl": 1.7713999999999999,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
     },
     {
       "id": "PENGU-Mean Reversion-1793397638533",
@@ -1137,46 +1096,34 @@
       "engine": "Mean Reversion",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.007430330529149689,
       "sl": 0.0074894819999999996,
       "tp1": 0.007300197293279006,
       "tp2": 0.007256,
-      "rr1": 2.2,
-      "rr2": 2.9471884070448904,
+      "r_realized": -1.0,
+      "mae_r": 1.4652124385822647,
+      "mfe_r": 0.6818178579489632,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8418010524432689,
       "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
+      "grade_raw": "A+",
+      "score_raw": 0.8418010524432689,
       "regime_at_entry": {
         "trend_strength": 16.419012808729438,
         "volatility_pctl": 79.16666666666667,
         "macro_bias": "neutral"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1793397638533,
-      "filled_ts": 1793396700000,
-      "mae_r": 0.8058881742931499,
-      "mfe_r": 0.6818178579489632,
-      "resolution_logic_version": "1.1.0",
+      "regime_src": "entry",
+      "resolved_ts": 1793399400000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
       "exit_model": "managed",
-      "score_raw": 0.8418010524432689,
-      "grade_raw": "A+",
-      "tg_message_id": 9100,
-      "_last_checked_t": 1793398500000,
-      "active_sl": 0.0074894819999999996,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1793399431551
+  "last_run_ts": 1793400327621
 }
