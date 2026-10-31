@@ -199,7 +199,7 @@
         "expired": 2
       },
       "Mean Reversion|pending": {
-        "dispatched": 6,
+        "dispatched": 7,
         "filled": 3,
         "expired": 2
       },
@@ -216,16 +216,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 164,
+        "seen": 165,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 164,
+        "seen": 165,
         "rejected": 0
       },
       "tp1_capped": {
-        "seen": 89,
-        "rejected": 89
+        "seen": 90,
+        "rejected": 90
       }
     },
     "circuit_breaker": {
@@ -1281,7 +1281,7 @@
       "score_raw": 0.8513351261044173,
       "grade_raw": "A+",
       "tg_message_id": 9135,
-      "_last_checked_t": 1793463300000,
+      "_last_checked_t": 1793464200000,
       "active_sl": 86.89848675191409,
       "be_armed": true,
       "partial_done": true,
@@ -1289,8 +1289,53 @@
       "tp1_hit": false,
       "be_ts": 1793459700000,
       "partial_ts": 1793460600000
+    },
+    {
+      "id": "TAO-Mean Reversion-1793465126704",
+      "symbol": "TAO",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 238.80598160405845,
+      "sl": 240.57033,
+      "tp1": 234.924415132987,
+      "tp2": 234.13666666666666,
+      "rr1": 2.2,
+      "rr2": 2.646481243802162,
+      "confidence": 0.8575929967137099,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 19.451922646654655,
+        "volatility_pctl": 11.666666666666666,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793465126704,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8575929967137099,
+      "grade_raw": "A+",
+      "tg_message_id": 9148,
+      "_last_checked_t": 1793463300000,
+      "active_sl": 240.57033,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793464230924
+  "last_run_ts": 1793465126704
 }
