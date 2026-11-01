@@ -159,6 +159,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 0.55
+      },
+      "AVAX|range|intraday|Range Trading": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -183,9 +189,9 @@
         "sum_conf": 3.3889701305395263
       },
       "Range Trading|A+": {
-        "n": 1,
+        "n": 2,
         "wins": 0,
-        "sum_conf": 0.8305572695212213
+        "sum_conf": 1.6637757419087489
       },
       "Mean Reversion|A+": {
         "n": 5,
@@ -222,7 +228,7 @@
       },
       "Range Trading|pending": {
         "dispatched": 3,
-        "filled": 1,
+        "filled": 2,
         "expired": 1
       }
     },
@@ -289,6 +295,10 @@
       "AAVE": {
         "direction": "bearish",
         "until_ts": 1793460600000
+      },
+      "AVAX": {
+        "direction": "bearish",
+        "until_ts": 1793512800000
       }
     }
   },
@@ -1316,6 +1326,38 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "AVAX-Range Trading-1793509241981",
+      "symbol": "AVAX",
+      "engine": "Range Trading",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 8.786,
+      "sl": 8.875430000000001,
+      "tp1": 8.589253999999995,
+      "tp2": 8.553,
+      "r_realized": -1.0,
+      "mae_r": 1.1685116851168242,
+      "mfe_r": 0.47187744604717047,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8332184723875276,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8332184723875276,
+      "regime_at_entry": {
+        "trend_strength": 17.036511109946797,
+        "volatility_pctl": 26.666666666666668,
+        "macro_bias": "neutral"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1793509200000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -1358,7 +1400,7 @@
       "score_raw": 0.8161958693887594,
       "grade_raw": "A+",
       "tg_message_id": 9164,
-      "_last_checked_t": 1793508300000,
+      "_last_checked_t": 1793509200000,
       "active_sl": 0.007349341999999999,
       "be_armed": false,
       "partial_done": false,
@@ -1396,60 +1438,15 @@
       "status": "active",
       "created_ts": 1793507432785,
       "filled_ts": 1793508300000,
-      "mae_r": 0.42927864206978783,
-      "mfe_r": 0.1612594296774435,
+      "mae_r": 0.46891206970382604,
+      "mfe_r": 0.2801597125795802,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8206639836047944,
       "grade_raw": "A+",
       "tg_message_id": 9167,
-      "_last_checked_t": 1793508300000,
+      "_last_checked_t": 1793509200000,
       "active_sl": 0.41596,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "AVAX-Range Trading-1793509241981",
-      "symbol": "AVAX",
-      "engine": "Range Trading",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 8.786,
-      "sl": 8.875430000000001,
-      "tp1": 8.589253999999995,
-      "tp2": 8.553,
-      "rr1": 2.2,
-      "rr2": 2.60538969026047,
-      "confidence": 0.8332184723875276,
-      "grade": "A+",
-      "confluences": [
-        "range extreme rejection",
-        "range-boundary entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 17.036511109946797,
-        "volatility_pctl": 26.666666666666668,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
-      "created_ts": 1793509241981,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8332184723875276,
-      "grade_raw": "A+",
-      "tg_message_id": 9168,
-      "_last_checked_t": 1793507400000,
-      "active_sl": 8.875430000000001,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -1457,5 +1454,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793509241981
+  "last_run_ts": 1793510125169
 }
