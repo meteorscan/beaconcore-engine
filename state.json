@@ -211,7 +211,7 @@
         "expired": 2
       },
       "Mean Reversion|pending": {
-        "dispatched": 7,
+        "dispatched": 8,
         "filled": 5,
         "expired": 2
       },
@@ -228,11 +228,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 168,
+        "seen": 169,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 168,
+        "seen": 169,
         "rejected": 0
       },
       "tp1_capped": {
@@ -1346,20 +1346,65 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 5,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1793502925288,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1793506500000,
+      "mae_r": 0.1425565316142709,
+      "mfe_r": 0.3918634556932667,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8161958693887594,
       "grade_raw": "A+",
       "tg_message_id": 9164,
-      "_last_checked_t": 1793505600000,
+      "_last_checked_t": 1793506500000,
       "active_sl": 0.007349341999999999,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "ONDO-Mean Reversion-1793507432785",
+      "symbol": "ONDO",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.4134368773237744,
+      "sl": 0.41596,
+      "tp1": 0.407835,
+      "tp2": 0.4078,
+      "rr1": 2.2202159952659586,
+      "rr2": 2.2340876949378763,
+      "confidence": 0.8206639836047944,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 17.664894086080302,
+        "volatility_pctl": 10.833333333333334,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793507432785,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8206639836047944,
+      "grade_raw": "A+",
+      "tg_message_id": 9167,
+      "_last_checked_t": 1793505600000,
+      "active_sl": 0.41596,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -1367,5 +1412,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793506525155
+  "last_run_ts": 1793507432785
 }
