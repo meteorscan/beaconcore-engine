@@ -207,7 +207,7 @@
     "forensic_counts": {},
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 22,
+        "dispatched": 23,
         "filled": 16,
         "expired": 6
       },
@@ -234,11 +234,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 174,
+        "seen": 175,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 174,
+        "seen": 175,
         "rejected": 0
       },
       "tp1_capped": {
@@ -1394,13 +1394,13 @@
       "created_ts": 1793502925288,
       "filled_ts": 1793506500000,
       "mae_r": 0.727078392731897,
-      "mfe_r": 0.3918634556932667,
+      "mfe_r": 0.44196532950334066,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8161958693887594,
       "grade_raw": "A+",
       "tg_message_id": 9164,
-      "_last_checked_t": 1793513700000,
+      "_last_checked_t": 1793514600000,
       "active_sl": 0.007349341999999999,
       "be_armed": false,
       "partial_done": false,
@@ -1439,13 +1439,13 @@
       "created_ts": 1793507432785,
       "filled_ts": 1793508300000,
       "mae_r": 0.805796204593195,
-      "mfe_r": 0.3792432816646758,
+      "mfe_r": 0.4268033948255305,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8206639836047944,
       "grade_raw": "A+",
       "tg_message_id": 9167,
-      "_last_checked_t": 1793513700000,
+      "_last_checked_t": 1793514600000,
       "active_sl": 0.41596,
       "be_armed": false,
       "partial_done": false,
@@ -1479,7 +1479,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 3,
+      "pending_bars": 4,
       "status": "pending",
       "created_ts": 1793512840358,
       "filled_ts": null,
@@ -1490,8 +1490,53 @@
       "score_raw": 0.838032341781159,
       "grade_raw": "A+",
       "tg_message_id": 9171,
-      "_last_checked_t": 1793513700000,
+      "_last_checked_t": 1793514600000,
       "active_sl": 240.57033,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "AAVE-Liquidity Sweep-1793515525198",
+      "symbol": "AAVE",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 139.4436,
+      "sl": 141.072,
+      "tp1": 136.17,
+      "tp2": 133.93,
+      "rr1": 2.010316875460586,
+      "rr2": 3.385900270203881,
+      "confidence": 0.7517731008755862,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 37.57532391221397,
+        "volatility_pctl": 46.666666666666664,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793515525198,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7517731008755862,
+      "grade_raw": "A",
+      "tg_message_id": 9172,
+      "_last_checked_t": 1793513700000,
+      "active_sl": 141.072,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -1499,5 +1544,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793514632789
+  "last_run_ts": 1793515525198
 }
