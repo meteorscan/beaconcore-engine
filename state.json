@@ -171,6 +171,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 0.5550539988164896
+      },
+      "ZEC|range|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -208,6 +214,11 @@
         "n": 6,
         "wins": 1,
         "sum_conf": 4.946527759956367
+      },
+      "Mean Reversion|A": {
+        "n": 1,
+        "wins": 0,
+        "sum_conf": 0.7991283754785878
       }
     },
     "forensic_counts": {},
@@ -224,7 +235,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 10,
-        "filled": 6,
+        "filled": 7,
         "expired": 3
       },
       "Reversal|pending": {
@@ -306,6 +317,10 @@
       "AVAX": {
         "direction": "bearish",
         "until_ts": 1793512800000
+      },
+      "ZEC": {
+        "direction": "bullish",
+        "until_ts": 1793563200000
       }
     }
   },
@@ -1429,55 +1444,41 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "ZEC-Mean Reversion-1793552439131",
       "symbol": "ZEC",
       "engine": "Mean Reversion",
       "counter_trend": false,
       "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 1229.651838125448,
       "sl": 1220.02875,
       "tp1": 1249.1666666666667,
       "tp2": 1249.3,
-      "rr1": 2.0279174716910564,
-      "rr2": 2.041773037762473,
+      "r_realized": -1.0,
+      "mae_r": 1.2523877957198861,
+      "mfe_r": 0.36871343463737505,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7991283754785878,
       "grade": "A",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
+      "grade_raw": "A",
+      "score_raw": 0.7991283754785878,
       "regime_at_entry": {
         "trend_strength": 18.951472184002757,
         "volatility_pctl": 0.8333333333333334,
         "macro_bias": "neutral"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 5,
-      "status": "active",
-      "created_ts": 1793552439131,
-      "filled_ts": 1793556000000,
-      "mae_r": 0.3898788077733832,
-      "mfe_r": 0.36871343463737505,
-      "resolution_logic_version": "1.1.0",
+      "regime_src": "entry",
+      "resolved_ts": 1793559600000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
       "exit_model": "managed",
-      "score_raw": 0.7991283754785878,
-      "grade_raw": "A",
-      "tg_message_id": 9200,
-      "_last_checked_t": 1793558700000,
-      "active_sl": 1220.02875,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1793559641432
+  "last_run_ts": 1793560526758
 }
