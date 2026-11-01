@@ -219,7 +219,7 @@
       "Mean Reversion|pending": {
         "dispatched": 9,
         "filled": 5,
-        "expired": 2
+        "expired": 3
       },
       "Reversal|pending": {
         "dispatched": 11,
@@ -1401,7 +1401,7 @@
       "score_raw": 0.8161958693887594,
       "grade_raw": "A+",
       "tg_message_id": 9164,
-      "_last_checked_t": 1793520900000,
+      "_last_checked_t": 1793521800000,
       "active_sl": 0.007349341999999999,
       "be_armed": false,
       "partial_done": false,
@@ -1446,53 +1446,8 @@
       "score_raw": 0.8206639836047944,
       "grade_raw": "A+",
       "tg_message_id": 9167,
-      "_last_checked_t": 1793520900000,
+      "_last_checked_t": 1793521800000,
       "active_sl": 0.41596,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "TAO-Mean Reversion-1793512840358",
-      "symbol": "TAO",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 238.73396768036017,
-      "sl": 240.57033,
-      "tp1": 234.95,
-      "tp2": 234.93,
-      "rr1": 2.060577937093755,
-      "rr2": 2.0714690340118755,
-      "confidence": 0.838032341781159,
-      "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 9.747194587036043,
-        "volatility_pctl": 2.5,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1793512840358,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.838032341781159,
-      "grade_raw": "A+",
-      "tg_message_id": 9171,
-      "_last_checked_t": 1793520900000,
-      "active_sl": 240.57033,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -1525,7 +1480,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 8,
+      "pending_bars": 9,
       "status": "pending",
       "created_ts": 1793515525198,
       "filled_ts": null,
@@ -1536,7 +1491,7 @@
       "score_raw": 0.7517731008755862,
       "grade_raw": "A",
       "tg_message_id": 9172,
-      "_last_checked_t": 1793520900000,
+      "_last_checked_t": 1793521800000,
       "active_sl": 141.072,
       "be_armed": false,
       "partial_done": false,
@@ -1545,5 +1500,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793521834086
+  "last_run_ts": 1793522726359
 }
