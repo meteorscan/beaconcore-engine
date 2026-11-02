@@ -257,7 +257,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 27,
+        "dispatched": 28,
         "filled": 19,
         "expired": 8
       },
@@ -284,16 +284,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 218,
+        "seen": 219,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 218,
+        "seen": 219,
         "rejected": 0
       },
       "tp1_capped": {
-        "seen": 110,
-        "rejected": 110
+        "seen": 111,
+        "rejected": 111
       }
     },
     "circuit_breaker": {
@@ -1740,7 +1740,53 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "ETH-Liquidity Sweep-1793627179369",
+      "symbol": "ETH",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 2301.0512,
+      "sl": 2317.5152,
+      "tp1": 2264.8304,
+      "tp2": 2247.9,
+      "rr1": 2.2,
+      "rr2": 3.2283284742468403,
+      "confidence": 0.7627329785349157,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 24.83707617212895,
+        "volatility_pctl": 36.666666666666664,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793627179369,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7627329785349157,
+      "grade_raw": "A",
+      "tg_message_id": 9253,
+      "_last_checked_t": 1793625300000,
+      "active_sl": 2317.5152,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1793626239050
+  "last_run_ts": 1793627179369
 }
