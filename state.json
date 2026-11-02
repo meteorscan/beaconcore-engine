@@ -290,16 +290,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 224,
+        "seen": 226,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 224,
+        "seen": 226,
         "rejected": 0
       },
       "tp1_capped": {
-        "seen": 116,
-        "rejected": 116
+        "seen": 118,
+        "rejected": 118
       }
     },
     "circuit_breaker": {
@@ -1844,5 +1844,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1793644242408
+  "last_run_ts": 1793645129425
 }
