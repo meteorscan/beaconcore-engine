@@ -190,6 +190,12 @@
         "losses": 0,
         "sum_r": 0.0,
         "breakeven": 1
+      },
+      "XLM|range|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 0.5373040500346411
       }
     },
     "calibration_buckets": {
@@ -219,9 +225,9 @@
         "sum_conf": 1.6637757419087489
       },
       "Mean Reversion|A+": {
-        "n": 6,
+        "n": 7,
         "wins": 3,
-        "sum_conf": 5.042523420655512
+        "sum_conf": 5.8959758130376105
       },
       "Liquidity Sweep|A+": {
         "n": 6,
@@ -249,8 +255,8 @@
         "expired": 2
       },
       "Mean Reversion|pending": {
-        "dispatched": 11,
-        "filled": 7,
+        "dispatched": 12,
+        "filled": 8,
         "expired": 3
       },
       "Reversal|pending": {
@@ -266,16 +272,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 198,
+        "seen": 199,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 198,
+        "seen": 199,
         "rejected": 0
       },
       "tp1_capped": {
-        "seen": 96,
-        "rejected": 96
+        "seen": 97,
+        "rejected": 97
       }
     },
     "circuit_breaker": {
@@ -1555,6 +1561,38 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "XLM-Mean Reversion-1793585725055",
+      "symbol": "XLM",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.169714677921171,
+      "sl": 0.1709708,
+      "tp1": 0.167015,
+      "tp2": 0.16699,
+      "r_realized": 0.5373040500346411,
+      "mae_r": 0.05996397969471698,
+      "mfe_r": 1.2376805944055471,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8534523923820981,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8534523923820981,
+      "regime_at_entry": {
+        "trend_strength": 16.68363110490303,
+        "volatility_pctl": 15.833333333333334,
+        "macro_bias": "neutral"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1793589300000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -1597,7 +1635,7 @@
       "score_raw": 0.8008623587756064,
       "grade_raw": "A+",
       "tg_message_id": 9216,
-      "_last_checked_t": 1793588400000,
+      "_last_checked_t": 1793589300000,
       "active_sl": 0.19472453,
       "be_armed": false,
       "partial_done": false,
@@ -1605,53 +1643,51 @@
       "tp1_hit": false
     },
     {
-      "id": "XLM-Mean Reversion-1793585725055",
-      "symbol": "XLM",
+      "id": "SUI-Mean Reversion-1793590236566",
+      "symbol": "SUI",
       "engine": "Mean Reversion",
       "counter_trend": false,
       "direction": "bearish",
       "style": "intraday",
       "entry_kind": "pending",
-      "entry": 0.169714677921171,
-      "sl": 0.1709708,
-      "tp1": 0.167015,
-      "tp2": 0.16699,
-      "rr1": 2.1492162001385644,
-      "rr2": 2.1691187242812044,
-      "confidence": 0.8534523923820981,
+      "entry": 0.9092144970514355,
+      "sl": 0.914822,
+      "tp1": 0.8968779905645936,
+      "tp2": 0.894585,
+      "rr1": 2.2,
+      "rr2": 2.6089147318559482,
+      "confidence": 0.8608199517095222,
       "grade": "A+",
       "confluences": [
         "1H Bollinger extreme",
         "band-level entry"
       ],
       "regime_at_entry": {
-        "trend_strength": 16.68363110490303,
-        "volatility_pctl": 15.833333333333334,
+        "trend_strength": 17.17436593529478,
+        "volatility_pctl": 22.5,
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1793585725055,
-      "filled_ts": 1793585700000,
-      "mae_r": 0.020158931409437003,
-      "mfe_r": 1.2376805944055471,
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793590236566,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
-      "score_raw": 0.8534523923820981,
+      "score_raw": 0.8608199517095222,
       "grade_raw": "A+",
-      "tg_message_id": 9224,
+      "tg_message_id": 9228,
       "_last_checked_t": 1793588400000,
-      "active_sl": 0.16956193471104195,
-      "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.5373040500346411,
-      "tp1_hit": false,
-      "be_ts": 1793587500000,
-      "partial_ts": 1793587500000
+      "active_sl": 0.914822,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793589331126
+  "last_run_ts": 1793590236566
 }
