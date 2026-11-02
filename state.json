@@ -268,7 +268,7 @@
         "expired": 9
       },
       "Momentum|pending": {
-        "dispatched": 6,
+        "dispatched": 7,
         "filled": 4,
         "expired": 2
       },
@@ -290,11 +290,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 234,
+        "seen": 236,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 234,
+        "seen": 236,
         "rejected": 0
       },
       "tp1_capped": {
@@ -1875,14 +1875,60 @@
       "created_ts": 1793646927532,
       "filled_ts": 1793655000000,
       "mae_r": 0.5860544313022017,
-      "mfe_r": 0.32837462862268246,
+      "mfe_r": 0.402825270474799,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7502515269768837,
       "grade_raw": "A",
       "tg_message_id": 9274,
-      "_last_checked_t": 1793655000000,
+      "_last_checked_t": 1793655900000,
       "active_sl": 83.0704,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "SUI-Momentum-1793656841188",
+      "symbol": "SUI",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.8745308189433357,
+      "sl": 0.8797849999999999,
+      "tp1": 0.8634,
+      "tp2": 0.8567215086339984,
+      "rr1": 2.1184688580950004,
+      "rr2": 3.389550172952009,
+      "confidence": 0.8615522361637001,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 24.192806961953515,
+        "volatility_pctl": 47.5,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793656841188,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8615522361637001,
+      "grade_raw": "A+",
+      "tg_message_id": 9283,
+      "_last_checked_t": 1793655000000,
+      "active_sl": 0.8797849999999999,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -1890,5 +1936,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793655929047
+  "last_run_ts": 1793656841188
 }
