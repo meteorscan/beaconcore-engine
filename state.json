@@ -310,15 +310,20 @@
         "dispatched": 3,
         "filled": 2,
         "expired": 1
+      },
+      "Breakout|pending": {
+        "dispatched": 1,
+        "filled": 0,
+        "expired": 0
       }
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 245,
+        "seen": 246,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 245,
+        "seen": 246,
         "rejected": 0
       },
       "tp1_capped": {
@@ -1995,7 +2000,54 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "HYPE-Breakout-1793715329953",
+      "symbol": "HYPE",
+      "engine": "Breakout",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 85.295,
+      "sl": 84.0184,
+      "tp1": 88.074,
+      "tp2": 88.091,
+      "rr1": 2.176876077079737,
+      "rr2": 2.1901926993576595,
+      "confidence": 0.7872878185466504,
+      "grade": "A",
+      "confluences": [
+        "1H range breakout",
+        "volume confirmation",
+        "retest entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 22.910324420769523,
+        "volatility_pctl": 40.0,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793715329953,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7872878185466504,
+      "grade_raw": "A",
+      "tg_message_id": 9310,
+      "_last_checked_t": 1793713500000,
+      "active_sl": 84.0184,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1793714443442
+  "last_run_ts": 1793715329953
 }
