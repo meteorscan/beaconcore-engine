@@ -314,7 +314,7 @@
       "Breakout|pending": {
         "dispatched": 1,
         "filled": 0,
-        "expired": 0
+        "expired": 1
       }
     },
     "filter_funnel": {
@@ -2002,52 +2002,6 @@
   ],
   "active_signals": [
     {
-      "id": "HYPE-Breakout-1793715329953",
-      "symbol": "HYPE",
-      "engine": "Breakout",
-      "counter_trend": false,
-      "direction": "bullish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 85.295,
-      "sl": 84.0184,
-      "tp1": 88.074,
-      "tp2": 88.091,
-      "rr1": 2.176876077079737,
-      "rr2": 2.1901926993576595,
-      "confidence": 0.7872878185466504,
-      "grade": "A",
-      "confluences": [
-        "1H range breakout",
-        "volume confirmation",
-        "retest entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 22.910324420769523,
-        "volatility_pctl": 40.0,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1793715329953,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.7872878185466504,
-      "grade_raw": "A",
-      "tg_message_id": 9310,
-      "_last_checked_t": 1793723400000,
-      "active_sl": 84.0184,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
       "id": "ETH-Liquidity Sweep-1793717125390",
       "symbol": "ETH",
       "engine": "Liquidity Sweep",
@@ -2085,7 +2039,7 @@
       "score_raw": 0.794465819328139,
       "grade_raw": "A",
       "tg_message_id": 9311,
-      "_last_checked_t": 1793723400000,
+      "_last_checked_t": 1793724300000,
       "active_sl": 2317.5152,
       "be_armed": false,
       "partial_done": false,
@@ -2130,7 +2084,7 @@
       "score_raw": 0.7734261506902596,
       "grade_raw": "A",
       "tg_message_id": 9313,
-      "_last_checked_t": 1793723400000,
+      "_last_checked_t": 1793724300000,
       "active_sl": 1.2928,
       "be_armed": false,
       "partial_done": false,
@@ -2165,7 +2119,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 5,
+      "pending_bars": 6,
       "status": "pending",
       "created_ts": 1793720729541,
       "filled_ts": null,
@@ -2176,7 +2130,7 @@
       "score_raw": 0.8144686921942431,
       "grade_raw": "A+",
       "tg_message_id": 9315,
-      "_last_checked_t": 1793723400000,
+      "_last_checked_t": 1793724300000,
       "active_sl": 130.52039,
       "be_armed": false,
       "partial_done": false,
@@ -2185,5 +2139,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793724332041
+  "last_run_ts": 1793725249245
 }
