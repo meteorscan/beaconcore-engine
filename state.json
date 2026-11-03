@@ -304,7 +304,7 @@
       "Reversal|pending": {
         "dispatched": 15,
         "filled": 10,
-        "expired": 4
+        "expired": 5
       },
       "Range Trading|pending": {
         "dispatched": 3,
@@ -2039,7 +2039,7 @@
       "score_raw": 0.794465819328139,
       "grade_raw": "A",
       "tg_message_id": 9311,
-      "_last_checked_t": 1793728800000,
+      "_last_checked_t": 1793729700000,
       "active_sl": 2317.5152,
       "be_armed": false,
       "partial_done": false,
@@ -2077,61 +2077,15 @@
       "status": "active",
       "created_ts": 1793718926168,
       "filled_ts": 1793720700000,
-      "mae_r": 0.4819172404572493,
+      "mae_r": 0.5069857610802829,
       "mfe_r": 0.6378100140383642,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7734261506902596,
       "grade_raw": "A",
       "tg_message_id": 9313,
-      "_last_checked_t": 1793728800000,
+      "_last_checked_t": 1793729700000,
       "active_sl": 1.2928,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "AAVE-Reversal-1793720729541",
-      "symbol": "AAVE",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 129.30416,
-      "sl": 130.52039,
-      "tp1": 126.82,
-      "tp2": 126.54,
-      "rr1": 2.0425084071269506,
-      "rr2": 2.272728020193548,
-      "confidence": 0.8144686921942431,
-      "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 23.98171834250619,
-        "volatility_pctl": 33.333333333333336,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1793720729541,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8144686921942431,
-      "grade_raw": "A+",
-      "tg_message_id": 9315,
-      "_last_checked_t": 1793728800000,
-      "active_sl": 130.52039,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2139,5 +2093,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793729739460
+  "last_run_ts": 1793730647322
 }
