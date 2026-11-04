@@ -325,7 +325,7 @@
       "Liquidity Sweep|pending": {
         "dispatched": 38,
         "filled": 26,
-        "expired": 9
+        "expired": 10
       },
       "Momentum|pending": {
         "dispatched": 8,
@@ -355,20 +355,20 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 286,
+        "seen": 287,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 286,
-        "rejected": 13
+        "seen": 287,
+        "rejected": 14
       },
       "tp1_capped": {
-        "seen": 154,
-        "rejected": 154
+        "seen": 155,
+        "rejected": 155
       },
       "breaker_gate": {
         "seen": 0,
-        "rejected": 13
+        "rejected": 14
       }
     },
     "circuit_breaker": {
@@ -2308,54 +2308,8 @@
       "score_raw": 0.7966398468961317,
       "grade_raw": "A",
       "tg_message_id": 9375,
-      "_last_checked_t": 1793816100000,
+      "_last_checked_t": 1793817000000,
       "active_sl": 0.6594,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "PENGU-Liquidity Sweep-1793808038820",
-      "symbol": "PENGU",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.007516608,
-      "sl": 0.0075843,
-      "tp1": 0.0073676856,
-      "tp2": 0.007351,
-      "rr1": 2.2,
-      "rr2": 2.44649293860426,
-      "confidence": 0.8223649031023007,
-      "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 27.79480332722149,
-        "volatility_pctl": 88.33333333333333,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "1h",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1793808038820,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8223649031023007,
-      "grade_raw": "A+",
-      "tg_message_id": 9376,
-      "_last_checked_t": 1793816100000,
-      "active_sl": 0.0075843,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2389,7 +2343,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 10,
+      "pending_bars": 11,
       "status": "pending",
       "created_ts": 1793808927106,
       "filled_ts": null,
@@ -2400,7 +2354,7 @@
       "score_raw": 0.8262254783230633,
       "grade_raw": "A+",
       "tg_message_id": 9377,
-      "_last_checked_t": 1793816100000,
+      "_last_checked_t": 1793817000000,
       "active_sl": 0.42104,
       "be_armed": false,
       "partial_done": false,
@@ -2434,7 +2388,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 7,
+      "pending_bars": 8,
       "status": "pending",
       "created_ts": 1793811644682,
       "filled_ts": null,
@@ -2445,7 +2399,7 @@
       "score_raw": 0.7955852093730196,
       "grade_raw": "A",
       "tg_message_id": 9378,
-      "_last_checked_t": 1793816100000,
+      "_last_checked_t": 1793817000000,
       "active_sl": 57.1485,
       "be_armed": false,
       "partial_done": false,
@@ -2454,5 +2408,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793817036524
+  "last_run_ts": 1793817928132
 }
