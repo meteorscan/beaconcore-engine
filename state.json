@@ -323,9 +323,9 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 38,
+        "dispatched": 39,
         "filled": 26,
-        "expired": 10
+        "expired": 11
       },
       "Momentum|pending": {
         "dispatched": 8,
@@ -355,12 +355,12 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 287,
+        "seen": 290,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 287,
-        "rejected": 14
+        "seen": 290,
+        "rejected": 16
       },
       "tp1_capped": {
         "seen": 155,
@@ -368,7 +368,7 @@
       },
       "breaker_gate": {
         "seen": 0,
-        "rejected": 14
+        "rejected": 16
       }
     },
     "circuit_breaker": {
@@ -2302,60 +2302,14 @@
       "created_ts": 1793806238398,
       "filled_ts": 1793807100000,
       "mae_r": 0.3301161565426589,
-      "mfe_r": 0.6712565991410072,
+      "mfe_r": 0.9751214353484603,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7966398468961317,
       "grade_raw": "A",
       "tg_message_id": 9375,
-      "_last_checked_t": 1793817000000,
+      "_last_checked_t": 1793817900000,
       "active_sl": 0.6594,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "ONDO-Liquidity Sweep-1793808927106",
-      "symbol": "ONDO",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.41680184,
-      "sl": 0.42104,
-      "tp1": 0.4074778879999999,
-      "tp2": 0.40647,
-      "rr1": 2.2,
-      "rr2": 2.437812635672053,
-      "confidence": 0.8262254783230633,
-      "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 25.796478651091522,
-        "volatility_pctl": 84.16666666666667,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1793808927106,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8262254783230633,
-      "grade_raw": "A+",
-      "tg_message_id": 9377,
-      "_last_checked_t": 1793817000000,
-      "active_sl": 0.42104,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2388,7 +2342,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 8,
+      "pending_bars": 9,
       "status": "pending",
       "created_ts": 1793811644682,
       "filled_ts": null,
@@ -2399,8 +2353,54 @@
       "score_raw": 0.7955852093730196,
       "grade_raw": "A",
       "tg_message_id": 9378,
-      "_last_checked_t": 1793817000000,
+      "_last_checked_t": 1793817900000,
       "active_sl": 57.1485,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "SUI-Liquidity Sweep-1793818840322",
+      "symbol": "SUI",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.93788728,
+      "sl": 0.95091997,
+      "tp1": 0.9004449999999999,
+      "tp2": 0.90009,
+      "rr1": 2.8729510177868245,
+      "rr2": 2.9001902139926727,
+      "confidence": 0.8501901445731975,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 29.8430678282968,
+        "volatility_pctl": 94.16666666666667,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793818840322,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8501901445731975,
+      "grade_raw": "A+",
+      "tg_message_id": 9381,
+      "_last_checked_t": 1793817000000,
+      "active_sl": 0.95091997,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2408,5 +2408,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793817928132
+  "last_run_ts": 1793818840322
 }
