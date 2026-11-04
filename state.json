@@ -355,20 +355,20 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 277,
+        "seen": 279,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 277,
-        "rejected": 5
+        "seen": 279,
+        "rejected": 7
       },
       "tp1_capped": {
-        "seen": 147,
-        "rejected": 147
+        "seen": 149,
+        "rejected": 149
       },
       "breaker_gate": {
         "seen": 0,
-        "rejected": 5
+        "rejected": 7
       }
     },
     "circuit_breaker": {
@@ -2302,13 +2302,13 @@
       "created_ts": 1793806238398,
       "filled_ts": 1793807100000,
       "mae_r": 0.3301161565426589,
-      "mfe_r": 0.2914255538816832,
+      "mfe_r": 0.49170010501841643,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7966398468961317,
       "grade_raw": "A",
       "tg_message_id": 9375,
-      "_last_checked_t": 1793808000000,
+      "_last_checked_t": 1793808900000,
       "active_sl": 0.6594,
       "be_armed": false,
       "partial_done": false,
@@ -2343,7 +2343,7 @@
       },
       "sl_anchor_tf": "1h",
       "entry_filled": false,
-      "pending_bars": 2,
+      "pending_bars": 3,
       "status": "pending",
       "created_ts": 1793808038820,
       "filled_ts": null,
@@ -2354,7 +2354,7 @@
       "score_raw": 0.8223649031023007,
       "grade_raw": "A+",
       "tg_message_id": 9376,
-      "_last_checked_t": 1793808000000,
+      "_last_checked_t": 1793808900000,
       "active_sl": 0.0075843,
       "be_armed": false,
       "partial_done": false,
@@ -2389,7 +2389,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1793808927106,
       "filled_ts": null,
@@ -2400,7 +2400,7 @@
       "score_raw": 0.8262254783230633,
       "grade_raw": "A+",
       "tg_message_id": 9377,
-      "_last_checked_t": 1793807100000,
+      "_last_checked_t": 1793808900000,
       "active_sl": 0.42104,
       "be_armed": false,
       "partial_done": false,
@@ -2409,5 +2409,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793808927106
+  "last_run_ts": 1793809843775
 }
