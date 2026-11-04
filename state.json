@@ -311,7 +311,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 34,
+        "dispatched": 35,
         "filled": 25,
         "expired": 9
       },
@@ -331,7 +331,7 @@
         "expired": 5
       },
       "Range Trading|pending": {
-        "dispatched": 3,
+        "dispatched": 4,
         "filled": 2,
         "expired": 1
       },
@@ -343,16 +343,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 257,
+        "seen": 259,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 257,
+        "seen": 259,
         "rejected": 0
       },
       "tp1_capped": {
-        "seen": 130,
-        "rejected": 130
+        "seen": 132,
+        "rejected": 132
       }
     },
     "circuit_breaker": {
@@ -2184,7 +2184,99 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "TAO-Liquidity Sweep-1793775646234",
+      "symbol": "TAO",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 228.66216000000003,
+      "sl": 231.59136,
+      "tp1": 222.21792000000008,
+      "tp2": 220.53,
+      "rr1": 2.2,
+      "rr2": 2.7762392462105976,
+      "confidence": 0.8599545277261399,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 22.98275648350828,
+        "volatility_pctl": 80.0,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "1h",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793775646234,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8599545277261399,
+      "grade_raw": "A+",
+      "tg_message_id": 9354,
+      "_last_checked_t": 1793773800000,
+      "active_sl": 231.59136,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "APT-Range Trading-1793775646234",
+      "symbol": "APT",
+      "engine": "Range Trading",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.6367,
+      "sl": 0.642416022942276,
+      "tp1": 0.624124749526993,
+      "tp2": 0.6179,
+      "rr1": 2.2,
+      "rr2": 3.289000094970677,
+      "confidence": 0.8673640275476042,
+      "grade": "A+",
+      "confluences": [
+        "range extreme rejection",
+        "range-boundary entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 15.626832572370262,
+        "volatility_pctl": 78.33333333333333,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "1h",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793775646234,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8673640275476042,
+      "grade_raw": "A+",
+      "tg_message_id": 9355,
+      "_last_checked_t": 1793773800000,
+      "active_sl": 0.642416022942276,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1793774725689
+  "last_run_ts": 1793775646234
 }
