@@ -323,7 +323,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 39,
+        "dispatched": 41,
         "filled": 26,
         "expired": 13
       },
@@ -355,12 +355,12 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 307,
+        "seen": 310,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 307,
-        "rejected": 31
+        "seen": 310,
+        "rejected": 32
       },
       "tp1_capped": {
         "seen": 160,
@@ -368,7 +368,7 @@
       },
       "breaker_gate": {
         "seen": 0,
-        "rejected": 31
+        "rejected": 32
       }
     },
     "circuit_breaker": {
@@ -2308,7 +2308,7 @@
       "score_raw": 0.7966398468961317,
       "grade_raw": "A",
       "tg_message_id": 9375,
-      "_last_checked_t": 1793828700000,
+      "_last_checked_t": 1793829600000,
       "active_sl": 0.6443394497803251,
       "be_armed": true,
       "partial_done": true,
@@ -2316,8 +2316,99 @@
       "tp1_hit": false,
       "be_ts": 1793818800000,
       "partial_ts": 1793818800000
+    },
+    {
+      "id": "ONDO-Liquidity Sweep-1793830528708",
+      "symbol": "ONDO",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.41521528,
+      "sl": 0.42054012,
+      "tp1": 0.40355,
+      "tp2": 0.40133,
+      "rr1": 2.190728735511303,
+      "rr2": 2.607642670953495,
+      "confidence": 0.8214567931907192,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 29.036979857034957,
+        "volatility_pctl": 85.0,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793830528708,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8214567931907192,
+      "grade_raw": "A+",
+      "tg_message_id": 9389,
+      "_last_checked_t": 1793828700000,
+      "active_sl": 0.42054012,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "LTC-Liquidity Sweep-1793830528708",
+      "symbol": "LTC",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 56.590576,
+      "sl": 57.112055,
+      "tp1": 55.486,
+      "tp2": 55.441,
+      "rr1": 2.118160079312883,
+      "rr2": 2.2044531035765536,
+      "confidence": 0.5374479164930137,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 23.437807635155707,
+        "volatility_pctl": 90.83333333333333,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793830528708,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7823854162846303,
+      "grade_raw": "A",
+      "tg_message_id": 9390,
+      "_last_checked_t": 1793828700000,
+      "active_sl": 57.112055,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793829647758
+  "last_run_ts": 1793830528708
 }
