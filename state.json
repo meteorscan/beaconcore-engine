@@ -329,7 +329,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 43,
+        "dispatched": 44,
         "filled": 26,
         "expired": 13
       },
@@ -361,11 +361,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 327,
+        "seen": 329,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 327,
+        "seen": 329,
         "rejected": 32
       },
       "tp1_capped": {
@@ -2336,7 +2336,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 10,
+      "pending_bars": 11,
       "status": "pending",
       "created_ts": 1793830528708,
       "filled_ts": null,
@@ -2347,7 +2347,7 @@
       "score_raw": 0.8214567931907192,
       "grade_raw": "A+",
       "tg_message_id": 9389,
-      "_last_checked_t": 1793837700000,
+      "_last_checked_t": 1793838600000,
       "active_sl": 0.42054012,
       "be_armed": false,
       "partial_done": false,
@@ -2392,7 +2392,7 @@
       "score_raw": 0.7823854162846303,
       "grade_raw": "A",
       "tg_message_id": 9390,
-      "_last_checked_t": 1793837700000,
+      "_last_checked_t": 1793838600000,
       "active_sl": 57.112055,
       "be_armed": false,
       "partial_done": false,
@@ -2427,7 +2427,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 9,
+      "pending_bars": 10,
       "status": "pending",
       "created_ts": 1793831431294,
       "filled_ts": null,
@@ -2438,7 +2438,7 @@
       "score_raw": 0.8144997422727058,
       "grade_raw": "A+",
       "tg_message_id": 9393,
-      "_last_checked_t": 1793837700000,
+      "_last_checked_t": 1793838600000,
       "active_sl": 82.4463,
       "be_armed": false,
       "partial_done": false,
@@ -2484,8 +2484,53 @@
       "score_raw": 0.8031669918320113,
       "grade_raw": "A+",
       "tg_message_id": 9395,
-      "_last_checked_t": 1793837700000,
+      "_last_checked_t": 1793838600000,
       "active_sl": 0.6616,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "TAO-Liquidity Sweep-1793839525695",
+      "symbol": "TAO",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 237.5528,
+      "sl": 240.21998,
+      "tp1": 231.86,
+      "tp2": 231.83333333333334,
+      "rr1": 2.134389130092447,
+      "rr2": 2.1443872054629396,
+      "confidence": 0.5383581532740793,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 28.697298764158578,
+        "volatility_pctl": 88.33333333333333,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793839525695,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7843879372029744,
+      "grade_raw": "A",
+      "tg_message_id": 9396,
+      "_last_checked_t": 1793837700000,
+      "active_sl": 240.21998,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2493,5 +2538,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793838636075
+  "last_run_ts": 1793839525695
 }
