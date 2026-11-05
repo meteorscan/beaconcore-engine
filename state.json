@@ -367,16 +367,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 335,
+        "seen": 336,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 335,
+        "seen": 336,
         "rejected": 32
       },
       "tp1_capped": {
-        "seen": 163,
-        "rejected": 163
+        "seen": 164,
+        "rejected": 164
       },
       "breaker_gate": {
         "seen": 0,
@@ -2416,7 +2416,7 @@
       "score_raw": 0.7823854162846303,
       "grade_raw": "A",
       "tg_message_id": 9390,
-      "_last_checked_t": 1793852100000,
+      "_last_checked_t": 1793853000000,
       "active_sl": 56.5396444816,
       "be_armed": true,
       "partial_done": true,
@@ -2463,7 +2463,7 @@
       "score_raw": 0.7843879372029744,
       "grade_raw": "A",
       "tg_message_id": 9396,
-      "_last_checked_t": 1793852100000,
+      "_last_checked_t": 1793853000000,
       "active_sl": 237.33900247999998,
       "be_armed": true,
       "partial_done": true,
@@ -2511,7 +2511,7 @@
       "score_raw": 0.8008546289406403,
       "grade_raw": "A+",
       "tg_message_id": 9409,
-      "_last_checked_t": 1793852100000,
+      "_last_checked_t": 1793853000000,
       "active_sl": 0.414841586248,
       "be_armed": true,
       "partial_done": true,
@@ -2547,19 +2547,19 @@
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 2,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1793852126728,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1793853000000,
+      "mae_r": 0.31245778249542655,
+      "mfe_r": 0.5439544533436212,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8198685973788438,
       "grade_raw": "A+",
       "tg_message_id": 9416,
-      "_last_checked_t": 1793852100000,
+      "_last_checked_t": 1793853000000,
       "active_sl": 11.681999999999999,
       "be_armed": false,
       "partial_done": false,
@@ -2568,5 +2568,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793853032554
+  "last_run_ts": 1793853924353
 }
