@@ -367,11 +367,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 336,
+        "seen": 337,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 336,
+        "seen": 337,
         "rejected": 32
       },
       "tp1_capped": {
@@ -2410,13 +2410,13 @@
       "created_ts": 1793830528708,
       "filled_ts": 1793831400000,
       "mae_r": 0.28078599521745534,
-      "mfe_r": 1.3280995016098371,
+      "mfe_r": 1.3511109747468195,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7823854162846303,
       "grade_raw": "A",
       "tg_message_id": 9390,
-      "_last_checked_t": 1793853000000,
+      "_last_checked_t": 1793853900000,
       "active_sl": 56.5396444816,
       "be_armed": true,
       "partial_done": true,
@@ -2463,7 +2463,7 @@
       "score_raw": 0.7843879372029744,
       "grade_raw": "A",
       "tg_message_id": 9396,
-      "_last_checked_t": 1793853000000,
+      "_last_checked_t": 1793853900000,
       "active_sl": 237.33900247999998,
       "be_armed": true,
       "partial_done": true,
@@ -2511,7 +2511,7 @@
       "score_raw": 0.8008546289406403,
       "grade_raw": "A+",
       "tg_message_id": 9409,
-      "_last_checked_t": 1793853000000,
+      "_last_checked_t": 1793853900000,
       "active_sl": 0.414841586248,
       "be_armed": true,
       "partial_done": true,
@@ -2552,14 +2552,14 @@
       "status": "active",
       "created_ts": 1793852126728,
       "filled_ts": 1793853000000,
-      "mae_r": 0.31245778249542655,
+      "mae_r": 0.32451992666216706,
       "mfe_r": 0.5439544533436212,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8198685973788438,
       "grade_raw": "A+",
       "tg_message_id": 9416,
-      "_last_checked_t": 1793853000000,
+      "_last_checked_t": 1793853900000,
       "active_sl": 11.681999999999999,
       "be_armed": false,
       "partial_done": false,
@@ -2568,5 +2568,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793853924353
+  "last_run_ts": 1793854851279
 }
