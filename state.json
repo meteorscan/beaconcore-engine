@@ -365,7 +365,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 54,
+        "dispatched": 55,
         "filled": 37,
         "expired": 17
       },
@@ -397,11 +397,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 402,
+        "seen": 403,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 402,
+        "seen": 403,
         "rejected": 32
       },
       "tp1_capped": {
@@ -2761,7 +2761,53 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "LINK-Liquidity Sweep-1794002439978",
+      "symbol": "LINK",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 10.962368000000001,
+      "sl": 11.045034000000001,
+      "tp1": 10.793,
+      "tp2": 10.792,
+      "rr1": 2.0488229743788597,
+      "rr2": 2.060919846127819,
+      "confidence": 0.4839523417574514,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 16.201966418796392,
+        "volatility_pctl": 53.333333333333336,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794002439978,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8001681729653995,
+      "grade_raw": "A+",
+      "tg_message_id": 9527,
+      "_last_checked_t": 1794000600000,
+      "active_sl": 11.045034000000001,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1794001526654
+  "last_run_ts": 1794002439978
 }
