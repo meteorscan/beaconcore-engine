@@ -365,7 +365,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 53,
+        "dispatched": 54,
         "filled": 37,
         "expired": 16
       },
@@ -397,16 +397,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 399,
+        "seen": 401,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 399,
+        "seen": 401,
         "rejected": 32
       },
       "tp1_capped": {
-        "seen": 192,
-        "rejected": 192
+        "seen": 193,
+        "rejected": 193
       },
       "breaker_gate": {
         "seen": 0,
@@ -2789,7 +2789,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1793988044113,
       "filled_ts": null,
@@ -2800,8 +2800,53 @@
       "score_raw": 0.7896658688576925,
       "grade_raw": "A",
       "tg_message_id": 9519,
-      "_last_checked_t": 1793986200000,
+      "_last_checked_t": 1793988000000,
       "active_sl": 133.93380000000002,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "LINK-Liquidity Sweep-1793988925303",
+      "symbol": "LINK",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 10.962368000000001,
+      "sl": 11.045034000000001,
+      "tp1": 10.792,
+      "tp2": 10.717,
+      "rr1": 2.060919846127819,
+      "rr2": 2.9681852273002427,
+      "confidence": 0.4839702470143496,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 20.624565142893264,
+        "volatility_pctl": 69.16666666666667,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793988925303,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8002051771629892,
+      "grade_raw": "A+",
+      "tg_message_id": 9520,
+      "_last_checked_t": 1793987100000,
+      "active_sl": 11.045034000000001,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2809,5 +2854,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793988044113
+  "last_run_ts": 1793988925303
 }
