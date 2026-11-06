@@ -359,7 +359,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 52,
+        "dispatched": 53,
         "filled": 35,
         "expired": 16
       },
@@ -391,11 +391,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 386,
+        "seen": 389,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 386,
+        "seen": 389,
         "rejected": 32
       },
       "tp1_capped": {
@@ -2692,15 +2692,60 @@
       "status": "active",
       "created_ts": 1793970926172,
       "filled_ts": 1793970000000,
-      "mae_r": 0.5153133086573386,
-      "mfe_r": 0.4264142290936356,
+      "mae_r": 0.5726358544335036,
+      "mfe_r": 0.5410593206459424,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8488618562412337,
       "grade_raw": "A+",
       "tg_message_id": 9506,
-      "_last_checked_t": 1793970900000,
+      "_last_checked_t": 1793971800000,
       "active_sl": 132.01188,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "LINK-Liquidity Sweep-1793972726044",
+      "symbol": "LINK",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 10.933304,
+      "sl": 10.9992,
+      "tp1": 10.792,
+      "tp2": 10.717,
+      "rr1": 2.144348670632497,
+      "rr2": 3.282505766662587,
+      "confidence": 0.8132702771953156,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 28.215550685271808,
+        "volatility_pctl": 65.0,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793972726044,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8132702771953156,
+      "grade_raw": "A+",
+      "tg_message_id": 9508,
+      "_last_checked_t": 1793970900000,
+      "active_sl": 10.9992,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2708,5 +2753,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793971832971
+  "last_run_ts": 1793972726044
 }
