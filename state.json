@@ -377,7 +377,7 @@
       "Mean Reversion|pending": {
         "dispatched": 19,
         "filled": 14,
-        "expired": 4
+        "expired": 5
       },
       "Reversal|pending": {
         "dispatched": 16,
@@ -2763,51 +2763,6 @@
   ],
   "active_signals": [
     {
-      "id": "AAVE-Mean Reversion-1793988044113",
-      "symbol": "AAVE",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 132.6513373792556,
-      "sl": 133.93380000000002,
-      "tp1": 129.8299196136179,
-      "tp2": 129.79,
-      "rr1": 2.2,
-      "rr2": 2.2311273116051833,
-      "confidence": 0.7896658688576925,
-      "grade": "A",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 12.761867882877556,
-        "volatility_pctl": 87.5,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1793988044113,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.7896658688576925,
-      "grade_raw": "A",
-      "tg_message_id": 9519,
-      "_last_checked_t": 1793996100000,
-      "active_sl": 133.93380000000002,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
       "id": "LINK-Liquidity Sweep-1793988925303",
       "symbol": "LINK",
       "engine": "Liquidity Sweep",
@@ -2834,7 +2789,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 10,
+      "pending_bars": 11,
       "status": "pending",
       "created_ts": 1793988925303,
       "filled_ts": null,
@@ -2845,7 +2800,7 @@
       "score_raw": 0.8002051771629892,
       "grade_raw": "A+",
       "tg_message_id": 9520,
-      "_last_checked_t": 1793996100000,
+      "_last_checked_t": 1793997000000,
       "active_sl": 11.045034000000001,
       "be_armed": false,
       "partial_done": false,
@@ -2854,5 +2809,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793997032346
+  "last_run_ts": 1793997929329
 }
