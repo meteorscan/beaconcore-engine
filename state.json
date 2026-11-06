@@ -353,7 +353,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 49,
+        "dispatched": 50,
         "filled": 33,
         "expired": 15
       },
@@ -385,16 +385,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 364,
+        "seen": 367,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 364,
+        "seen": 367,
         "rejected": 32
       },
       "tp1_capped": {
-        "seen": 179,
-        "rejected": 179
+        "seen": 181,
+        "rejected": 181
       },
       "breaker_gate": {
         "seen": 0,
@@ -2620,15 +2620,60 @@
       "status": "active",
       "created_ts": 1793931325316,
       "filled_ts": 1793935800000,
-      "mae_r": 0.3152674924088521,
+      "mae_r": 0.46818271184219373,
       "mfe_r": 0.2745483539768914,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8376455008232896,
       "grade_raw": "A+",
       "tg_message_id": 9489,
-      "_last_checked_t": 1793938500000,
+      "_last_checked_t": 1793939400000,
       "active_sl": 0.00669669,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "ONDO-Liquidity Sweep-1793940334401",
+      "symbol": "ONDO",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.37551064,
+      "sl": 0.378363,
+      "tp1": 0.36976,
+      "tp2": 0.3675,
+      "rr1": 2.0160989496417114,
+      "rr2": 2.8084253039588334,
+      "confidence": 0.8231169175258624,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 39.34962083922352,
+        "volatility_pctl": 88.33333333333333,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793940334401,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8231169175258624,
+      "grade_raw": "A+",
+      "tg_message_id": 9491,
+      "_last_checked_t": 1793938500000,
+      "active_sl": 0.378363,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2636,5 +2681,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1793939433790
+  "last_run_ts": 1793940334401
 }
