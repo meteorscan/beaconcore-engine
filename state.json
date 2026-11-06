@@ -375,7 +375,7 @@
         "expired": 3
       },
       "Mean Reversion|pending": {
-        "dispatched": 18,
+        "dispatched": 19,
         "filled": 14,
         "expired": 4
       },
@@ -397,16 +397,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 398,
+        "seen": 399,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 398,
+        "seen": 399,
         "rejected": 32
       },
       "tp1_capped": {
-        "seen": 191,
-        "rejected": 191
+        "seen": 192,
+        "rejected": 192
       },
       "breaker_gate": {
         "seen": 0,
@@ -2761,7 +2761,53 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "AAVE-Mean Reversion-1793988044113",
+      "symbol": "AAVE",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 132.6513373792556,
+      "sl": 133.93380000000002,
+      "tp1": 129.8299196136179,
+      "tp2": 129.79,
+      "rr1": 2.2,
+      "rr2": 2.2311273116051833,
+      "confidence": 0.7896658688576925,
+      "grade": "A",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 12.761867882877556,
+        "volatility_pctl": 87.5,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1793988044113,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7896658688576925,
+      "grade_raw": "A",
+      "tg_message_id": 9519,
+      "_last_checked_t": 1793986200000,
+      "active_sl": 133.93380000000002,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1793987126955
+  "last_run_ts": 1793988044113
 }
