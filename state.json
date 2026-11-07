@@ -393,7 +393,7 @@
         "expired": 3
       },
       "Mean Reversion|pending": {
-        "dispatched": 19,
+        "dispatched": 20,
         "filled": 14,
         "expired": 5
       },
@@ -415,11 +415,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 417,
+        "seen": 418,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 417,
+        "seen": 418,
         "rejected": 32
       },
       "tp1_capped": {
@@ -2908,15 +2908,60 @@
       "status": "active",
       "created_ts": 1794057327611,
       "filled_ts": 1794062700000,
-      "mae_r": 0.13773405831167085,
+      "mae_r": 0.37279025004657285,
       "mfe_r": 0.7404003938300063,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8048576108882346,
       "grade_raw": "A+",
       "tg_message_id": 9557,
-      "_last_checked_t": 1794063600000,
+      "_last_checked_t": 1794064500000,
       "active_sl": 1240.9578000000001,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "LINK-Mean Reversion-1794065432768",
+      "symbol": "LINK",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 10.920951586489533,
+      "sl": 10.992982,
+      "tp1": 10.774999999999999,
+      "tp2": 10.773,
+      "rr1": 2.026249460144034,
+      "rr2": 2.054015509268662,
+      "confidence": 0.836070085009816,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 9.949397676989378,
+        "volatility_pctl": 2.5,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794065432768,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.836070085009816,
+      "grade_raw": "A+",
+      "tg_message_id": 9559,
+      "_last_checked_t": 1794063600000,
+      "active_sl": 10.992982,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2924,5 +2969,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794064526044
+  "last_run_ts": 1794065432768
 }
