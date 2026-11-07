@@ -450,7 +450,8 @@
       "2026-11-03": "sent",
       "2026-11-04": "sent",
       "2026-11-05": "sent",
-      "2026-11-06": "sent"
+      "2026-11-06": "sent",
+      "2026-11-07": "sent"
     },
     "symbol_cooldown": {
       "UNI": {
@@ -2877,7 +2878,7 @@
       "score_raw": 0.8571154131011811,
       "grade_raw": "A+",
       "tg_message_id": 9533,
-      "_last_checked_t": 1794036600000,
+      "_last_checked_t": 1794037500000,
       "active_sl": 0.006608602,
       "be_armed": false,
       "partial_done": false,
@@ -2886,5 +2887,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794037523778
+  "last_run_ts": 1794038440331
 }
