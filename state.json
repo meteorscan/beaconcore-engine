@@ -370,7 +370,7 @@
         "expired": 17
       },
       "Momentum|pending": {
-        "dispatched": 9,
+        "dispatched": 10,
         "filled": 6,
         "expired": 3
       },
@@ -397,16 +397,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 404,
+        "seen": 405,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 404,
+        "seen": 405,
         "rejected": 32
       },
       "tp1_capped": {
-        "seen": 193,
-        "rejected": 193
+        "seen": 194,
+        "rejected": 194
       },
       "breaker_gate": {
         "seen": 0,
@@ -2794,13 +2794,13 @@
       "created_ts": 1794002439978,
       "filled_ts": 1794002400000,
       "mae_r": 0.23748578617567015,
-      "mfe_r": 1.722207437156772,
+      "mfe_r": 1.818982411148509,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8001681729653995,
       "grade_raw": "A+",
       "tg_message_id": 9527,
-      "_last_checked_t": 1794017700000,
+      "_last_checked_t": 1794018600000,
       "active_sl": 10.9525018688,
       "be_armed": true,
       "partial_done": true,
@@ -2808,8 +2808,54 @@
       "tp1_hit": false,
       "be_ts": 1794005100000,
       "partial_ts": 1794005100000
+    },
+    {
+      "id": "PENGU-Momentum-1794019524713",
+      "symbol": "PENGU",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.00655222141620343,
+      "sl": 0.006608602,
+      "tp1": 0.006428184131850975,
+      "tp2": 0.006403,
+      "rr1": 2.2,
+      "rr2": 2.6466809343770548,
+      "confidence": 0.8571154131011811,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 22.68392906935235,
+        "volatility_pctl": 30.833333333333332,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794019524713,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8571154131011811,
+      "grade_raw": "A+",
+      "tg_message_id": 9533,
+      "_last_checked_t": 1794017700000,
+      "active_sl": 0.006608602,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794018632829
+  "last_run_ts": 1794019524713
 }
