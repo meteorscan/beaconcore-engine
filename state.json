@@ -388,7 +388,7 @@
         "expired": 17
       },
       "Momentum|pending": {
-        "dispatched": 10,
+        "dispatched": 11,
         "filled": 7,
         "expired": 3
       },
@@ -415,11 +415,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 418,
+        "seen": 419,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 418,
+        "seen": 419,
         "rejected": 32
       },
       "tp1_capped": {
@@ -2915,7 +2915,7 @@
       "score_raw": 0.8048576108882346,
       "grade_raw": "A+",
       "tg_message_id": 9557,
-      "_last_checked_t": 1794067200000,
+      "_last_checked_t": 1794068100000,
       "active_sl": 1240.9578000000001,
       "be_armed": false,
       "partial_done": false,
@@ -2949,7 +2949,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 4,
+      "pending_bars": 5,
       "status": "pending",
       "created_ts": 1794065432768,
       "filled_ts": null,
@@ -2960,8 +2960,54 @@
       "score_raw": 0.836070085009816,
       "grade_raw": "A+",
       "tg_message_id": 9559,
-      "_last_checked_t": 1794067200000,
+      "_last_checked_t": 1794068100000,
       "active_sl": 10.992982,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "SUI-Momentum-1794069033371",
+      "symbol": "SUI",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.8601743254535494,
+      "sl": 0.8654646,
+      "tp1": 0.84938,
+      "tp2": 0.84163,
+      "rr1": 2.04040931312188,
+      "rr2": 3.5053616387435715,
+      "confidence": 0.7943574072867663,
+      "grade": "A",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 13.102615448347334,
+        "volatility_pctl": 0.8333333333333334,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794069033371,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7943574072867663,
+      "grade_raw": "A",
+      "tg_message_id": 9562,
+      "_last_checked_t": 1794067200000,
+      "active_sl": 0.8654646,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2969,5 +3015,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794068126992
+  "last_run_ts": 1794069033371
 }
