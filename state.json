@@ -358,6 +358,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "TAO|range|intraday|Reversal": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 1.846740297700701
       }
     },
     "calibration_buckets": {
@@ -372,9 +378,9 @@
         "sum_conf": 3.84951495380437
       },
       "Reversal|A+": {
-        "n": 6,
-        "wins": 1,
-        "sum_conf": 4.947014501310873
+        "n": 7,
+        "wins": 2,
+        "sum_conf": 5.794739306274383
       },
       "Momentum|A+": {
         "n": 9,
@@ -428,7 +434,7 @@
       },
       "Reversal|pending": {
         "dispatched": 17,
-        "filled": 11,
+        "filled": 12,
         "expired": 5
       },
       "Range Trading|pending": {
@@ -3132,58 +3138,41 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "TAO-Reversal-1794150043616",
       "symbol": "TAO",
       "engine": "Reversal",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 225.72343999999998,
       "sl": 227.83260500000003,
       "tp1": 220.53,
       "tp2": 220.34,
-      "rr1": 2.462320396934268,
-      "rr2": 2.5524034392756656,
+      "r_realized": 1.846740297700701,
+      "mae_r": 0.5388672768607511,
+      "mfe_r": 6.971213726758999,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8477248049635097,
       "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
+      "grade_raw": "A+",
+      "score_raw": 0.8477248049635097,
       "regime_at_entry": {
         "trend_strength": 15.41353014436695,
         "volatility_pctl": 10.833333333333334,
         "macro_bias": "neutral"
       },
-      "sl_anchor_tf": "1h",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1794150043616,
-      "filled_ts": 1794149100000,
-      "mae_r": 0.5388672768607511,
-      "mfe_r": 1.6610554413713035,
-      "resolution_logic_version": "1.1.0",
+      "regime_src": "entry",
+      "resolved_ts": 1794174300000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
       "exit_model": "managed",
-      "score_raw": 0.8477248049635097,
-      "grade_raw": "A+",
-      "tg_message_id": 9593,
-      "_last_checked_t": 1794173400000,
-      "active_sl": 225.52028890399998,
-      "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.615580099233567,
-      "tp1_hit": false,
-      "be_ts": 1794156300000,
-      "partial_ts": 1794157200000
+      "tp1_hit": true,
+      "resolution_logic_version": "1.1.0"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1794174326411
+  "last_run_ts": 1794175242471
 }
