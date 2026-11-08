@@ -422,7 +422,7 @@
         "expired": 3
       },
       "Mean Reversion|pending": {
-        "dispatched": 20,
+        "dispatched": 21,
         "filled": 15,
         "expired": 5
       },
@@ -444,16 +444,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 422,
+        "seen": 423,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 422,
+        "seen": 423,
         "rejected": 32
       },
       "tp1_capped": {
-        "seen": 207,
-        "rejected": 207
+        "seen": 208,
+        "rejected": 208
       },
       "breaker_gate": {
         "seen": 0,
@@ -3104,14 +3104,60 @@
       "created_ts": 1794150043616,
       "filled_ts": 1794149100000,
       "mae_r": 0.5388672768607511,
-      "mfe_r": 0.6654007628611123,
+      "mfe_r": 1.2248638679287482,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8477248049635097,
       "grade_raw": "A+",
       "tg_message_id": 9593,
+      "_last_checked_t": 1794156300000,
+      "active_sl": 225.52028890399998,
+      "be_armed": true,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false,
+      "be_ts": 1794156300000
+    },
+    {
+      "id": "ZEC-Mean Reversion-1794157241485",
+      "symbol": "ZEC",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bullish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1244.8914168469328,
+      "sl": 1234.3,
+      "tp1": 1268.192533910185,
+      "tp2": 1276.45,
+      "rr1": 2.2,
+      "rr2": 2.9796375318951185,
+      "confidence": 0.8212047508960726,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 16.832930405356517,
+        "volatility_pctl": 8.333333333333334,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794157241485,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8212047508960726,
+      "grade_raw": "A+",
+      "tg_message_id": 9596,
       "_last_checked_t": 1794155400000,
-      "active_sl": 227.83260500000003,
+      "active_sl": 1234.3,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -3119,5 +3165,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794156325139
+  "last_run_ts": 1794157241485
 }
