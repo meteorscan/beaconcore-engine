@@ -411,7 +411,7 @@
         "expired": 17
       },
       "Momentum|pending": {
-        "dispatched": 12,
+        "dispatched": 13,
         "filled": 9,
         "expired": 3
       },
@@ -438,16 +438,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 420,
+        "seen": 421,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 420,
+        "seen": 421,
         "rejected": 32
       },
       "tp1_capped": {
-        "seen": 206,
-        "rejected": 206
+        "seen": 207,
+        "rejected": 207
       },
       "breaker_gate": {
         "seen": 0,
@@ -3028,7 +3028,54 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "APT-Momentum-1794132044715",
+      "symbol": "APT",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.5919667160885708,
+      "sl": 0.5960000000000001,
+      "tp1": 0.5830934914834263,
+      "tp2": 0.5825,
+      "rr1": 2.2,
+      "rr2": 2.347148451847002,
+      "confidence": 0.8166621747901549,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 17.92101818108924,
+        "volatility_pctl": 0.8333333333333334,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794132044715,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8166621747901549,
+      "grade_raw": "A+",
+      "tg_message_id": 9590,
+      "_last_checked_t": 1794130200000,
+      "active_sl": 0.5960000000000001,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1794131128598
+  "last_run_ts": 1794132044715
 }
