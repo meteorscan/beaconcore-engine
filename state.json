@@ -423,7 +423,7 @@
         "expired": 17
       },
       "Momentum|pending": {
-        "dispatched": 14,
+        "dispatched": 15,
         "filled": 10,
         "expired": 3
       },
@@ -450,16 +450,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 435,
+        "seen": 437,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 435,
+        "seen": 437,
         "rejected": 32
       },
       "tp1_capped": {
-        "seen": 219,
-        "rejected": 219
+        "seen": 221,
+        "rejected": 221
       },
       "breaker_gate": {
         "seen": 0,
@@ -3212,8 +3212,54 @@
       "score_raw": 0.8678969369084975,
       "grade_raw": "A+",
       "tg_message_id": 9616,
-      "_last_checked_t": 1794183300000,
+      "_last_checked_t": 1794184200000,
       "active_sl": 0.006347340999999999,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "ADA-Momentum-1794185124089",
+      "symbol": "ADA",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.17687731104063503,
+      "sl": 0.17846,
+      "tp1": 0.1733953953300321,
+      "tp2": 0.17139,
+      "rr1": 2.2,
+      "rr2": 3.4670811394531547,
+      "confidence": 0.8704433586584797,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 29.69764298514475,
+        "volatility_pctl": 46.666666666666664,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794185124089,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8704433586584797,
+      "grade_raw": "A+",
+      "tg_message_id": 9621,
+      "_last_checked_t": 1794183300000,
+      "active_sl": 0.17846,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -3221,5 +3267,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794184236748
+  "last_run_ts": 1794185124089
 }
