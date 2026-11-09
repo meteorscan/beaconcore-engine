@@ -450,7 +450,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 59,
+        "dispatched": 60,
         "filled": 42,
         "expired": 17
       },
@@ -462,7 +462,7 @@
       "Mean Reversion|pending": {
         "dispatched": 23,
         "filled": 17,
-        "expired": 5
+        "expired": 6
       },
       "Reversal|pending": {
         "dispatched": 17,
@@ -482,16 +482,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 468,
+        "seen": 469,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 468,
+        "seen": 469,
         "rejected": 32
       },
       "tp1_capped": {
-        "seen": 237,
-        "rejected": 237
+        "seen": 238,
+        "rejected": 238
       },
       "breaker_gate": {
         "seen": 0,
@@ -3563,45 +3563,45 @@
   ],
   "active_signals": [
     {
-      "id": "AAVE-Mean Reversion-1794232844745",
-      "symbol": "AAVE",
-      "engine": "Mean Reversion",
+      "id": "AVAX-Liquidity Sweep-1794242730210",
+      "symbol": "AVAX",
+      "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
       "style": "intraday",
       "entry_kind": "pending",
-      "entry": 133.67029343382703,
-      "sl": 134.98999999999998,
-      "tp1": 130.82,
-      "tp2": 130.77,
-      "rr1": 2.1597933259456776,
-      "rr2": 2.1976805360888982,
-      "confidence": 0.7878948779384568,
+      "entry": 8.8190048,
+      "sl": 9.02318,
+      "tp1": 8.369819360000001,
+      "tp2": 8.339,
+      "rr1": 2.2,
+      "rr2": 2.3509456584345205,
+      "confidence": 0.553025537326558,
       "grade": "A",
       "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
+        "EQH/EQL sweep",
+        "OTE retracement entry"
       ],
       "regime_at_entry": {
-        "trend_strength": 13.50641206506283,
-        "volatility_pctl": 85.0,
+        "trend_strength": 33.30218449051387,
+        "volatility_pctl": 100.0,
         "macro_bias": "neutral"
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 11,
+      "pending_bars": 0,
       "status": "pending",
-      "created_ts": 1794232844745,
+      "created_ts": 1794242730210,
       "filled_ts": null,
       "mae_r": 0.0,
       "mfe_r": 0.0,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
-      "score_raw": 0.7878948779384568,
+      "score_raw": 0.7939279562504059,
       "grade_raw": "A",
-      "tg_message_id": 9664,
+      "tg_message_id": 9673,
       "_last_checked_t": 1794240900000,
-      "active_sl": 134.98999999999998,
+      "active_sl": 9.02318,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -3609,5 +3609,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794241837020
+  "last_run_ts": 1794242730210
 }
