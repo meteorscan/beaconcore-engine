@@ -77,10 +77,10 @@
         "sum_r": 4.999107469783796
       },
       "ADA|trend|intraday|Momentum": {
-        "n": 1,
+        "n": 2,
         "wins": 1,
-        "losses": 0,
-        "sum_r": 0.5139905797109643
+        "losses": 1,
+        "sum_r": -0.4860094202890357
       },
       "SOL|range|intraday|Mean Reversion": {
         "n": 1,
@@ -397,9 +397,9 @@
         "sum_conf": 5.794739306274383
       },
       "Momentum|A+": {
-        "n": 12,
+        "n": 13,
         "wins": 3,
-        "sum_conf": 10.180447813382424
+        "sum_conf": 11.050891172040902
       },
       "Range Trading|A+": {
         "n": 3,
@@ -437,8 +437,8 @@
         "expired": 17
       },
       "Momentum|pending": {
-        "dispatched": 21,
-        "filled": 13,
+        "dispatched": 22,
+        "filled": 14,
         "expired": 3
       },
       "Mean Reversion|pending": {
@@ -464,11 +464,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 454,
+        "seen": 455,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 454,
+        "seen": 455,
         "rejected": 32
       },
       "tp1_capped": {
@@ -528,7 +528,7 @@
       },
       "ADA": {
         "direction": "bearish",
-        "until_ts": 1793108700000
+        "until_ts": 1794194100000
       },
       "PENDLE": {
         "direction": "bearish",
@@ -3280,6 +3280,38 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "ADA-Momentum-1794185124089",
+      "symbol": "ADA",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.17687731104063503,
+      "sl": 0.17846,
+      "tp1": 0.1733953953300321,
+      "tp2": 0.17139,
+      "r_realized": -1.0,
+      "mae_r": 1.0189550826285154,
+      "mfe_r": 0.8007328497088457,
+      "forensic_category": "structural_invalidation_too_tight",
+      "confidence": 0.8704433586584797,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8704433586584797,
+      "regime_at_entry": {
+        "trend_strength": 29.69764298514475,
+        "volatility_pctl": 46.666666666666664,
+        "macro_bias": "neutral"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1794190500000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -3322,54 +3354,8 @@
       "score_raw": 0.8678969369084975,
       "grade_raw": "A+",
       "tg_message_id": 9616,
-      "_last_checked_t": 1794189600000,
+      "_last_checked_t": 1794190500000,
       "active_sl": 0.006347340999999999,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "ADA-Momentum-1794185124089",
-      "symbol": "ADA",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.17687731104063503,
-      "sl": 0.17846,
-      "tp1": 0.1733953953300321,
-      "tp2": 0.17139,
-      "rr1": 2.2,
-      "rr2": 3.4670811394531547,
-      "confidence": 0.8704433586584797,
-      "grade": "A+",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 29.69764298514475,
-        "volatility_pctl": 46.666666666666664,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1794185124089,
-      "filled_ts": 1794185100000,
-      "mae_r": 0.8925878651050849,
-      "mfe_r": 0.8007328497088457,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8704433586584797,
-      "grade_raw": "A+",
-      "tg_message_id": 9621,
-      "_last_checked_t": 1794189600000,
-      "active_sl": 0.17846,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -3403,7 +3389,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 6,
+      "pending_bars": 7,
       "status": "pending",
       "created_ts": 1794186040250,
       "filled_ts": null,
@@ -3414,7 +3400,7 @@
       "score_raw": 0.8714373717791688,
       "grade_raw": "A+",
       "tg_message_id": 9623,
-      "_last_checked_t": 1794189600000,
+      "_last_checked_t": 1794190500000,
       "active_sl": 1.1334,
       "be_armed": false,
       "partial_done": false,
@@ -3460,7 +3446,7 @@
       "score_raw": 0.8674961079339705,
       "grade_raw": "A+",
       "tg_message_id": 9631,
-      "_last_checked_t": 1794189600000,
+      "_last_checked_t": 1794190500000,
       "active_sl": 243.08100000000002,
       "be_armed": false,
       "partial_done": false,
@@ -3495,7 +3481,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 2,
+      "pending_bars": 3,
       "status": "pending",
       "created_ts": 1794189639020,
       "filled_ts": null,
@@ -3506,8 +3492,54 @@
       "score_raw": 0.8670510636852127,
       "grade_raw": "A+",
       "tg_message_id": 9632,
-      "_last_checked_t": 1794189600000,
+      "_last_checked_t": 1794190500000,
       "active_sl": 1.58875,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "SOL-Momentum-1794191433025",
+      "symbol": "SOL",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 87.62883442156092,
+      "sl": 88.32249999999999,
+      "tp1": 86.148,
+      "tp2": 85.144,
+      "rr1": 2.134795883764627,
+      "rr2": 3.5821792212213586,
+      "confidence": 0.8590999369703166,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 22.282520906320865,
+        "volatility_pctl": 65.83333333333333,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794191433025,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8590999369703166,
+      "grade_raw": "A+",
+      "tg_message_id": 9634,
+      "_last_checked_t": 1794189600000,
+      "active_sl": 88.32249999999999,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -3515,5 +3547,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794190525589
+  "last_run_ts": 1794191433025
 }
