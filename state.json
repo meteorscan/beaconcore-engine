@@ -330,10 +330,10 @@
         "sum_r": -1.0
       },
       "PENGU|trend|intraday|Momentum": {
-        "n": 1,
-        "wins": 1,
+        "n": 2,
+        "wins": 2,
         "losses": 0,
-        "sum_r": 1.6500000000000001
+        "sum_r": 2.2
       },
       "LINK|range|intraday|Mean Reversion": {
         "n": 1,
@@ -403,9 +403,9 @@
         "sum_conf": 5.794739306274383
       },
       "Momentum|A+": {
-        "n": 16,
+        "n": 17,
         "wins": 4,
-        "sum_conf": 13.644538280630403
+        "sum_conf": 14.5124352175389
       },
       "Range Trading|A+": {
         "n": 3,
@@ -444,7 +444,7 @@
       },
       "Momentum|pending": {
         "dispatched": 22,
-        "filled": 17,
+        "filled": 18,
         "expired": 4
       },
       "Mean Reversion|pending": {
@@ -458,7 +458,7 @@
         "expired": 5
       },
       "Range Trading|pending": {
-        "dispatched": 4,
+        "dispatched": 5,
         "filled": 3,
         "expired": 1
       },
@@ -470,11 +470,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 459,
+        "seen": 460,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 459,
+        "seen": 460,
         "rejected": 32
       },
       "tp1_capped": {
@@ -3419,58 +3419,87 @@
       "exit_model": "managed",
       "tp1_hit": true,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "PENGU-Momentum-1794179729412",
       "symbol": "PENGU",
       "engine": "Momentum",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.00621766338265934,
       "sl": 0.006347340999999999,
       "tp1": 0.005932372624509889,
       "tp2": 0.005924,
-      "rr1": 2.2,
-      "rr2": 2.2645649163023642,
+      "r_realized": 0.55,
+      "mae_r": 0.4729930931683478,
+      "mfe_r": 1.23894459162742,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8678969369084975,
       "grade": "A+",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
+      "grade_raw": "A+",
+      "score_raw": 0.8678969369084975,
       "regime_at_entry": {
         "trend_strength": 33.24582902390217,
         "volatility_pctl": 40.0,
         "macro_bias": "neutral"
       },
+      "regime_src": "entry",
+      "resolved_ts": 1794213900000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
+    }
+  ],
+  "active_signals": [
+    {
+      "id": "AAVE-Range Trading-1794214842760",
+      "symbol": "AAVE",
+      "engine": "Range Trading",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 132.28,
+      "sl": 133.62349,
+      "tp1": 129.46,
+      "tp2": 129.15,
+      "rr1": 2.099010785342643,
+      "rr2": 2.329753105717191,
+      "confidence": 0.857854914848638,
+      "grade": "A+",
+      "confluences": [
+        "range extreme rejection",
+        "range-boundary entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 15.561571179609075,
+        "volatility_pctl": 71.66666666666667,
+        "macro_bias": "neutral"
+      },
       "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1794179729412,
-      "filled_ts": 1794179700000,
-      "mae_r": 0.4729930931683478,
-      "mfe_r": 1.23894459162742,
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794214842760,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
-      "score_raw": 0.8678969369084975,
+      "score_raw": 0.857854914848638,
       "grade_raw": "A+",
-      "tg_message_id": 9616,
+      "tg_message_id": 9651,
       "_last_checked_t": 1794213000000,
-      "active_sl": 0.006212067485614947,
-      "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.55,
-      "tp1_hit": false,
-      "be_ts": 1794207600000,
-      "partial_ts": 1794207600000
+      "active_sl": 133.62349,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794213928433
+  "last_run_ts": 1794214842760
 }
