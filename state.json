@@ -450,7 +450,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 60,
+        "dispatched": 61,
         "filled": 42,
         "expired": 17
       },
@@ -482,16 +482,16 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 472,
+        "seen": 473,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 472,
+        "seen": 473,
         "rejected": 32
       },
       "tp1_capped": {
-        "seen": 241,
-        "rejected": 241
+        "seen": 242,
+        "rejected": 242
       },
       "breaker_gate": {
         "seen": 0,
@@ -3600,7 +3600,7 @@
       "score_raw": 0.7939279562504059,
       "grade_raw": "A",
       "tg_message_id": 9673,
-      "_last_checked_t": 1794262500000,
+      "_last_checked_t": 1794263400000,
       "active_sl": 8.81106769568,
       "be_armed": true,
       "partial_done": true,
@@ -3608,8 +3608,53 @@
       "tp1_hit": false,
       "be_ts": 1794247200000,
       "partial_ts": 1794248100000
+    },
+    {
+      "id": "AAVE-Liquidity Sweep-1794264328255",
+      "symbol": "AAVE",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 133.44528,
+      "sl": 134.66,
+      "tp1": 130.772896,
+      "tp2": 130.37,
+      "rr1": 2.2,
+      "rr2": 2.531678082191775,
+      "confidence": 0.5445805258190115,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 13.611958716431763,
+        "volatility_pctl": 52.5,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794264328255,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7736599286322943,
+      "grade_raw": "A",
+      "tg_message_id": 9678,
+      "_last_checked_t": 1794262500000,
+      "active_sl": 134.66,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794263433664
+  "last_run_ts": 1794264328255
 }
