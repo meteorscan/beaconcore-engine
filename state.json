@@ -378,6 +378,12 @@
         "losses": 1,
         "sum_r": -1.0,
         "breakeven": 1
+      },
+      "SOL|trend|intraday|Momentum": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 1.6010969128234702
       }
     },
     "calibration_buckets": {
@@ -397,9 +403,9 @@
         "sum_conf": 5.794739306274383
       },
       "Momentum|A+": {
-        "n": 15,
-        "wins": 3,
-        "sum_conf": 12.785438343660086
+        "n": 16,
+        "wins": 4,
+        "sum_conf": 13.644538280630403
       },
       "Range Trading|A+": {
         "n": 3,
@@ -438,7 +444,7 @@
       },
       "Momentum|pending": {
         "dispatched": 22,
-        "filled": 16,
+        "filled": 17,
         "expired": 4
       },
       "Mean Reversion|pending": {
@@ -3380,6 +3386,38 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "SOL-Momentum-1794191433025",
+      "symbol": "SOL",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 87.62883442156092,
+      "sl": 88.32249999999999,
+      "tp1": 86.148,
+      "tp2": 85.144,
+      "r_realized": 1.6010969128234702,
+      "mae_r": 0.6662656946003664,
+      "mfe_r": 2.267424635802494,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8590999369703166,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8590999369703166,
+      "regime_at_entry": {
+        "trend_strength": 22.282520906320865,
+        "volatility_pctl": 65.83333333333333,
+        "macro_bias": "neutral"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1794204900000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": true,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -3422,62 +3460,14 @@
       "score_raw": 0.8678969369084975,
       "grade_raw": "A+",
       "tg_message_id": 9616,
-      "_last_checked_t": 1794204000000,
+      "_last_checked_t": 1794204900000,
       "active_sl": 0.006347340999999999,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
       "tp1_hit": false
-    },
-    {
-      "id": "SOL-Momentum-1794191433025",
-      "symbol": "SOL",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 87.62883442156092,
-      "sl": 88.32249999999999,
-      "tp1": 86.148,
-      "tp2": 85.144,
-      "rr1": 2.134795883764627,
-      "rr2": 3.5821792212213586,
-      "confidence": 0.8590999369703166,
-      "grade": "A+",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 22.282520906320865,
-        "volatility_pctl": 65.83333333333333,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 3,
-      "status": "active",
-      "created_ts": 1794191433025,
-      "filled_ts": 1794193200000,
-      "mae_r": 0.6662656946003664,
-      "mfe_r": 1.7441177120009024,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8590999369703166,
-      "grade_raw": "A+",
-      "tg_message_id": 9634,
-      "_last_checked_t": 1794204000000,
-      "active_sl": 87.54996847058152,
-      "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.5336989709411567,
-      "tp1_hit": false,
-      "be_ts": 1794202200000,
-      "partial_ts": 1794202200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794204925275
+  "last_run_ts": 1794205834853
 }
