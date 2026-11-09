@@ -101,10 +101,10 @@
         "sum_r": 1.6500000000000001
       },
       "PENDLE|trend|intraday|Momentum": {
-        "n": 2,
+        "n": 3,
         "wins": 1,
-        "losses": 1,
-        "sum_r": -0.49448080280641726
+        "losses": 2,
+        "sum_r": -1.4944808028064172
       },
       "PENDLE|trend|intraday|Liquidity Sweep": {
         "n": 3,
@@ -397,9 +397,9 @@
         "sum_conf": 5.794739306274383
       },
       "Momentum|A+": {
-        "n": 14,
+        "n": 15,
         "wins": 3,
-        "sum_conf": 11.918387279974873
+        "sum_conf": 12.785438343660086
       },
       "Range Trading|A+": {
         "n": 3,
@@ -438,7 +438,7 @@
       },
       "Momentum|pending": {
         "dispatched": 22,
-        "filled": 15,
+        "filled": 16,
         "expired": 4
       },
       "Mean Reversion|pending": {
@@ -532,7 +532,7 @@
       },
       "PENDLE": {
         "direction": "bearish",
-        "until_ts": 1794189600000
+        "until_ts": 1794202200000
       },
       "AAVE": {
         "direction": "bearish",
@@ -3348,6 +3348,38 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "PENDLE-Momentum-1794189639020",
+      "symbol": "PENDLE",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 1.577861711829354,
+      "sl": 1.58875,
+      "tp1": 1.5539074778539328,
+      "tp2": 1.551,
+      "r_realized": -1.0,
+      "mae_r": 1.105618071635934,
+      "mfe_r": 0.3730349312671626,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8670510636852127,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8670510636852127,
+      "regime_at_entry": {
+        "trend_strength": 23.180824558382433,
+        "volatility_pctl": 45.833333333333336,
+        "macro_bias": "neutral"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1794198600000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -3390,54 +3422,8 @@
       "score_raw": 0.8678969369084975,
       "grade_raw": "A+",
       "tg_message_id": 9616,
-      "_last_checked_t": 1794197700000,
+      "_last_checked_t": 1794198600000,
       "active_sl": 0.006347340999999999,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "PENDLE-Momentum-1794189639020",
-      "symbol": "PENDLE",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 1.577861711829354,
-      "sl": 1.58875,
-      "tp1": 1.5539074778539328,
-      "tp2": 1.551,
-      "rr1": 2.2,
-      "rr2": 2.467028003701375,
-      "confidence": 0.8670510636852127,
-      "grade": "A+",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 23.180824558382433,
-        "volatility_pctl": 45.833333333333336,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 6,
-      "status": "active",
-      "created_ts": 1794189639020,
-      "filled_ts": 1794194100000,
-      "mae_r": 0.8484610276527743,
-      "mfe_r": 0.3730349312671626,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8670510636852127,
-      "grade_raw": "A+",
-      "tg_message_id": 9632,
-      "_last_checked_t": 1794197700000,
-      "active_sl": 1.58875,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -3482,7 +3468,7 @@
       "score_raw": 0.8590999369703166,
       "grade_raw": "A+",
       "tg_message_id": 9634,
-      "_last_checked_t": 1794197700000,
+      "_last_checked_t": 1794198600000,
       "active_sl": 88.32249999999999,
       "be_armed": false,
       "partial_done": false,
@@ -3491,5 +3477,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794198634402
+  "last_run_ts": 1794199526286
 }
