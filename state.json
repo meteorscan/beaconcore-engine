@@ -3422,7 +3422,7 @@
       "score_raw": 0.8678969369084975,
       "grade_raw": "A+",
       "tg_message_id": 9616,
-      "_last_checked_t": 1794201300000,
+      "_last_checked_t": 1794202200000,
       "active_sl": 0.006347340999999999,
       "be_armed": false,
       "partial_done": false,
@@ -3462,20 +3462,22 @@
       "created_ts": 1794191433025,
       "filled_ts": 1794193200000,
       "mae_r": 0.6662656946003664,
-      "mfe_r": 0.9786191540431929,
+      "mfe_r": 1.3073078003979244,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8590999369703166,
       "grade_raw": "A+",
       "tg_message_id": 9634,
-      "_last_checked_t": 1794201300000,
-      "active_sl": 88.32249999999999,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
+      "_last_checked_t": 1794202200000,
+      "active_sl": 87.54996847058152,
+      "be_armed": true,
+      "partial_done": true,
+      "banked_r": 0.5336989709411567,
+      "tp1_hit": false,
+      "be_ts": 1794202200000,
+      "partial_ts": 1794202200000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794202235635
+  "last_run_ts": 1794203125581
 }
