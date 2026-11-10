@@ -396,6 +396,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "DOGE|range|intraday|Reversal": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -410,9 +416,9 @@
         "sum_conf": 3.84951495380437
       },
       "Reversal|A+": {
-        "n": 7,
+        "n": 8,
         "wins": 2,
-        "sum_conf": 5.794739306274383
+        "sum_conf": 6.62177879748776
       },
       "Momentum|A+": {
         "n": 17,
@@ -466,7 +472,7 @@
       },
       "Reversal|pending": {
         "dispatched": 18,
-        "filled": 12,
+        "filled": 13,
         "expired": 5
       },
       "Range Trading|pending": {
@@ -580,6 +586,10 @@
       "BCH": {
         "direction": "bearish",
         "until_ts": 1794195000000
+      },
+      "DOGE": {
+        "direction": "bearish",
+        "until_ts": 1794293100000
       }
     }
   },
@@ -3559,6 +3569,38 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "DOGE-Reversal-1794283236942",
+      "symbol": "DOGE",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.06972776,
+      "sl": 0.070234164,
+      "tp1": 0.06864,
+      "tp2": 0.068487,
+      "r_realized": -1.0,
+      "mae_r": 1.1616021990347656,
+      "mfe_r": 0.5267730902599579,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8270394912133778,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8270394912133778,
+      "regime_at_entry": {
+        "trend_strength": 14.288753484032767,
+        "volatility_pctl": 38.333333333333336,
+        "macro_bias": "neutral"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1794289500000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -3600,7 +3642,7 @@
       "score_raw": 0.7939279562504059,
       "grade_raw": "A",
       "tg_message_id": 9673,
-      "_last_checked_t": 1794288600000,
+      "_last_checked_t": 1794289500000,
       "active_sl": 8.81106769568,
       "be_armed": true,
       "partial_done": true,
@@ -3608,52 +3650,6 @@
       "tp1_hit": false,
       "be_ts": 1794247200000,
       "partial_ts": 1794248100000
-    },
-    {
-      "id": "DOGE-Reversal-1794283236942",
-      "symbol": "DOGE",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.06972776,
-      "sl": 0.070234164,
-      "tp1": 0.06864,
-      "tp2": 0.068487,
-      "rr1": 2.1480083095709928,
-      "rr2": 2.4501386244974146,
-      "confidence": 0.8270394912133778,
-      "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 14.288753484032767,
-        "volatility_pctl": 38.333333333333336,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1794283236942,
-      "filled_ts": 1794283200000,
-      "mae_r": 0.782458274421222,
-      "mfe_r": 0.5267730902599579,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8270394912133778,
-      "grade_raw": "A+",
-      "tg_message_id": 9684,
-      "_last_checked_t": 1794288600000,
-      "active_sl": 0.070234164,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
     },
     {
       "id": "LTC-Momentum-1794284129269",
@@ -3687,14 +3683,14 @@
       "status": "active",
       "created_ts": 1794284129269,
       "filled_ts": 1794284100000,
-      "mae_r": 0.5049145161750844,
+      "mae_r": 0.7072583710292102,
       "mfe_r": 0.330739325949761,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8344670832416152,
       "grade_raw": "A+",
       "tg_message_id": 9685,
-      "_last_checked_t": 1794288600000,
+      "_last_checked_t": 1794289500000,
       "active_sl": 51.6574,
       "be_armed": false,
       "partial_done": false,
@@ -3703,5 +3699,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794289526963
+  "last_run_ts": 1794290441805
 }
