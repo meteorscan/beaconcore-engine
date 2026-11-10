@@ -13,6 +13,7 @@ import logging
 import math
 import os
 import statistics
+import sys
 import threading
 import time
 import urllib.error
@@ -43,14 +44,78 @@ RESOLUTION_LOGIC_VERSION = "1.1.0"  # managed-exit (BE + partial) resolution log
 RESOLUTION_LOGIC_VERSION_LEGACY = "1.0.4"  # tag carried by every trade resolved under the old full-exit-at-TP1 logic
 SCHEMA_VERSION = 2  # state.json schema; v2 = exit_model/regime_src stamps on trades + signals (see migrate_state)
 
-# Same watchlist as the reference engines in this project (Section: "use the
-# same watchlist ... unless the prompt's own rules require a change" -- no
-# rule here requires a change).
-WATCHLIST = [
-    "BTC", "ETH", "HYPE", "ZEC", "NEAR", "ONDO", "SUI", "PENGU", "BNB", "SOL",
-    "TRX", "BCH", "DOGE", "ADA", "DOT", "TAO", "AVAX", "LINK", "AAVE", "XRP",
-    "XLM", "UNI", "LTC", "APT", "PENDLE",
+# --- Instrument registry -----------------------------------------------------
+# Watchlist v2: 20 instruments in two categories (12 main + 8 secondary), crypto
+# plus stock indices, precious metals and commodities.
+#
+# `symbol` is the ENGINE key (state.json, candle cache, trade records, Telegram).
+# Crypto keeps its historical bare-ticker keys ("BTC", not "BTCUSD") so every
+# existing trade record / cache entry / tp1_rank_preference stays addressable.
+# `hl_coin` is what Hyperliquid itself expects. Crypto perps live in the core
+# universe (bare ticker). Indices and commodities are NOT crypto perps: they are
+# HIP-3 markets deployed by trade.xyz on the "xyz" perp dex, so every request
+# must carry the "xyz:" prefix and meta lookups must pass dex="xyz".
+@dataclass(frozen=True)
+class Instrument:
+    symbol: str          # engine key
+    label: str           # name as listed by the operator
+    asset_class: str     # "crypto" | "index" | "precious_metal" | "commodity"
+    category: str        # "main" | "secondary"
+    dex: str = ""        # "" = Hyperliquid core perps; "xyz" = HIP-3 (trade.xyz)
+    notes: str = ""
+
+    @property
+    def hl_coin(self) -> str:
+        return f"{self.dex}:{self.symbol}" if self.dex else self.symbol
+
+    @property
+    def is_crypto(self) -> bool:
+        return self.asset_class == "crypto"
+
+
+_XYZ_NOTE = ("HIP-3 perp (xyz dex): oracle/pricing follows the underlying's futures calendar "
+             "(daily maintenance gap, weekend internal pricing) -- not the 24/7 crypto tape; "
+             "contract specs/margin/OI caps are set by the deployer, not Hyperliquid core")
+
+INSTRUMENTS_LIST = [
+    # ---- MAIN WATCHLIST (12), operator order ----
+    Instrument("BTC", "BTCUSD", "crypto", "main"),
+    Instrument("ETH", "ETHUSD", "crypto", "main"),
+    Instrument("SP500", "S&P500", "index", "main", dex="xyz", notes=_XYZ_NOTE),
+    Instrument("GOLD", "GOLD", "precious_metal", "main", dex="xyz", notes=_XYZ_NOTE),
+    Instrument("XYZ100", "XYZ100", "index", "main", dex="xyz", notes=_XYZ_NOTE + "; Nasdaq-100 proxy index"),
+    Instrument("SOL", "SOLUSD", "crypto", "main"),
+    Instrument("XRP", "XRPUSD", "crypto", "main"),
+    Instrument("ZEC", "ZECUSD", "crypto", "main"),
+    Instrument("LINK", "LINKUSD", "crypto", "main"),
+    Instrument("BNB", "BNBUSD", "crypto", "main"),
+    Instrument("NEAR", "NEARUSD", "crypto", "main"),
+    Instrument("HYPE", "HYPEUSD", "crypto", "main"),
+    # ---- SECONDARY WATCHLIST (8), operator order ----
+    Instrument("AVAX", "AVAXUSD", "crypto", "secondary"),
+    Instrument("SILVER", "SILVER", "precious_metal", "secondary", dex="xyz", notes=_XYZ_NOTE),
+    Instrument("COPPER", "COPPER", "commodity", "secondary", dex="xyz", notes=_XYZ_NOTE),
+    Instrument("BRENTOIL", "BRENTOIL", "commodity", "secondary", dex="xyz", notes=_XYZ_NOTE),
+    Instrument("AAVE", "AAVEUSD", "crypto", "secondary"),
+    Instrument("LTC", "LTCUSD", "crypto", "secondary"),
+    Instrument("DOGE", "DOGEUSD", "crypto", "secondary"),
+    Instrument("TAO", "TAOUSD", "crypto", "secondary"),
 ]
+INSTRUMENTS = {i.symbol: i for i in INSTRUMENTS_LIST}
+WATCHLIST_MAIN = [i.symbol for i in INSTRUMENTS_LIST if i.category == "main"]
+WATCHLIST_SECONDARY = [i.symbol for i in INSTRUMENTS_LIST if i.category == "secondary"]
+WATCHLIST = WATCHLIST_MAIN + WATCHLIST_SECONDARY  # every downstream consumer still reads WATCHLIST
+assert (len(WATCHLIST_MAIN), len(WATCHLIST_SECONDARY), len(WATCHLIST), len(INSTRUMENTS)) == (12, 8, 20, 20), \
+    "watchlist registry out of sync (expected 12 main + 8 secondary = 20 unique)"
+
+
+def instrument_is_crypto(symbol: str) -> bool:
+    # Symbols not in the registry (e.g. a still-open legacy signal on a de-listed coin like SUI) are
+    # old crypto perps by construction -- the pre-v2 watchlist was crypto-only.
+    inst = INSTRUMENTS.get(symbol)
+    return True if inst is None else inst.is_crypto
+
+
 MACRO_ASSET = "BTC"  # dominant benchmark for Regime Vector macro bias / breadth
 
 # --- Timeframes (Section 7: forbidden 1M/2M/3M/5M, minimum entry TF = 15M) --
@@ -193,6 +258,11 @@ CORRELATION_CLUSTERS = {
     "meme_beta": {"DOGE", "PENGU"},
     "payments": {"XRP", "XLM", "LTC", "BCH"},
     "hype_zec": {"HYPE", "ZEC"},
+    # watchlist v2 additions (new instruments only; crypto clusters above are untouched). Without these,
+    # SP500/XYZ100 and GOLD/SILVER would each count as uncorrelated "solo" assets and the per-cluster cap
+    # (MAX_CORRELATED_CONCURRENT) would silently stop limiting near-duplicate exposure.
+    "equity_indices": {"SP500", "XYZ100"},
+    "precious_metals": {"GOLD", "SILVER"},
 }
 
 
@@ -443,7 +513,10 @@ def hl_post(payload: dict, retries: int = 4, timeout: int = 12):
 
 
 def hl_coin(symbol: str) -> str:
-    return symbol  # Hyperliquid perp coin names match the watchlist symbols directly
+    # Registry-aware: HIP-3 instruments need their dex prefix ("xyz:GOLD"). Unknown symbols fall back to the
+    # identity mapping, so open/legacy crypto signals on de-listed watchlist coins keep being monitored.
+    inst = INSTRUMENTS.get(symbol)
+    return inst.hl_coin if inst else symbol
 
 
 def current_bar_open_ms(reference_ms: int, interval: str) -> int:
@@ -512,33 +585,92 @@ def fetch_all_candles(symbol: str, candle_cache: dict, reference_ms: Optional[in
     return bundle
 
 
-def get_meta_and_ctx():
-    raw = hl_post({"type": "metaAndAssetCtxs"})
+def get_meta_and_ctx(dex: str = ""):
+    payload = {"type": "metaAndAssetCtxs"}
+    if dex:
+        payload["dex"] = dex  # HIP-3 builder dex; omitted for core perps so crypto requests are unchanged
+    raw = hl_post(payload)
     if not raw or len(raw) < 2:
         return None
     universe = [a["name"] for a in raw[0]["universe"]]
     return universe, raw[1]
 
 
+def _universe_symbol_map(dex: str) -> dict:
+    """hl universe name -> engine symbol for the watchlist instruments on `dex`."""
+    out = {}
+    for sym in set(WATCHLIST) | {MACRO_ASSET}:
+        inst = INSTRUMENTS.get(sym)
+        if inst is None or inst.dex != dex:
+            continue
+        out[inst.hl_coin] = sym
+        out.setdefault(inst.symbol, sym)  # tolerate a universe that lists the bare name
+    return out
+
+
 def get_market_snapshot() -> dict:
     out = {}
-    got = get_meta_and_ctx()
-    if not got:
-        return out
-    universe, ctxs = got
-    wanted = set(WATCHLIST) | {MACRO_ASSET}
-    for i, name in enumerate(universe):
-        if name not in wanted:
+    for dex in sorted({INSTRUMENTS[s].dex for s in INSTRUMENTS}):
+        got = get_meta_and_ctx(dex)
+        if not got:
             continue
-        try:
-            ctx = ctxs[i]
-            mark = float(ctx.get("markPx", 0) or 0)
-            funding = float(ctx.get("funding", 0) or 0)
-            oi_coins = float(ctx.get("openInterest", 0) or 0)
-            out[name] = {"mark": mark, "funding": funding, "oi_usd": oi_coins * mark}
-        except (KeyError, ValueError, TypeError, IndexError):
-            continue
+        universe, ctxs = got
+        wanted = _universe_symbol_map(dex)
+        for i, name in enumerate(universe):
+            sym = wanted.get(name)
+            if sym is None:
+                continue
+            try:
+                ctx = ctxs[i]
+                mark = float(ctx.get("markPx", 0) or 0)
+                funding = float(ctx.get("funding", 0) or 0)
+                oi_coins = float(ctx.get("openInterest", 0) or 0)
+                out[sym] = {"mark": mark, "funding": funding, "oi_usd": oi_coins * mark}
+            except (KeyError, ValueError, TypeError, IndexError):
+                continue
     return out
+
+
+def check_instrument_support() -> dict:
+    """Preflight: is every watchlist instrument actually listed on the venue it is mapped to?
+
+    Never substitutes anything. Returns {"supported": [...], "unsupported": {sym: reason},
+    "unverified": {sym: reason}}. `unverified` = the meta lookup itself failed (network/API), which says
+    nothing about the instrument, so callers must not treat it as unsupported.
+    """
+    universes = {}
+    for dex in sorted({INSTRUMENTS[s].dex for s in WATCHLIST}):
+        got = get_meta_and_ctx(dex)
+        universes[dex] = set(got[0]) if got else None
+    supported, unsupported, unverified = [], {}, {}
+    for sym in WATCHLIST:
+        inst = INSTRUMENTS[sym]
+        uni = universes[inst.dex]
+        where = f"dex '{inst.dex}'" if inst.dex else "core perp universe"
+        if uni is None:
+            unverified[sym] = f"could not fetch metaAndAssetCtxs for {where}"
+        elif inst.hl_coin in uni or inst.symbol in uni:
+            supported.append(sym)
+        else:
+            unsupported[sym] = f"'{inst.hl_coin}' not listed in Hyperliquid {where}"
+    return {"supported": supported, "unsupported": unsupported, "unverified": unverified}
+
+
+def format_watchlist_report(res: dict) -> str:
+    lines = [f"WATCHLIST: {len(WATCHLIST_MAIN)} main + {len(WATCHLIST_SECONDARY)} secondary = {len(WATCHLIST)} total"]
+    for cat, syms in (("MAIN", WATCHLIST_MAIN), ("SECONDARY", WATCHLIST_SECONDARY)):
+        lines.append(f"{cat}:")
+        for n, sym in enumerate(syms, 1):
+            inst = INSTRUMENTS[sym]
+            if sym in res["unsupported"]:
+                status = "UNSUPPORTED -- " + res["unsupported"][sym]
+            elif sym in res["unverified"]:
+                status = "UNVERIFIED -- " + res["unverified"][sym]
+            else:
+                status = "supported"
+            lines.append(f"  {n:>2}. {inst.label:<9} engine={sym:<8} hl_coin={inst.hl_coin:<11} "
+                         f"class={inst.asset_class:<14} {status}")
+    return "\n".join(lines)
 
 
 # ============================================================================
@@ -3011,10 +3143,20 @@ def run_scan(state: dict, candle_cache: dict) -> None:
     # --- 2. scan every watchlist asset (bounded thread pool) --------------
     views_by_symbol_1h = {}
     scan_results = {}
-    log.info("Scan phase starting: %d symbols, 6 worker threads.", len(WATCHLIST))
+    # Preflight: skip (and loudly report) instruments the venue does not list -- never substitute another one.
+    # Fail-open: if the meta lookup itself failed, scan everything rather than silently dropping crypto.
+    support = check_instrument_support()
+    if support["unsupported"]:
+        for sym, why in support["unsupported"].items():
+            log.warning("UNSUPPORTED INSTRUMENT %s (%s): %s -- skipped this run", sym, INSTRUMENTS[sym].label, why)
+    if support["unverified"]:
+        log.warning("Instrument support could not be verified for %d symbol(s) (scanning anyway): %s",
+                    len(support["unverified"]), ", ".join(support["unverified"]))
+    scan_list = [sym for sym in WATCHLIST if sym not in support["unsupported"]]
+    log.info("Scan phase starting: %d symbols, 6 worker threads.", len(scan_list))
     n_done = 0
     with ThreadPoolExecutor(max_workers=6) as pool:
-        futures = {pool.submit(scan_symbol, sym, candle_cache, state, now_ms): sym for sym in WATCHLIST}
+        futures = {pool.submit(scan_symbol, sym, candle_cache, state, now_ms): sym for sym in scan_list}
         for fut in as_completed(futures):
             sym = futures[fut]
             try:
@@ -3023,13 +3165,18 @@ def run_scan(state: dict, candle_cache: dict) -> None:
                 log.error("scan_symbol failed for %s: %s", sym, e)
                 result = []
             n_done += 1
-            log.info("  [%d/%d] %s scanned (%.1fs elapsed)", n_done, len(WATCHLIST), sym,
+            log.info("  [%d/%d] %s scanned (%.1fs elapsed)", n_done, len(scan_list), sym,
                       time.monotonic() - t_start)
             if result:
                 scan_results[sym] = result
                 views_by_symbol_1h[sym] = result["views"][TF_1H]
     log.info("Scan phase done (%.1fs elapsed): %d/%d symbols produced usable data.",
-              time.monotonic() - t_start, len(scan_results), len(WATCHLIST))
+              time.monotonic() - t_start, len(scan_results), len(scan_list))
+
+    # Breadth = "how many watchlist assets agree with BTC's macro bias". That is a crypto-market concept, so it is
+    # computed over crypto views only: adding indices/metals/oil must not shift breadth (and thereby the scores)
+    # of the existing crypto strategies.
+    breadth_views_1h = {s: v for s, v in views_by_symbol_1h.items() if instrument_is_crypto(s)}
 
     macro_view = views_by_symbol_1h.get(MACRO_ASSET)
     macro_bias = "neutral"
@@ -3040,7 +3187,7 @@ def run_scan(state: dict, candle_cache: dict) -> None:
     for symbol, result in scan_results.items():
         views, stage1, stage3, stage4 = result["views"], result["stage1"], result["stage3"], result["stage4"]
         try:
-            regime = build_regime_vector(views, macro_bias, views_by_symbol_1h, now_ms)
+            regime = build_regime_vector(views, macro_bias, breadth_views_1h, now_ms)
         except (ValueError, ZeroDivisionError, statistics.StatisticsError) as e:
             log.warning("regime vector failed for %s: %s", symbol, e)
             continue
@@ -3078,7 +3225,18 @@ def run_scan(state: dict, candle_cache: dict) -> None:
               time.monotonic() - t_start, len(all_new_signals), len(state["active_signals"]))
 
 
+def check_watchlist_cli() -> int:
+    """Read-only report: touches no state.json / candle cache / lock and sends nothing."""
+    res = check_instrument_support()
+    print(format_watchlist_report(res))
+    print(f"\nsupported={len(res['supported'])} unsupported={len(res['unsupported'])} "
+          f"unverified={len(res['unverified'])} total={len(WATCHLIST)}")
+    return 1 if res["unsupported"] else 0
+
+
 def main() -> None:
+    if "--check-watchlist" in sys.argv[1:]:
+        sys.exit(check_watchlist_cli())
     log.info("=== %s v%s process started (pid=%d) ===", ENGINE_NAME, ENGINE_VERSION, os.getpid())
     run_started = time.monotonic()
     lock_f = open(LOCK_PATH, "a+")
