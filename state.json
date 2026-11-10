@@ -467,7 +467,7 @@
         "expired": 18
       },
       "Momentum|pending": {
-        "dispatched": 23,
+        "dispatched": 24,
         "filled": 19,
         "expired": 4
       },
@@ -494,11 +494,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 477,
+        "seen": 478,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 477,
+        "seen": 478,
         "rejected": 32
       },
       "tp1_capped": {
@@ -3678,7 +3678,54 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "LTC-Momentum-1794309330774",
+      "symbol": "LTC",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 51.31677946111002,
+      "sl": 51.73168,
+      "tp1": 50.415,
+      "tp2": 50.331,
+      "rr1": 2.173483465513561,
+      "rr2": 2.3759416262687387,
+      "confidence": 0.49883199080757745,
+      "grade": "A",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 14.342118853118505,
+        "volatility_pctl": 38.333333333333336,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794309330774,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8307637131100039,
+      "grade_raw": "A+",
+      "tg_message_id": 9706,
+      "_last_checked_t": 1794307500000,
+      "active_sl": 51.73168,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1794308443839
+  "last_run_ts": 1794309330774
 }
