@@ -402,6 +402,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "LTC|range|intraday|Momentum": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -421,9 +427,9 @@
         "sum_conf": 6.62177879748776
       },
       "Momentum|A+": {
-        "n": 17,
+        "n": 18,
         "wins": 4,
-        "sum_conf": 14.5124352175389
+        "sum_conf": 15.346902300780515
       },
       "Range Trading|A+": {
         "n": 4,
@@ -462,7 +468,7 @@
       },
       "Momentum|pending": {
         "dispatched": 23,
-        "filled": 18,
+        "filled": 19,
         "expired": 4
       },
       "Mean Reversion|pending": {
@@ -590,6 +596,10 @@
       "DOGE": {
         "direction": "bearish",
         "until_ts": 1794293100000
+      },
+      "LTC": {
+        "direction": "bearish",
+        "until_ts": 1794299400000
       }
     }
   },
@@ -3601,6 +3611,38 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "LTC-Momentum-1794284129269",
+      "symbol": "LTC",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 51.276859656654715,
+      "sl": 51.6574,
+      "tp1": 50.43967090129508,
+      "tp2": 50.415,
+      "r_realized": -1.0,
+      "mae_r": 1.059389235320815,
+      "mfe_r": 0.330739325949761,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.5161564452695071,
+      "grade": "A",
+      "grade_raw": "A+",
+      "score_raw": 0.8344670832416152,
+      "regime_at_entry": {
+        "trend_strength": 15.264277756797977,
+        "volatility_pctl": 36.666666666666664,
+        "macro_bias": "neutral"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1794295800000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -3642,7 +3684,7 @@
       "score_raw": 0.7939279562504059,
       "grade_raw": "A",
       "tg_message_id": 9673,
-      "_last_checked_t": 1794294900000,
+      "_last_checked_t": 1794295800000,
       "active_sl": 8.81106769568,
       "be_armed": true,
       "partial_done": true,
@@ -3650,54 +3692,8 @@
       "tp1_hit": false,
       "be_ts": 1794247200000,
       "partial_ts": 1794248100000
-    },
-    {
-      "id": "LTC-Momentum-1794284129269",
-      "symbol": "LTC",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 51.276859656654715,
-      "sl": 51.6574,
-      "tp1": 50.43967090129508,
-      "tp2": 50.415,
-      "rr1": 2.2,
-      "rr2": 2.264831237282761,
-      "confidence": 0.5161564452695071,
-      "grade": "A",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 15.264277756797977,
-        "volatility_pctl": 36.666666666666664,
-        "macro_bias": "neutral"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1794284129269,
-      "filled_ts": 1794284100000,
-      "mae_r": 0.8097442195916958,
-      "mfe_r": 0.330739325949761,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8344670832416152,
-      "grade_raw": "A+",
-      "tg_message_id": 9685,
-      "_last_checked_t": 1794294900000,
-      "active_sl": 51.6574,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794295838678
+  "last_run_ts": 1794296744382
 }
