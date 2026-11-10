@@ -116,6 +116,12 @@ def instrument_is_crypto(symbol: str) -> bool:
     return True if inst is None else inst.is_crypto
 
 
+def instrument_asset_class(symbol: str) -> str:
+    """Asset class of a symbol; legacy symbols outside the registry are crypto (see above)."""
+    inst = INSTRUMENTS.get(symbol)
+    return "crypto" if inst is None else inst.asset_class
+
+
 MACRO_ASSET = "BTC"  # dominant benchmark for Regime Vector macro bias / breadth
 
 # --- Timeframes (Section 7: forbidden 1M/2M/3M/5M, minimum entry TF = 15M) --
@@ -1307,6 +1313,17 @@ MAX_SL_DISTANCE_PCT = 0.025     # hard ceiling: risk must be <= 2.5% of entry re
                                  # spike day 3x ATR can itself become a wide, uncomfortable % move --
                                  # this is the absolute sanity cap independent of what ATR is doing.
                                  # Lower this (e.g. 0.015) for a tighter, more scalp-resistant ceiling.
+# Per-asset-class minimum SL distance (fraction of entry). Crypto keeps the original 0.6% floor unchanged.
+# Indices, metals and commodities are structurally less volatile (a 15m ATR of ~0.05-0.1% is normal for an
+# equity index or gold), so a 0.6% absolute floor would reject nearly every setup on them -- this floor is a
+# hard REJECT, not a widening. These are conservative STARTING VALUES, not measured ones; tune them against
+# real rejection counts. The ATR-relative floor (MIN_ENTRY_SL_DISTANCE_ATR) still applies to every class.
+MIN_SL_DISTANCE_PCT_BY_CLASS = {
+    "crypto": MIN_SL_DISTANCE_PCT,
+    "index": 0.0015,
+    "precious_metal": 0.0020,
+    "commodity": 0.0030,
+}
 
 
 def _valid_structural_anchor(direction: str, entry: float, pivots: list) -> Optional[float]:
@@ -1475,7 +1492,8 @@ def build_risk_plan(direction: str, entry: float, view_15m: View, view_1h: View,
         return None  # hard ceiling; a stop only clearing it by escalating further is rejected, never accepted worse
     if risk > entry * MAX_SL_DISTANCE_PCT:
         return None  # absolute sanity ceiling, independent of an ATR spike -- SL too far in real terms
-    min_risk = max(view_15m.atr * MIN_ENTRY_SL_DISTANCE_ATR, entry * MIN_SL_DISTANCE_PCT)
+    min_sl_pct = MIN_SL_DISTANCE_PCT_BY_CLASS.get(instrument_asset_class(symbol), MIN_SL_DISTANCE_PCT)
+    min_risk = max(view_15m.atr * MIN_ENTRY_SL_DISTANCE_ATR, entry * min_sl_pct)
     if risk < min_risk:
         return None  # entry-placement rule: entry too close to invalidation is noise, not a real trade
 
@@ -2459,6 +2477,7 @@ def new_signal_record(candidate: Candidate, score: float, grade: str, symbol: st
     rec = {
         "id": f"{symbol}-{candidate.engine}-{now_ms}",
         "symbol": symbol,
+        "asset_class": instrument_asset_class(symbol),
         "engine": candidate.engine,
         "counter_trend": candidate.counter_trend,
         "direction": candidate.direction,
@@ -2861,7 +2880,9 @@ def process_resolution(sig: dict, views: dict, regime: RegimeVector, state: dict
 
     update_segment_stats(sig, state)
     state["tier2_trades"].append({
-        "id": sig["id"], "symbol": sig["symbol"], "engine": sig["engine"],
+        "id": sig["id"], "symbol": sig["symbol"],
+        "asset_class": sig.get("asset_class") or instrument_asset_class(sig["symbol"]),
+        "engine": sig["engine"],
         "counter_trend": sig["counter_trend"], "direction": sig["direction"],
         "entry": sig["entry"], "sl": sig["sl"], "tp1": sig["tp1"], "tp2": sig["tp2"],
         "r_realized": sig["r_realized"], "mae_r": sig["mae_r"], "mfe_r": sig["mfe_r"],
