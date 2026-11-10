@@ -462,7 +462,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 61,
+        "dispatched": 62,
         "filled": 43,
         "expired": 18
       },
@@ -494,11 +494,11 @@
     },
     "filter_funnel": {
       "liquidity_sanity": {
-        "seen": 478,
+        "seen": 479,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 478,
+        "seen": 479,
         "rejected": 32
       },
       "tp1_capped": {
@@ -3710,7 +3710,53 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "PENDLE-Liquidity Sweep-1794323726352",
+      "symbol": "PENDLE",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1.597668,
+      "sl": 1.60956,
+      "tp1": 1.5738,
+      "tp2": 1.5719,
+      "rr1": 2.0070635721493417,
+      "rr2": 2.1668348469559353,
+      "confidence": 0.5634791415640173,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 15.514758492984921,
+        "volatility_pctl": 44.166666666666664,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794323726352,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7899152158579095,
+      "grade_raw": "A",
+      "tg_message_id": 9725,
+      "_last_checked_t": 1794321900000,
+      "active_sl": 1.60956,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1794322845049
+  "last_run_ts": 1794323726352
 }
