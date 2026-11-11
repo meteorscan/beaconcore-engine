@@ -23,12 +23,13 @@
       "last_adjust_ts": 0
     },
     "daily_totals": {
-      "2026-11-10": "sent"
+      "2026-11-10": "sent",
+      "2026-11-11": "sent"
     },
     "symbol_cooldown": {}
   },
   "tier2_trades": [],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1794383127459
+  "last_run_ts": 1794384045496
 }
