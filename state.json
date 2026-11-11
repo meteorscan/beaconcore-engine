@@ -12,8 +12,27 @@
     "segment_stats": {},
     "calibration_buckets": {},
     "forensic_counts": {},
-    "fill_stats": {},
-    "filter_funnel": {},
+    "fill_stats": {
+      "Liquidity Sweep|pending": {
+        "dispatched": 1,
+        "filled": 0,
+        "expired": 0
+      }
+    },
+    "filter_funnel": {
+      "tp1_capped": {
+        "seen": 1,
+        "rejected": 1
+      },
+      "liquidity_sanity": {
+        "seen": 1,
+        "rejected": 0
+      },
+      "dispatch_gate": {
+        "seen": 1,
+        "rejected": 0
+      }
+    },
     "circuit_breaker": {
       "tripped": false,
       "tripped_ts": null,
@@ -29,7 +48,54 @@
     "symbol_cooldown": {}
   },
   "tier2_trades": [],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "TAO-Liquidity Sweep-1794411927524",
+      "symbol": "TAO",
+      "asset_class": "crypto",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 224.89616,
+      "sl": 227.08686,
+      "tp1": 220.07662000000002,
+      "tp2": 219.065,
+      "rr1": 2.2,
+      "rr2": 2.6617793399370204,
+      "confidence": 0.8156958228084537,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 12.65270632370476,
+        "volatility_pctl": 52.5,
+        "macro_bias": "neutral"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794411927524,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8156958228084537,
+      "grade_raw": "A+",
+      "tg_message_id": 9783,
+      "_last_checked_t": 1794410100000,
+      "active_sl": 227.08686,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1794411038530
+  "last_run_ts": 1794411927524
 }
