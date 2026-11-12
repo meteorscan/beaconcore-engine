@@ -21,6 +21,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 1.5944588325877782
+      },
+      "DOGE|trend|intraday|Momentum": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -33,6 +39,11 @@
         "n": 1,
         "wins": 1,
         "sum_conf": 0.7955982595907762
+      },
+      "Momentum|A+": {
+        "n": 1,
+        "wins": 0,
+        "sum_conf": 0.8655135908758284
       }
     },
     "forensic_counts": {},
@@ -44,7 +55,7 @@
       },
       "Momentum|pending": {
         "dispatched": 1,
-        "filled": 0,
+        "filled": 1,
         "expired": 0
       }
     },
@@ -75,7 +86,12 @@
       "2026-11-11": "sent",
       "2026-11-12": "sent"
     },
-    "symbol_cooldown": {}
+    "symbol_cooldown": {
+      "DOGE": {
+        "direction": "bearish",
+        "until_ts": 1794511800000
+      }
+    }
   },
   "tier2_trades": [
     {
@@ -143,9 +159,7 @@
       "exit_model": "managed",
       "tp1_hit": true,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "DOGE-Momentum-1794503730598",
       "symbol": "DOGE",
@@ -153,47 +167,34 @@
       "engine": "Momentum",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.06567555033415973,
       "sl": 0.06616199999999998,
       "tp1": 0.06460536106931115,
       "tp2": 0.064561,
-      "rr1": 2.2,
-      "rr2": 2.291193544628179,
+      "r_realized": -1.0,
+      "mae_r": 1.2179053814682186,
+      "mfe_r": 0.28893088849584136,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8655135908758284,
       "grade": "A+",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
+      "grade_raw": "A+",
+      "score_raw": 0.8655135908758284,
       "regime_at_entry": {
         "trend_strength": 44.89257404667331,
         "volatility_pctl": 75.83333333333333,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1794503730598,
-      "filled_ts": 1794502800000,
-      "mae_r": 0.9424400879140883,
-      "mfe_r": 0.28893088849584136,
-      "resolution_logic_version": "1.1.0",
+      "regime_src": "entry",
+      "resolved_ts": 1794508200000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
       "exit_model": "managed",
-      "score_raw": 0.8655135908758284,
-      "grade_raw": "A+",
-      "tg_message_id": 9865,
-      "_last_checked_t": 1794507300000,
-      "active_sl": 0.06616199999999998,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1794508238213
+  "last_run_ts": 1794509128466
 }
