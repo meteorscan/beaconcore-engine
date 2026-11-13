@@ -67,7 +67,7 @@
       "Mean Reversion|pending": {
         "dispatched": 1,
         "filled": 0,
-        "expired": 0
+        "expired": 1
       }
     },
     "filter_funnel": {
@@ -309,54 +309,7 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [
-    {
-      "id": "AVAX-Mean Reversion-1794582046996",
-      "symbol": "AVAX",
-      "asset_class": "crypto",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 8.573487566937047,
-      "sl": 8.7395308,
-      "tp1": 8.2275,
-      "tp2": 8.2268,
-      "rr1": 2.0837197671637067,
-      "rr2": 2.087935536677981,
-      "confidence": 0.8316465375608267,
-      "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 21.92617483089959,
-        "volatility_pctl": 67.5,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1794582046996,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8316465375608267,
-      "grade_raw": "A+",
-      "tg_message_id": 9923,
-      "_last_checked_t": 1794590100000,
-      "active_sl": 8.7395308,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    }
-  ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1794591038599
+  "last_run_ts": 1794591929996
 }
