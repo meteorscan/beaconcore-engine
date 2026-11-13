@@ -84,7 +84,8 @@
     "daily_totals": {
       "2026-11-10": "sent",
       "2026-11-11": "sent",
-      "2026-11-12": "sent"
+      "2026-11-12": "sent",
+      "2026-11-13": "sent"
     },
     "symbol_cooldown": {
       "DOGE": {
@@ -229,5 +230,5 @@
   ],
   "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1794555931160
+  "last_run_ts": 1794556844784
 }
