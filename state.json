@@ -54,7 +54,7 @@
         "expired": 0
       },
       "Momentum|pending": {
-        "dispatched": 3,
+        "dispatched": 4,
         "filled": 3,
         "expired": 0
       }
@@ -65,11 +65,11 @@
         "rejected": 14
       },
       "liquidity_sanity": {
-        "seen": 19,
+        "seen": 20,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 19,
+        "seen": 20,
         "rejected": 0
       }
     },
@@ -261,7 +261,55 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "BNB-Momentum-1794575729807",
+      "symbol": "BNB",
+      "asset_class": "crypto",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 638.4210616036167,
+      "sl": 642.448,
+      "tp1": 630.15,
+      "tp2": 627.16,
+      "rr1": 2.0539329856760102,
+      "rr2": 2.79643254878963,
+      "confidence": 0.8446224879614594,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 46.17685954720035,
+        "volatility_pctl": 94.16666666666667,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794575729807,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8446224879614594,
+      "grade_raw": "A+",
+      "tg_message_id": 9918,
+      "_last_checked_t": 1794573900000,
+      "active_sl": 642.448,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1794574846540
+  "last_run_ts": 1794575729807
 }
