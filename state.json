@@ -120,7 +120,8 @@
       "2026-11-11": "sent",
       "2026-11-12": "sent",
       "2026-11-13": "sent",
-      "2026-11-14": "sent"
+      "2026-11-14": "sent",
+      "2026-11-15": "sent"
     },
     "symbol_cooldown": {
       "DOGE": {
@@ -508,13 +509,13 @@
       "created_ts": 1794717928500,
       "filled_ts": 1794721500000,
       "mae_r": 0.11077868501518978,
-      "mfe_r": 0.5232182306046969,
+      "mfe_r": 0.8247731738033824,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8530986212388749,
       "grade_raw": "A+",
       "tg_message_id": 10114,
-      "_last_checked_t": 1794727800000,
+      "_last_checked_t": 1794728700000,
       "active_sl": 0.05935,
       "be_armed": false,
       "partial_done": false,
@@ -555,13 +556,13 @@
       "created_ts": 1794720635188,
       "filled_ts": 1794722400000,
       "mae_r": 0.24756907875548465,
-      "mfe_r": 0.4055759861141221,
+      "mfe_r": 0.5929323393834917,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8519646478957156,
       "grade_raw": "A+",
       "tg_message_id": 10116,
-      "_last_checked_t": 1794727800000,
+      "_last_checked_t": 1794728700000,
       "active_sl": 191.74155000000002,
       "be_armed": false,
       "partial_done": false,
@@ -570,5 +571,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794728733935
+  "last_run_ts": 1794729640131
 }
