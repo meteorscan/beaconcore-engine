@@ -78,7 +78,7 @@
         "expired": 0
       },
       "Momentum|pending": {
-        "dispatched": 11,
+        "dispatched": 12,
         "filled": 8,
         "expired": 3
       },
@@ -99,11 +99,11 @@
         "rejected": 22
       },
       "liquidity_sanity": {
-        "seen": 33,
+        "seen": 34,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 33,
+        "seen": 34,
         "rejected": 0
       }
     },
@@ -473,7 +473,55 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "AVAX-Momentum-1794716128117",
+      "symbol": "AVAX",
+      "asset_class": "crypto",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 7.0915697682028505,
+      "sl": 7.168819999999999,
+      "tp1": 6.9331,
+      "tp2": 6.735,
+      "rr1": 2.0513824297508405,
+      "rr2": 4.615776029503259,
+      "confidence": 0.8438217148902717,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 61.434261122110804,
+        "volatility_pctl": 99.16666666666667,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794716128117,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8438217148902717,
+      "grade_raw": "A+",
+      "tg_message_id": 10112,
+      "_last_checked_t": 1794714300000,
+      "active_sl": 7.168819999999999,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1794715237714
+  "last_run_ts": 1794716128117
 }
