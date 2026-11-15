@@ -95,15 +95,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 30,
-        "rejected": 30
+        "seen": 33,
+        "rejected": 33
       },
       "liquidity_sanity": {
-        "seen": 44,
+        "seen": 47,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 44,
+        "seen": 47,
         "rejected": 0
       }
     },
@@ -503,7 +503,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 8,
+      "pending_bars": 9,
       "status": "pending",
       "created_ts": 1794716128117,
       "filled_ts": null,
@@ -514,7 +514,7 @@
       "score_raw": 0.8438217148902717,
       "grade_raw": "A+",
       "tg_message_id": 10112,
-      "_last_checked_t": 1794721500000,
+      "_last_checked_t": 1794722400000,
       "active_sl": 7.168819999999999,
       "be_armed": false,
       "partial_done": false,
@@ -555,13 +555,13 @@
       "created_ts": 1794717928500,
       "filled_ts": 1794721500000,
       "mae_r": 0.11077868501518978,
-      "mfe_r": 0.08023320622926179,
+      "mfe_r": 0.42568024358625145,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8530986212388749,
       "grade_raw": "A+",
       "tg_message_id": 10114,
-      "_last_checked_t": 1794721500000,
+      "_last_checked_t": 1794722400000,
       "active_sl": 0.05935,
       "be_armed": false,
       "partial_done": false,
@@ -596,19 +596,19 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 3,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1794720635188,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1794722400000,
+      "mae_r": 0.24756907875548465,
+      "mfe_r": 0.2468435201497986,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8519646478957156,
       "grade_raw": "A+",
       "tg_message_id": 10116,
-      "_last_checked_t": 1794721500000,
+      "_last_checked_t": 1794722400000,
       "active_sl": 191.74155000000002,
       "be_armed": false,
       "partial_done": false,
@@ -617,5 +617,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794722439230
+  "last_run_ts": 1794723326485
 }
