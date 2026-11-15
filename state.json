@@ -63,6 +63,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "XRP|range|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 0.55
       }
     },
     "calibration_buckets": {
@@ -80,6 +86,11 @@
         "n": 10,
         "wins": 2,
         "sum_conf": 8.586072470631013
+      },
+      "Mean Reversion|A+": {
+        "n": 1,
+        "wins": 0,
+        "sum_conf": 0.8398309884672017
       }
     },
     "forensic_counts": {},
@@ -95,8 +106,8 @@
         "expired": 4
       },
       "Mean Reversion|pending": {
-        "dispatched": 3,
-        "filled": 0,
+        "dispatched": 4,
+        "filled": 1,
         "expired": 2
       },
       "Reversal|pending": {
@@ -107,15 +118,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 60,
-        "rejected": 60
+        "seen": 61,
+        "rejected": 61
       },
       "liquidity_sanity": {
-        "seen": 79,
+        "seen": 80,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 79,
+        "seen": 80,
         "rejected": 0
       }
     },
@@ -587,11 +598,44 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "XRP-Mean Reversion-1794783642272",
+      "symbol": "XRP",
+      "asset_class": "crypto",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.973899862154688,
+      "sl": 0.979834,
+      "tp1": 0.9608447588950018,
+      "tp2": 0.9579,
+      "r_realized": 0.55,
+      "mae_r": 0.5055726583234162,
+      "mfe_r": 1.3582195703551834,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8398309884672017,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8398309884672017,
+      "regime_at_entry": {
+        "trend_strength": 15.817686127135095,
+        "volatility_pctl": 73.33333333333333,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1794785400000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
     {
-      "id": "XRP-Mean Reversion-1794783642272",
+      "id": "XRP-Mean Reversion-1794786326256",
       "symbol": "XRP",
       "asset_class": "crypto",
       "engine": "Mean Reversion",
@@ -600,11 +644,11 @@
       "style": "intraday",
       "entry_kind": "pending",
       "entry": 0.973899862154688,
-      "sl": 0.979834,
-      "tp1": 0.9608447588950018,
+      "sl": 0.97987,
+      "tp1": 0.9607655588950017,
       "tp2": 0.9579,
       "rr1": 2.2,
-      "rr2": 2.6962403927519505,
+      "rr2": 2.679982032115372,
       "confidence": 0.8398309884672017,
       "grade": "A+",
       "confluences": [
@@ -617,28 +661,26 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1794783642272,
-      "filled_ts": 1794783600000,
-      "mae_r": 0.5055726583234162,
-      "mfe_r": 1.3582195703551834,
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794786326256,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8398309884672017,
       "grade_raw": "A+",
-      "tg_message_id": 10137,
+      "tg_message_id": 10141,
       "_last_checked_t": 1794784500000,
-      "active_sl": 0.9730233522787488,
-      "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.55,
-      "tp1_hit": false,
-      "be_ts": 1794784500000,
-      "partial_ts": 1794784500000
+      "active_sl": 0.97987,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794785437301
+  "last_run_ts": 1794786326256
 }
