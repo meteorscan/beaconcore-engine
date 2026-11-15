@@ -23,10 +23,10 @@
         "sum_r": 1.5944588325877782
       },
       "DOGE|trend|intraday|Momentum": {
-        "n": 3,
-        "wins": 0,
+        "n": 4,
+        "wins": 1,
         "losses": 3,
-        "sum_r": -3.0
+        "sum_r": -1.3499999999999999
       },
       "BNB|trend|intraday|Momentum": {
         "n": 1,
@@ -39,6 +39,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 1.6500000000000001
+      },
+      "LINK|trend|intraday|Momentum": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -53,9 +59,9 @@
         "sum_conf": 0.7955982595907762
       },
       "Momentum|A+": {
-        "n": 5,
-        "wins": 1,
-        "sum_conf": 4.2979160243862164
+        "n": 7,
+        "wins": 2,
+        "sum_conf": 6.019495799204587
       }
     },
     "forensic_counts": {},
@@ -67,7 +73,7 @@
       },
       "Momentum|pending": {
         "dispatched": 11,
-        "filled": 5,
+        "filled": 7,
         "expired": 3
       },
       "Mean Reversion|pending": {
@@ -118,6 +124,10 @@
       "BNB": {
         "direction": "bearish",
         "until_ts": 1794583800000
+      },
+      "LINK": {
+        "direction": "bearish",
+        "until_ts": 1794711600000
       }
     }
   },
@@ -352,6 +362,72 @@
       "exit_model": "managed",
       "tp1_hit": true,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "DOGE-Momentum-1794704440699",
+      "symbol": "DOGE",
+      "asset_class": "crypto",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.05747623008689842,
+      "sl": 0.0580776,
+      "tp1": 0.05615321627807495,
+      "tp2": 0.055384,
+      "r_realized": 1.6500000000000001,
+      "mae_r": 0.7811663052425207,
+      "mfe_r": 2.6127514075234775,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8614536995962281,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8614536995962281,
+      "regime_at_entry": {
+        "trend_strength": 57.52955197719507,
+        "volatility_pctl": 99.16666666666667,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1794708000000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": true,
+      "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "LINK-Momentum-1794705326279",
+      "symbol": "LINK",
+      "asset_class": "crypto",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 8.848009990761513,
+      "sl": 8.965699999999998,
+      "tp1": 8.589091970436845,
+      "tp2": 8.5593,
+      "r_realized": -1.0,
+      "mae_r": 1.3500721961582538,
+      "mfe_r": 1.5108333486592076,
+      "forensic_category": "correct_read_poor_rr",
+      "confidence": 0.8601260752221425,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8601260752221425,
+      "regime_at_entry": {
+        "trend_strength": 50.18348149244722,
+        "volatility_pctl": 99.16666666666667,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1794708000000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -384,7 +460,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 5,
+      "pending_bars": 6,
       "status": "pending",
       "created_ts": 1794704440699,
       "filled_ts": null,
@@ -395,102 +471,8 @@
       "score_raw": 0.8615134022918354,
       "grade_raw": "A+",
       "tg_message_id": 10086,
-      "_last_checked_t": 1794707100000,
+      "_last_checked_t": 1794708000000,
       "active_sl": 70.88020000000002,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "DOGE-Momentum-1794704440699",
-      "symbol": "DOGE",
-      "asset_class": "crypto",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.05747623008689842,
-      "sl": 0.0580776,
-      "tp1": 0.05615321627807495,
-      "tp2": 0.055384,
-      "rr1": 2.2,
-      "rr2": 3.47910668844023,
-      "confidence": 0.8614536995962281,
-      "grade": "A+",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 57.52955197719507,
-        "volatility_pctl": 99.16666666666667,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 5,
-      "status": "pending",
-      "created_ts": 1794704440699,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8614536995962281,
-      "grade_raw": "A+",
-      "tg_message_id": 10088,
-      "_last_checked_t": 1794707100000,
-      "active_sl": 0.0580776,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "LINK-Momentum-1794705326279",
-      "symbol": "LINK",
-      "asset_class": "crypto",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 8.848009990761513,
-      "sl": 8.965699999999998,
-      "tp1": 8.589091970436845,
-      "tp2": 8.5593,
-      "rr1": 2.2,
-      "rr2": 2.4531393329783446,
-      "confidence": 0.8601260752221425,
-      "grade": "A+",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 50.18348149244722,
-        "volatility_pctl": 99.16666666666667,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 4,
-      "status": "pending",
-      "created_ts": 1794705326279,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8601260752221425,
-      "grade_raw": "A+",
-      "tg_message_id": 10095,
-      "_last_checked_t": 1794707100000,
-      "active_sl": 8.965699999999998,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -498,5 +480,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794708039924
+  "last_run_ts": 1794708927202
 }
