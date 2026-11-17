@@ -104,7 +104,7 @@
       "Liquidity Sweep|pending": {
         "dispatched": 8,
         "filled": 4,
-        "expired": 2
+        "expired": 3
       },
       "Momentum|pending": {
         "dispatched": 14,
@@ -746,7 +746,7 @@
       "score_raw": 0.8229905496055061,
       "grade_raw": "A+",
       "tg_message_id": 10184,
-      "_last_checked_t": 1794877200000,
+      "_last_checked_t": 1794878100000,
       "active_sl": 0.0594062941728,
       "be_armed": true,
       "partial_done": true,
@@ -754,54 +754,8 @@
       "tp1_hit": false,
       "be_ts": 1794871800000,
       "partial_ts": 1794871800000
-    },
-    {
-      "id": "TAO-Liquidity Sweep-1794869130186",
-      "symbol": "TAO",
-      "asset_class": "crypto",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 193.03048,
-      "sl": 196.31928500921873,
-      "tp1": 185.66,
-      "tp2": 185.59,
-      "rr1": 2.2410814807628037,
-      "rr2": 2.2623658073810673,
-      "confidence": 0.8111404938009472,
-      "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 12.705164864353689,
-        "volatility_pctl": 33.333333333333336,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "1h",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1794869130186,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8111404938009472,
-      "grade_raw": "A+",
-      "tg_message_id": 10200,
-      "_last_checked_t": 1794877200000,
-      "active_sl": 196.31928500921873,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794878138516
+  "last_run_ts": 1794879038535
 }
