@@ -866,18 +866,19 @@
       "created_ts": 1794886243736,
       "filled_ts": 1794885300000,
       "mae_r": 0.5722244638712352,
-      "mfe_r": 0.9704235409166405,
+      "mfe_r": 1.0683694459825441,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8003359975588825,
       "grade_raw": "A+",
       "tg_message_id": 10209,
-      "_last_checked_t": 1794906000000,
-      "active_sl": 196.2975895313756,
-      "be_armed": false,
+      "_last_checked_t": 1794906900000,
+      "active_sl": 192.85675256800002,
+      "be_armed": true,
       "partial_done": false,
       "banked_r": 0.0,
-      "tp1_hit": false
+      "tp1_hit": false,
+      "be_ts": 1794906900000
     },
     {
       "id": "SOL-Range Trading-1794902447877",
@@ -907,7 +908,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 6,
+      "pending_bars": 7,
       "status": "pending",
       "created_ts": 1794902447877,
       "filled_ts": null,
@@ -918,7 +919,7 @@
       "score_raw": 0.855705086625937,
       "grade_raw": "A+",
       "tg_message_id": 10221,
-      "_last_checked_t": 1794906000000,
+      "_last_checked_t": 1794906900000,
       "active_sl": 73.7384,
       "be_armed": false,
       "partial_done": false,
@@ -927,5 +928,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794906933269
+  "last_run_ts": 1794907841527
 }
