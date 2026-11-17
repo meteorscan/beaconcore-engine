@@ -122,7 +122,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 10,
+        "dispatched": 11,
         "filled": 6,
         "expired": 3
       },
@@ -132,7 +132,7 @@
         "expired": 4
       },
       "Mean Reversion|pending": {
-        "dispatched": 6,
+        "dispatched": 7,
         "filled": 3,
         "expired": 3
       },
@@ -149,15 +149,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 77,
-        "rejected": 77
+        "seen": 79,
+        "rejected": 79
       },
       "liquidity_sanity": {
-        "seen": 124,
+        "seen": 126,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 124,
+        "seen": 126,
         "rejected": 0
       }
     },
@@ -897,7 +897,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1794915932758,
       "filled_ts": null,
@@ -908,8 +908,101 @@
       "score_raw": 0.7660390177831844,
       "grade_raw": "A",
       "tg_message_id": 10229,
-      "_last_checked_t": 1794914100000,
+      "_last_checked_t": 1794915900000,
       "active_sl": 0.060142082000000006,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "AAVE-Liquidity Sweep-1794916845494",
+      "symbol": "AAVE",
+      "asset_class": "crypto",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 112.75584,
+      "sl": 113.76,
+      "tp1": 110.546688,
+      "tp2": 110.32,
+      "rr1": 2.2,
+      "rr2": 2.425748884639914,
+      "confidence": 0.8025459083450316,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 33.03886804744789,
+        "volatility_pctl": 54.166666666666664,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794916845494,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8025459083450316,
+      "grade_raw": "A+",
+      "tg_message_id": 10230,
+      "_last_checked_t": 1794915000000,
+      "active_sl": 113.76,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "TAO-Mean Reversion-1794916845494",
+      "symbol": "TAO",
+      "asset_class": "crypto",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 194.79160607979543,
+      "sl": 196.2961,
+      "tp1": 191.48171945534537,
+      "tp2": 189.64,
+      "rr1": 2.2,
+      "rr2": 3.4241454954467185,
+      "confidence": 0.8552579876832019,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 13.24820723767509,
+        "volatility_pctl": 5.833333333333333,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "1h",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794916845494,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8552579876832019,
+      "grade_raw": "A+",
+      "tg_message_id": 10231,
+      "_last_checked_t": 1794915000000,
+      "active_sl": 196.2961,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -917,5 +1010,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794915932758
+  "last_run_ts": 1794916845494
 }
