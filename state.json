@@ -108,10 +108,10 @@
         "sum_r": 1.543264740008612
       },
       "AAVE|trend|intraday|Reversal": {
-        "n": 1,
-        "wins": 1,
+        "n": 2,
+        "wins": 2,
         "losses": 0,
-        "sum_r": 1.6500000000000001
+        "sum_r": 3.4727626090254153
       }
     },
     "calibration_buckets": {
@@ -144,6 +144,11 @@
         "n": 1,
         "wins": 1,
         "sum_conf": 0.7981545207005315
+      },
+      "Reversal|A+": {
+        "n": 1,
+        "wins": 1,
+        "sum_conf": 0.8168510989112655
       }
     },
     "forensic_counts": {
@@ -167,7 +172,7 @@
       },
       "Reversal|pending": {
         "dispatched": 3,
-        "filled": 1,
+        "filled": 2,
         "expired": 1
       },
       "Range Trading|pending": {
@@ -1093,6 +1098,39 @@
       "exit_model": "managed",
       "tp1_hit": true,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "AAVE-Reversal-1794931245417",
+      "symbol": "AAVE",
+      "asset_class": "crypto",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 113.39624,
+      "sl": 114.662,
+      "tp1": 110.32,
+      "tp2": 108.59,
+      "r_realized": 1.822762609025415,
+      "mae_r": 0.04247250663632672,
+      "mfe_r": 2.951776008090008,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8168510989112655,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8168510989112655,
+      "regime_at_entry": {
+        "trend_strength": 30.32113330344622,
+        "volatility_pctl": 80.0,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1794933900000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": true,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -1124,7 +1162,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 8,
+      "pending_bars": 9,
       "status": "pending",
       "created_ts": 1794927652472,
       "filled_ts": null,
@@ -1135,63 +1173,14 @@
       "score_raw": 0.8554774798298213,
       "grade_raw": "A+",
       "tg_message_id": 10240,
-      "_last_checked_t": 1794933000000,
+      "_last_checked_t": 1794933900000,
       "active_sl": 197.26707,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
       "tp1_hit": false
-    },
-    {
-      "id": "AAVE-Reversal-1794931245417",
-      "symbol": "AAVE",
-      "asset_class": "crypto",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 113.39624,
-      "sl": 114.662,
-      "tp1": 110.32,
-      "tp2": 108.59,
-      "rr1": 2.43035014536722,
-      "rr2": 3.797117937049679,
-      "confidence": 0.8168510989112655,
-      "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 30.32113330344622,
-        "volatility_pctl": 80.0,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1794931245417,
-      "filled_ts": 1794931200000,
-      "mae_r": 0.04247250663632672,
-      "mfe_r": 2.2565415244596125,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8168510989112655,
-      "grade_raw": "A+",
-      "tg_message_id": 10255,
-      "_last_checked_t": 1794933000000,
-      "active_sl": 113.29418338400001,
-      "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.607587536341805,
-      "tp1_hit": false,
-      "be_ts": 1794932100000,
-      "partial_ts": 1794933000000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794933930946
+  "last_run_ts": 1794934850870
 }
