@@ -100,6 +100,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 0.55
+      },
+      "AVAX|range|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 1.543264740008612
       }
     },
     "calibration_buckets": {
@@ -119,9 +125,9 @@
         "sum_conf": 8.586072470631013
       },
       "Mean Reversion|A+": {
-        "n": 5,
-        "wins": 1,
-        "sum_conf": 4.211253336201012
+        "n": 6,
+        "wins": 2,
+        "sum_conf": 5.050754027427174
       },
       "Range Trading|A+": {
         "n": 1,
@@ -145,7 +151,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 10,
-        "filled": 5,
+        "filled": 6,
         "expired": 3
       },
       "Reversal|pending": {
@@ -165,11 +171,11 @@
         "rejected": 94
       },
       "liquidity_sanity": {
-        "seen": 152,
+        "seen": 153,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 152,
+        "seen": 153,
         "rejected": 0
       }
     },
@@ -977,6 +983,39 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "AVAX-Mean Reversion-1794924046281",
+      "symbol": "AVAX",
+      "asset_class": "crypto",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 7.272020976170112,
+      "sl": 7.3471398,
+      "tp1": 7.11745,
+      "tp2": 7.1154,
+      "r_realized": 1.543264740008612,
+      "mae_r": 0.17277991278564092,
+      "mfe_r": 2.624122238874605,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8395006912261617,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8395006912261617,
+      "regime_at_entry": {
+        "trend_strength": 10.174220392337263,
+        "volatility_pctl": 3.3333333333333335,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1794929400000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": true,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -1013,66 +1052,20 @@
       "created_ts": 1794915932758,
       "filled_ts": 1794917700000,
       "mae_r": 0.40481097037259683,
-      "mfe_r": 0.9875914954988779,
+      "mfe_r": 1.6046456409008654,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7660390177831844,
       "grade_raw": "A",
       "tg_message_id": 10229,
-      "_last_checked_t": 1794928500000,
-      "active_sl": 0.060142082000000006,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "AVAX-Mean Reversion-1794924046281",
-      "symbol": "AVAX",
-      "asset_class": "crypto",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 7.272020976170112,
-      "sl": 7.3471398,
-      "tp1": 7.11745,
-      "tp2": 7.1154,
-      "rr1": 2.0576863200114826,
-      "rr2": 2.0849764171599956,
-      "confidence": 0.8395006912261617,
-      "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 10.174220392337263,
-        "volatility_pctl": 3.3333333333333335,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1794924046281,
-      "filled_ts": 1794924000000,
-      "mae_r": 0.17277991278564092,
-      "mfe_r": 1.828050136688595,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8395006912261617,
-      "grade_raw": "A+",
-      "tg_message_id": 10234,
-      "_last_checked_t": 1794928500000,
-      "active_sl": 7.265476157291559,
+      "_last_checked_t": 1794929400000,
+      "active_sl": 0.0594062941728,
       "be_armed": true,
       "partial_done": true,
-      "banked_r": 0.5144215800028706,
+      "banked_r": 0.512553607494934,
       "tp1_hit": false,
-      "be_ts": 1794926700000,
-      "partial_ts": 1794927600000
+      "be_ts": 1794929400000,
+      "partial_ts": 1794929400000
     },
     {
       "id": "TAO-Mean Reversion-1794927652472",
@@ -1102,7 +1095,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 3,
+      "pending_bars": 4,
       "status": "pending",
       "created_ts": 1794927652472,
       "filled_ts": null,
@@ -1113,7 +1106,7 @@
       "score_raw": 0.8554774798298213,
       "grade_raw": "A+",
       "tg_message_id": 10240,
-      "_last_checked_t": 1794928500000,
+      "_last_checked_t": 1794929400000,
       "active_sl": 197.26707,
       "be_armed": false,
       "partial_done": false,
@@ -1148,26 +1141,28 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 0,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1794929445280,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1794928500000,
+      "mae_r": 0.7510196338802906,
+      "mfe_r": 1.7862088589585572,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7981545207005315,
       "grade_raw": "A",
       "tg_message_id": 10245,
-      "_last_checked_t": 1794927600000,
-      "active_sl": 114.66000000000001,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
+      "_last_checked_t": 1794929400000,
+      "active_sl": 113.714125096,
+      "be_armed": true,
+      "partial_done": true,
+      "banked_r": 0.55,
+      "tp1_hit": false,
+      "be_ts": 1794929400000,
+      "partial_ts": 1794929400000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794929445280
+  "last_run_ts": 1794930331670
 }
