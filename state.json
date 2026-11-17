@@ -112,7 +112,7 @@
         "expired": 4
       },
       "Mean Reversion|pending": {
-        "dispatched": 5,
+        "dispatched": 6,
         "filled": 2,
         "expired": 3
       },
@@ -124,15 +124,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 65,
-        "rejected": 65
+        "seen": 66,
+        "rejected": 66
       },
       "liquidity_sanity": {
-        "seen": 107,
+        "seen": 108,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 107,
+        "seen": 108,
         "rejected": 0
       }
     },
@@ -746,7 +746,7 @@
       "score_raw": 0.8229905496055061,
       "grade_raw": "A+",
       "tg_message_id": 10184,
-      "_last_checked_t": 1794879000000,
+      "_last_checked_t": 1794879900000,
       "active_sl": 0.0594062941728,
       "be_armed": true,
       "partial_done": true,
@@ -754,8 +754,54 @@
       "tp1_hit": false,
       "be_ts": 1794871800000,
       "partial_ts": 1794871800000
+    },
+    {
+      "id": "AAVE-Mean Reversion-1794880844784",
+      "symbol": "AAVE",
+      "asset_class": "crypto",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 110.1872619412042,
+      "sl": 111.109,
+      "tp1": 108.15943821185344,
+      "tp2": 108.11,
+      "rr1": 2.2,
+      "rr2": 2.253635858237248,
+      "confidence": 0.8206224887516443,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 21.799373062362896,
+        "volatility_pctl": 13.333333333333334,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794880844784,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8206224887516443,
+      "grade_raw": "A+",
+      "tg_message_id": 10206,
+      "_last_checked_t": 1794879000000,
+      "active_sl": 111.109,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794879942968
+  "last_run_ts": 1794880844784
 }
