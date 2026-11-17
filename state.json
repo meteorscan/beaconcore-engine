@@ -165,11 +165,11 @@
         "rejected": 92
       },
       "liquidity_sanity": {
-        "seen": 148,
+        "seen": 149,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 148,
+        "seen": 149,
         "rejected": 0
       }
     },
@@ -980,13 +980,13 @@
       "created_ts": 1794915932758,
       "filled_ts": 1794917700000,
       "mae_r": 0.40481097037259683,
-      "mfe_r": 0.5009834758469532,
+      "mfe_r": 0.9875914954988779,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7660390177831844,
       "grade_raw": "A",
       "tg_message_id": 10229,
-      "_last_checked_t": 1794926700000,
+      "_last_checked_t": 1794927600000,
       "active_sl": 0.060142082000000006,
       "be_armed": false,
       "partial_done": false,
@@ -1026,18 +1026,20 @@
       "created_ts": 1794924046281,
       "filled_ts": 1794923100000,
       "mae_r": 0.8356233273409412,
-      "mfe_r": 0.6918591395024116,
+      "mfe_r": 1.4602573316644687,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8557108828317624,
       "grade_raw": "A+",
       "tg_message_id": 10233,
-      "_last_checked_t": 1794926700000,
-      "active_sl": 0.97988891,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
+      "_last_checked_t": 1794927600000,
+      "active_sl": 0.9725708352861004,
+      "be_armed": true,
+      "partial_done": true,
+      "banked_r": 0.55,
+      "tp1_hit": false,
+      "be_ts": 1794927600000,
+      "partial_ts": 1794927600000
     },
     {
       "id": "AVAX-Mean Reversion-1794924046281",
@@ -1072,19 +1074,20 @@
       "created_ts": 1794924046281,
       "filled_ts": 1794924000000,
       "mae_r": 0.17277991278564092,
-      "mfe_r": 1.0160033434887972,
+      "mfe_r": 1.7721387181404133,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8395006912261617,
       "grade_raw": "A+",
       "tg_message_id": 10234,
-      "_last_checked_t": 1794926700000,
+      "_last_checked_t": 1794927600000,
       "active_sl": 7.265476157291559,
       "be_armed": true,
-      "partial_done": false,
-      "banked_r": 0.0,
+      "partial_done": true,
+      "banked_r": 0.5144215800028706,
       "tp1_hit": false,
-      "be_ts": 1794926700000
+      "be_ts": 1794926700000,
+      "partial_ts": 1794927600000
     },
     {
       "id": "TAO-Mean Reversion-1794927652472",
@@ -1114,7 +1117,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1794927652472,
       "filled_ts": null,
@@ -1125,7 +1128,7 @@
       "score_raw": 0.8554774798298213,
       "grade_raw": "A+",
       "tg_message_id": 10240,
-      "_last_checked_t": 1794925800000,
+      "_last_checked_t": 1794927600000,
       "active_sl": 197.26707,
       "be_armed": false,
       "partial_done": false,
@@ -1134,5 +1137,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794927652472
+  "last_run_ts": 1794928533809
 }
