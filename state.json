@@ -178,7 +178,7 @@
         "expired": 4
       },
       "Mean Reversion|pending": {
-        "dispatched": 14,
+        "dispatched": 15,
         "filled": 8,
         "expired": 5
       },
@@ -195,15 +195,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 114,
-        "rejected": 114
+        "seen": 115,
+        "rejected": 115
       },
       "liquidity_sanity": {
-        "seen": 178,
+        "seen": 180,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 178,
+        "seen": 180,
         "rejected": 0
       }
     },
@@ -1288,8 +1288,54 @@
       "score_raw": 0.8162676042444903,
       "grade_raw": "A+",
       "tg_message_id": 10279,
-      "_last_checked_t": 1794974400000,
+      "_last_checked_t": 1794975300000,
       "active_sl": 75.92699999999999,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "XRP-Mean Reversion-1794976236571",
+      "symbol": "XRP",
+      "asset_class": "crypto",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.9844608987875801,
+      "sl": 0.9917908,
+      "tp1": 0.96972,
+      "tp2": 0.96584,
+      "rr1": 2.0110637729473138,
+      "rr2": 2.5404024212534733,
+      "confidence": 0.7957582375112673,
+      "grade": "A",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 14.337038000053159,
+        "volatility_pctl": 7.5,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1794976236571,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7957582375112673,
+      "grade_raw": "A",
+      "tg_message_id": 10287,
+      "_last_checked_t": 1794974400000,
+      "active_sl": 0.9917908,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -1297,5 +1343,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794975334575
+  "last_run_ts": 1794976236571
 }
