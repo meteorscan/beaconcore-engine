@@ -66,10 +66,10 @@
         "sum_r": -1.0
       },
       "XRP|range|intraday|Mean Reversion": {
-        "n": 3,
+        "n": 4,
         "wins": 3,
-        "losses": 0,
-        "sum_r": 2.75
+        "losses": 1,
+        "sum_r": 1.75
       },
       "DOGE|range|intraday|Liquidity Sweep": {
         "n": 3,
@@ -161,6 +161,11 @@
         "n": 1,
         "wins": 1,
         "sum_conf": 0.8168510989112655
+      },
+      "Mean Reversion|A": {
+        "n": 1,
+        "wins": 0,
+        "sum_conf": 0.7957582375112673
       }
     },
     "forensic_counts": {
@@ -179,7 +184,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 15,
-        "filled": 8,
+        "filled": 9,
         "expired": 5
       },
       "Reversal|pending": {
@@ -253,6 +258,10 @@
       "ETH": {
         "direction": "bearish",
         "until_ts": 1794960000000
+      },
+      "XRP": {
+        "direction": "bearish",
+        "until_ts": 1794988800000
       }
     }
   },
@@ -1246,6 +1255,39 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "XRP-Mean Reversion-1794976236571",
+      "symbol": "XRP",
+      "asset_class": "crypto",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.9844608987875801,
+      "sl": 0.9917908,
+      "tp1": 0.96972,
+      "tp2": 0.96584,
+      "r_realized": -1.0,
+      "mae_r": 1.274110106231124,
+      "mfe_r": 0.38894095635962694,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7957582375112673,
+      "grade": "A",
+      "grade_raw": "A",
+      "score_raw": 0.7957582375112673,
+      "regime_at_entry": {
+        "trend_strength": 14.337038000053159,
+        "volatility_pctl": 7.5,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1794985200000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -1288,54 +1330,8 @@
       "score_raw": 0.8162676042444903,
       "grade_raw": "A+",
       "tg_message_id": 10279,
-      "_last_checked_t": 1794984300000,
+      "_last_checked_t": 1794985200000,
       "active_sl": 75.92699999999999,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "XRP-Mean Reversion-1794976236571",
-      "symbol": "XRP",
-      "asset_class": "crypto",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.9844608987875801,
-      "sl": 0.9917908,
-      "tp1": 0.96972,
-      "tp2": 0.96584,
-      "rr1": 2.0110637729473138,
-      "rr2": 2.5404024212534733,
-      "confidence": 0.7957582375112673,
-      "grade": "A",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 14.337038000053159,
-        "volatility_pctl": 7.5,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 4,
-      "status": "active",
-      "created_ts": 1794976236571,
-      "filled_ts": 1794978900000,
-      "mae_r": 0.7011146621883755,
-      "mfe_r": 0.38894095635962694,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.7957582375112673,
-      "grade_raw": "A",
-      "tg_message_id": 10287,
-      "_last_checked_t": 1794984300000,
-      "active_sl": 0.9917908,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -1343,5 +1339,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794985244049
+  "last_run_ts": 1794986131182
 }
