@@ -195,15 +195,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 113,
-        "rejected": 113
+        "seen": 114,
+        "rejected": 114
       },
       "liquidity_sanity": {
-        "seen": 177,
+        "seen": 178,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 177,
+        "seen": 178,
         "rejected": 0
       }
     },
@@ -1278,7 +1278,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 7,
+      "pending_bars": 8,
       "status": "pending",
       "created_ts": 1794960044135,
       "filled_ts": null,
@@ -1289,7 +1289,7 @@
       "score_raw": 0.8355336667493551,
       "grade_raw": "A+",
       "tg_message_id": 10277,
-      "_last_checked_t": 1794964500000,
+      "_last_checked_t": 1794965400000,
       "active_sl": 1844.99315,
       "be_armed": false,
       "partial_done": false,
@@ -1324,7 +1324,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 7,
+      "pending_bars": 8,
       "status": "pending",
       "created_ts": 1794960044135,
       "filled_ts": null,
@@ -1335,7 +1335,7 @@
       "score_raw": 0.8107266156125968,
       "grade_raw": "A+",
       "tg_message_id": 10278,
-      "_last_checked_t": 1794964500000,
+      "_last_checked_t": 1794965400000,
       "active_sl": 9.41878,
       "be_armed": false,
       "partial_done": false,
@@ -1375,13 +1375,13 @@
       "created_ts": 1794963641531,
       "filled_ts": 1794963600000,
       "mae_r": 0.07820458680215837,
-      "mfe_r": 0.4218481962017948,
+      "mfe_r": 0.5407286691423615,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8162676042444903,
       "grade_raw": "A+",
       "tg_message_id": 10279,
-      "_last_checked_t": 1794964500000,
+      "_last_checked_t": 1794965400000,
       "active_sl": 75.92699999999999,
       "be_armed": false,
       "partial_done": false,
@@ -1416,7 +1416,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 3,
+      "pending_bars": 4,
       "status": "pending",
       "created_ts": 1794963641531,
       "filled_ts": null,
@@ -1427,7 +1427,7 @@
       "score_raw": 0.8502421448263473,
       "grade_raw": "A+",
       "tg_message_id": 10280,
-      "_last_checked_t": 1794964500000,
+      "_last_checked_t": 1794965400000,
       "active_sl": 0.0605084,
       "be_armed": false,
       "partial_done": false,
@@ -1436,5 +1436,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1794965443077
+  "last_run_ts": 1794966327620
 }
