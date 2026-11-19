@@ -145,10 +145,10 @@
         "sum_r": -1.0
       },
       "ETH|range|intraday|Reversal": {
-        "n": 1,
+        "n": 2,
         "wins": 1,
-        "losses": 0,
-        "sum_r": 1.61325802615936
+        "losses": 1,
+        "sum_r": 0.6132580261593601
       }
     },
     "calibration_buckets": {
@@ -183,9 +183,9 @@
         "sum_conf": 1.5510490243382056
       },
       "Reversal|A+": {
-        "n": 2,
+        "n": 3,
         "wins": 2,
-        "sum_conf": 1.6423349336947393
+        "sum_conf": 2.4655012703134807
       },
       "Mean Reversion|A": {
         "n": 1,
@@ -214,7 +214,7 @@
       },
       "Reversal|pending": {
         "dispatched": 7,
-        "filled": 4,
+        "filled": 5,
         "expired": 1
       },
       "Range Trading|pending": {
@@ -229,11 +229,11 @@
         "rejected": 130
       },
       "liquidity_sanity": {
-        "seen": 202,
+        "seen": 203,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 202,
+        "seen": 203,
         "rejected": 0
       }
     },
@@ -284,7 +284,7 @@
       },
       "ETH": {
         "direction": "bearish",
-        "until_ts": 1794960000000
+        "until_ts": 1795116600000
       },
       "XRP": {
         "direction": "bearish",
@@ -1546,6 +1546,39 @@
       "exit_model": "managed",
       "tp1_hit": true,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "ETH-Reversal-1795110346939",
+      "symbol": "ETH",
+      "asset_class": "crypto",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 1777.5968,
+      "sl": 1790.4999999999998,
+      "tp1": 1750.1,
+      "tp2": 1749.8,
+      "r_realized": -1.0,
+      "mae_r": 1.0000000000000175,
+      "mfe_r": 0.7360034720069681,
+      "forensic_category": "structural_invalidation_too_tight",
+      "confidence": 0.8231663366187412,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8231663366187412,
+      "regime_at_entry": {
+        "trend_strength": 18.030417959650798,
+        "volatility_pctl": 30.833333333333332,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1795113000000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -1582,62 +1615,15 @@
       "status": "active",
       "created_ts": 1795109439921,
       "filled_ts": 1795108500000,
-      "mae_r": 0.8150594451783414,
+      "mae_r": 0.9888001837918524,
       "mfe_r": 1.859973579920746,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.802440990793532,
       "grade_raw": "A+",
       "tg_message_id": 10377,
-      "_last_checked_t": 1795112100000,
+      "_last_checked_t": 1795113000000,
       "active_sl": 0.980078,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "ETH-Reversal-1795110346939",
-      "symbol": "ETH",
-      "asset_class": "crypto",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 1777.5968,
-      "sl": 1790.4999999999998,
-      "tp1": 1750.1,
-      "tp2": 1749.8,
-      "rr1": 2.131006262012576,
-      "rr2": 2.154256308512666,
-      "confidence": 0.8231663366187412,
-      "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 18.030417959650798,
-        "volatility_pctl": 30.833333333333332,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1795110346939,
-      "filled_ts": 1795109400000,
-      "mae_r": 0.8372496744993704,
-      "mfe_r": 0.7360034720069681,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8231663366187412,
-      "grade_raw": "A+",
-      "tg_message_id": 10379,
-      "_last_checked_t": 1795112100000,
-      "active_sl": 1790.4999999999998,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -1671,7 +1657,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1795113043332,
       "filled_ts": null,
@@ -1682,7 +1668,7 @@
       "score_raw": 0.7582168852814704,
       "grade_raw": "A",
       "tg_message_id": 10380,
-      "_last_checked_t": 1795111200000,
+      "_last_checked_t": 1795113000000,
       "active_sl": 200.91600000000003,
       "be_armed": false,
       "partial_done": false,
@@ -1691,5 +1677,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795113043332
+  "last_run_ts": 1795113933911
 }
