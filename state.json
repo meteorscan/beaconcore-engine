@@ -1510,7 +1510,7 @@
       "score_raw": 0.7464692742207646,
       "grade_raw": "A",
       "tg_message_id": 10369,
-      "_last_checked_t": 1795096800000,
+      "_last_checked_t": 1795097700000,
       "active_sl": 0.995064,
       "be_armed": false,
       "partial_done": false,
@@ -1519,5 +1519,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795097731299
+  "last_run_ts": 1795098644814
 }
