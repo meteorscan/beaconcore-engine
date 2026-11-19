@@ -203,7 +203,7 @@
         "expired": 5
       },
       "Momentum|pending": {
-        "dispatched": 15,
+        "dispatched": 16,
         "filled": 10,
         "expired": 4
       },
@@ -225,15 +225,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 132,
-        "rejected": 132
+        "seen": 134,
+        "rejected": 134
       },
       "liquidity_sanity": {
-        "seen": 205,
+        "seen": 207,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 205,
+        "seen": 207,
         "rejected": 0
       }
     },
@@ -1622,7 +1622,7 @@
       "score_raw": 0.802440990793532,
       "grade_raw": "A+",
       "tg_message_id": 10377,
-      "_last_checked_t": 1795116600000,
+      "_last_checked_t": 1795117500000,
       "active_sl": 0.9722377977600001,
       "be_armed": true,
       "partial_done": true,
@@ -1659,7 +1659,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 6,
+      "pending_bars": 7,
       "status": "pending",
       "created_ts": 1795113043332,
       "filled_ts": null,
@@ -1670,7 +1670,7 @@
       "score_raw": 0.7582168852814704,
       "grade_raw": "A",
       "tg_message_id": 10380,
-      "_last_checked_t": 1795116600000,
+      "_last_checked_t": 1795117500000,
       "active_sl": 200.91600000000003,
       "be_armed": false,
       "partial_done": false,
@@ -1711,14 +1711,63 @@
       "created_ts": 1795116644561,
       "filled_ts": 1795115700000,
       "mae_r": 0.0331584019207408,
-      "mfe_r": 0.820941949739387,
+      "mfe_r": 1.1967461044698509,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8393551607966672,
       "grade_raw": "A+",
       "tg_message_id": 10382,
+      "_last_checked_t": 1795117500000,
+      "active_sl": 1779.908413337795,
+      "be_armed": true,
+      "partial_done": true,
+      "banked_r": 0.55,
+      "tp1_hit": false,
+      "be_ts": 1795117500000,
+      "partial_ts": 1795117500000
+    },
+    {
+      "id": "AAVE-Momentum-1795118445065",
+      "symbol": "AAVE",
+      "asset_class": "crypto",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 105.52544410877373,
+      "sl": 106.38000000000001,
+      "tp1": 103.6454211480759,
+      "tp2": 102.54,
+      "rr1": 2.2,
+      "rr2": 3.4935621407859268,
+      "confidence": 0.8370928816443685,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 20.727282048892253,
+        "volatility_pctl": 69.16666666666667,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795118445065,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8370928816443685,
+      "grade_raw": "A+",
+      "tg_message_id": 10388,
       "_last_checked_t": 1795116600000,
-      "active_sl": 1793.22,
+      "active_sl": 106.38000000000001,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -1726,5 +1775,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795117531698
+  "last_run_ts": 1795118445065
 }
