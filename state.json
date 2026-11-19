@@ -149,6 +149,12 @@
         "wins": 1,
         "losses": 1,
         "sum_r": 0.6132580261593601
+      },
+      "ETH|range|intraday|Momentum": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 1.6500000000000001
       }
     },
     "calibration_buckets": {
@@ -163,9 +169,9 @@
         "sum_conf": 3.0993407583881094
       },
       "Momentum|A+": {
-        "n": 10,
-        "wins": 2,
-        "sum_conf": 8.586072470631013
+        "n": 11,
+        "wins": 3,
+        "sum_conf": 9.42542763142768
       },
       "Mean Reversion|A+": {
         "n": 11,
@@ -204,7 +210,7 @@
       },
       "Momentum|pending": {
         "dispatched": 16,
-        "filled": 10,
+        "filled": 11,
         "expired": 4
       },
       "Mean Reversion|pending": {
@@ -225,15 +231,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 135,
-        "rejected": 135
+        "seen": 136,
+        "rejected": 136
       },
       "liquidity_sanity": {
-        "seen": 208,
+        "seen": 209,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 208,
+        "seen": 209,
         "rejected": 0
       }
     },
@@ -1579,6 +1585,39 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "ETH-Momentum-1795116644561",
+      "symbol": "ETH",
+      "asset_class": "crypto",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 1781.511773934336,
+      "sl": 1793.22,
+      "tp1": 1755.7536765898749,
+      "tp2": 1750.1,
+      "r_realized": 1.6500000000000001,
+      "mae_r": 0.0331584019207408,
+      "mfe_r": 2.4778966319600424,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8393551607966672,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8393551607966672,
+      "regime_at_entry": {
+        "trend_strength": 19.86305306359639,
+        "volatility_pctl": 51.666666666666664,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1795119300000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": true,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -1616,13 +1655,13 @@
       "created_ts": 1795109439921,
       "filled_ts": 1795108500000,
       "mae_r": 0.9888001837918524,
-      "mfe_r": 1.859973579920746,
+      "mfe_r": 2.1112515076675775,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.802440990793532,
       "grade_raw": "A+",
       "tg_message_id": 10377,
-      "_last_checked_t": 1795118400000,
+      "_last_checked_t": 1795119300000,
       "active_sl": 0.9722377977600001,
       "be_armed": true,
       "partial_done": true,
@@ -1659,7 +1698,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 8,
+      "pending_bars": 9,
       "status": "pending",
       "created_ts": 1795113043332,
       "filled_ts": null,
@@ -1670,61 +1709,12 @@
       "score_raw": 0.7582168852814704,
       "grade_raw": "A",
       "tg_message_id": 10380,
-      "_last_checked_t": 1795118400000,
+      "_last_checked_t": 1795119300000,
       "active_sl": 200.91600000000003,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
       "tp1_hit": false
-    },
-    {
-      "id": "ETH-Momentum-1795116644561",
-      "symbol": "ETH",
-      "asset_class": "crypto",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 1781.511773934336,
-      "sl": 1793.22,
-      "tp1": 1755.7536765898749,
-      "tp2": 1750.1,
-      "rr1": 2.2,
-      "rr2": 2.682880716358481,
-      "confidence": 0.8393551607966672,
-      "grade": "A+",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 19.86305306359639,
-        "volatility_pctl": 51.666666666666664,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1795116644561,
-      "filled_ts": 1795115700000,
-      "mae_r": 0.0331584019207408,
-      "mfe_r": 2.1875025123955916,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8393551607966672,
-      "grade_raw": "A+",
-      "tg_message_id": 10382,
-      "_last_checked_t": 1795118400000,
-      "active_sl": 1779.908413337795,
-      "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.55,
-      "tp1_hit": false,
-      "be_ts": 1795117500000,
-      "partial_ts": 1795117500000
     },
     {
       "id": "AAVE-Momentum-1795118445065",
@@ -1760,20 +1750,22 @@
       "created_ts": 1795118445065,
       "filled_ts": 1795117500000,
       "mae_r": 0.22766900705240692,
-      "mfe_r": 0.8489135891775557,
+      "mfe_r": 1.1882711466848166,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8370928816443685,
       "grade_raw": "A+",
       "tg_message_id": 10388,
-      "_last_checked_t": 1795118400000,
-      "active_sl": 106.38000000000001,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
+      "_last_checked_t": 1795119300000,
+      "active_sl": 105.43047120907583,
+      "be_armed": true,
+      "partial_done": true,
+      "banked_r": 0.55,
+      "tp1_hit": false,
+      "be_ts": 1795119300000,
+      "partial_ts": 1795119300000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795119329870
+  "last_run_ts": 1795120247239
 }
