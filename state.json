@@ -195,7 +195,7 @@
         "expired": 4
       },
       "Mean Reversion|pending": {
-        "dispatched": 16,
+        "dispatched": 17,
         "filled": 10,
         "expired": 5
       },
@@ -212,15 +212,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 124,
-        "rejected": 124
+        "seen": 125,
+        "rejected": 125
       },
       "liquidity_sanity": {
-        "seen": 191,
+        "seen": 192,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 191,
+        "seen": 192,
         "rejected": 0
       }
     },
@@ -1410,7 +1410,7 @@
       "score_raw": 0.8073116716442935,
       "grade_raw": "A+",
       "tg_message_id": 10341,
-      "_last_checked_t": 1795077000000,
+      "_last_checked_t": 1795077900000,
       "active_sl": 0.05991986,
       "be_armed": false,
       "partial_done": false,
@@ -1456,8 +1456,54 @@
       "score_raw": 0.8163007878244025,
       "grade_raw": "A+",
       "tg_message_id": 10345,
-      "_last_checked_t": 1795077000000,
+      "_last_checked_t": 1795077900000,
       "active_sl": 75.67559999999999,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "TAO-Mean Reversion-1795078845957",
+      "symbol": "TAO",
+      "asset_class": "crypto",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 197.87425659183018,
+      "sl": 199.251,
+      "tp1": 194.84542109385654,
+      "tp2": 194.0533333333333,
+      "rr1": 2.2,
+      "rr2": 2.7753343403155974,
+      "confidence": 0.8180565892110699,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 17.3789425579244,
+        "volatility_pctl": 11.666666666666666,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795078845957,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8180565892110699,
+      "grade_raw": "A+",
+      "tg_message_id": 10355,
+      "_last_checked_t": 1795077000000,
+      "active_sl": 199.251,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -1465,5 +1511,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795077943132
+  "last_run_ts": 1795078845957
 }
