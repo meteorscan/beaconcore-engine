@@ -235,7 +235,7 @@
       "Momentum|pending": {
         "dispatched": 21,
         "filled": 16,
-        "expired": 4
+        "expired": 5
       },
       "Mean Reversion|pending": {
         "dispatched": 17,
@@ -245,7 +245,7 @@
       "Reversal|pending": {
         "dispatched": 9,
         "filled": 7,
-        "expired": 1
+        "expired": 2
       },
       "Range Trading|pending": {
         "dispatched": 2,
@@ -1880,102 +1880,7 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [
-    {
-      "id": "LINK-Momentum-1795230047191",
-      "symbol": "LINK",
-      "asset_class": "crypto",
-      "engine": "Momentum",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 8.521847813243008,
-      "sl": 8.6282196,
-      "tp1": 8.3077,
-      "tp2": 8.2757,
-      "rr1": 2.0132012422827215,
-      "rr2": 2.3140328911211934,
-      "confidence": 0.5851788984528492,
-      "grade": "A+",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 37.35881259915366,
-        "volatility_pctl": 90.83333333333333,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1795230047191,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.837024463572365,
-      "grade_raw": "A+",
-      "tg_message_id": 10516,
-      "_last_checked_t": 1795238100000,
-      "active_sl": 8.6282196,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "DOGE-Reversal-1795230047191",
-      "symbol": "DOGE",
-      "asset_class": "crypto",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.05454344,
-      "sl": 0.054908700000000005,
-      "tp1": 0.05373986799999998,
-      "tp2": 0.053393,
-      "rr1": 2.2,
-      "rr2": 3.149646826917747,
-      "confidence": 0.8304735346978472,
-      "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 45.32246249583893,
-        "volatility_pctl": 88.33333333333333,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1795230047191,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8304735346978472,
-      "grade_raw": "A+",
-      "tg_message_id": 10517,
-      "_last_checked_t": 1795238100000,
-      "active_sl": 0.054908700000000005,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    }
-  ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1795239036318
+  "last_run_ts": 1795239937032
 }
