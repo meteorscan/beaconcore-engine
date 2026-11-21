@@ -228,7 +228,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 17,
+        "dispatched": 18,
         "filled": 11,
         "expired": 6
       },
@@ -255,15 +255,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 148,
-        "rejected": 148
+        "seen": 149,
+        "rejected": 149
       },
       "liquidity_sanity": {
-        "seen": 231,
+        "seen": 232,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 231,
+        "seen": 232,
         "rejected": 0
       }
     },
@@ -1914,7 +1914,54 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "ETH-Liquidity Sweep-1795264238522",
+      "symbol": "ETH",
+      "asset_class": "crypto",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1661.4728,
+      "sl": 1674.6999999999998,
+      "tp1": 1632.3729600000004,
+      "tp2": 1623.0,
+      "rr1": 2.2,
+      "rr2": 2.908612555945367,
+      "confidence": 0.8340293014222686,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 39.41871670907607,
+        "volatility_pctl": 95.83333333333333,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795264238522,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8340293014222686,
+      "grade_raw": "A+",
+      "tg_message_id": 10556,
+      "_last_checked_t": 1795262400000,
+      "active_sl": 1674.6999999999998,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1795263331753
+  "last_run_ts": 1795264238522
 }
