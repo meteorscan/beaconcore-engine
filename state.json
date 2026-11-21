@@ -169,10 +169,16 @@
         "sum_r": 1.7587126099730432
       },
       "LTC|trend|intraday|Momentum": {
-        "n": 1,
-        "wins": 0,
+        "n": 2,
+        "wins": 1,
         "losses": 1,
-        "sum_r": -1.0
+        "sum_r": 0.5300487267674145
+      },
+      "TAO|trend|intraday|Reversal": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 1.5081825168397136
       }
     },
     "calibration_buckets": {
@@ -187,9 +193,9 @@
         "sum_conf": 3.0993407583881094
       },
       "Momentum|A+": {
-        "n": 15,
-        "wins": 5,
-        "sum_conf": 12.823320347013649
+        "n": 16,
+        "wins": 6,
+        "sum_conf": 13.663524376330884
       },
       "Mean Reversion|A+": {
         "n": 11,
@@ -207,9 +213,9 @@
         "sum_conf": 1.5510490243382056
       },
       "Reversal|A+": {
-        "n": 4,
-        "wins": 3,
-        "sum_conf": 3.2679422611070126
+        "n": 5,
+        "wins": 4,
+        "sum_conf": 4.07382823424897
       },
       "Mean Reversion|A": {
         "n": 1,
@@ -228,7 +234,7 @@
       },
       "Momentum|pending": {
         "dispatched": 21,
-        "filled": 15,
+        "filled": 16,
         "expired": 4
       },
       "Mean Reversion|pending": {
@@ -238,7 +244,7 @@
       },
       "Reversal|pending": {
         "dispatched": 9,
-        "filled": 6,
+        "filled": 7,
         "expired": 1
       },
       "Range Trading|pending": {
@@ -1806,9 +1812,7 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "LTC-Momentum-1795226443546",
       "symbol": "LTC",
@@ -1816,47 +1820,31 @@
       "engine": "Momentum",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 40.51538657151804,
       "sl": 40.9337,
       "tp1": 39.662,
       "tp2": 39.55,
-      "rr1": 2.0400649690232195,
-      "rr2": 2.3078067921974004,
+      "r_realized": 1.5300487267674145,
+      "mae_r": 0.4843579351904524,
+      "mfe_r": 5.331855062870017,
+      "forensic_category": "genuine_variance",
       "confidence": 0.5867686813252838,
       "grade": "A+",
-      "confluences": [
-        "1H RSI momentum",
-        "15M EMA stack alignment",
-        "EMA pullback entry"
-      ],
+      "grade_raw": "A+",
+      "score_raw": 0.8402040293172343,
       "regime_at_entry": {
         "trend_strength": 49.85838245953435,
         "volatility_pctl": 90.0,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1795226443546,
-      "filled_ts": 1795226400000,
-      "mae_r": 0.4843579351904524,
-      "mfe_r": 1.829696393672079,
-      "resolution_logic_version": "1.1.0",
+      "regime_src": "entry",
+      "resolved_ts": 1795231800000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
       "exit_model": "managed",
-      "score_raw": 0.8402040293172343,
-      "grade_raw": "A+",
-      "tg_message_id": 10508,
-      "_last_checked_t": 1795230900000,
-      "active_sl": 40.478922723603674,
-      "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.5100162422558049,
-      "tp1_hit": false,
-      "be_ts": 1795229100000,
-      "partial_ts": 1795229100000
+      "tp1_hit": true,
+      "resolution_logic_version": "1.1.0"
     },
     {
       "id": "TAO-Reversal-1795229129210",
@@ -1865,48 +1853,34 @@
       "engine": "Reversal",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 179.80784,
       "sl": 182.46228,
       "tp1": 174.47,
       "tp2": 174.1,
-      "rr1": 2.0109100224529515,
-      "rr2": 2.1502991214719556,
+      "r_realized": 1.5081825168397136,
+      "mae_r": 0.0648573710462438,
+      "mfe_r": 4.2147646961317715,
+      "forensic_category": "genuine_variance",
       "confidence": 0.8058859731419578,
       "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
+      "grade_raw": "A+",
+      "score_raw": 0.8058859731419578,
       "regime_at_entry": {
         "trend_strength": 33.92530454135945,
         "volatility_pctl": 91.66666666666667,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1795229129210,
-      "filled_ts": 1795228200000,
-      "mae_r": 0.0648573710462438,
-      "mfe_r": 1.4684227181627805,
-      "resolution_logic_version": "1.1.0",
+      "regime_src": "entry",
+      "resolved_ts": 1795231800000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
       "exit_model": "managed",
-      "score_raw": 0.8058859731419578,
-      "grade_raw": "A+",
-      "tg_message_id": 10513,
-      "_last_checked_t": 1795230900000,
-      "active_sl": 179.646012944,
-      "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.5027275056132379,
-      "tp1_hit": false,
-      "be_ts": 1795230000000,
-      "partial_ts": 1795230000000
-    },
+      "tp1_hit": true,
+      "resolution_logic_version": "1.1.0"
+    }
+  ],
+  "active_signals": [
     {
       "id": "LINK-Momentum-1795230047191",
       "symbol": "LINK",
@@ -1936,7 +1910,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 3,
+      "pending_bars": 4,
       "status": "pending",
       "created_ts": 1795230047191,
       "filled_ts": null,
@@ -1947,7 +1921,7 @@
       "score_raw": 0.837024463572365,
       "grade_raw": "A+",
       "tg_message_id": 10516,
-      "_last_checked_t": 1795230900000,
+      "_last_checked_t": 1795231800000,
       "active_sl": 8.6282196,
       "be_armed": false,
       "partial_done": false,
@@ -1983,7 +1957,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 3,
+      "pending_bars": 4,
       "status": "pending",
       "created_ts": 1795230047191,
       "filled_ts": null,
@@ -1994,7 +1968,7 @@
       "score_raw": 0.8304735346978472,
       "grade_raw": "A+",
       "tg_message_id": 10517,
-      "_last_checked_t": 1795230900000,
+      "_last_checked_t": 1795231800000,
       "active_sl": 0.054908700000000005,
       "be_armed": false,
       "partial_done": false,
@@ -2003,5 +1977,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795231844164
+  "last_run_ts": 1795232726785
 }
