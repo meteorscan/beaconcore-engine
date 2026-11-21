@@ -233,7 +233,7 @@
         "expired": 6
       },
       "Momentum|pending": {
-        "dispatched": 21,
+        "dispatched": 22,
         "filled": 16,
         "expired": 5
       },
@@ -255,15 +255,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 143,
-        "rejected": 143
+        "seen": 144,
+        "rejected": 144
       },
       "liquidity_sanity": {
-        "seen": 224,
+        "seen": 225,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 224,
+        "seen": 225,
         "rejected": 0
       }
     },
@@ -1880,7 +1880,55 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "LTC-Momentum-1795247136389",
+      "symbol": "LTC",
+      "asset_class": "crypto",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 38.86917606555797,
+      "sl": 39.3307,
+      "tp1": 37.85382340978551,
+      "tp2": 37.782,
+      "rr1": 2.2,
+      "rr2": 2.355622286138527,
+      "confidence": 0.6065066142064237,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 52.763889713464735,
+        "volatility_pctl": 100.0,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795247136389,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8534470026932756,
+      "grade_raw": "A+",
+      "tg_message_id": 10545,
+      "_last_checked_t": 1795245300000,
+      "active_sl": 39.3307,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1795246237505
+  "last_run_ts": 1795247136389
 }
