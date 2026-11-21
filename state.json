@@ -237,7 +237,7 @@
         "expired": 5
       },
       "Reversal|pending": {
-        "dispatched": 7,
+        "dispatched": 8,
         "filled": 6,
         "expired": 1
       },
@@ -253,11 +253,11 @@
         "rejected": 142
       },
       "liquidity_sanity": {
-        "seen": 220,
+        "seen": 221,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 220,
+        "seen": 221,
         "rejected": 0
       }
     },
@@ -1843,14 +1843,61 @@
       "created_ts": 1795226443546,
       "filled_ts": 1795226400000,
       "mae_r": 0.4843579351904524,
-      "mfe_r": 0.15630999883347088,
+      "mfe_r": 0.7587291009753732,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8402040293172343,
       "grade_raw": "A+",
       "tg_message_id": 10508,
-      "_last_checked_t": 1795227300000,
+      "_last_checked_t": 1795228200000,
       "active_sl": 40.9337,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "TAO-Reversal-1795229129210",
+      "symbol": "TAO",
+      "asset_class": "crypto",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 179.80784,
+      "sl": 182.46228,
+      "tp1": 174.47,
+      "tp2": 174.1,
+      "rr1": 2.0109100224529515,
+      "rr2": 2.1502991214719556,
+      "confidence": 0.8058859731419578,
+      "grade": "A+",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 33.92530454135945,
+        "volatility_pctl": 91.66666666666667,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795229129210,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8058859731419578,
+      "grade_raw": "A+",
+      "tg_message_id": 10513,
+      "_last_checked_t": 1795227300000,
+      "active_sl": 182.46228,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -1858,5 +1905,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795228251046
+  "last_run_ts": 1795229129210
 }
