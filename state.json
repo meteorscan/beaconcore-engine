@@ -227,7 +227,7 @@
         "expired": 6
       },
       "Momentum|pending": {
-        "dispatched": 19,
+        "dispatched": 20,
         "filled": 15,
         "expired": 4
       },
@@ -253,11 +253,11 @@
         "rejected": 140
       },
       "liquidity_sanity": {
-        "seen": 217,
+        "seen": 218,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 217,
+        "seen": 218,
         "rejected": 0
       }
     },
@@ -1808,7 +1808,55 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "LTC-Momentum-1795226443546",
+      "symbol": "LTC",
+      "asset_class": "crypto",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 40.51538657151804,
+      "sl": 40.9337,
+      "tp1": 39.662,
+      "tp2": 39.55,
+      "rr1": 2.0400649690232195,
+      "rr2": 2.3078067921974004,
+      "confidence": 0.5867686813252838,
+      "grade": "A+",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 49.85838245953435,
+        "volatility_pctl": 90.0,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795226443546,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8402040293172343,
+      "grade_raw": "A+",
+      "tg_message_id": 10508,
+      "_last_checked_t": 1795224600000,
+      "active_sl": 40.9337,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1795225528613
+  "last_run_ts": 1795226443546
 }
