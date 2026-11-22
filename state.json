@@ -285,15 +285,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 198,
-        "rejected": 198
+        "seen": 199,
+        "rejected": 199
       },
       "liquidity_sanity": {
-        "seen": 284,
+        "seen": 285,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 284,
+        "seen": 285,
         "rejected": 0
       }
     },
@@ -2283,7 +2283,7 @@
       "score_raw": 0.8211213377731036,
       "grade_raw": "A+",
       "tg_message_id": 10616,
-      "_last_checked_t": 1795357800000,
+      "_last_checked_t": 1795358700000,
       "active_sl": 0.93187975272,
       "be_armed": true,
       "partial_done": true,
@@ -2320,7 +2320,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 7,
+      "pending_bars": 8,
       "status": "pending",
       "created_ts": 1795353328527,
       "filled_ts": null,
@@ -2331,7 +2331,7 @@
       "score_raw": 0.8651027580828022,
       "grade_raw": "A+",
       "tg_message_id": 10622,
-      "_last_checked_t": 1795357800000,
+      "_last_checked_t": 1795358700000,
       "active_sl": 6.783200000000001,
       "be_armed": false,
       "partial_done": false,
@@ -2365,19 +2365,19 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 0,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1795358729127,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1795357800000,
+      "mae_r": 0.24957798080423158,
+      "mfe_r": 0.8769255886176438,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8472222012485757,
       "grade_raw": "A+",
       "tg_message_id": 10627,
-      "_last_checked_t": 1795356900000,
+      "_last_checked_t": 1795358700000,
       "active_sl": 99.99789799999999,
       "be_armed": false,
       "partial_done": false,
@@ -2386,5 +2386,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795358729127
+  "last_run_ts": 1795359639457
 }
