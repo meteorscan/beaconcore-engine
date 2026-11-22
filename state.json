@@ -234,7 +234,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 20,
+        "dispatched": 21,
         "filled": 13,
         "expired": 6
       },
@@ -261,15 +261,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 164,
-        "rejected": 164
+        "seen": 165,
+        "rejected": 165
       },
       "liquidity_sanity": {
-        "seen": 247,
+        "seen": 248,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 247,
+        "seen": 248,
         "rejected": 0
       }
     },
@@ -2053,15 +2053,62 @@
       "status": "active",
       "created_ts": 1795338044671,
       "filled_ts": 1795337100000,
-      "mae_r": 0.008957066031882004,
-      "mfe_r": 0.6116900290928726,
+      "mae_r": 0.20467248523316955,
+      "mfe_r": 0.6645860883364622,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8014255989287283,
       "grade_raw": "A+",
       "tg_message_id": 10605,
-      "_last_checked_t": 1795338000000,
+      "_last_checked_t": 1795338900000,
       "active_sl": 8.715707,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "ETH-Liquidity Sweep-1795339834035",
+      "symbol": "ETH",
+      "asset_class": "crypto",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1688.0208,
+      "sl": 1699.8,
+      "tp1": 1662.1065600000002,
+      "tp2": 1647.6,
+      "rr1": 2.2,
+      "rr2": 3.431540342298313,
+      "confidence": 0.8335531269905128,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 19.43289430166029,
+        "volatility_pctl": 20.833333333333332,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795339834035,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8335531269905128,
+      "grade_raw": "A+",
+      "tg_message_id": 10606,
+      "_last_checked_t": 1795338000000,
+      "active_sl": 1699.8,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2069,5 +2116,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795338926287
+  "last_run_ts": 1795339834035
 }
