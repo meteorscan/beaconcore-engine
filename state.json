@@ -251,7 +251,7 @@
       "Reversal|pending": {
         "dispatched": 12,
         "filled": 8,
-        "expired": 3
+        "expired": 4
       },
       "Range Trading|pending": {
         "dispatched": 2,
@@ -2020,13 +2020,13 @@
       "created_ts": 1795271436578,
       "filled_ts": 1795270500000,
       "mae_r": 0.1491514163193821,
-      "mfe_r": 1.6476716796521353,
+      "mfe_r": 1.6929697408951163,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8295411547906998,
       "grade_raw": "A+",
       "tg_message_id": 10565,
-      "_last_checked_t": 1795324500000,
+      "_last_checked_t": 1795325400000,
       "active_sl": 1690.92559608,
       "be_armed": true,
       "partial_done": true,
@@ -2034,55 +2034,8 @@
       "tp1_hit": false,
       "be_ts": 1795316400000,
       "partial_ts": 1795316400000
-    },
-    {
-      "id": "LINK-Reversal-1795316447321",
-      "symbol": "LINK",
-      "asset_class": "crypto",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 8.5875288,
-      "sl": 8.6649563,
-      "tp1": 8.417188299999998,
-      "tp2": 8.3328,
-      "rr1": 2.2,
-      "rr2": 3.2899008750120644,
-      "confidence": 0.8234847229251844,
-      "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 15.269835250187397,
-        "volatility_pctl": 21.666666666666668,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1795316447321,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8234847229251844,
-      "grade_raw": "A+",
-      "tg_message_id": 10585,
-      "_last_checked_t": 1795324500000,
-      "active_sl": 8.6649563,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795325436577
+  "last_run_ts": 1795326336599
 }
