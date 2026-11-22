@@ -179,6 +179,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 1.5081825168397136
+      },
+      "SOL|trend|intraday|Reversal": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 1.6500000000000001
       }
     },
     "calibration_buckets": {
@@ -213,9 +219,9 @@
         "sum_conf": 1.5510490243382056
       },
       "Reversal|A+": {
-        "n": 5,
-        "wins": 4,
-        "sum_conf": 4.07382823424897
+        "n": 6,
+        "wins": 5,
+        "sum_conf": 4.908388827473191
       },
       "Mean Reversion|A": {
         "n": 1,
@@ -244,7 +250,7 @@
       },
       "Reversal|pending": {
         "dispatched": 12,
-        "filled": 7,
+        "filled": 8,
         "expired": 3
       },
       "Range Trading|pending": {
@@ -1945,6 +1951,39 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "SOL-Reversal-1795302934517",
+      "symbol": "SOL",
+      "asset_class": "crypto",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 70.477376,
+      "sl": 71.12105,
+      "tp1": 69.06129320000002,
+      "tp2": 68.701,
+      "r_realized": 1.6500000000000001,
+      "mae_r": 0.007183760723584773,
+      "mfe_r": 2.787709306263772,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8345605932242202,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8345605932242202,
+      "regime_at_entry": {
+        "trend_strength": 24.61445876165642,
+        "volatility_pctl": 41.666666666666664,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1795324500000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": true,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -1981,13 +2020,13 @@
       "created_ts": 1795271436578,
       "filled_ts": 1795270500000,
       "mae_r": 0.1491514163193821,
-      "mfe_r": 1.4627045962432996,
+      "mfe_r": 1.6476716796521353,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8295411547906998,
       "grade_raw": "A+",
       "tg_message_id": 10565,
-      "_last_checked_t": 1795323600000,
+      "_last_checked_t": 1795324500000,
       "active_sl": 1690.92559608,
       "be_armed": true,
       "partial_done": true,
@@ -1995,55 +2034,6 @@
       "tp1_hit": false,
       "be_ts": 1795316400000,
       "partial_ts": 1795316400000
-    },
-    {
-      "id": "SOL-Reversal-1795302934517",
-      "symbol": "SOL",
-      "asset_class": "crypto",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 70.477376,
-      "sl": 71.12105,
-      "tp1": 69.06129320000002,
-      "tp2": 68.701,
-      "rr1": 2.2,
-      "rr2": 2.759744839779206,
-      "confidence": 0.8345605932242202,
-      "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 24.61445876165642,
-        "volatility_pctl": 41.666666666666664,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 6,
-      "status": "active",
-      "created_ts": 1795302934517,
-      "filled_ts": 1795307400000,
-      "mae_r": 0.007183760723584773,
-      "mfe_r": 2.1414194141755365,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8345605932242202,
-      "grade_raw": "A+",
-      "tg_message_id": 10581,
-      "_last_checked_t": 1795323600000,
-      "active_sl": 70.41394636160001,
-      "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.55,
-      "tp1_hit": false,
-      "be_ts": 1795314600000,
-      "partial_ts": 1795314600000
     },
     {
       "id": "LINK-Reversal-1795316447321",
@@ -2074,7 +2064,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 10,
+      "pending_bars": 11,
       "status": "pending",
       "created_ts": 1795316447321,
       "filled_ts": null,
@@ -2085,7 +2075,7 @@
       "score_raw": 0.8234847229251844,
       "grade_raw": "A+",
       "tg_message_id": 10585,
-      "_last_checked_t": 1795323600000,
+      "_last_checked_t": 1795324500000,
       "active_sl": 8.6649563,
       "be_armed": false,
       "partial_done": false,
@@ -2094,5 +2084,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795324526084
+  "last_run_ts": 1795325436577
 }
