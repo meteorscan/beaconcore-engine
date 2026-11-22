@@ -268,7 +268,7 @@
         "expired": 5
       },
       "Mean Reversion|pending": {
-        "dispatched": 19,
+        "dispatched": 20,
         "filled": 13,
         "expired": 5
       },
@@ -285,15 +285,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 197,
-        "rejected": 197
+        "seen": 198,
+        "rejected": 198
       },
       "liquidity_sanity": {
-        "seen": 282,
+        "seen": 283,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 282,
+        "seen": 283,
         "rejected": 0
       }
     },
@@ -2250,7 +2250,7 @@
       "score_raw": 0.8211213377731036,
       "grade_raw": "A+",
       "tg_message_id": 10616,
-      "_last_checked_t": 1795353300000,
+      "_last_checked_t": 1795354200000,
       "active_sl": 0.93187975272,
       "be_armed": true,
       "partial_done": true,
@@ -2287,7 +2287,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 2,
+      "pending_bars": 3,
       "status": "pending",
       "created_ts": 1795353328527,
       "filled_ts": null,
@@ -2298,8 +2298,54 @@
       "score_raw": 0.8651027580828022,
       "grade_raw": "A+",
       "tg_message_id": 10622,
-      "_last_checked_t": 1795353300000,
+      "_last_checked_t": 1795354200000,
       "active_sl": 6.783200000000001,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "AAVE-Mean Reversion-1795355126450",
+      "symbol": "AAVE",
+      "asset_class": "crypto",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 99.32078359913655,
+      "sl": 100.06159999999998,
+      "tp1": 97.69098751723699,
+      "tp2": 97.683,
+      "rr1": 2.2,
+      "rr2": 2.210782046979074,
+      "confidence": 0.8622830257120753,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 20.25510587796322,
+        "volatility_pctl": 15.0,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795355126450,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8622830257120753,
+      "grade_raw": "A+",
+      "tg_message_id": 10623,
+      "_last_checked_t": 1795353300000,
+      "active_sl": 100.06159999999998,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2307,5 +2353,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795354235150
+  "last_run_ts": 1795355126450
 }
