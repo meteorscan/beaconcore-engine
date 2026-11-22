@@ -246,7 +246,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 22,
+        "dispatched": 23,
         "filled": 15,
         "expired": 6
       },
@@ -273,15 +273,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 173,
-        "rejected": 173
+        "seen": 176,
+        "rejected": 176
       },
       "liquidity_sanity": {
-        "seen": 258,
+        "seen": 261,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 258,
+        "seen": 261,
         "rejected": 0
       }
     },
@@ -2138,7 +2138,7 @@
       "score_raw": 0.7879678817870501,
       "grade_raw": "A",
       "tg_message_id": 10607,
-      "_last_checked_t": 1795343400000,
+      "_last_checked_t": 1795344300000,
       "active_sl": 71.12105,
       "be_armed": false,
       "partial_done": false,
@@ -2172,20 +2172,66 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 0,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1795344329115,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1795343400000,
+      "mae_r": 0.3285019428620544,
+      "mfe_r": 0.0397389271813299,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8546891001561417,
       "grade_raw": "A+",
       "tg_message_id": 10612,
-      "_last_checked_t": 1795342500000,
+      "_last_checked_t": 1795344300000,
       "active_sl": 1724.7,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "DOGE-Liquidity Sweep-1795345238962",
+      "symbol": "DOGE",
+      "asset_class": "crypto",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.055449952,
+      "sl": 0.0558425,
+      "tp1": 0.054586346399999985,
+      "tp2": 0.054217,
+      "rr1": 2.2,
+      "rr2": 3.1408948714551475,
+      "confidence": 0.8140477359409395,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 19.457686690277917,
+        "volatility_pctl": 26.666666666666668,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795345238962,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8140477359409395,
+      "grade_raw": "A+",
+      "tg_message_id": 10613,
+      "_last_checked_t": 1795343400000,
+      "active_sl": 0.0558425,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2193,5 +2239,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795344329115
+  "last_run_ts": 1795345238962
 }
