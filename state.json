@@ -284,22 +284,22 @@
         "expired": 4
       },
       "Range Trading|pending": {
-        "dispatched": 2,
+        "dispatched": 3,
         "filled": 1,
         "expired": 1
       }
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 201,
-        "rejected": 201
+        "seen": 203,
+        "rejected": 203
       },
       "liquidity_sanity": {
-        "seen": 292,
+        "seen": 294,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 292,
+        "seen": 294,
         "rejected": 0
       }
     },
@@ -2421,8 +2421,54 @@
       "score_raw": 0.7419700660904553,
       "grade_raw": "A",
       "tg_message_id": 10648,
-      "_last_checked_t": 1795404600000,
+      "_last_checked_t": 1795405500000,
       "active_sl": 191.94175,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "LTC-Range Trading-1795406446817",
+      "symbol": "LTC",
+      "asset_class": "crypto",
+      "engine": "Range Trading",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 40.517,
+      "sl": 40.887847,
+      "tp1": 39.701136600000005,
+      "tp2": 39.662,
+      "rr1": 2.2,
+      "rr2": 2.3055330095700093,
+      "confidence": 0.8589217055253341,
+      "grade": "A+",
+      "confluences": [
+        "range extreme rejection",
+        "range-boundary entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 13.305998020359288,
+        "volatility_pctl": 11.666666666666666,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795406446817,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8589217055253341,
+      "grade_raw": "A+",
+      "tg_message_id": 10654,
+      "_last_checked_t": 1795404600000,
+      "active_sl": 40.887847,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2430,5 +2476,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795405528194
+  "last_run_ts": 1795406446817
 }
