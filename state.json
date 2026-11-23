@@ -227,6 +227,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 0.511176592030917
+      },
+      "LTC|range|intraday|Mean Reversion": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -246,9 +252,9 @@
         "sum_conf": 14.51697137902416
       },
       "Mean Reversion|A+": {
-        "n": 14,
+        "n": 15,
         "wins": 3,
-        "sum_conf": 11.787476690609115
+        "sum_conf": 12.647323497678956
       },
       "Range Trading|A+": {
         "n": 2,
@@ -287,7 +293,7 @@
       },
       "Mean Reversion|pending": {
         "dispatched": 23,
-        "filled": 15,
+        "filled": 16,
         "expired": 6
       },
       "Reversal|pending": {
@@ -374,7 +380,7 @@
       },
       "LTC": {
         "direction": "bearish",
-        "until_ts": 1795417200000
+        "until_ts": 1795438800000
       }
     }
   },
@@ -2490,6 +2496,39 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "LTC-Mean Reversion-1795417239828",
+      "symbol": "LTC",
+      "asset_class": "crypto",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 40.60987292543124,
+      "sl": 40.963,
+      "tp1": 39.83299336137997,
+      "tp2": 39.662,
+      "r_realized": -1.0,
+      "mae_r": 1.1189373543540724,
+      "mfe_r": 0.486716929425843,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8598468070698413,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8598468070698413,
+      "regime_at_entry": {
+        "trend_strength": 16.340783203282523,
+        "volatility_pctl": 13.333333333333334,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1795435200000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -2532,54 +2571,8 @@
       "score_raw": 0.8548410562622233,
       "grade_raw": "A+",
       "tg_message_id": 10656,
-      "_last_checked_t": 1795434300000,
+      "_last_checked_t": 1795435200000,
       "active_sl": 0.056049,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "LTC-Mean Reversion-1795417239828",
-      "symbol": "LTC",
-      "asset_class": "crypto",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 40.60987292543124,
-      "sl": 40.963,
-      "tp1": 39.83299336137997,
-      "tp2": 39.662,
-      "rr1": 2.2,
-      "rr2": 2.684226143205771,
-      "confidence": 0.8598468070698413,
-      "grade": "A+",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 16.340783203282523,
-        "volatility_pctl": 13.333333333333334,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1795417239828,
-      "filled_ts": 1795416300000,
-      "mae_r": 0.9263721139712819,
-      "mfe_r": 0.486716929425843,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8598468070698413,
-      "grade_raw": "A+",
-      "tg_message_id": 10658,
-      "_last_checked_t": 1795434300000,
-      "active_sl": 40.963,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2619,13 +2612,13 @@
       "created_ts": 1795423528484,
       "filled_ts": 1795424400000,
       "mae_r": 0.48379253346343587,
-      "mfe_r": 1.2678474017341068,
+      "mfe_r": 1.3281542539631066,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7904744556671522,
       "grade_raw": "A",
       "tg_message_id": 10668,
-      "_last_checked_t": 1795434300000,
+      "_last_checked_t": 1795435200000,
       "active_sl": 559.541079392,
       "be_armed": true,
       "partial_done": true,
@@ -2636,5 +2629,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795435243226
+  "last_run_ts": 1795436127225
 }
