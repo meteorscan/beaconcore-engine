@@ -175,10 +175,10 @@
         "sum_r": -0.46995127323258545
       },
       "TAO|trend|intraday|Reversal": {
-        "n": 1,
-        "wins": 1,
+        "n": 2,
+        "wins": 2,
         "losses": 0,
-        "sum_r": 1.5081825168397136
+        "sum_r": 2.039540716617007
       },
       "SOL|trend|intraday|Reversal": {
         "n": 1,
@@ -238,9 +238,9 @@
         "sum_conf": 0.8603462150990661
       },
       "Reversal|A": {
-        "n": 2,
+        "n": 3,
         "wins": 1,
-        "sum_conf": 1.5510490243382056
+        "sum_conf": 2.31383470432801
       },
       "Reversal|A+": {
         "n": 7,
@@ -273,8 +273,8 @@
         "expired": 6
       },
       "Reversal|pending": {
-        "dispatched": 14,
-        "filled": 9,
+        "dispatched": 16,
+        "filled": 10,
         "expired": 4
       },
       "Range Trading|pending": {
@@ -285,15 +285,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 200,
-        "rejected": 200
+        "seen": 201,
+        "rejected": 201
       },
       "liquidity_sanity": {
-        "seen": 288,
+        "seen": 290,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 288,
+        "seen": 290,
         "rejected": 0
       }
     },
@@ -2306,9 +2306,7 @@
       "exit_model": "managed",
       "tp1_hit": true,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "TAO-Reversal-1795372235677",
       "symbol": "TAO",
@@ -2316,15 +2314,50 @@
       "engine": "Reversal",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 190.13664,
       "sl": 191.94175,
       "tp1": 186.3,
       "tp2": 185.81,
-      "rr1": 2.1254327991091735,
-      "rr2": 2.3968844003966328,
+      "r_realized": 0.5313581997772934,
+      "mae_r": 0.688800128524016,
+      "mfe_r": 1.4772728531779122,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7627856799898045,
+      "grade": "A",
+      "grade_raw": "A",
+      "score_raw": 0.7627856799898045,
+      "regime_at_entry": {
+        "trend_strength": 25.60142052748404,
+        "volatility_pctl": 1.6666666666666667,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1795402800000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
+    }
+  ],
+  "active_signals": [
+    {
+      "id": "TAO-Reversal-1795403726767",
+      "symbol": "TAO",
+      "asset_class": "crypto",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 190.07479999999998,
+      "sl": 191.94175,
+      "tp1": 186.3,
+      "tp2": 185.81,
+      "rr1": 2.0219073890569685,
+      "rr2": 2.284367551353763,
+      "confidence": 0.7419700660904553,
       "grade": "A",
       "confluences": [
         "1H liquidity sweep",
@@ -2332,33 +2365,78 @@
         "OTE retracement entry"
       ],
       "regime_at_entry": {
-        "trend_strength": 25.60142052748404,
+        "trend_strength": 23.38919464442879,
         "volatility_pctl": 1.6666666666666667,
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 3,
-      "status": "active",
-      "created_ts": 1795372235677,
-      "filled_ts": 1795374000000,
-      "mae_r": 0.688800128524016,
-      "mfe_r": 1.4772728531779122,
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795403726767,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
-      "score_raw": 0.7627856799898045,
+      "score_raw": 0.7419700660904553,
       "grade_raw": "A",
-      "tg_message_id": 10633,
+      "tg_message_id": 10648,
       "_last_checked_t": 1795401900000,
-      "active_sl": 189.965517024,
-      "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.5313581997772934,
-      "tp1_hit": false,
-      "be_ts": 1795401000000,
-      "partial_ts": 1795401000000
+      "active_sl": 191.94175,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "DOGE-Reversal-1795403726767",
+      "symbol": "DOGE",
+      "asset_class": "crypto",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.055086536000000005,
+      "sl": 0.05561305749999999,
+      "tp1": 0.05392818870000003,
+      "tp2": 0.053749,
+      "rr1": 2.2,
+      "rr2": 2.540325513773014,
+      "confidence": 0.8158446337976357,
+      "grade": "A+",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 10.175401084206372,
+        "volatility_pctl": 2.5,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795403726767,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8158446337976357,
+      "grade_raw": "A+",
+      "tg_message_id": 10649,
+      "_last_checked_t": 1795401900000,
+      "active_sl": 0.05561305749999999,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795402852862
+  "last_run_ts": 1795403726767
 }
