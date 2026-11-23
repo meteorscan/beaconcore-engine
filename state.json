@@ -215,6 +215,12 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "LTC|range|intraday|Range Trading": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -239,9 +245,9 @@
         "sum_conf": 11.787476690609115
       },
       "Range Trading|A+": {
-        "n": 1,
+        "n": 2,
         "wins": 1,
-        "sum_conf": 0.8603462150990661
+        "sum_conf": 1.7192679206244001
       },
       "Reversal|A": {
         "n": 3,
@@ -285,7 +291,7 @@
       },
       "Range Trading|pending": {
         "dispatched": 3,
-        "filled": 1,
+        "filled": 2,
         "expired": 1
       }
     },
@@ -295,11 +301,11 @@
         "rejected": 215
       },
       "liquidity_sanity": {
-        "seen": 316,
+        "seen": 317,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 316,
+        "seen": 317,
         "rejected": 0
       }
     },
@@ -361,7 +367,7 @@
       },
       "LTC": {
         "direction": "bearish",
-        "until_ts": 1795264200000
+        "until_ts": 1795417200000
       }
     }
   },
@@ -2378,6 +2384,39 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "LTC-Range Trading-1795406446817",
+      "symbol": "LTC",
+      "asset_class": "crypto",
+      "engine": "Range Trading",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 40.517,
+      "sl": 40.887847,
+      "tp1": 39.701136600000005,
+      "tp2": 39.662,
+      "r_realized": -1.0,
+      "mae_r": 1.062432755287223,
+      "mfe_r": 0.09437854425141341,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.8589217055253341,
+      "grade": "A+",
+      "grade_raw": "A+",
+      "score_raw": 0.8589217055253341,
+      "regime_at_entry": {
+        "trend_strength": 13.305998020359288,
+        "volatility_pctl": 11.666666666666666,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1795413600000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -2421,54 +2460,8 @@
       "score_raw": 0.7419700660904553,
       "grade_raw": "A",
       "tg_message_id": 10648,
-      "_last_checked_t": 1795412700000,
+      "_last_checked_t": 1795413600000,
       "active_sl": 191.94175,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "LTC-Range Trading-1795406446817",
-      "symbol": "LTC",
-      "asset_class": "crypto",
-      "engine": "Range Trading",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 40.517,
-      "sl": 40.887847,
-      "tp1": 39.701136600000005,
-      "tp2": 39.662,
-      "rr1": 2.2,
-      "rr2": 2.3055330095700093,
-      "confidence": 0.8589217055253341,
-      "grade": "A+",
-      "confluences": [
-        "range extreme rejection",
-        "range-boundary entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 13.305998020359288,
-        "volatility_pctl": 11.666666666666666,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 6,
-      "status": "active",
-      "created_ts": 1795406446817,
-      "filled_ts": 1795410900000,
-      "mae_r": 0.7927797717117807,
-      "mfe_r": 0.09437854425141341,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8589217055253341,
-      "grade_raw": "A+",
-      "tg_message_id": 10654,
-      "_last_checked_t": 1795412700000,
-      "active_sl": 40.887847,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2513,7 +2506,7 @@
       "score_raw": 0.7464232678865647,
       "grade_raw": "A",
       "tg_message_id": 10655,
-      "_last_checked_t": 1795412700000,
+      "_last_checked_t": 1795413600000,
       "active_sl": 563.7280000000001,
       "be_armed": false,
       "partial_done": false,
@@ -2559,7 +2552,7 @@
       "score_raw": 0.8548410562622233,
       "grade_raw": "A+",
       "tg_message_id": 10656,
-      "_last_checked_t": 1795412700000,
+      "_last_checked_t": 1795413600000,
       "active_sl": 0.056049,
       "be_armed": false,
       "partial_done": false,
@@ -2568,5 +2561,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795413641899
+  "last_run_ts": 1795414526611
 }
