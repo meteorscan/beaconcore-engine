@@ -297,15 +297,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 221,
-        "rejected": 221
+        "seen": 222,
+        "rejected": 222
       },
       "liquidity_sanity": {
-        "seen": 327,
+        "seen": 329,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 327,
+        "seen": 329,
         "rejected": 0
       }
     },
@@ -2487,18 +2487,20 @@
       "created_ts": 1795407330690,
       "filled_ts": 1795410900000,
       "mae_r": 0.6415232446838494,
-      "mfe_r": 0.8716803363299971,
+      "mfe_r": 1.066402657607756,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7464232678865647,
       "grade_raw": "A",
       "tg_message_id": 10655,
-      "_last_checked_t": 1795420800000,
-      "active_sl": 563.7280000000001,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
+      "_last_checked_t": 1795421700000,
+      "active_sl": 558.962001032,
+      "be_armed": true,
+      "partial_done": true,
+      "banked_r": 0.511176592030917,
+      "tp1_hit": false,
+      "be_ts": 1795421700000,
+      "partial_ts": 1795421700000
     },
     {
       "id": "DOGE-Mean Reversion-1795407330690",
@@ -2533,13 +2535,13 @@
       "created_ts": 1795407330690,
       "filled_ts": 1795411800000,
       "mae_r": 0.6098561846872447,
-      "mfe_r": 0.5946146545333028,
+      "mfe_r": 0.6338908775513674,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8548410562622233,
       "grade_raw": "A+",
       "tg_message_id": 10656,
-      "_last_checked_t": 1795420800000,
+      "_last_checked_t": 1795421700000,
       "active_sl": 0.056049,
       "be_armed": false,
       "partial_done": false,
@@ -2579,13 +2581,13 @@
       "created_ts": 1795417239828,
       "filled_ts": 1795416300000,
       "mae_r": 0.3543400763636278,
-      "mfe_r": 0.34512484090910367,
+      "mfe_r": 0.486716929425843,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8598468070698413,
       "grade_raw": "A+",
       "tg_message_id": 10658,
-      "_last_checked_t": 1795420800000,
+      "_last_checked_t": 1795421700000,
       "active_sl": 40.963,
       "be_armed": false,
       "partial_done": false,
@@ -2594,5 +2596,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795421726443
+  "last_run_ts": 1795422638937
 }
