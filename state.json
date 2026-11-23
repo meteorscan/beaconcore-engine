@@ -280,7 +280,7 @@
         "expired": 5
       },
       "Mean Reversion|pending": {
-        "dispatched": 22,
+        "dispatched": 23,
         "filled": 15,
         "expired": 6
       },
@@ -297,15 +297,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 219,
-        "rejected": 219
+        "seen": 220,
+        "rejected": 220
       },
       "liquidity_sanity": {
-        "seen": 323,
+        "seen": 325,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 323,
+        "seen": 325,
         "rejected": 0
       }
     },
@@ -2453,14 +2453,14 @@
       "status": "active",
       "created_ts": 1795403726767,
       "filled_ts": 1795403700000,
-      "mae_r": 0.9347866841640012,
+      "mae_r": 0.9615683333779654,
       "mfe_r": 0.28645651999249094,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7419700660904553,
       "grade_raw": "A",
       "tg_message_id": 10648,
-      "_last_checked_t": 1795415400000,
+      "_last_checked_t": 1795416300000,
       "active_sl": 191.94175,
       "be_armed": false,
       "partial_done": false,
@@ -2506,7 +2506,7 @@
       "score_raw": 0.7464232678865647,
       "grade_raw": "A",
       "tg_message_id": 10655,
-      "_last_checked_t": 1795415400000,
+      "_last_checked_t": 1795416300000,
       "active_sl": 563.7280000000001,
       "be_armed": false,
       "partial_done": false,
@@ -2552,8 +2552,54 @@
       "score_raw": 0.8548410562622233,
       "grade_raw": "A+",
       "tg_message_id": 10656,
-      "_last_checked_t": 1795415400000,
+      "_last_checked_t": 1795416300000,
       "active_sl": 0.056049,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "LTC-Mean Reversion-1795417239828",
+      "symbol": "LTC",
+      "asset_class": "crypto",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 40.60987292543124,
+      "sl": 40.963,
+      "tp1": 39.83299336137997,
+      "tp2": 39.662,
+      "rr1": 2.2,
+      "rr2": 2.684226143205771,
+      "confidence": 0.8598468070698413,
+      "grade": "A+",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 16.340783203282523,
+        "volatility_pctl": 13.333333333333334,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795417239828,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8598468070698413,
+      "grade_raw": "A+",
+      "tg_message_id": 10658,
+      "_last_checked_t": 1795415400000,
+      "active_sl": 40.963,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2561,5 +2607,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795416334076
+  "last_run_ts": 1795417239828
 }
