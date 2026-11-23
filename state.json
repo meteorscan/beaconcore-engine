@@ -309,7 +309,7 @@
         "expired": 6
       },
       "Reversal|pending": {
-        "dispatched": 20,
+        "dispatched": 21,
         "filled": 13,
         "expired": 4
       },
@@ -325,11 +325,11 @@
         "rejected": 232
       },
       "liquidity_sanity": {
-        "seen": 348,
+        "seen": 349,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 348,
+        "seen": 349,
         "rejected": 0
       }
     },
@@ -2676,13 +2676,13 @@
       "created_ts": 1795448727824,
       "filled_ts": 1795447800000,
       "mae_r": 0.3998690623408805,
-      "mfe_r": 1.571268074650625,
+      "mfe_r": 1.6288563969512502,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7989658857408508,
       "grade_raw": "A",
       "tg_message_id": 10694,
-      "_last_checked_t": 1795465800000,
+      "_last_checked_t": 1795466700000,
       "active_sl": 42.7027489056,
       "be_armed": true,
       "partial_done": true,
@@ -2720,7 +2720,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 4,
+      "pending_bars": 5,
       "status": "pending",
       "created_ts": 1795464044026,
       "filled_ts": null,
@@ -2731,7 +2731,7 @@
       "score_raw": 0.783484526333052,
       "grade_raw": "A",
       "tg_message_id": 10723,
-      "_last_checked_t": 1795465800000,
+      "_last_checked_t": 1795466700000,
       "active_sl": 61878.2,
       "be_armed": false,
       "partial_done": false,
@@ -2767,7 +2767,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 4,
+      "pending_bars": 5,
       "status": "pending",
       "created_ts": 1795464044026,
       "filled_ts": null,
@@ -2778,7 +2778,7 @@
       "score_raw": 0.764283818139791,
       "grade_raw": "A",
       "tg_message_id": 10724,
-      "_last_checked_t": 1795465800000,
+      "_last_checked_t": 1795466700000,
       "active_sl": 1751.94,
       "be_armed": false,
       "partial_done": false,
@@ -2814,7 +2814,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 4,
+      "pending_bars": 5,
       "status": "pending",
       "created_ts": 1795464044026,
       "filled_ts": null,
@@ -2825,8 +2825,55 @@
       "score_raw": 0.7766503549526519,
       "grade_raw": "A",
       "tg_message_id": 10725,
-      "_last_checked_t": 1795465800000,
+      "_last_checked_t": 1795466700000,
       "active_sl": 100.14850000000001,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "XRP-Reversal-1795467643803",
+      "symbol": "XRP",
+      "asset_class": "crypto",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.9435636000000001,
+      "sl": 0.9566020000000001,
+      "tp1": 0.91118,
+      "tp2": 0.90852,
+      "rr1": 2.483709657626707,
+      "rr2": 2.6877224199288294,
+      "confidence": 0.8168462806473825,
+      "grade": "A+",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 24.293595501849076,
+        "volatility_pctl": 88.33333333333333,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795467643803,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8168462806473825,
+      "grade_raw": "A+",
+      "tg_message_id": 10728,
+      "_last_checked_t": 1795465800000,
+      "active_sl": 0.9566020000000001,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2834,5 +2881,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795466730273
+  "last_run_ts": 1795467643803
 }
