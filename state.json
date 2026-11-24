@@ -2750,7 +2750,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1795491045620,
       "filled_ts": null,
@@ -2761,7 +2761,7 @@
       "score_raw": 0.7965340127379761,
       "grade_raw": "A",
       "tg_message_id": 10749,
-      "_last_checked_t": 1795489200000,
+      "_last_checked_t": 1795491000000,
       "active_sl": 6.910603699999999,
       "be_armed": false,
       "partial_done": false,
@@ -2770,5 +2770,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795491045620
+  "last_run_ts": 1795491927049
 }
