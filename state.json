@@ -257,6 +257,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 1.5656567493513713
+      },
+      "TAO|range|intraday|Breaker Block": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 1.6500000000000001
       }
     },
     "calibration_buckets": {
@@ -299,6 +305,11 @@
         "n": 1,
         "wins": 0,
         "sum_conf": 0.7957582375112673
+      },
+      "Breaker Block|A": {
+        "n": 1,
+        "wins": 1,
+        "sum_conf": 0.7372176761205651
       }
     },
     "forensic_counts": {
@@ -323,7 +334,7 @@
       "Reversal|pending": {
         "dispatched": 25,
         "filled": 14,
-        "expired": 8
+        "expired": 9
       },
       "Range Trading|pending": {
         "dispatched": 3,
@@ -332,7 +343,7 @@
       },
       "Breaker Block|pending": {
         "dispatched": 1,
-        "filled": 0,
+        "filled": 1,
         "expired": 0
       }
     },
@@ -2724,6 +2735,39 @@
       "exit_model": "managed",
       "tp1_hit": true,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "TAO-Breaker Block-1795492855106",
+      "symbol": "TAO",
+      "asset_class": "crypto",
+      "engine": "Breaker Block",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 190.97,
+      "sl": 192.69,
+      "tp1": 187.186,
+      "tp2": 185.46,
+      "r_realized": 1.6500000000000001,
+      "mae_r": 0.5406976744186089,
+      "mfe_r": 3.0523255813953507,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7372176761205651,
+      "grade": "A",
+      "grade_raw": "A",
+      "score_raw": 0.7372176761205651,
+      "regime_at_entry": {
+        "trend_strength": 20.144274528229538,
+        "volatility_pctl": 61.666666666666664,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1795510800000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": true,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -2761,112 +2805,19 @@
       "created_ts": 1795491045620,
       "filled_ts": 1795493700000,
       "mae_r": 0.43730240563705747,
-      "mfe_r": 0.9895498774612098,
+      "mfe_r": 1.0317272719930508,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7965340127379761,
       "grade_raw": "A",
       "tg_message_id": 10749,
-      "_last_checked_t": 1795509900000,
-      "active_sl": 6.910603699999999,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "TAO-Breaker Block-1795492855106",
-      "symbol": "TAO",
-      "asset_class": "crypto",
-      "engine": "Breaker Block",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 190.97,
-      "sl": 192.69,
-      "tp1": 187.186,
-      "tp2": 185.46,
-      "rr1": 2.2,
-      "rr2": 3.20348837209302,
-      "confidence": 0.7372176761205651,
-      "grade": "A",
-      "confluences": [
-        "confirmed breaker block retest"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 20.144274528229538,
-        "volatility_pctl": 61.666666666666664,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 3,
-      "status": "active",
-      "created_ts": 1795492855106,
-      "filled_ts": 1795494600000,
-      "mae_r": 0.5406976744186089,
-      "mfe_r": 2.1860465116279033,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.7372176761205651,
-      "grade_raw": "A",
-      "tg_message_id": 10751,
-      "_last_checked_t": 1795509900000,
-      "active_sl": 190.798127,
+      "_last_checked_t": 1795510800000,
+      "active_sl": 6.79305034736,
       "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.55,
-      "tp1_hit": false,
-      "be_ts": 1795505400000,
-      "partial_ts": 1795505400000
-    },
-    {
-      "id": "AAVE-Reversal-1795501843354",
-      "symbol": "AAVE",
-      "asset_class": "crypto",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 97.96551199999999,
-      "sl": 99.358259,
-      "tp1": 95.048,
-      "tp2": 95.045,
-      "rr1": 2.0947896495199476,
-      "rr2": 2.0969436660067897,
-      "confidence": 0.8235239212517913,
-      "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 11.749149029707949,
-        "volatility_pctl": 65.83333333333333,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1795501843354,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.8235239212517913,
-      "grade_raw": "A+",
-      "tg_message_id": 10756,
-      "_last_checked_t": 1795509900000,
-      "active_sl": 99.358259,
-      "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
-      "tp1_hit": false
+      "tp1_hit": false,
+      "be_ts": 1795510800000
     },
     {
       "id": "LTC-Reversal-1795509938594",
@@ -2902,20 +2853,22 @@
       "created_ts": 1795509938594,
       "filled_ts": 1795509900000,
       "mae_r": 0.15002766182165722,
-      "mfe_r": 0.8432832067595681,
+      "mfe_r": 1.78944324297143,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.805319389086868,
       "grade_raw": "A+",
       "tg_message_id": 10770,
-      "_last_checked_t": 1795509900000,
-      "active_sl": 42.0654,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
+      "_last_checked_t": 1795510800000,
+      "active_sl": 41.7096994552,
+      "be_armed": true,
+      "partial_done": true,
+      "banked_r": 0.55,
+      "tp1_hit": false,
+      "be_ts": 1795510800000,
+      "partial_ts": 1795510800000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795510845795
+  "last_run_ts": 1795511739188
 }
