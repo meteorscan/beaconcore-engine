@@ -269,6 +269,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 1.6500000000000001
+      },
+      "AVAX|range|intraday|Reversal": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "sum_r": 1.63798334621091
       }
     },
     "calibration_buckets": {
@@ -298,9 +304,9 @@
         "sum_conf": 1.7192679206244001
       },
       "Reversal|A": {
-        "n": 5,
-        "wins": 1,
-        "sum_conf": 3.8462792260856173
+        "n": 6,
+        "wins": 2,
+        "sum_conf": 4.642813238823593
       },
       "Reversal|A+": {
         "n": 10,
@@ -339,7 +345,7 @@
       },
       "Reversal|pending": {
         "dispatched": 25,
-        "filled": 15,
+        "filled": 16,
         "expired": 9
       },
       "Range Trading|pending": {
@@ -2807,9 +2813,7 @@
       "exit_model": "managed",
       "tp1_hit": true,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "AVAX-Reversal-1795491045620",
       "symbol": "AVAX",
@@ -2817,49 +2821,34 @@
       "engine": "Reversal",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 6.7991696,
       "sl": 6.910603699999999,
       "tp1": 6.5558,
       "tp2": 6.5305,
-      "rr1": 2.18397779494788,
-      "rr2": 2.4110178123213752,
+      "r_realized": 1.63798334621091,
+      "mae_r": 0.43730240563705747,
+      "mfe_r": 2.5097308633533317,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7965340127379761,
       "grade": "A",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
+      "grade_raw": "A",
+      "score_raw": 0.7965340127379761,
       "regime_at_entry": {
         "trend_strength": 19.818383503092917,
         "volatility_pctl": 53.333333333333336,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 4,
-      "status": "active",
-      "created_ts": 1795491045620,
-      "filled_ts": 1795493700000,
-      "mae_r": 0.43730240563705747,
-      "mfe_r": 1.1905655450171941,
-      "resolution_logic_version": "1.1.0",
+      "regime_src": "entry",
+      "resolved_ts": 1795525200000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
       "exit_model": "managed",
-      "score_raw": 0.7965340127379761,
-      "grade_raw": "A",
-      "tg_message_id": 10749,
-      "_last_checked_t": 1795524300000,
-      "active_sl": 6.79305034736,
-      "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.54599444873697,
-      "tp1_hit": false,
-      "be_ts": 1795510800000,
-      "partial_ts": 1795517100000
+      "tp1_hit": true,
+      "resolution_logic_version": "1.1.0"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1795525245839
+  "last_run_ts": 1795526137287
 }
