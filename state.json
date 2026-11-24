@@ -342,11 +342,11 @@
         "rejected": 239
       },
       "liquidity_sanity": {
-        "seen": 362,
+        "seen": 363,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 362,
+        "seen": 363,
         "rejected": 0
       }
     },
@@ -2766,7 +2766,7 @@
       "score_raw": 0.7965340127379761,
       "grade_raw": "A",
       "tg_message_id": 10749,
-      "_last_checked_t": 1795500900000,
+      "_last_checked_t": 1795501800000,
       "active_sl": 6.910603699999999,
       "be_armed": false,
       "partial_done": false,
@@ -2811,7 +2811,7 @@
       "score_raw": 0.7372176761205651,
       "grade_raw": "A",
       "tg_message_id": 10751,
-      "_last_checked_t": 1795500900000,
+      "_last_checked_t": 1795501800000,
       "active_sl": 192.69,
       "be_armed": false,
       "partial_done": false,
@@ -2847,7 +2847,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 0,
+      "pending_bars": 2,
       "status": "pending",
       "created_ts": 1795501843354,
       "filled_ts": null,
@@ -2858,7 +2858,7 @@
       "score_raw": 0.8235239212517913,
       "grade_raw": "A+",
       "tg_message_id": 10756,
-      "_last_checked_t": 1795500000000,
+      "_last_checked_t": 1795501800000,
       "active_sl": 99.358259,
       "be_armed": false,
       "partial_done": false,
@@ -2867,5 +2867,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795501843354
+  "last_run_ts": 1795502737948
 }
