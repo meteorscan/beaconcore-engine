@@ -329,19 +329,24 @@
         "dispatched": 3,
         "filled": 2,
         "expired": 1
+      },
+      "Breaker Block|pending": {
+        "dispatched": 1,
+        "filled": 0,
+        "expired": 0
       }
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 232,
-        "rejected": 232
+        "seen": 233,
+        "rejected": 233
       },
       "liquidity_sanity": {
-        "seen": 354,
+        "seen": 355,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 354,
+        "seen": 355,
         "rejected": 0
       }
     },
@@ -2750,7 +2755,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 2,
+      "pending_bars": 3,
       "status": "pending",
       "created_ts": 1795491045620,
       "filled_ts": null,
@@ -2761,8 +2766,53 @@
       "score_raw": 0.7965340127379761,
       "grade_raw": "A",
       "tg_message_id": 10749,
-      "_last_checked_t": 1795491000000,
+      "_last_checked_t": 1795491900000,
       "active_sl": 6.910603699999999,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "TAO-Breaker Block-1795492855106",
+      "symbol": "TAO",
+      "asset_class": "crypto",
+      "engine": "Breaker Block",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 190.97,
+      "sl": 192.69,
+      "tp1": 187.186,
+      "tp2": 185.46,
+      "rr1": 2.2,
+      "rr2": 3.20348837209302,
+      "confidence": 0.7372176761205651,
+      "grade": "A",
+      "confluences": [
+        "confirmed breaker block retest"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 20.144274528229538,
+        "volatility_pctl": 61.666666666666664,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795492855106,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7372176761205651,
+      "grade_raw": "A",
+      "tg_message_id": 10751,
+      "_last_checked_t": 1795491000000,
+      "active_sl": 192.69,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -2770,5 +2820,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795491927049
+  "last_run_ts": 1795492855106
 }
