@@ -2959,20 +2959,22 @@
       "created_ts": 1795655738157,
       "filled_ts": 1795658400000,
       "mae_r": 0.5527030579164095,
-      "mfe_r": 0.9236835187943548,
+      "mfe_r": 1.1755892403399533,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8216722557374747,
       "grade_raw": "A+",
       "tg_message_id": 10877,
-      "_last_checked_t": 1795674600000,
-      "active_sl": 0.0572622,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
+      "_last_checked_t": 1795675500000,
+      "active_sl": 0.056754554888,
+      "be_armed": true,
+      "partial_done": true,
+      "banked_r": 0.55,
+      "tp1_hit": false,
+      "be_ts": 1795675500000,
+      "partial_ts": 1795675500000
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795675526527
+  "last_run_ts": 1795676442622
 }
