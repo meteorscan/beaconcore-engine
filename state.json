@@ -347,7 +347,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 34,
+        "dispatched": 35,
         "filled": 25,
         "expired": 8
       },
@@ -379,15 +379,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 253,
-        "rejected": 253
+        "seen": 254,
+        "rejected": 254
       },
       "liquidity_sanity": {
-        "seen": 400,
+        "seen": 401,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 400,
+        "seen": 401,
         "rejected": 0
       }
     },
@@ -3143,8 +3143,55 @@
       "score_raw": 0.6993174115561602,
       "grade_raw": "A",
       "tg_message_id": 10930,
-      "_last_checked_t": 1795747500000,
+      "_last_checked_t": 1795748400000,
       "active_sl": 9.580630000000001,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "BTC-Liquidity Sweep-1795749329293",
+      "symbol": "BTC",
+      "asset_class": "crypto",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 61501.335999999996,
+      "sl": 61897.4,
+      "tp1": 60629.99519999998,
+      "tp2": 60596.0,
+      "rr1": 2.2,
+      "rr2": 2.2858325927122447,
+      "confidence": 0.7759018595920177,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 15.80639220614229,
+        "volatility_pctl": 5.833333333333333,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795749329293,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7759018595920177,
+      "grade_raw": "A",
+      "tg_message_id": 10933,
+      "_last_checked_t": 1795747500000,
+      "active_sl": 61897.4,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -3152,5 +3199,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795748441254
+  "last_run_ts": 1795749329293
 }
