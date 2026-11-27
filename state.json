@@ -194,10 +194,10 @@
         "sum_r": -2.0
       },
       "ETH|range|intraday|Liquidity Sweep": {
-        "n": 1,
-        "wins": 0,
+        "n": 2,
+        "wins": 1,
         "losses": 1,
-        "sum_r": -1.0
+        "sum_r": 0.6500000000000001
       },
       "SOL|range|intraday|Liquidity Sweep": {
         "n": 2,
@@ -309,9 +309,9 @@
         "sum_conf": 10.634386876010101
       },
       "Liquidity Sweep|A": {
-        "n": 16,
-        "wins": 5,
-        "sum_conf": 12.210567098501716
+        "n": 17,
+        "wins": 6,
+        "sum_conf": 12.999717212375655
       },
       "Momentum|A+": {
         "n": 18,
@@ -355,8 +355,8 @@
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 39,
-        "filled": 29,
-        "expired": 8
+        "filled": 30,
+        "expired": 9
       },
       "Momentum|pending": {
         "dispatched": 23,
@@ -3311,9 +3311,7 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "ETH-Liquidity Sweep-1795754730608",
       "symbol": "ETH",
@@ -3321,96 +3319,34 @@
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 1744.0184,
       "sl": 1764.7,
       "tp1": 1698.5188799999996,
       "tp2": 1697.0500000000002,
-      "rr1": 2.2,
-      "rr2": 2.2710235184898404,
+      "r_realized": 1.6500000000000001,
+      "mae_r": 0.5068079839084022,
+      "mfe_r": 3.288836453659269,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7891501138739394,
       "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
+      "grade_raw": "A",
+      "score_raw": 0.7891501138739394,
       "regime_at_entry": {
         "trend_strength": 18.881499610094377,
         "volatility_pctl": 25.0,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 2,
-      "status": "active",
-      "created_ts": 1795754730608,
-      "filled_ts": 1795755600000,
-      "mae_r": 0.5068079839084022,
-      "mfe_r": 1.4176079220176252,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.7891501138739394,
-      "grade_raw": "A",
-      "tg_message_id": 10943,
-      "_last_checked_t": 1795788900000,
-      "active_sl": 1742.44878344,
-      "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.55,
-      "tp1_hit": false,
-      "be_ts": 1795777200000,
-      "partial_ts": 1795779900000
-    },
-    {
-      "id": "AAVE-Liquidity Sweep-1795780843744",
-      "symbol": "AAVE",
-      "asset_class": "crypto",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
+      "regime_src": "entry",
+      "resolved_ts": 1795789800000,
+      "result": "win",
       "style": "intraday",
       "entry_kind": "pending",
-      "entry": 97.42806399999999,
-      "sl": 98.05259999999998,
-      "tp1": 95.683,
-      "tp2": 95.554,
-      "rr1": 2.7941767968539963,
-      "rr2": 3.0007301420574857,
-      "confidence": 0.8092750926253776,
-      "grade": "A+",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 22.719891871682467,
-        "volatility_pctl": 0.8333333333333334,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1795780843744,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
-      "score_raw": 0.8092750926253776,
-      "grade_raw": "A+",
-      "tg_message_id": 10963,
-      "_last_checked_t": 1795788900000,
-      "active_sl": 98.05259999999998,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
+      "tp1_hit": true,
+      "resolution_logic_version": "1.1.0"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1795789839409
+  "last_run_ts": 1795790737585
 }
