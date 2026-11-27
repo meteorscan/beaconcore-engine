@@ -140,10 +140,10 @@
         "sum_r": 3.800992823905032
       },
       "XRP|range|intraday|Liquidity Sweep": {
-        "n": 1,
+        "n": 2,
         "wins": 0,
-        "losses": 1,
-        "sum_r": -1.0
+        "losses": 2,
+        "sum_r": -2.0
       },
       "ETH|range|intraday|Reversal": {
         "n": 2,
@@ -294,6 +294,12 @@
         "wins": 1,
         "losses": 0,
         "sum_r": 0.5159491434871114
+      },
+      "BTC|range|intraday|Liquidity Sweep": {
+        "n": 1,
+        "wins": 0,
+        "losses": 1,
+        "sum_r": -1.0
       }
     },
     "calibration_buckets": {
@@ -303,9 +309,9 @@
         "sum_conf": 10.634386876010101
       },
       "Liquidity Sweep|A": {
-        "n": 14,
+        "n": 16,
         "wins": 5,
-        "sum_conf": 10.709137528715736
+        "sum_conf": 12.210567098501716
       },
       "Momentum|A+": {
         "n": 18,
@@ -349,7 +355,7 @@
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 38,
-        "filled": 27,
+        "filled": 29,
         "expired": 8
       },
       "Momentum|pending": {
@@ -450,7 +456,7 @@
       },
       "XRP": {
         "direction": "bearish",
-        "until_ts": 1795102200000
+        "until_ts": 1795761000000
       },
       "LTC": {
         "direction": "bearish",
@@ -459,6 +465,10 @@
       "AVAX": {
         "direction": "bearish",
         "until_ts": 1795629600000
+      },
+      "BTC": {
+        "direction": "bearish",
+        "until_ts": 1795761000000
       }
     }
   },
@@ -3201,9 +3211,7 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "BTC-Liquidity Sweep-1795749329293",
       "symbol": "BTC",
@@ -3211,45 +3219,31 @@
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 61501.335999999996,
       "sl": 61897.4,
       "tp1": 60629.99519999998,
       "tp2": 60596.0,
-      "rr1": 2.2,
-      "rr2": 2.2858325927122447,
+      "r_realized": -1.0,
+      "mae_r": 1.1807788640219699,
+      "mfe_r": 0.4830936414316699,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7759018595920177,
       "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
+      "grade_raw": "A",
+      "score_raw": 0.7759018595920177,
       "regime_at_entry": {
         "trend_strength": 15.80639220614229,
         "volatility_pctl": 5.833333333333333,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1795749329293,
-      "filled_ts": 1795748400000,
-      "mae_r": 0.7313565484366166,
-      "mfe_r": 0.4830936414316699,
-      "resolution_logic_version": "1.1.0",
+      "regime_src": "entry",
+      "resolved_ts": 1795757400000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
       "exit_model": "managed",
-      "score_raw": 0.7759018595920177,
-      "grade_raw": "A",
-      "tg_message_id": 10933,
-      "_last_checked_t": 1795756500000,
-      "active_sl": 61897.4,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     },
     {
       "id": "XRP-Liquidity Sweep-1795751129808",
@@ -3258,45 +3252,34 @@
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.96129416,
       "sl": 0.96745,
       "tp1": 0.94865,
       "tp2": 0.94808,
-      "rr1": 2.054010500597801,
-      "rr2": 2.1466054998180466,
+      "r_realized": -1.0,
+      "mae_r": 1.3525107865051718,
+      "mfe_r": 0.5822373550969558,
+      "forensic_category": "genuine_variance",
       "confidence": 0.7255277101939622,
       "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
+      "grade_raw": "A",
+      "score_raw": 0.7255277101939622,
       "regime_at_entry": {
         "trend_strength": 16.799328792255913,
         "volatility_pctl": 9.166666666666666,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1795751129808,
-      "filled_ts": 1795751100000,
-      "mae_r": 0.8083121068773611,
-      "mfe_r": 0.5822373550969558,
-      "resolution_logic_version": "1.1.0",
+      "regime_src": "entry",
+      "resolved_ts": 1795757400000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
       "exit_model": "managed",
-      "score_raw": 0.7255277101939622,
-      "grade_raw": "A",
-      "tg_message_id": 10936,
-      "_last_checked_t": 1795756500000,
-      "active_sl": 0.96745,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
+    }
+  ],
+  "active_signals": [
     {
       "id": "ETH-Liquidity Sweep-1795754730608",
       "symbol": "ETH",
@@ -3330,14 +3313,14 @@
       "status": "active",
       "created_ts": 1795754730608,
       "filled_ts": 1795755600000,
-      "mae_r": 0.255376760018567,
+      "mae_r": 0.5068079839084022,
       "mfe_r": 0.6052916602197054,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7891501138739394,
       "grade_raw": "A",
       "tg_message_id": 10943,
-      "_last_checked_t": 1795756500000,
+      "_last_checked_t": 1795757400000,
       "active_sl": 1764.7,
       "be_armed": false,
       "partial_done": false,
@@ -3383,7 +3366,7 @@
       "score_raw": 0.8207118563275877,
       "grade_raw": "A+",
       "tg_message_id": 10944,
-      "_last_checked_t": 1795756500000,
+      "_last_checked_t": 1795757400000,
       "active_sl": 97.68759,
       "be_armed": false,
       "partial_done": false,
@@ -3392,5 +3375,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795757435419
+  "last_run_ts": 1795758328605
 }
