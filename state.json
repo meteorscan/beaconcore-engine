@@ -300,6 +300,13 @@
         "wins": 0,
         "losses": 1,
         "sum_r": -1.0
+      },
+      "XRP|trend|intraday|Reversal": {
+        "n": 1,
+        "wins": 0,
+        "losses": 0,
+        "sum_r": 0.0,
+        "breakeven": 1
       }
     },
     "calibration_buckets": {
@@ -329,9 +336,9 @@
         "sum_conf": 1.7192679206244001
       },
       "Reversal|A": {
-        "n": 7,
+        "n": 8,
         "wins": 2,
-        "sum_conf": 5.390267371164114
+        "sum_conf": 6.186477822987262
       },
       "Reversal|A+": {
         "n": 10,
@@ -350,7 +357,7 @@
       }
     },
     "forensic_counts": {
-      "breakeven_exit": 3
+      "breakeven_exit": 4
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
@@ -370,7 +377,7 @@
       },
       "Reversal|pending": {
         "dispatched": 29,
-        "filled": 17,
+        "filled": 18,
         "expired": 9
       },
       "Range Trading|pending": {
@@ -3377,6 +3384,39 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "XRP-Reversal-1795801532197",
+      "symbol": "XRP",
+      "asset_class": "crypto",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 0.9486648,
+      "sl": 0.9553200000000001,
+      "tp1": 0.9340233599999997,
+      "tp2": 0.9311,
+      "r_realized": 0.0,
+      "mae_r": 0.8046640221180337,
+      "mfe_r": 1.1381776655847906,
+      "forensic_category": "breakeven_exit",
+      "confidence": 0.796210451823148,
+      "grade": "A",
+      "grade_raw": "A",
+      "score_raw": 0.796210451823148,
+      "regime_at_entry": {
+        "trend_strength": 27.89147485471011,
+        "volatility_pctl": 60.0,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1795822200000,
+      "result": "breakeven",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -3420,61 +3460,13 @@
       "score_raw": 0.7881479202075018,
       "grade_raw": "A",
       "tg_message_id": 10972,
-      "_last_checked_t": 1795821300000,
+      "_last_checked_t": 1795822200000,
       "active_sl": 9.38311319096,
       "be_armed": true,
       "partial_done": false,
       "banked_r": 0.0,
       "tp1_hit": false,
       "be_ts": 1795816800000
-    },
-    {
-      "id": "XRP-Reversal-1795801532197",
-      "symbol": "XRP",
-      "asset_class": "crypto",
-      "engine": "Reversal",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 0.9486648,
-      "sl": 0.9553200000000001,
-      "tp1": 0.9340233599999997,
-      "tp2": 0.9311,
-      "rr1": 2.2,
-      "rr2": 2.6392595263853402,
-      "confidence": 0.796210451823148,
-      "grade": "A",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 27.89147485471011,
-        "volatility_pctl": 60.0,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1795801532197,
-      "filled_ts": 1795801500000,
-      "mae_r": 0.8046640221180337,
-      "mfe_r": 1.1381776655847906,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.796210451823148,
-      "grade_raw": "A",
-      "tg_message_id": 10977,
-      "_last_checked_t": 1795821300000,
-      "active_sl": 0.94781100168,
-      "be_armed": true,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false,
-      "be_ts": 1795817700000
     },
     {
       "id": "DOGE-Reversal-1795819527160",
@@ -3509,14 +3501,14 @@
       "status": "active",
       "created_ts": 1795819527160,
       "filled_ts": 1795820400000,
-      "mae_r": 0.04877503214149141,
+      "mae_r": 0.11033894009523126,
       "mfe_r": 0.4067978867162547,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.835953200472594,
       "grade_raw": "A+",
       "tg_message_id": 10988,
-      "_last_checked_t": 1795821300000,
+      "_last_checked_t": 1795822200000,
       "active_sl": 0.0580885305,
       "be_armed": false,
       "partial_done": false,
@@ -3525,5 +3517,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795822236846
+  "last_run_ts": 1795823128059
 }
