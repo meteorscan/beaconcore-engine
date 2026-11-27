@@ -354,7 +354,7 @@
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 39,
+        "dispatched": 40,
         "filled": 30,
         "expired": 9
       },
@@ -369,7 +369,7 @@
         "expired": 6
       },
       "Reversal|pending": {
-        "dispatched": 25,
+        "dispatched": 26,
         "filled": 16,
         "expired": 9
       },
@@ -390,11 +390,11 @@
         "rejected": 271
       },
       "liquidity_sanity": {
-        "seen": 425,
+        "seen": 427,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 425,
+        "seen": 427,
         "rejected": 0
       }
     },
@@ -3346,7 +3346,101 @@
       "resolution_logic_version": "1.1.0"
     }
   ],
-  "active_signals": [],
+  "active_signals": [
+    {
+      "id": "SOL-Liquidity Sweep-1795794329892",
+      "symbol": "SOL",
+      "asset_class": "crypto",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 72.768424,
+      "sl": 73.96889499999999,
+      "tp1": 69.719,
+      "tp2": 68.874,
+      "rr1": 2.5401896422321064,
+      "rr2": 3.2440800319208236,
+      "confidence": 0.8061433729004002,
+      "grade": "A+",
+      "confluences": [
+        "EQH/EQL sweep",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 31.52483130054521,
+        "volatility_pctl": 45.0,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795794329892,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8061433729004002,
+      "grade_raw": "A+",
+      "tg_message_id": 10971,
+      "_last_checked_t": 1795792500000,
+      "active_sl": 73.96889499999999,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "LINK-Reversal-1795794329892",
+      "symbol": "LINK",
+      "asset_class": "crypto",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 9.3915656,
+      "sl": 9.533479999999999,
+      "tp1": 9.0339,
+      "tp2": 8.9954,
+      "rr1": 2.5202911050605343,
+      "rr2": 2.791581404001299,
+      "confidence": 0.7881479202075018,
+      "grade": "A",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 31.536387793829615,
+        "volatility_pctl": 64.16666666666667,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795794329892,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7881479202075018,
+      "grade_raw": "A",
+      "tg_message_id": 10972,
+      "_last_checked_t": 1795792500000,
+      "active_sl": 9.533479999999999,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    }
+  ],
   "macro_events": [],
-  "last_run_ts": 1795793441728
+  "last_run_ts": 1795794329892
 }
