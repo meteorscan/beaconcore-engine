@@ -379,15 +379,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 260,
-        "rejected": 260
+        "seen": 262,
+        "rejected": 262
       },
       "liquidity_sanity": {
-        "seen": 408,
+        "seen": 411,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 408,
+        "seen": 411,
         "rejected": 0
       }
     },
@@ -3143,7 +3143,7 @@
       "score_raw": 0.6993174115561602,
       "grade_raw": "A",
       "tg_message_id": 10930,
-      "_last_checked_t": 1795750200000,
+      "_last_checked_t": 1795751100000,
       "active_sl": 9.580630000000001,
       "be_armed": false,
       "partial_done": false,
@@ -3190,7 +3190,7 @@
       "score_raw": 0.7759018595920177,
       "grade_raw": "A",
       "tg_message_id": 10933,
-      "_last_checked_t": 1795750200000,
+      "_last_checked_t": 1795751100000,
       "active_sl": 61897.4,
       "be_armed": false,
       "partial_done": false,
@@ -3230,13 +3230,13 @@
       "created_ts": 1795750235425,
       "filled_ts": 1795750200000,
       "mae_r": 0.20455682455242075,
-      "mfe_r": 0.686261601358496,
+      "mfe_r": 0.960556771351211,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.820710968495847,
       "grade_raw": "A+",
       "tg_message_id": 10935,
-      "_last_checked_t": 1795750200000,
+      "_last_checked_t": 1795751100000,
       "active_sl": 97.68759,
       "be_armed": false,
       "partial_done": false,
@@ -3270,19 +3270,19 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 0,
-      "status": "pending",
+      "entry_filled": true,
+      "pending_bars": 1,
+      "status": "active",
       "created_ts": 1795751129808,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1795751100000,
+      "mae_r": 0.29335395331911496,
+      "mfe_r": 0.042912096480733214,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7255277101939622,
       "grade_raw": "A",
       "tg_message_id": 10936,
-      "_last_checked_t": 1795749300000,
+      "_last_checked_t": 1795751100000,
       "active_sl": 0.96745,
       "be_armed": false,
       "partial_done": false,
@@ -3291,5 +3291,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795751129808
+  "last_run_ts": 1795752042571
 }
