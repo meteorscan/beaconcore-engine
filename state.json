@@ -200,10 +200,10 @@
         "sum_r": -1.0
       },
       "SOL|range|intraday|Liquidity Sweep": {
-        "n": 1,
+        "n": 2,
         "wins": 0,
-        "losses": 1,
-        "sum_r": -1.0
+        "losses": 2,
+        "sum_r": -2.0
       },
       "ETH|range|intraday|Mean Reversion": {
         "n": 1,
@@ -303,9 +303,9 @@
         "sum_conf": 10.634386876010101
       },
       "Liquidity Sweep|A": {
-        "n": 13,
+        "n": 14,
         "wins": 5,
-        "sum_conf": 9.971208163550035
+        "sum_conf": 10.709137528715736
       },
       "Momentum|A+": {
         "n": 18,
@@ -349,7 +349,7 @@
     "fill_stats": {
       "Liquidity Sweep|pending": {
         "dispatched": 38,
-        "filled": 26,
+        "filled": 27,
         "expired": 8
       },
       "Momentum|pending": {
@@ -434,7 +434,7 @@
       },
       "SOL": {
         "direction": "bearish",
-        "until_ts": 1795353300000
+        "until_ts": 1795760100000
       },
       "TAO": {
         "direction": "bearish",
@@ -3168,6 +3168,39 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
+    },
+    {
+      "id": "SOL-Liquidity Sweep-1795753836819",
+      "symbol": "SOL",
+      "asset_class": "crypto",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 72.692,
+      "sl": 73.3132,
+      "tp1": 71.427,
+      "tp2": 71.197,
+      "r_realized": -1.0,
+      "mae_r": 1.06728911783646,
+      "mfe_r": 0.07887958789438546,
+      "forensic_category": "genuine_variance",
+      "confidence": 0.7379293651657024,
+      "grade": "A",
+      "grade_raw": "A",
+      "score_raw": 0.7379293651657024,
+      "regime_at_entry": {
+        "trend_strength": 18.725450834729266,
+        "volatility_pctl": 22.5,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1795756500000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     }
   ],
   "active_signals": [
@@ -3204,14 +3237,14 @@
       "status": "active",
       "created_ts": 1795749329293,
       "filled_ts": 1795748400000,
-      "mae_r": 0.6278379251838104,
+      "mae_r": 0.7313565484366166,
       "mfe_r": 0.4830936414316699,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7759018595920177,
       "grade_raw": "A",
       "tg_message_id": 10933,
-      "_last_checked_t": 1795755600000,
+      "_last_checked_t": 1795756500000,
       "active_sl": 61897.4,
       "be_armed": false,
       "partial_done": false,
@@ -3257,54 +3290,8 @@
       "score_raw": 0.7255277101939622,
       "grade_raw": "A",
       "tg_message_id": 10936,
-      "_last_checked_t": 1795755600000,
+      "_last_checked_t": 1795756500000,
       "active_sl": 0.96745,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "SOL-Liquidity Sweep-1795753836819",
-      "symbol": "SOL",
-      "asset_class": "crypto",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 72.692,
-      "sl": 73.3132,
-      "tp1": 71.427,
-      "tp2": 71.197,
-      "rr1": 2.0363811976818784,
-      "rr2": 2.406632324533139,
-      "confidence": 0.7379293651657024,
-      "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 18.725450834729266,
-        "volatility_pctl": 22.5,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1795753836819,
-      "filled_ts": 1795752900000,
-      "mae_r": 0.9111397295557001,
-      "mfe_r": 0.07887958789438546,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.7379293651657024,
-      "grade_raw": "A",
-      "tg_message_id": 10939,
-      "_last_checked_t": 1795755600000,
-      "active_sl": 73.3132,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -3343,14 +3330,14 @@
       "status": "active",
       "created_ts": 1795754730608,
       "filled_ts": 1795755600000,
-      "mae_r": 0.11032028469750953,
+      "mae_r": 0.255376760018567,
       "mfe_r": 0.6052916602197054,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7891501138739394,
       "grade_raw": "A",
       "tg_message_id": 10943,
-      "_last_checked_t": 1795755600000,
+      "_last_checked_t": 1795756500000,
       "active_sl": 1764.7,
       "be_armed": false,
       "partial_done": false,
@@ -3390,13 +3377,13 @@
       "created_ts": 1795754730608,
       "filled_ts": 1795755600000,
       "mae_r": 0.4596701318723141,
-      "mfe_r": 0.7468371244998367,
+      "mfe_r": 0.8015402242849743,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.8207118563275877,
       "grade_raw": "A+",
       "tg_message_id": 10944,
-      "_last_checked_t": 1795755600000,
+      "_last_checked_t": 1795756500000,
       "active_sl": 97.68759,
       "be_armed": false,
       "partial_done": false,
@@ -3405,5 +3392,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795756525512
+  "last_run_ts": 1795757435419
 }
