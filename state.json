@@ -423,7 +423,8 @@
       "2026-11-23": "sent",
       "2026-11-24": "sent",
       "2026-11-25": "sent",
-      "2026-11-26": "sent"
+      "2026-11-26": "sent",
+      "2026-11-27": "sent"
     },
     "symbol_cooldown": {
       "DOGE": {
@@ -3320,7 +3321,7 @@
       "score_raw": 0.7891501138739394,
       "grade_raw": "A",
       "tg_message_id": 10943,
-      "_last_checked_t": 1795764600000,
+      "_last_checked_t": 1795765500000,
       "active_sl": 1764.7,
       "be_armed": false,
       "partial_done": false,
@@ -3366,7 +3367,7 @@
       "score_raw": 0.8207118563275877,
       "grade_raw": "A+",
       "tg_message_id": 10944,
-      "_last_checked_t": 1795764600000,
+      "_last_checked_t": 1795765500000,
       "active_sl": 96.94216546747167,
       "be_armed": true,
       "partial_done": true,
@@ -3377,5 +3378,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795765527240
+  "last_run_ts": 1795766450821
 }
