@@ -78,10 +78,11 @@
         "sum_r": 1.5924481952998266
       },
       "AAVE|range|intraday|Mean Reversion": {
-        "n": 3,
+        "n": 4,
         "wins": 2,
         "losses": 1,
-        "sum_r": 0.07152096445193712
+        "sum_r": 0.07152096445193712,
+        "breakeven": 1
       },
       "SOL|range|intraday|Range Trading": {
         "n": 1,
@@ -187,10 +188,10 @@
         "sum_r": 1.6500000000000001
       },
       "LINK|range|intraday|Liquidity Sweep": {
-        "n": 1,
+        "n": 2,
         "wins": 0,
-        "losses": 1,
-        "sum_r": -1.0
+        "losses": 2,
+        "sum_r": -2.0
       },
       "ETH|range|intraday|Liquidity Sweep": {
         "n": 1,
@@ -302,9 +303,9 @@
         "sum_conf": 10.634386876010101
       },
       "Liquidity Sweep|A": {
-        "n": 12,
+        "n": 13,
         "wins": 5,
-        "sum_conf": 9.271890751993874
+        "sum_conf": 9.971208163550035
       },
       "Momentum|A+": {
         "n": 18,
@@ -312,9 +313,9 @@
         "sum_conf": 15.37898767779657
       },
       "Mean Reversion|A+": {
-        "n": 16,
+        "n": 17,
         "wins": 3,
-        "sum_conf": 13.50216455394118
+        "sum_conf": 14.322875522437027
       },
       "Range Trading|A+": {
         "n": 2,
@@ -343,12 +344,12 @@
       }
     },
     "forensic_counts": {
-      "breakeven_exit": 2
+      "breakeven_exit": 3
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
-        "dispatched": 37,
-        "filled": 25,
+        "dispatched": 38,
+        "filled": 26,
         "expired": 8
       },
       "Momentum|pending": {
@@ -357,8 +358,8 @@
         "expired": 5
       },
       "Mean Reversion|pending": {
-        "dispatched": 25,
-        "filled": 18,
+        "dispatched": 26,
+        "filled": 19,
         "expired": 6
       },
       "Reversal|pending": {
@@ -379,15 +380,15 @@
     },
     "filter_funnel": {
       "tp1_capped": {
-        "seen": 266,
-        "rejected": 266
+        "seen": 269,
+        "rejected": 269
       },
       "liquidity_sanity": {
-        "seen": 417,
+        "seen": 421,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 417,
+        "seen": 421,
         "rejected": 0
       }
     },
@@ -429,7 +430,7 @@
       },
       "LINK": {
         "direction": "bearish",
-        "until_ts": 1795724100000
+        "until_ts": 1795757400000
       },
       "SOL": {
         "direction": "bearish",
@@ -3101,9 +3102,7 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "LINK-Liquidity Sweep-1795746636107",
       "symbol": "LINK",
@@ -3111,45 +3110,67 @@
       "engine": "Liquidity Sweep",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 9.460528799999999,
       "sl": 9.580630000000001,
       "tp1": 9.196306159999994,
       "tp2": 9.137,
-      "rr1": 2.2,
-      "rr2": 2.6938015606837564,
+      "r_realized": -1.0,
+      "mae_r": 1.3203132025325117,
+      "mfe_r": 0.24336809290829675,
+      "forensic_category": "genuine_variance",
       "confidence": 0.6993174115561602,
       "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "OTE retracement entry"
-      ],
+      "grade_raw": "A",
+      "score_raw": 0.6993174115561602,
       "regime_at_entry": {
         "trend_strength": 21.035480469003854,
         "volatility_pctl": 19.166666666666668,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "1h",
-      "entry_filled": true,
-      "pending_bars": 0,
-      "status": "active",
-      "created_ts": 1795746636107,
-      "filled_ts": 1795745700000,
-      "mae_r": 0.8773534319390512,
-      "mfe_r": 0.24336809290829675,
-      "resolution_logic_version": "1.1.0",
+      "regime_src": "entry",
+      "resolved_ts": 1795753800000,
+      "result": "loss",
+      "style": "intraday",
+      "entry_kind": "pending",
       "exit_model": "managed",
-      "score_raw": 0.6993174115561602,
-      "grade_raw": "A",
-      "tg_message_id": 10930,
-      "_last_checked_t": 1795752900000,
-      "active_sl": 9.580630000000001,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
     },
+    {
+      "id": "AAVE-Mean Reversion-1795750235425",
+      "symbol": "AAVE",
+      "asset_class": "crypto",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "entry": 96.90740856258832,
+      "sl": 97.68759,
+      "tp1": 95.19100940028261,
+      "tp2": 95.051,
+      "r_realized": 0.0,
+      "mae_r": 0.20455682455242075,
+      "mfe_r": 1.055406503030933,
+      "forensic_category": "breakeven_exit",
+      "confidence": 0.4938924041108937,
+      "grade": "A",
+      "grade_raw": "A+",
+      "score_raw": 0.820710968495847,
+      "regime_at_entry": {
+        "trend_strength": 18.22783766756002,
+        "volatility_pctl": 15.0,
+        "macro_bias": "bearish"
+      },
+      "regime_src": "entry",
+      "resolved_ts": 1795753800000,
+      "result": "breakeven",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "exit_model": "managed",
+      "tp1_hit": false,
+      "resolution_logic_version": "1.1.0"
+    }
+  ],
+  "active_signals": [
     {
       "id": "BTC-Liquidity Sweep-1795749329293",
       "symbol": "BTC",
@@ -3190,59 +3211,12 @@
       "score_raw": 0.7759018595920177,
       "grade_raw": "A",
       "tg_message_id": 10933,
-      "_last_checked_t": 1795752900000,
+      "_last_checked_t": 1795753800000,
       "active_sl": 61897.4,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
       "tp1_hit": false
-    },
-    {
-      "id": "AAVE-Mean Reversion-1795750235425",
-      "symbol": "AAVE",
-      "asset_class": "crypto",
-      "engine": "Mean Reversion",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 96.90740856258832,
-      "sl": 97.68759,
-      "tp1": 95.19100940028261,
-      "tp2": 95.051,
-      "rr1": 2.2,
-      "rr2": 2.3794574871546557,
-      "confidence": 0.4938924041108937,
-      "grade": "A",
-      "confluences": [
-        "1H Bollinger extreme",
-        "band-level entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 18.22783766756002,
-        "volatility_pctl": 15.0,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 1,
-      "status": "active",
-      "created_ts": 1795750235425,
-      "filled_ts": 1795750200000,
-      "mae_r": 0.20455682455242075,
-      "mfe_r": 1.055406503030933,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.820710968495847,
-      "grade_raw": "A+",
-      "tg_message_id": 10935,
-      "_last_checked_t": 1795752900000,
-      "active_sl": 96.82019189488199,
-      "be_armed": true,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false,
-      "be_ts": 1795752900000
     },
     {
       "id": "XRP-Liquidity Sweep-1795751129808",
@@ -3276,14 +3250,14 @@
       "status": "active",
       "created_ts": 1795751129808,
       "filled_ts": 1795751100000,
-      "mae_r": 0.29335395331911496,
+      "mae_r": 0.3209700057181381,
       "mfe_r": 0.5822373550969558,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7255277101939622,
       "grade_raw": "A",
       "tg_message_id": 10936,
-      "_last_checked_t": 1795752900000,
+      "_last_checked_t": 1795753800000,
       "active_sl": 0.96745,
       "be_armed": false,
       "partial_done": false,
@@ -3317,20 +3291,113 @@
         "macro_bias": "bearish"
       },
       "sl_anchor_tf": "15m",
-      "entry_filled": false,
+      "entry_filled": true,
       "pending_bars": 0,
-      "status": "pending",
+      "status": "active",
       "created_ts": 1795753836819,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
+      "filled_ts": 1795752900000,
+      "mae_r": 0.6133290405666438,
+      "mfe_r": 0.004829362524146982,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.7379293651657024,
       "grade_raw": "A",
       "tg_message_id": 10939,
-      "_last_checked_t": 1795752000000,
+      "_last_checked_t": 1795753800000,
       "active_sl": 73.3132,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "ETH-Liquidity Sweep-1795754730608",
+      "symbol": "ETH",
+      "asset_class": "crypto",
+      "engine": "Liquidity Sweep",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 1744.0184,
+      "sl": 1764.7,
+      "tp1": 1698.5188799999996,
+      "tp2": 1697.0500000000002,
+      "rr1": 2.2,
+      "rr2": 2.2710235184898404,
+      "confidence": 0.7891501138739394,
+      "grade": "A",
+      "confluences": [
+        "EQH/EQL sweep",
+        "equal-cluster liquidity",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 18.881499610094377,
+        "volatility_pctl": 25.0,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795754730608,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7891501138739394,
+      "grade_raw": "A",
+      "tg_message_id": 10943,
+      "_last_checked_t": 1795752900000,
+      "active_sl": 1764.7,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "AAVE-Mean Reversion-1795754730608",
+      "symbol": "AAVE",
+      "asset_class": "crypto",
+      "engine": "Mean Reversion",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 97.02949201028092,
+      "sl": 97.68759,
+      "tp1": 95.58167643289894,
+      "tp2": 95.051,
+      "rr1": 2.2,
+      "rr2": 3.0063790517358426,
+      "confidence": 0.47845868265355673,
+      "grade": "A",
+      "confluences": [
+        "1H Bollinger extreme",
+        "band-level entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 18.965965236567342,
+        "volatility_pctl": 13.333333333333334,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795754730608,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.8207118563275877,
+      "grade_raw": "A+",
+      "tg_message_id": 10944,
+      "_last_checked_t": 1795752900000,
+      "active_sl": 97.68759,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -3338,5 +3405,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795753836819
+  "last_run_ts": 1795754730608
 }
