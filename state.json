@@ -356,7 +356,7 @@
       "Liquidity Sweep|pending": {
         "dispatched": 41,
         "filled": 30,
-        "expired": 10
+        "expired": 11
       },
       "Momentum|pending": {
         "dispatched": 23,
@@ -3420,7 +3420,7 @@
       "score_raw": 0.7881479202075018,
       "grade_raw": "A",
       "tg_message_id": 10972,
-      "_last_checked_t": 1795810500000,
+      "_last_checked_t": 1795811400000,
       "active_sl": 9.533479999999999,
       "be_armed": false,
       "partial_done": false,
@@ -3467,55 +3467,8 @@
       "score_raw": 0.796210451823148,
       "grade_raw": "A",
       "tg_message_id": 10977,
-      "_last_checked_t": 1795810500000,
+      "_last_checked_t": 1795811400000,
       "active_sl": 0.9553200000000001,
-      "be_armed": false,
-      "partial_done": false,
-      "banked_r": 0.0,
-      "tp1_hit": false
-    },
-    {
-      "id": "TAO-Liquidity Sweep-1795802443447",
-      "symbol": "TAO",
-      "asset_class": "crypto",
-      "engine": "Liquidity Sweep",
-      "counter_trend": false,
-      "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
-      "entry": 187.33408000000003,
-      "sl": 190.58,
-      "tp1": 180.28,
-      "tp2": 179.49,
-      "rr1": 2.173214373736895,
-      "rr2": 2.416596835411858,
-      "confidence": 0.5594014947230059,
-      "grade": "A",
-      "confluences": [
-        "EQH/EQL sweep",
-        "equal-cluster liquidity",
-        "OTE retracement entry"
-      ],
-      "regime_at_entry": {
-        "trend_strength": 25.200177672766205,
-        "volatility_pctl": 60.833333333333336,
-        "macro_bias": "bearish"
-      },
-      "sl_anchor_tf": "15m",
-      "entry_filled": false,
-      "pending_bars": 11,
-      "status": "pending",
-      "created_ts": 1795802443447,
-      "filled_ts": null,
-      "mae_r": 0.0,
-      "mfe_r": 0.0,
-      "resolution_logic_version": "1.1.0",
-      "exit_model": "managed",
-      "score_raw": 0.7933898554090795,
-      "grade_raw": "A",
-      "tg_message_id": 10979,
-      "_last_checked_t": 1795810500000,
-      "active_sl": 190.58,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -3523,5 +3476,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795811444638
+  "last_run_ts": 1795812328568
 }
