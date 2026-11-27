@@ -369,7 +369,7 @@
         "expired": 6
       },
       "Reversal|pending": {
-        "dispatched": 28,
+        "dispatched": 29,
         "filled": 17,
         "expired": 9
       },
@@ -390,11 +390,11 @@
         "rejected": 275
       },
       "liquidity_sanity": {
-        "seen": 433,
+        "seen": 435,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 433,
+        "seen": 435,
         "rejected": 0
       }
     },
@@ -3420,7 +3420,7 @@
       "score_raw": 0.7881479202075018,
       "grade_raw": "A",
       "tg_message_id": 10972,
-      "_last_checked_t": 1795817700000,
+      "_last_checked_t": 1795818600000,
       "active_sl": 9.38311319096,
       "be_armed": true,
       "partial_done": false,
@@ -3468,15 +3468,62 @@
       "score_raw": 0.796210451823148,
       "grade_raw": "A",
       "tg_message_id": 10977,
-      "_last_checked_t": 1795817700000,
+      "_last_checked_t": 1795818600000,
       "active_sl": 0.94781100168,
       "be_armed": true,
       "partial_done": false,
       "banked_r": 0.0,
       "tp1_hit": false,
       "be_ts": 1795817700000
+    },
+    {
+      "id": "DOGE-Reversal-1795819527160",
+      "symbol": "DOGE",
+      "asset_class": "crypto",
+      "engine": "Reversal",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.057601232,
+      "sl": 0.0580885305,
+      "tp1": 0.056266666666666666,
+      "tp2": 0.056256,
+      "rr1": 2.73870191131995,
+      "rr2": 2.7605913008146143,
+      "confidence": 0.835953200472594,
+      "grade": "A+",
+      "confluences": [
+        "1H liquidity sweep",
+        "15M CHoCH",
+        "OTE retracement entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 27.40291093996948,
+        "volatility_pctl": 52.5,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795819527160,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.835953200472594,
+      "grade_raw": "A+",
+      "tg_message_id": 10988,
+      "_last_checked_t": 1795817700000,
+      "active_sl": 0.0580885305,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795818640489
+  "last_run_ts": 1795819527160
 }
