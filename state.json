@@ -373,7 +373,7 @@
         "expired": 11
       },
       "Momentum|pending": {
-        "dispatched": 23,
+        "dispatched": 24,
         "filled": 18,
         "expired": 5
       },
@@ -404,11 +404,11 @@
         "rejected": 275
       },
       "liquidity_sanity": {
-        "seen": 436,
+        "seen": 437,
         "rejected": 0
       },
       "dispatch_gate": {
-        "seen": 436,
+        "seen": 437,
         "rejected": 0
       }
     },
@@ -3500,7 +3500,7 @@
       "score_raw": 0.835953200472594,
       "grade_raw": "A+",
       "tg_message_id": 10988,
-      "_last_checked_t": 1795850100000,
+      "_last_checked_t": 1795851000000,
       "active_sl": 0.0575493908912,
       "be_armed": true,
       "partial_done": true,
@@ -3538,7 +3538,7 @@
       },
       "sl_anchor_tf": "15m",
       "entry_filled": false,
-      "pending_bars": 9,
+      "pending_bars": 10,
       "status": "pending",
       "created_ts": 1795843837590,
       "filled_ts": null,
@@ -3549,8 +3549,55 @@
       "score_raw": 0.7775926794269835,
       "grade_raw": "A",
       "tg_message_id": 10995,
-      "_last_checked_t": 1795850100000,
+      "_last_checked_t": 1795851000000,
       "active_sl": 72.3247525,
+      "be_armed": false,
+      "partial_done": false,
+      "banked_r": 0.0,
+      "tp1_hit": false
+    },
+    {
+      "id": "XRP-Momentum-1795851929285",
+      "symbol": "XRP",
+      "asset_class": "crypto",
+      "engine": "Momentum",
+      "counter_trend": false,
+      "direction": "bearish",
+      "style": "intraday",
+      "entry_kind": "pending",
+      "entry": 0.9469018797084372,
+      "sl": 0.953157205,
+      "tp1": 0.9341,
+      "tp2": 0.93359,
+      "rr1": 2.046556991321355,
+      "rr2": 2.1280875235045333,
+      "confidence": 0.7834695540219458,
+      "grade": "A",
+      "confluences": [
+        "1H RSI momentum",
+        "15M EMA stack alignment",
+        "EMA pullback entry"
+      ],
+      "regime_at_entry": {
+        "trend_strength": 26.208136613399518,
+        "volatility_pctl": 2.5,
+        "macro_bias": "bearish"
+      },
+      "sl_anchor_tf": "15m",
+      "entry_filled": false,
+      "pending_bars": 0,
+      "status": "pending",
+      "created_ts": 1795851929285,
+      "filled_ts": null,
+      "mae_r": 0.0,
+      "mfe_r": 0.0,
+      "resolution_logic_version": "1.1.0",
+      "exit_model": "managed",
+      "score_raw": 0.7834695540219458,
+      "grade_raw": "A",
+      "tg_message_id": 10996,
+      "_last_checked_t": 1795850100000,
+      "active_sl": 0.953157205,
       "be_armed": false,
       "partial_done": false,
       "banked_r": 0.0,
@@ -3558,5 +3605,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795851043528
+  "last_run_ts": 1795851929285
 }
