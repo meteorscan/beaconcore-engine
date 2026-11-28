@@ -307,6 +307,13 @@
         "losses": 0,
         "sum_r": 0.0,
         "breakeven": 1
+      },
+      "LINK|trend|intraday|Reversal": {
+        "n": 1,
+        "wins": 0,
+        "losses": 0,
+        "sum_r": 0.0,
+        "breakeven": 1
       }
     },
     "calibration_buckets": {
@@ -336,9 +343,9 @@
         "sum_conf": 1.7192679206244001
       },
       "Reversal|A": {
-        "n": 8,
+        "n": 9,
         "wins": 2,
-        "sum_conf": 6.186477822987262
+        "sum_conf": 6.974625743194764
       },
       "Reversal|A+": {
         "n": 10,
@@ -357,7 +364,7 @@
       }
     },
     "forensic_counts": {
-      "breakeven_exit": 4
+      "breakeven_exit": 5
     },
     "fill_stats": {
       "Liquidity Sweep|pending": {
@@ -377,7 +384,7 @@
       },
       "Reversal|pending": {
         "dispatched": 29,
-        "filled": 18,
+        "filled": 19,
         "expired": 9
       },
       "Range Trading|pending": {
@@ -3417,9 +3424,7 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "LINK-Reversal-1795794329892",
       "symbol": "LINK",
@@ -3427,47 +3432,34 @@
       "engine": "Reversal",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 9.3915656,
       "sl": 9.533479999999999,
       "tp1": 9.0339,
       "tp2": 8.9954,
-      "rr1": 2.5202911050605343,
-      "rr2": 2.791581404001299,
+      "r_realized": 0.0,
+      "mae_r": 0.23418624184719616,
+      "mfe_r": 1.052504890271884,
+      "forensic_category": "breakeven_exit",
       "confidence": 0.7881479202075018,
       "grade": "A",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
+      "grade_raw": "A",
+      "score_raw": 0.7881479202075018,
       "regime_at_entry": {
         "trend_strength": 31.536387793829615,
         "volatility_pctl": 64.16666666666667,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 9,
-      "status": "active",
-      "created_ts": 1795794329892,
-      "filled_ts": 1795801500000,
-      "mae_r": 0.23418624184719616,
-      "mfe_r": 1.052504890271884,
-      "resolution_logic_version": "1.1.0",
+      "regime_src": "entry",
+      "resolved_ts": 1795824900000,
+      "result": "breakeven",
+      "style": "intraday",
+      "entry_kind": "pending",
       "exit_model": "managed",
-      "score_raw": 0.7881479202075018,
-      "grade_raw": "A",
-      "tg_message_id": 10972,
-      "_last_checked_t": 1795824000000,
-      "active_sl": 9.38311319096,
-      "be_armed": true,
-      "partial_done": false,
-      "banked_r": 0.0,
       "tp1_hit": false,
-      "be_ts": 1795816800000
-    },
+      "resolution_logic_version": "1.1.0"
+    }
+  ],
+  "active_signals": [
     {
       "id": "DOGE-Reversal-1795819527160",
       "symbol": "DOGE",
@@ -3501,14 +3493,14 @@
       "status": "active",
       "created_ts": 1795819527160,
       "filled_ts": 1795820400000,
-      "mae_r": 0.46535747596185234,
+      "mae_r": 0.5371820352412274,
       "mfe_r": 0.4067978867162547,
       "resolution_logic_version": "1.1.0",
       "exit_model": "managed",
       "score_raw": 0.835953200472594,
       "grade_raw": "A+",
       "tg_message_id": 10988,
-      "_last_checked_t": 1795824000000,
+      "_last_checked_t": 1795824900000,
       "active_sl": 0.0580885305,
       "be_armed": false,
       "partial_done": false,
@@ -3517,5 +3509,5 @@
     }
   ],
   "macro_events": [],
-  "last_run_ts": 1795824925684
+  "last_run_ts": 1795825836299
 }
