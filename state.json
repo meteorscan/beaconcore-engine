@@ -248,10 +248,10 @@
         "sum_r": -0.34999999999999987
       },
       "DOGE|trend|intraday|Reversal": {
-        "n": 1,
-        "wins": 0,
+        "n": 2,
+        "wins": 1,
         "losses": 1,
-        "sum_r": -1.0
+        "sum_r": 1.0540264334899625
       },
       "LTC|trend|intraday|Liquidity Sweep": {
         "n": 1,
@@ -348,9 +348,9 @@
         "sum_conf": 6.974625743194764
       },
       "Reversal|A+": {
-        "n": 10,
-        "wins": 7,
-        "sum_conf": 8.178904556757143
+        "n": 11,
+        "wins": 8,
+        "sum_conf": 9.014857757229738
       },
       "Mean Reversion|A": {
         "n": 2,
@@ -384,7 +384,7 @@
       },
       "Reversal|pending": {
         "dispatched": 30,
-        "filled": 19,
+        "filled": 20,
         "expired": 10
       },
       "Range Trading|pending": {
@@ -3458,9 +3458,7 @@
       "exit_model": "managed",
       "tp1_hit": false,
       "resolution_logic_version": "1.1.0"
-    }
-  ],
-  "active_signals": [
+    },
     {
       "id": "DOGE-Reversal-1795819527160",
       "symbol": "DOGE",
@@ -3468,49 +3466,34 @@
       "engine": "Reversal",
       "counter_trend": false,
       "direction": "bearish",
-      "style": "intraday",
-      "entry_kind": "pending",
       "entry": 0.057601232,
       "sl": 0.0580885305,
       "tp1": 0.056266666666666666,
       "tp2": 0.056256,
-      "rr1": 2.73870191131995,
-      "rr2": 2.7605913008146143,
+      "r_realized": 2.0540264334899625,
+      "mae_r": 0.9640251303872235,
+      "mfe_r": 2.9021882891082376,
+      "forensic_category": "genuine_variance",
       "confidence": 0.835953200472594,
       "grade": "A+",
-      "confluences": [
-        "1H liquidity sweep",
-        "15M CHoCH",
-        "OTE retracement entry"
-      ],
+      "grade_raw": "A+",
+      "score_raw": 0.835953200472594,
       "regime_at_entry": {
         "trend_strength": 27.40291093996948,
         "volatility_pctl": 52.5,
         "macro_bias": "bearish"
       },
-      "sl_anchor_tf": "15m",
-      "entry_filled": true,
-      "pending_bars": 2,
-      "status": "active",
-      "created_ts": 1795819527160,
-      "filled_ts": 1795820400000,
-      "mae_r": 0.9640251303872235,
-      "mfe_r": 2.6867146112701126,
-      "resolution_logic_version": "1.1.0",
+      "regime_src": "entry",
+      "resolved_ts": 1795872600000,
+      "result": "win",
+      "style": "intraday",
+      "entry_kind": "pending",
       "exit_model": "managed",
-      "score_raw": 0.835953200472594,
-      "grade_raw": "A+",
-      "tg_message_id": 10988,
-      "_last_checked_t": 1795871700000,
-      "active_sl": 0.0575493908912,
-      "be_armed": true,
-      "partial_done": true,
-      "banked_r": 0.6846754778299875,
-      "tp1_hit": false,
-      "be_ts": 1795842000000,
-      "partial_ts": 1795842000000
+      "tp1_hit": true,
+      "resolution_logic_version": "1.1.0"
     }
   ],
+  "active_signals": [],
   "macro_events": [],
-  "last_run_ts": 1795872641149
+  "last_run_ts": 1795873527165
 }
